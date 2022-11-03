@@ -27,7 +27,14 @@
         </MudTd>
         <MudTd DataLabel="Project">
             <MudLink Href="@context.ProjectsLink" Underline="Underline.None">
-                @context.ActiveProjectName
+                @if(context.ActiveProjectName == string.Empty)
+                {
+                    <span>None</span>
+                }
+                else
+                {
+                    <span>@context.ActiveProjectName</span>
+                }
             </MudLink>
         </MudTd>
     </RowTemplate>

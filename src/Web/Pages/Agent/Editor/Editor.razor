@@ -5,7 +5,7 @@
 
 <PageTitle>Atomy - Editor</PageTitle>
 
-<MudGrid hidden="@(_projectMeta != null)">	
+<MudGrid hidden="@(_projectMeta?.IsActive != false)">	
 	<MudItem xs="12">
 		<MudCard>
 			<MudCardHeader>
@@ -23,6 +23,8 @@
 	</MudItem>
 </MudGrid>
 <Atomy.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
+@if(_projectMeta?.IsActive != false)
+{
 <MudToolBar Class="px-0" hidden="@(_projectMeta == null)">
 	<MudText Typo="Typo.h5">@_projectMeta?.Name</MudText>
 	<MudSpacer />
@@ -83,3 +85,4 @@
 		</MudCard>
 	</MudItem>
 </MudGrid>
+}
