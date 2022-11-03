@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Components;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Atomy.Web.Services;
 using Atomy.Web.Services.Agent;
 using Atomy.Web.Shared.Models;

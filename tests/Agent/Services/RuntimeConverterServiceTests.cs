@@ -1,11 +1,12 @@
 using System.Globalization;
 using Atomy.Agent.Services;
 using Atomy.Agent.Tests.Dummies;
-using Atomy.SDK;
-using Atomy.SDK.DAL;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Data.DAL;
+using Atomy.SDK.Common.Ports;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Atomy.SDK.Projects;
+using Atomy.SDK.Common;
 
 #nullable disable
 

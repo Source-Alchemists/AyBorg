@@ -1,10 +1,11 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Atomy.Agent.Runtime;
-using Atomy.SDK;
-using Atomy.SDK.Ports;
-using Atomy.SDK.Runtime;
-using Atomy.SDK.MQTT;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.System.Runtime;
+using Atomy.SDK.Communication.MQTT;
+using Atomy.SDK.Common;
+using Atomy.SDK.Projects;
 
 namespace Atomy.Agent.Tests.Runtime;
 

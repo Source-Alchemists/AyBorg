@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Components;
-using Atomy.SDK;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Atomy.Web.Services;
 using Atomy.Web.Services.Agent;
 using Atomy.Web.Shared.Modals;
 using MudBlazor;
 using Atomy.Web.Shared.Models;
+using Atomy.SDK.Projects;
 
 namespace Atomy.Web.Pages.Agent.Projects;
 

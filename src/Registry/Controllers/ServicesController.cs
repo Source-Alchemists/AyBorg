@@ -1,4 +1,4 @@
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Atomy.ServiceRegistry.Services;
 using Microsoft.AspNetCore.Mvc;
 

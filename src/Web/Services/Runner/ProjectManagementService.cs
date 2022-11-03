@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
-using Atomy.SDK;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
+using Atomy.SDK.Projects;
 
 namespace Atomy.Web.Services.Agent;
 

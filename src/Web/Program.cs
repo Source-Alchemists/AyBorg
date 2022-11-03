@@ -8,8 +8,8 @@ using Atomy.Web.Areas.Identity;
 using Atomy.Web.Services.Agent;
 using Atomy.Web.Services;
 using Atomy.Database.Data;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Mapper;
+using Atomy.SDK.Communication.MQTT;
+using Atomy.SDK.System.Mapper;
 using Atomy.Web;
 using Atomy.SDK.Authorization;
 
@@ -66,7 +66,7 @@ builder.Services.AddHttpClient<PluginsService>();
 builder.Services.AddHttpClient<IFlowService, FlowService>();
 builder.Services.AddHttpClient<IRuntimeService>();
 
-builder.Services.AddHostedService<Atomy.SDK.Services.RegistryService>();
+builder.Services.AddHostedService<Atomy.SDK.System.Services.RegistryService>();
 
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
 builder.Services.AddSingleton<IAgentCacheService, AgentCacheService>();

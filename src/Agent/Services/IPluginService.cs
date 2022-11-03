@@ -1,5 +1,5 @@
-﻿using Atomy.SDK;
-using Atomy.SDK.DAL;
+﻿using Atomy.SDK.Common;
+using Atomy.SDK.Data.DAL;
 
 namespace Atomy.Agent.Services
 {

@@ -2,12 +2,12 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Atomy.Agent.Hubs;
 using Atomy.Agent.Services;
-using Atomy.SDK;
-using Atomy.SDK.Mapper;
-using Atomy.SDK.Services;
+using Atomy.SDK.System.Mapper;
 using Atomy.Database.Data;
-using Atomy.SDK.MQTT;
 using Atomy.SDK.Authorization;
+using Atomy.SDK.System.Services;
+using Atomy.SDK.Common;
+using Atomy.SDK.Communication.MQTT;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +35,7 @@ builder.Services.AddHostedService<RegistryService>();
 
 builder.Services.AddMemoryCache();
 
-builder.Services.AddSingleton<IEnvironment, Atomy.SDK.Environment>();
+builder.Services.AddSingleton<IEnvironment, Atomy.SDK.Common.Environment>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
 builder.Services.AddSingleton<IRuntimeConverterService, RuntimeConverterService>();

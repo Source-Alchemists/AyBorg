@@ -1,13 +1,14 @@
 using Atomy.Database.Data;
 using Atomy.Agent.Services;
-using Atomy.SDK;
-using Atomy.SDK.DAL;
-using Atomy.SDK.Mapper;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Data.DAL;
+using Atomy.SDK.System.Mapper;
+using Atomy.SDK.Common.Ports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Atomy.SDK.Common;
+using Atomy.SDK.Projects;
 
 namespace Atomy.Agent.Tests;
 

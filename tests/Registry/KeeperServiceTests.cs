@@ -1,5 +1,5 @@
 using Atomy.ServiceRegistry.Services;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Atomy.ServiceRegistry.Mapper;

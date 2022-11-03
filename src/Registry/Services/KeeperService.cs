@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
 using Atomy.ServiceRegistry.Models;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Atomy.ServiceRegistry.Mapper;
 using Atomy.Database.Data;
 

@@ -1,7 +1,8 @@
 using Atomy.Agent.Hubs;
 using Atomy.Agent.Services;
-using Atomy.SDK;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Projects;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 

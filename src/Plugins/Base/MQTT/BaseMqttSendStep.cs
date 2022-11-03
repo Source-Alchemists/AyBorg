@@ -1,8 +1,7 @@
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
-using Atomy.SDK;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Communication.MQTT;
 
 namespace Atomy.Plugins.Base.MQTT;
 

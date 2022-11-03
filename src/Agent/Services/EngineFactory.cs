@@ -1,7 +1,7 @@
 using Atomy.Agent.Runtime;
-using Atomy.SDK;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Runtime;
+using Atomy.SDK.Communication.MQTT;
+using Atomy.SDK.Projects;
+using Atomy.SDK.System.Runtime;
 
 namespace Atomy.Agent.Services;
 

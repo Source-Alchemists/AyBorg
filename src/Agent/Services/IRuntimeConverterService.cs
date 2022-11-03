@@ -1,6 +1,6 @@
-using Atomy.SDK;
-using Atomy.SDK.DAL;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Data.DAL;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Projects;
 
 namespace Atomy.Agent.Services;
 

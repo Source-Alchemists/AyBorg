@@ -1,5 +1,5 @@
 using Atomy.Database.Data;
-using Atomy.SDK.Mapper;
+using Atomy.SDK.System.Mapper;
 using Atomy.ServiceRegistry.Mapper;
 using Atomy.ServiceRegistry.Services;
 using Microsoft.EntityFrameworkCore;

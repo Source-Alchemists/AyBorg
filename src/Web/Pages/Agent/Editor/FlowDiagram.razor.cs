@@ -5,10 +5,10 @@ using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
 using MudBlazor;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Atomy.Web.Pages.Agent.Editor.Nodes;
 using Atomy.Web.Services.Agent;
-using Atomy.SDK.MQTT;
+using Atomy.SDK.Communication.MQTT;
 using Atomy.Web.Services;
 using Atomy.Web.Shared.Modals;
 
@@ -221,7 +221,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         FlowPort targetPort = null!;
 
         // Just basic validation, the rest is done in the backend
-        if (fp1.Port.Direction == SDK.PortDirection.Output)
+        if (fp1.Port.Direction == SDK.Common.Ports.PortDirection.Output)
         {
             sourcePort = fp1;
             targetPort = fp2;

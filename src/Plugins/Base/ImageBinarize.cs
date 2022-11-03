@@ -1,7 +1,7 @@
 using System.Globalization;
-using Atomy.SDK;
 using Atomy.SDK.ImageProcessing;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Common;
 
 namespace Atomy.Plugins.Base;
 

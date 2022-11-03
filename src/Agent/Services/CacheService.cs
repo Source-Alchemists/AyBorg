@@ -1,9 +1,10 @@
 using Microsoft.Extensions.Caching.Memory;
-using Atomy.SDK.DTOs;
-using Atomy.SDK.Mapper;
-using Atomy.SDK.Ports;
-using Atomy.SDK;
-using Atomy.SDK.Caching;
+using Atomy.SDK.Data.DTOs;
+using Atomy.SDK.System.Mapper;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Projects;
+using Atomy.SDK.System.Caching;
+using Atomy.SDK.Common;
 
 namespace Atomy.Agent.Services;
 

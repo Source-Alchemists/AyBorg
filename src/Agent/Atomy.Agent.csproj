@@ -20,10 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SDK\src\Atomy.SDK.csproj" />
     <ProjectReference Include="..\SDK\database\Atomy.Database.Data\Atomy.Database.Data.csproj" />
     <ProjectReference Include="..\SDK\database\migrations\Atomy.Database.Migrations.SqlLite\Atomy.Database.Migrations.SqlLite.csproj" />
     <ProjectReference Include="..\SDK\database\migrations\Atomy.Database.Migrations.PostgreSql\Atomy.Database.Migrations.PostgreSql.csproj" />
+    <ProjectReference Include="..\SDK\src\Common\Atomy.SDK.Common.csproj" />
+    <ProjectReference Include="..\SDK\src\System\Atomy.SDK.System.csproj" />
+    <ProjectReference Include="..\SDK\src\Authorization\Atomy.SDK.Authorization.csproj" />
+    <ProjectReference Include="..\SDK\src\Communication\MQTT\Atomy.SDK.Communication.MQTT.csproj" />
   </ItemGroup>
 
   <ItemGroup>

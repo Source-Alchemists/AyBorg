@@ -1,6 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.SignalR.Client;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Newtonsoft.Json;
 using System.Text;
 

@@ -1,7 +1,6 @@
 using Atomy.Agent.Runtime;
-using Atomy.SDK;
-using Atomy.SDK.Ports;
-using Moq;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Agent.Tests.Runtime;
 

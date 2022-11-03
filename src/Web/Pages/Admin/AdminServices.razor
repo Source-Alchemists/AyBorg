@@ -1,7 +1,7 @@
 @page "/admin/services"
 @attribute [Authorize(Roles = Roles.Administrator)]
 @using SDK.Authorization
-@using SDK.DTOs
+@using SDK.Data.DTOs
 @inject Atomy.Web.Services.IRegistryService registryService
 
 <PageTitle>Atomy - Admin/Services</PageTitle>

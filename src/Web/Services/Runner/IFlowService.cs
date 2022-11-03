@@ -1,5 +1,5 @@
-using Atomy.SDK.DTOs;
-using Atomy.SDK.MQTT;
+using Atomy.SDK.Data.DTOs;
+using Atomy.SDK.Communication.MQTT;
 using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Atomy.Web.Services.Agent;

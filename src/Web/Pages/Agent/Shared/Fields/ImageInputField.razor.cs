@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Atomy.SDK.ImageProcessing.Encoding;
 
 namespace Atomy.Web.Pages.Agent.Shared.Fields;

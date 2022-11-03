@@ -1,5 +1,5 @@
-using Atomy.SDK.DTOs;
-using Atomy.SDK.Runtime;
+using Atomy.SDK.Data.DTOs;
+using Atomy.SDK.System.Runtime;
 
 namespace Atomy.Web.Shared.Models;
 

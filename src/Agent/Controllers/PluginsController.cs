@@ -1,7 +1,7 @@
 ﻿using Atomy.Agent.Services;
 using Atomy.SDK.Authorization;
-using Atomy.SDK.DTOs;
-using Atomy.SDK.Mapper;
+using Atomy.SDK.Data.DTOs;
+using Atomy.SDK.System.Mapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Atomy.Agent.Controllers;

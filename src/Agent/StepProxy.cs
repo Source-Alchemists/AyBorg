@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
-using Atomy.SDK;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Agent;
 

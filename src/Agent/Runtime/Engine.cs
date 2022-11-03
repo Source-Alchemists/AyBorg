@@ -1,6 +1,8 @@
-using Atomy.SDK;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Runtime;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Communication.MQTT;
+using Atomy.SDK.Projects;
+using Atomy.SDK.System.Runtime;
 
 namespace Atomy.Agent.Runtime;
 

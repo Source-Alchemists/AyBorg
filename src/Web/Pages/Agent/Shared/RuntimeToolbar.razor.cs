@@ -2,8 +2,8 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using MQTTnet;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Runtime;
+using Atomy.SDK.Communication.MQTT;
+using Atomy.SDK.System.Runtime;
 using Atomy.Web.Services.Agent;
 
 

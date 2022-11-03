@@ -1,5 +1,5 @@
-using Atomy.SDK.Caching;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.System.Caching;
+using Atomy.SDK.Data.DTOs;
 using Microsoft.Extensions.Caching.Memory;
 
 namespace Atomy.Web.Services.Agent;

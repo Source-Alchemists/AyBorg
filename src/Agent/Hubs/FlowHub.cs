@@ -1,5 +1,5 @@
-using Atomy.SDK.Mapper;
-using Atomy.SDK.Ports;
+using Atomy.SDK.System.Mapper;
+using Atomy.SDK.Common.Ports;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Atomy.Agent.Hubs;
