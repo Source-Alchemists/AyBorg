@@ -1,0 +1,22 @@
+﻿<MudDialog>
+    <DialogContent>
+        <MudTextField Label="Project name" @bind-Value="_newProject.Name" Required="true" />
+        @if(_errors.Any())
+        {
+            <MudAlert Severity="Severity.Error" Class="mud-my-2">
+                <MudList>
+                    @foreach (var error in _errors)
+                    {
+                        <MudListItem>
+                            <MudText>@error</MudText>
+                        </MudListItem>
+                    }
+                </MudList>
+            </MudAlert>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="@OnCloseClicked">Close</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@OnValidSubmit">Create</MudButton>
+    </DialogActions>
+</MudDialog>

@@ -1,0 +1,56 @@
+﻿@using Microsoft.AspNetCore.Components.Web
+@namespace Atomy.Web.Pages
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+<!DOCTYPE html>
+<html lang="en" data-color>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="~/" />
+
+    <!-- Material CSS -->
+    <link href="css/material.min.css" rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap" rel="stylesheet" />
+    <link href="_content/MudBlazor/MudBlazor.min.css" rel="stylesheet" />
+
+    <link href="fonts/style.css" rel="stylesheet">
+    <link href="fonts/icon.css" rel="stylesheet">
+	
+    <link href="_content/Z.Blazor.Diagrams/style.min.css" rel="stylesheet" />
+    <link href="_content/Z.Blazor.Diagrams/default.styles.min.css" rel="stylesheet" />
+
+    <link href="css/colors.css" rel="stylesheet" />
+    <link href="css/backbone.css" rel="stylesheet" />
+    <link href="css/styles.css" rel="stylesheet" />
+	
+    <script>
+    function switchTheme(dark) {
+            const Tag = document.documentElement;
+            dark ? Tag.dataset.color = 'dark' : Tag.dataset.color = '';
+        }
+    </script>
+
+    <component type="typeof(HeadOutlet)" render-mode="ServerPrerendered" />
+</head>
+<body>
+    <script src="_content/MudBlazor/MudBlazor.min.js"></script>
+    <script src="_content/Z.Blazor.Diagrams/script.min.js"></script>
+	
+    @RenderBody()
+
+    <div id="blazor-error-ui">
+        <environment include="Staging,Production">
+            An error has occurred. This application may no longer respond until reloaded.
+        </environment>
+        <environment include="Development">
+            An unhandled exception has occurred. See browser dev tools for details.
+        </environment>
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+
+    <script src="_framework/blazor.server.js"></script>
+</body>
+</html>

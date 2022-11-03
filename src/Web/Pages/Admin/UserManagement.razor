@@ -1,0 +1,67 @@
+@page "/admin/usermanagement"
+@using SDK.Authorization
+@attribute [Authorize(Roles = Roles.Administrator)]
+
+<PageTitle>Atomy - Admin/User Management</PageTitle>
+
+<MudGrid class="pt-6">
+    <MudItem xs="12">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudIcon Icon="@Icons.Filled.ManageAccounts" Size="Size.Large" />
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Accounts</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox" Color="Color.Primary" OnClick="@OnAddAccountClicked">Add Account</MudButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTable Items="@_users" Hover="true" Elevation="0">
+                    <HeaderContent>
+                        <MudTh>Account</MudTh>
+                        <MudTh>Email</MudTh>
+                        <MudTh>Access failed count</MudTh>
+                        <MudTh>Lockout enabled</MudTh>
+                        <MudTh>Lockout end</MudTh>
+                        <MudTh Style="width: 100px">Actions</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Account">@context.UserName</MudTd>
+                        <MudTd DataLabel="Email">@context.Email</MudTd>
+                        <MudTd DataLabel="Access failed count">@context.AccessFailedCount</MudTd>
+                        <MudTd DataLabel="Lockout enabled">@context.LockoutEnabled</MudTd>
+                        <MudTd DataLabel="Lockout end">@context.LockoutEnd</MudTd>
+                        <MudTd>
+                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
+                                <MudMenuItem Icon="@Icons.Filled.Edit" @onclick="() => OnEditAccountClicked(context)">
+                                    Edit
+                                </MudMenuItem>
+                                @if(!@context.UserName.Equals("SystemAdmin"))
+                                {
+                                    <MudMenuItem Icon="@Icons.Filled.Password" @onclick="() => OnResetPasswordClicked(context)">
+                                        Reset Password
+                                    </MudMenuItem>
+                                }
+                                @if(@context.LockoutEnd != null && @context.LockoutEnd > DateTime.UtcNow)
+                                {
+                                    <MudMenuItem Icon="@Icons.Filled.LockOpen" IconColor="Color.Warning" @onclick="() => OnUnlockAccountClicked(context)">
+                                        Unlock
+                                    </MudMenuItem>
+                                } 
+                                else if(!@context.UserName.Equals("SystemAdmin"))
+                                {
+                                    <MudMenuItem Icon="@Icons.Filled.Lock" IconColor="Color.Warning" @onclick="() => OnLockAccountClicked(context)">
+                                        Lock
+                                    </MudMenuItem>
+                                }
+                            </MudMenu>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>

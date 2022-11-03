@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Version>0.1.0</Version>
+    <UserSecretsId>aspnet-Atomy.Web-bcaead62-bf10-4a90-9b18-201f697037ae</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Blazored.LocalStorage" Version="4.2.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="6.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="6.0.8" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="6.0.10" />
+    <PackageReference Include="MudBlazor" Version="6.0.17" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.8">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\SDK\src\Atomy.SDK.csproj" />
+    <ProjectReference Include="..\SDK\database\Atomy.Database.Data\Atomy.Database.Data.csproj" />
+    <ProjectReference Include="..\SDK\database\migrations\Atomy.Database.Migrations.SqlLite\Atomy.Database.Migrations.SqlLite.csproj" />
+    <ProjectReference Include="..\SDK\database\migrations\Atomy.Database.Migrations.PostgreSql\Atomy.Database.Migrations.PostgreSql.csproj" />
+    <ProjectReference Include="..\Blazor.Diagrams\src\Blazor.Diagrams\Blazor.Diagrams.csproj" />
+  </ItemGroup>
+
+</Project>

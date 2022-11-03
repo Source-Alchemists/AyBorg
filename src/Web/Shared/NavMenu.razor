@@ -1,0 +1,41 @@
+﻿@using SDK.Authorization
+@* <MudNavLink Href="dashboard" Icon="@Icons.Filled.Dashboard" Match="NavLinkMatch.All">
+    Dashboard
+</MudNavLink> *@
+
+<AuthorizeView Roles="Administrator, Engineer">
+    <Authorized>
+        <MudNavGroup Title="Agents" Icon="@Icons.Filled.Workspaces" Expanded="true">
+            <MudNavLink Href="agents/overview"  Match="NavLinkMatch.All">
+                Overview
+            </MudNavLink>
+            @if(StateService.AgentState != null)
+            {
+                <MudNavGroup Title="@StateService.AgentState.Name" Icon="@Icons.Outlined.Workspaces" Expanded="true">
+                    <MudNavLink Href="@StateService.AgentState.EditorLink">
+                        Editor
+                    </MudNavLink>
+                    <MudNavLink Href="@StateService.AgentState.ProjectsLink">
+                        Projects
+                    </MudNavLink>
+                </MudNavGroup>
+            }
+        </MudNavGroup>
+    </Authorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="@Roles.Administrator">
+        <Authorized>
+            <MudNavGroup Title="Administration" Icon="@Icons.Filled.AdminPanelSettings" Expanded="true">
+                @* <MudNavLink Href="admin" Match="NavLinkMatch.All">
+                    Dashboard
+                </MudNavLink> *@
+                <MudNavLink Href="admin/services" Match="NavLinkMatch.Prefix">
+                    Services
+                </MudNavLink>
+                <MudNavLink Href="admin/usermanagement" Match="NavLinkMatch.All">
+                    User Management
+                </MudNavLink>
+            </MudNavGroup>
+    </Authorized>
+</AuthorizeView>

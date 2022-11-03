@@ -1,0 +1,67 @@
+@page "/admin/services"
+@attribute [Authorize(Roles = Roles.Administrator)]
+@using SDK.Authorization
+@using SDK.DTOs
+@inject Atomy.Web.Services.IRegistryService registryService
+
+<PageTitle>Atomy - Admin/Services</PageTitle>
+
+@if (serviceEntries == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <MudGrid class="pt-6">
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudIcon Icon="@Icons.Filled.MiscellaneousServices" Size="Size.Large" />
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+				        <MudText Typo="Typo.h6">Services</MudText>
+                    </CardHeaderContent>
+                    <CardHeaderActions>
+                        <MudIconButton Icon="@Icons.Material.Filled.Sync" Color="Color.Primary" OnClick="@OnRefreshAsync" Loading="@isRefreshing" />
+                    </CardHeaderActions>
+			    </MudCardHeader>
+                <MudCardContent>
+                    <MudTable Items="@serviceEntries" Hover="true" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>Name</MudTh>
+                            <MudTh>Unique name</MudTh>
+                            <MudTh>Url</MudTh>
+                            <MudTh>Version</MudTh>
+                            <MudTh>Type</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Name">@context.Name</MudTd>
+                            <MudTd DataLabel="Unique name">@context.UniqueName</MudTd>
+                            <MudTd DataLabel="Url">@context.Url</MudTd>
+                            <MudTd DataLabel="Version">@context.Version</MudTd>
+                            <MudTd DataLabel="Type">@context.Type</MudTd>
+                        </RowTemplate>
+                    </MudTable>
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    </MudGrid>
+}
+
+@code  {
+        private IEnumerable<ServiceRegistryEntryDto>? serviceEntries;
+        private bool isRefreshing = false;
+
+        protected override async Task OnInitializedAsync()
+        {
+            serviceEntries = await registryService.ReceiveAllAvailableServicesAsync();
+        }
+
+        private async Task OnRefreshAsync()
+        {
+            isRefreshing = true;
+            serviceEntries = await registryService.ReceiveAllAvailableServicesAsync();
+            isRefreshing = false;
+        }
+}

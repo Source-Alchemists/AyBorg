@@ -1,0 +1,25 @@
+@using System.ComponentModel.DataAnnotations
+<MudDialog Style="min-width: 400px">
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors">
+            <MudTextField T="string" Label="Account name" Text="@User.UserName" Disabled />
+            <MudTextField T="string" Label="Email" @bind-Text="@_userEmail" Required="false"
+                Validation="@(new EmailAddressAttribute() {ErrorMessage = "Invalid email address!"})" />
+            <MudCard Outlined="true" class="my-2">
+                <MudCardHeader class="pb-0">
+                    <MudText Typo="Typo.h6">Roles</MudText>
+                </MudCardHeader>
+                <MudCardContent class="pt-0">
+                    @foreach (var role in _roles)
+                    {
+                        <MudCheckBox @bind-Checked="@role.Checked" Label="@role.IdentityRole.Name" Disabled="@role.Disabled"/>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="OnCancelClicked">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="OnApplyClicked">Apply</MudButton>
+    </DialogActions>
+</MudDialog>

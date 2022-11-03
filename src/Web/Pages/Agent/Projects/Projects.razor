@@ -1,0 +1,51 @@
+@page "/agents/projects/{serviceId}"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+
+<PageTitle>Atomy - Projects</PageTitle>
+
+<Atomy.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
+<MudGrid class="pt-6">
+    @if(_draftProjects.Any()) {
+    <MudItem xs="12">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Medium" Color="Color.Warning" />
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+				    <MudText Typo="Typo.h6">Draft</MudText>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox" Color="Color.Primary" OnClick="@OnNewProjectClicked">New Project</MudButton>
+                </CardHeaderActions>
+			</MudCardHeader>
+            <MudCardContent>
+                <ProjectsTable 
+                    Projects="@_draftProjects" 
+                    OnProjectActivateClicked="@OnActivateProjectClicked" 
+                    OnProjectDeleteClicked="@OnProjectDeleteClicked"
+                    OnProjectSaveAsReady="@OnSaveAsReadyClicked" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    }
+    <MudItem xs="12">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Medium" Color="Color.Info" />
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+				    <MudText Typo="Typo.h6">Ready</MudText>
+                </CardHeaderContent>
+			</MudCardHeader>
+            <MudCardContent>
+                <ProjectsTable 
+                    Projects="@_readyProjects" 
+                    OnProjectActivateClicked="@OnActivateProjectClicked" 
+                    OnProjectDeleteClicked="@OnProjectDeleteClicked" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>

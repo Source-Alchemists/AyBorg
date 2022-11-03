@@ -1,0 +1,43 @@
+<MudButtonGroup Variant="Variant.Filled" OverrideStyles="false" Class="w50" >
+    @if(!_isStopVisible && !_isAbortVisible)
+    {
+    <MudButton Color="Color.Info" Variant="Variant.Filled" Class="w50" OnClick="@OnSingleRunClicked" Disabled="@_areButtonsDisabled">
+        @if (_isButtonLoading)
+        {
+            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+        }
+        <MudIcon Icon="@Icons.Filled.PlayArrow" />
+        <span>Single</span>
+    </MudButton>
+    <MudButton Color="Color.Primary" Variant="Variant.Filled" Class="w50" OnClick="@OnContinuousRunClicked" Disabled="@_areButtonsDisabled">
+        @if (_isButtonLoading)
+        {
+            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+        }
+        <MudIcon Icon="@Icons.Filled.PlayCircle" />
+        <span>Continuous</span>
+    </MudButton>
+    }
+    @if(_isStopVisible)
+    {
+    <MudButton Color="Color.Secondary" Variant="Variant.Filled" Class="@_stopClass" OnClick="@OnStopClicked" Disabled="@_areButtonsDisabled">
+        @if (_isButtonLoading)
+        {
+            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+        }
+        <MudIcon Icon="@Icons.Filled.Stop" />
+        <span>Stop</span>
+    </MudButton>
+    }
+    @if(_isAbortVisible)
+    {
+    <MudButton Color="Color.Warning" Variant="Variant.Filled" Class="mud-full-width" OnClick="@OnAbortClicked" Disabled="@_areButtonsDisabled">
+        @if (_isButtonLoading)
+        {
+            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
+        }
+        <MudIcon Icon="@Icons.Filled.StopCircle" />
+        <span>Abort</span>
+    </MudButton>
+    }
+</MudButtonGroup>

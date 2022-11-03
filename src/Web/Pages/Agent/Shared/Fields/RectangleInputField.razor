@@ -1,0 +1,42 @@
+@inherits BaseInputField
+
+<div Class="flow-node-field">
+    <MudText>@Port.Name</MudText>
+    @if (_isEditableField)
+    {
+        @if (!_isXEditing)
+        {
+            <EditFieldButton Label="X" Value="@_value.X" IsLinkConvertable="@Port.IsLinkConvertable"
+        Clicked="@OnXClicked" />
+        }
+        <div Class="mud-full-width"  hidden="@(!_isXEditing)">
+            <MudNumericField @bind-Value="@_value.X" Class="flow-input-body" OnKeyUp="@OnKeyUp" OnBlur="@OnFocusOut" />
+        </div>
+        @if (!_isYEditing)
+        {
+            <EditFieldButton Label="Y" Value="@_value.Y" IsLinkConvertable="@Port.IsLinkConvertable"
+        Clicked="@OnYClicked" />
+        }
+        <div Class="mud-full-width"  hidden="@(!_isYEditing)">
+            <MudNumericField @bind-Value="@_value.Y" Class="flow-input-body" OnKeyUp="@OnKeyUp" OnBlur="@OnFocusOut" />
+        </div>
+        @if (!_isWidthEditing)
+        {
+            <EditFieldButton Label="Width" Value="@_value.Width" IsLinkConvertable="@Port.IsLinkConvertable"
+        Clicked="@OnWidthClicked" />
+        }
+        <div Class="mud-full-width"  hidden="@(!_isWidthEditing)">
+            <MudNumericField @bind-Value="@_value.Width" Class="flow-input-body" OnKeyUp="@OnKeyUp"
+            OnBlur="@OnFocusOut" />
+        </div>
+        @if (!_isHeightEditing)
+        {
+            <EditFieldButton Label="Height" Value="@_value.Height" IsLinkConvertable="@Port.IsLinkConvertable"
+        Clicked="@OnHeightClicked" />
+        }
+        <div lass="mud-full-width"  hidden="@(!_isHeightEditing)">
+            <MudNumericField @bind-Value="@_value.Height" Class="flow-input-body" OnKeyUp="@OnKeyUp"
+            OnBlur="@OnFocusOut" />
+        </div>
+    }
+</div>

@@ -1,0 +1,31 @@
+@using System.ComponentModel.DataAnnotations
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors">
+            <MudTextField T="string" @bind-Text="@_userName" Label="Account name" Required="true" RequiredError="Account name is required!" />
+            <MudTextField T="string" @bind-Text="@_userEmail" Label="Email" Required="false"
+                Validation="@(new EmailAddressAttribute() {ErrorMessage = "Invalid email address!"})" />
+            <MudCard Outlined="true" class="my-2">
+                <MudCardHeader class="pb-0">
+                    <MudText Typo="Typo.h6">Roles</MudText>
+                </MudCardHeader>
+                <MudCardContent class="pt-0">
+                    @foreach (var role in _roles)
+                    {
+                        <MudCheckBox @bind-Checked="@role.Checked" Label="@role.IdentityRole.Name"/>
+                    }
+                </MudCardContent>
+            </MudCard>
+        </MudForm>
+        <MudAlert Severity="Severity.Info" class="mb-1"><strong>Password:</strong> @_password <MudIconButton Icon="@Icons.Filled.ContentCopy" Color="Color.Info" OnClick="@OnCopyToClipboardClicked" /></MudAlert>
+        <MudAlert Severity="Severity.Warning">Make sure to copy the password. It is never displayed again!</MudAlert>
+        @foreach (var error in _serviceErrors)
+        {
+            <MudText Color="Color.Error">@error</MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="@OnCancelClicked">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@OnAddClicked">Add</MudButton>
+    </DialogActions>
+</MudDialog>

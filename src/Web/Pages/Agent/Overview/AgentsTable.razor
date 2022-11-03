@@ -1,0 +1,34 @@
+@using Atomy.SDK.Runtime
+<MudTable Items="@Agents" Hover="true" Elevation="0">
+    <HeaderContent>
+        <MudTh Style="width: 33%">State</MudTh>
+        <MudTh Style="width: 33%">Name</MudTh>
+        <MudTh Style="width: 33%">Project</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="State">
+            @if (@context.Status == null)
+            {
+                <span>Idle</span>
+            } 
+            else if(@context.Status.State != EngineState.Running)
+            {
+                <span>Idle (Since: @context.Status.StoppedAt)</span>
+            } 
+            else
+            {
+                <span>Active (Since: @context.Status.StartedAt)</span>
+            }
+        </MudTd>
+        <MudTd DataLabel="Name">
+            <MudLink Href="@context.EditorLink" Underline="Underline.None">
+                @context.Name
+            </MudLink>
+        </MudTd>
+        <MudTd DataLabel="Project">
+            <MudLink Href="@context.ProjectsLink" Underline="Underline.None">
+                @context.ActiveProjectName
+            </MudLink>
+        </MudTd>
+    </RowTemplate>
+</MudTable>

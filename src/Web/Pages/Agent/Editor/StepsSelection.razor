@@ -1,0 +1,40 @@
+@using SDK.DTOs
+@inject Atomy.Web.Services.IRegistryService registryService
+@inject Atomy.Web.Services.Agent.PluginsService AgentPluginsService;
+
+<MudList Clickable="true">
+    <MudListSubheader>
+        Drag & drop to the automation flow
+    </MudListSubheader>
+    @foreach(var step in _availableSteps)
+    {
+        <MudListItem Icon="@Icons.Filled.DragIndicator" IconColor="Color.Primary" draggable="true" @ondragstart="(args) => OnDragStart(args, step)">
+            <MudText>@step.Name</MudText>
+        </MudListItem>
+    }
+</MudList>
+
+@code {
+    private string _baseUrl = string.Empty;
+    private IEnumerable<StepDto> _availableSteps = new List<StepDto>();
+
+    [Parameter]
+	public string ServiceId { get; set; } = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var services = await registryService.ReceiveAllAvailableServicesAsync();
+		_baseUrl = registryService.GetUrl(services, ServiceId);
+		if (_baseUrl == string.Empty) {
+			return;
+		}
+		_availableSteps = await AgentPluginsService.ReceiveStepsAsync(_baseUrl);
+        await base.OnParametersSetAsync();
+    }
+
+    private async Task OnDragStart(DragEventArgs args, StepDto step)
+    {
+        DragDropStateHandler.DraggedStep = step;
+        await Task.CompletedTask;
+    }
+}

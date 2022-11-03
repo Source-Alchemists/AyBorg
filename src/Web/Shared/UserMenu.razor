@@ -1,0 +1,21 @@
+﻿<AuthorizeView>
+    <NotAuthorized>
+        <MudLink Href="Identity/Account/Login" Underline="Underline.None">
+            Login
+        </MudLink>
+    </NotAuthorized>
+    <Authorized>
+        <MudMenu Label="@context.User.Identity!.Name" Color="Color.Inherit">
+            <MudLink Href="Identity/Account/Manage/ChangePassword" Underline="Underline.None">
+                <MudMenuItem Icon="@Icons.Filled.Password">
+                    Change password
+                </MudMenuItem>
+            </MudLink>
+            <MudLink Href="Identity/Account/LogOut" Underline="Underline.None">
+                <MudMenuItem Icon="@Icons.Filled.Logout">
+                    Log out
+                </MudMenuItem>
+            </MudLink>
+        </MudMenu>
+    </Authorized>
+</AuthorizeView>

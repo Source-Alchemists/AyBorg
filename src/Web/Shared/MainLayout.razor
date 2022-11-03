@@ -1,0 +1,55 @@
+﻿@inherits LayoutComponentBase
+
+<PageTitle>Atomy</PageTitle>
+
+<MudThemeProvider @bind-IsDarkMode="@_isDarkMode" Theme="_theme"/>
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<AuthorizeView>
+    <Authorized>
+        <MudLayout Class="mud-height-full">
+            <MudDrawerContainer Class="mud-height-full">
+                <MudAppBar Elevation="0">
+                    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+                    <MudSpacer />
+                    <MudIcon Icon="@Icons.Filled.WbSunny" />
+                    <MudSwitch @ref="_themeSwitchRef" T="bool" Checked="@_isDarkMode" CheckedChanged="OnThemeSwitchChanged"></MudSwitch>
+                    <UserMenu />
+                </MudAppBar>
+                
+                <MudDrawer @bind-Open="@_isDrawerOpen" Elevation="0" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+                    <MudDrawerHeader>
+                        <MudText Typo="Typo.h5" hidden="@(!_isDrawerOpen)">Atomy</MudText>
+                    </MudDrawerHeader>
+                    <MudNavMenu Bordered="true">
+                        <NavMenu />
+                    </MudNavMenu>
+                </MudDrawer>
+                
+                <MudMainContent Class="mud-height-full">
+                    <MudContainer Class="mud-height-full py-0" MaxWidth="MaxWidth.ExtraExtraLarge">
+                        @Body
+                    </MudContainer>
+                </MudMainContent>
+            </MudDrawerContainer>
+        </MudLayout>
+    </Authorized>
+
+    <NotAuthorized>
+        <MudLayout Class="mud-height-full">
+            <MudCard style="position:absolute; top:50%; left:50%; transform:translate(-50%, -50%); width:400px">
+                <MudCardHeader>
+                    <MudText Typo="Typo.h6" Align="Align.Center" class="mud-full-width">Welcome to Atomy!</MudText>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText Align="Align.Center" class="mud-full-width">
+                        <MudLink Href="Identity/Account/Login">
+                            Go to login
+                        </MudLink>
+                    </MudText>
+                </MudCardContent>
+            </MudCard>
+        </MudLayout>
+    </NotAuthorized>
+</AuthorizeView>

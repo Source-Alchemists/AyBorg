@@ -1,0 +1,23 @@
+using Atomy.Web.Services;
+using Microsoft.AspNetCore.Components;
+
+namespace Atomy.Web.Shared;
+
+public partial class NavMenu : ComponentBase
+{
+    [Inject] IStateService StateService { get; set; } = null!;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+        if (firstRender)
+        {
+            StateService.OnUpdate += OnUpdate;
+            await StateService.UpdateFromLocalstorageAsync();
+        }
+    }
+
+    private async void OnUpdate()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+}

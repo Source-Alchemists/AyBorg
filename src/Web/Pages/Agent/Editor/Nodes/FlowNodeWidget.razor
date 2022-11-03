@@ -1,0 +1,63 @@
+﻿@using Atomy.Web.Pages.Agent.Shared.Fields
+@using Blazor.Diagrams.Components.Renderers
+@using SDK.Ports
+
+<MudCard Class="@nodeClass">
+	<MudCardHeader Class="flow node title">
+		<MudText>@Node!.Title</MudText>
+	</MudCardHeader>
+	<MudCardContent Class="pt-10 pb-0">
+		@foreach (var port in _outputPorts.Cast<FlowPort>())
+		{
+			<div Class="mud-full-width" Style="height: 40px">
+				<div Style="position: relative; float: right">
+				<MudTooltip Text="@port.Brand.ToString()">
+					<PortRenderer Port="port" class="@GetPortClass(port)"></PortRenderer>
+				</MudTooltip>
+				</div>
+				<span Style="float: right" Class="pt-1">@port.Name</span>
+			</div>
+			
+		}
+		@foreach (var port in _inputPorts.Cast<FlowPort>())
+		{
+			<div Style="position: absolute; float: left; left: -6px">
+				<MudTooltip Text="@port.Brand.ToString()">
+					<PortRenderer Port="port" class="@GetPortClass(port)"></PortRenderer>
+				</MudTooltip>
+			</div>
+			@switch (port.Brand)	
+			{
+				case PortBrand.Numeric:
+					<NumericInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					break;
+				case PortBrand.Boolean:
+					<BooleanInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					break;
+				case PortBrand.String:
+					<StringInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					break;
+				case PortBrand.Folder:
+					<DirectoryInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					break;
+				case PortBrand.Image:
+					<ImageInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					break;
+				case PortBrand.Rectangle:
+					<RectangleInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					break;
+				case PortBrand.Enum:
+					<EnumInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					break;
+				default:
+					break;
+			}
+		}
+	</MudCardContent>
+	<MudCardActions>
+		<div Class="mud-full-width" Style="height: 42px">
+			<MudIconButton Icon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@(OnRemoveNode)" Style="float: left" hidden="@(!Node.Selected)" />
+			<span Style="float: right" Class="pr-3 pt-4">@Node!.Step!.ExecutionTimeMs ms</span>
+		</div>
+	</MudCardActions>
+</MudCard>

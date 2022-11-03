@@ -1,0 +1,19 @@
+@inherits BaseInputField
+
+<div Class="flow-node-field mud-full-width px-1">
+    <span>@Port.Name</span>
+    <div class="mud-width-full" Style="height: 200px">
+        @if (!string.IsNullOrEmpty(_imageUrl) && _imageWidth > 0 && _imageHeight > 0)
+        {
+            <div class="mud-height-full mud-width-full d-flex justify-center">
+                <MudTooltip Text="@_imageTooltip">
+                    <MudImage class="mud-height-full mud-width-full" Src="@_imageUrl" ObjectPosition="ObjectPosition.Center" ObjectFit="ObjectFit.ScaleDown" />
+                </MudTooltip>
+            </div>
+        } 
+        else 
+        {
+            <span>No image</span>
+        }
+    </div>
+</div>

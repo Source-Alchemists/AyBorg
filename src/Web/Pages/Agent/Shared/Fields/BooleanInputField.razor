@@ -1,0 +1,12 @@
+@inherits BaseInputField
+
+<div Class="flow-node-field px-1" Style="height: 50px">
+    <MudGrid>
+        <MudItem xs="8">
+            <MudText Class="pt-1">@Port.Name</MudText>
+        </MudItem>
+        <MudItem xs="4">
+            <MudSwitch T="bool" Checked="@_value" CheckedChanged="OnCheckChanged" Disabled="Port!.IsLinkConvertable" Color="Color.Info" Class="p-0 m-0" />
+        </MudItem>
+    </MudGrid>
+</div>

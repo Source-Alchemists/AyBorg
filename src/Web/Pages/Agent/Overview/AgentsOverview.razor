@@ -1,0 +1,48 @@
+@page "/agents/overview"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+
+<PageTitle>Atomy - Agents</PageTitle>
+
+<MudGrid class="pt-6">
+    <MudItem xs="4">
+        <MudCard>
+            <MudCardHeader>
+				<MudText Typo="Typo.h6">Agents</MudText>
+			</MudCardHeader>
+            <MudCardContent>
+                <MudText Typo="Typo.h4">@AgentOverviewService.AgentsCount</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="4">
+        <MudCard>
+            <MudCardHeader>
+				<MudText Typo="Typo.h6">Active</MudText>
+			</MudCardHeader>
+            <MudCardContent>
+                <MudText Typo="Typo.h4">@AgentOverviewService.ActiveAgentsCount</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="4">
+        <MudCard>
+            <MudCardHeader>
+				<MudText Typo="Typo.h6">Idle</MudText>
+			</MudCardHeader>
+            <MudCardContent>
+                <MudText Typo="Typo.h4">@AgentOverviewService.InactiveAgentsCount</MudText>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12">
+        <MudCard>
+            <MudCardHeader>
+				<MudText Typo="Typo.h6">Agents</MudText>
+			</MudCardHeader>
+            <MudCardContent>
+                <AgentsTable Agents="@AgentOverviewService.AgentServices" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>

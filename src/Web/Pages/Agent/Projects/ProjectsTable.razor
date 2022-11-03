@@ -1,0 +1,75 @@
+@using SDK.DTOs
+<MudTable Items="@Projects" Hover="true" Elevation="0">
+    <HeaderContent>
+        <MudTh Style="width:20px">Active</MudTh>
+        <MudTh>Name</MudTh>
+        <MudTh Style="width:20%" Display="Display.None.TableCell.OnFullHD">Change date</MudTh>
+        <MudTh Style="width:20%" Display="Display.None.TableCell.OnFullHD">Creation date</MudTh>
+        <MudTh Style="width: 200px">Actions</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Active">
+            @if (@context.IsActive)
+            {
+                <MudIcon Icon="@Icons.Filled.Check" />
+            }
+        </MudTd>
+        <MudTd DataLabel="Name">@context.Name</MudTd>
+        <MudTd DataLabel="Change date">@context.UpdatedDate</MudTd>
+        <MudTd DataLabel="Creation date">@context.CreatedDate</MudTd>
+        <MudTd DataLabel="Actions">
+            @if (@context.IsActive)
+            {
+                <MudButton class="mb-4" Variant="Variant.Text" Color="Color.Primary" Disabled>Activate</MudButton>
+            }
+            else
+            {
+                <MudButton class="mb-4" Variant="Variant.Text" Color="Color.Primary" 
+                    @onclick="(args) => OnActivateClicked(args, context)">Activate</MudButton>
+            }
+
+            <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
+                @if (@context.State == SDK.ProjectState.Draft) {
+                    <MudMenuItem Icon="@Icons.Filled.Circle" IconColor="Color.Info" @onclick="(args) => OnSaveAsReady(args, context)">
+                            Save as 'ready'
+                    </MudMenuItem>
+                }
+                <MudMenuItem Icon="@Icons.Filled.DeleteForever" IconColor="Color.Error" @onclick="(args) => OnDeleteClicked(args, context)">
+                    Delete        
+                </MudMenuItem>
+            </MudMenu>
+        </MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public IEnumerable<ProjectMetaDto> Projects { get; set; } = new List<ProjectMetaDto>();
+
+    [Parameter]
+    [EditorRequired]
+    public EventCallback<ProjectMetaDto> OnProjectActivateClicked { get; set; }
+
+    [Parameter]
+    [EditorRequired]
+    public EventCallback<ProjectMetaDto> OnProjectDeleteClicked { get; set; }
+
+    [Parameter]
+    public EventCallback<ProjectMetaDto> OnProjectSaveAsReady { get; set; }
+
+    private async Task OnActivateClicked(EventArgs args, ProjectMetaDto projectDto)
+    {
+        await OnProjectActivateClicked.InvokeAsync(projectDto);
+    }
+
+    private async Task OnDeleteClicked(EventArgs args, ProjectMetaDto projectDto) 
+    {
+        await OnProjectDeleteClicked.InvokeAsync(projectDto);
+    }
+
+    private async Task OnSaveAsReady(EventArgs args, ProjectMetaDto projectDto)
+    {
+        await OnProjectSaveAsReady.InvokeAsync(projectDto);
+    }
+}

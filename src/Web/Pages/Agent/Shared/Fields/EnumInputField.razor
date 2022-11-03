@@ -1,0 +1,10 @@
+@inherits BaseInputField
+
+<div Class="flow-node-field mud-full-width p-1">
+    <MudSelect Label="@Port.Name" T="string" SelectedValues="_selectedNames" SelectedValuesChanged="@OnSelectedValuesChanged" Disabled="Port!.IsLinkConvertable">
+        @foreach(var name in _names)
+        {
+            <MudSelectItem T="string" value="@name">@name</MudSelectItem>
+        }
+    </MudSelect>
+</div>

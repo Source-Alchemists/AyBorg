@@ -1,0 +1,11 @@
+obj/
+bin/
+.vs/
+.fake
+
+*.db
+*.db-shm
+*.db-wal
+
+.DS_Store
+**/.DS_Store

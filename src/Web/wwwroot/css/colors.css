@@ -1,0 +1,18 @@
+:root {
+    --a-theme-flow-node-box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    --a-theme-flow-node-selected-box-shadow: 0 4px 10px var(--mud-palette-primary);
+    --a-theme-flow-node-port-default-color: #8391A2;
+    --a-theme-flow-node-port-field-color: #8391A2;
+    --a-theme-flow-node-port-image-color: #00BCD4;
+    --a-theme-flow-node-port-shape-color: #c100e7;
+}
+
+html[data-color=dark] {
+    --mud-palette-background: #1a1a27ff;
+    --mud-palette-background-grey: #252532;
+    --mud-palette-drawer-background: #1a1a27ff;
+    --mud-palette-appbar-background: #1a1a27cc;
+    --mud-palette-surface: #1e1e2dff;
+    --mud-palette-info: #00BCD4;
+    --mud-palette-info-darken: #00a1b6;
+}

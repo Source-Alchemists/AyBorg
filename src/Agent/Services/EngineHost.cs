@@ -1,0 +1,292 @@
+using System.Text.Json;
+using Atomy.Agent.Runtime;
+using Atomy.SDK;
+using Atomy.SDK.MQTT;
+using Atomy.SDK.Runtime;
+
+namespace Atomy.Agent.Services;
+
+public class EngineHost : IEngineHost
+{
+    private readonly ILogger<EngineHost> _logger;
+    private readonly IEngineFactory _engineFactory;
+    private readonly IMqttClientProvider _mqttClientProvider;
+    private readonly ICacheService _cacheService;
+    private IEngine? _engine;
+    private EngineMeta? _engineMeta;
+    private bool _isDisposed = false;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="EngineHost"/> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="engineFactory">The engine factory.</param>
+    /// <param name="mqttClientProvider">The MQTT client provider.</param>
+    public EngineHost(ILogger<EngineHost> logger, 
+                        IEngineFactory engineFactory, 
+                        IMqttClientProvider mqttClientProvider,
+                        ICacheService cacheService)
+    {
+        _logger = logger;
+        _engineFactory = engineFactory;
+        _mqttClientProvider = mqttClientProvider;
+        _cacheService = cacheService;
+    }
+
+    /// <summary>
+    /// Gets the active project.
+    /// </summary>
+    public Project? ActiveProject { get; private set; }
+
+    /// <summary>
+    /// Tries to activate the specified project.
+    /// </summary>
+    /// <param name="project">The project.</param>
+    public async Task<bool> TryActivateProjectAsync(Project project)
+    {
+        ActiveProject = project;
+        await Task.CompletedTask;
+        return true;
+    }
+
+    /// <summary>
+    /// Tries to deactivate the project.
+    /// </summary>
+    /// <returns></returns>
+    public async Task<bool> TryDeactivateProjectAsync()
+    {
+        if(ActiveProject is null)
+        {
+            _logger.LogTrace("No active project to deactivate.");
+            return true;
+        }
+
+        if(_engine != null)
+        {
+            _engine.Dispose();
+            _engine = null;
+        }
+
+        foreach(var step in ActiveProject.Steps)
+        {
+            step.Dispose();
+        }
+        
+        ActiveProject = null;
+        return await Task.FromResult(true);
+    }
+
+    /// <summary>
+    /// Gets the engine status asynchronous.
+    /// </summary>
+    /// <returns></returns>
+    public async Task<EngineMeta> GetEngineStatusAsync()
+    {
+        if (_engine == null)
+        {
+            _logger.LogTrace("No active engine.");
+            return null!;
+        }
+
+        if(_engineMeta == null)
+        {
+            _logger.LogWarning("Engine meta is null.");
+            return null!;
+        }
+
+        _engineMeta.State = _engine.State;
+
+        _logger.LogTrace($"Engine status: {_engine.State}, {_engine.ExecutionType}");
+        return await Task.FromResult(_engineMeta);
+    }
+
+    /// <summary>
+    /// Start the engine.
+    /// </summary>
+    /// <param name="executionType">The execution type.</param>
+    /// <returns>Engine meta informations.</returns>
+    public async Task<EngineMeta> StartRunAsync(EngineExecutionType executionType)
+    {
+        if (ActiveProject == null)
+        {
+            _logger.LogWarning("No active project.");
+            return null!;
+        }
+
+        if (_engine != null
+            && (_engine.State == EngineState.Running
+                || _engine.State == EngineState.Stopping
+                || _engine.State == EngineState.Aborting))
+        {
+            _logger.LogWarning("Engine is already running.");
+            return null!;
+        }
+
+        // Dispose previous engine.
+        DisposeEngine();
+
+        _engine = _engineFactory.CreateEngine(ActiveProject, executionType);
+        _engineMeta = new EngineMeta
+        {
+            Id = _engine.Id,
+            State = EngineState.Idle,
+            ExecutionType = executionType
+        };
+        _engine.StateChanged += EngineStateChanged;
+        _engine.IterationFinished += EngineIterationFinished;
+        var startResult = await _engine.TryStartAsync();
+        if (!startResult)
+        {
+            _logger.LogWarning("Engine start failed.");
+            return null!;
+        }
+        _engineMeta.State = EngineState.Starting;
+        return _engineMeta;
+    }
+
+    /// <summary>
+    /// Stops the engine.
+    /// </summary>
+    /// <returns>Engine meta informations.</returns>
+    public async Task<EngineMeta> StopRunAsync()
+    {
+        if (_engine == null)
+        {
+            _logger.LogWarning("No active engine.");
+            return null!;
+        }
+
+        if (_engine.State != EngineState.Running)
+        {
+            _logger.LogWarning("Engine is not running.");
+            return null!;
+        }
+
+        if(_engineMeta == null)
+        {
+            _logger.LogWarning("Engine meta is null.");
+            return null!;
+        }
+
+        var stopResult = await _engine.TryStopAsync();
+        if (!stopResult)
+        {
+            _logger.LogWarning("Engine stop failed.");
+            return null!;
+        }
+
+        _engineMeta.State = EngineState.Stopping;
+        return _engineMeta;
+    }
+
+    /// <summary>
+    /// Aborts the engine.
+    /// </summary>
+    /// <returns>Engine meta informations.</returns>
+    public async Task<EngineMeta> AbortRunAsync()
+    {
+        if (_engine == null)
+        {
+            _logger.LogWarning("No active engine.");
+            return null!;
+        }
+
+        if (_engine.State == EngineState.Aborting)
+        {
+            _logger.LogWarning("Engine is already aborting.");
+            return null!;
+        }
+
+        if(_engineMeta == null)
+        {
+            _logger.LogWarning("Engine meta is null.");
+            return null!;
+        }
+
+        var abortResult = await _engine.TryAbortAsync();
+        if (!abortResult)
+        {
+            _logger.LogWarning("Engine abort failed.");
+            return null!;
+        }
+
+        _engineMeta.State = EngineState.Aborting;
+        return _engineMeta;
+    }
+
+    /// <summary>
+    /// Disposes the engine host.
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool isDisposing)
+    {
+        if(isDisposing && !_isDisposed)
+        {
+            DisposeEngine();
+            _isDisposed = true;
+        }
+    }
+
+    private async void EngineStateChanged(object? sender, EngineState state)
+    {
+        if(_engineMeta == null)
+        {
+            _logger.LogWarning("Engine meta is null.");
+            return;
+        }	
+
+        _engineMeta.State = state;
+
+        _logger.LogTrace($"Engine state changed to '{state}'.");
+
+        if (state == EngineState.Stopped)
+        {
+            _logger.LogInformation($"Engine stopped at {DateTime.UtcNow} (UTC).");
+        }
+        else if (state == EngineState.Aborted)
+        {
+            _logger.LogInformation($"Engine aborted at {DateTime.UtcNow} (UTC).");
+        }
+        else if (state == EngineState.Finished)
+        {
+            _logger.LogInformation($"Engine finished single run at {DateTime.UtcNow} (UTC).");
+        }
+        else if (state == EngineState.Running)
+        {
+            _logger.LogInformation($"Engine started at {DateTime.UtcNow} (UTC).");
+        }
+
+        if (state == EngineState.Stopped || state == EngineState.Aborted || state == EngineState.Finished)
+        {
+            _engineMeta.StoppedAt = DateTime.UtcNow;
+            _logger.LogTrace($"Engine is done. Removing engine.");
+        }
+
+        await _mqttClientProvider.PublishAsync($"atomy/agents/{_mqttClientProvider.ServiceUniqueName}/engine/status", JsonSerializer.Serialize(_engineMeta), new MqttPublishOptions());
+    }
+
+    private void DisposeEngine()
+    {
+        if(_engine == null) return;
+        _engine.StateChanged -= EngineStateChanged;
+        _engine.IterationFinished -= EngineIterationFinished;
+        _engine.Dispose();
+        _engine = null;
+    }
+
+    private async void EngineIterationFinished(object? sender, IterationFinishedEventArgs e)
+    {
+        if(ActiveProject == null)
+        {
+            _logger.LogWarning("No active project.");
+            return;
+        }
+        
+        _cacheService.CreateCache(e.IterationId, ActiveProject);
+        await Task.CompletedTask;
+    }
+}

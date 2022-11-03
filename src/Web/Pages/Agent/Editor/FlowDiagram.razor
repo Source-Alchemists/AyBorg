@@ -1,0 +1,8 @@
+﻿@using Blazor.Diagrams.Components
+
+<div Class="diagram-container" dropzone="none" ondragover="event.preventDefault();" @ondragenter="OnDragEnter" @ondrop="OnDrop">
+	<CascadingValue Value="_diagram">
+		<DiagramCanvas Class="grid">
+		</DiagramCanvas>
+	</CascadingValue>
+</div>

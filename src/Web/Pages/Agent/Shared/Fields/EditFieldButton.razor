@@ -1,0 +1,36 @@
+<div Class="mud-full-width py-1 m-0">
+    <MudButton Color="Color.Default" DisableElevation="true" Variant="Variant.Filled" Class="mud-width-full m-0"
+            OnClick="OnEditFiedClicked" Disabled="IsLinkConvertable">
+        <div Class="w50 ta-start">
+            <MudText>@Label</MudText>
+        </div>
+        <div Class="w50 ta-end">
+            <MudTooltip Text="@(Value?.ToString())" Style="width: 200px">
+                <div Style="max-width: 110px; max-height: 30px" Class="pt-2 to-ellipsis">
+                @Value
+                </div>
+            </MudTooltip>
+        </div>
+    </MudButton>
+</div>
+
+@code {
+    [Parameter]
+    [EditorRequired]
+    public string Label { get; set; } = string.Empty;
+
+    [Parameter]
+    [EditorRequired]
+    public object Value { get; set; } = new object();
+
+    [Parameter]
+    public bool IsLinkConvertable { get; set; }
+
+    [Parameter]
+    public EventCallback Clicked { get; set; }
+
+    private async void OnEditFiedClicked()
+    {
+        await Clicked.InvokeAsync();
+    }
+}

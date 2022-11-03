@@ -1,0 +1,12 @@
+﻿@if(IsVisible)
+{
+	<MudItem xs="12">
+		<MudAlert Severity="Severity.Warning" Visible>
+			Unabled to connect to service! The specified service may no longer exist.
+		</MudAlert>
+	</MudItem>
+}
+@code {
+	[Parameter]
+	public bool IsVisible { get; set; }
+}
