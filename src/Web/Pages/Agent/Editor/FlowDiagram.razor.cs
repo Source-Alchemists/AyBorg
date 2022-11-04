@@ -22,7 +22,6 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
     [Inject] IFlowService FlowService { get; set; } = null!;
     [Inject] IMqttClientProvider MqttClientProvider { get; set; } = null!;
-    [Inject] IRuntimeService RuntimeService { get; set; } = null!;
     [Inject] ILogger<FlowDiagram> Logger { get; set; } = null!;
     [Inject] IStateService StateService { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
@@ -104,7 +103,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     {
         _flowHubConnection.On<LinkDto, bool>("LinkChanged", async (linkDto, removed) =>
         {
-            Logger.LogTrace("LinkChanged event received from server. Link: {0}, Removed: {1}", linkDto, removed);
+            Logger.LogTrace("LinkChanged event received from server. Link: {link}, Removed: {removed}", linkDto, removed);
             if (removed)
             {
                 var linkModel = FindLinkModel(linkDto);
@@ -141,10 +140,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     {
         foreach (var li in _diagram.Links)
         {
-            var sp = li.SourcePort as FlowPort;
-            var tp = li.TargetPort as FlowPort;
-
-            if (sp != null && sp.Port.Id.Equals(linkDto.SourceId) && tp != null && tp.Port.Id.Equals(linkDto.TargetId))
+            if (li.SourcePort is FlowPort sp && sp.Port.Id.Equals(linkDto.SourceId) && li.TargetPort is FlowPort tp && tp.Port.Id.Equals(linkDto.TargetId))
             {
                 return li;
             }
@@ -210,15 +206,15 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     }
 
 
-    private async Task OnLinkTargetPortChangedAsync(BaseLinkModel link, PortModel p1, PortModel p2)
+    private async Task OnLinkTargetPortChangedAsync(BaseLinkModel link, PortModel _, PortModel p2)
     {
         if (_suspendDiagramRefresh) return;
         if (link.SourcePort == null) return;
 
         var fp1 = (FlowPort)link.SourcePort;
         var fp2 = (FlowPort)p2;
-        FlowPort sourcePort = null!;
-        FlowPort targetPort = null!;
+        FlowPort sourcePort;
+        FlowPort targetPort;
 
         // Just basic validation, the rest is done in the backend
         if (fp1.Port.Direction == SDK.Common.Ports.PortDirection.Output)
@@ -234,7 +230,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
         if (targetPort.Port.IsConnected)
         {
-            Logger.LogWarning($"Port {targetPort.Port.Id} already has a link");
+            Logger.LogWarning("Port {targetPort.Port.Id} already has a link", targetPort.Port.Id);
             Snackbar.Add("Port already has a link", Severity.Warning);
             _diagram.Links.Remove(link);
             return;
@@ -243,13 +239,13 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         var result = await FlowService.TryAddLinkAsync(StateService.AgentState.BaseUrl, sourcePort.Port.Id, targetPort.Port.Id);
         if (!result)
         {
-            Logger.LogWarning("Failed to add link from {0} to {1}", sourcePort.Port.Id, targetPort.Port.Id);
+            Logger.LogWarning("Failed to add link from {Id} to {Id}", sourcePort.Port.Id, targetPort.Port.Id);
             _diagram.Links.Remove(link);
             Snackbar.Add("Link is not compatible", Severity.Warning);
         }
     }
 
-    private async Task OnDragEnter(DragEventArgs args)
+    private static async Task OnDragEnter(DragEventArgs args)
     {
         if (DragDropStateHandler.DraggedStep == null) args.DataTransfer.DropEffect = "none";
         else args.DataTransfer.DropEffect = "move";
@@ -330,8 +326,10 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
     private async Task<bool> ShowDeleteConfirmDialogAsync(string targetName)
     {
-        var dialogParameters = new DialogParameters();
-        dialogParameters.Add("ContentText", $"Are you sure you want to delete '{targetName}'?");
+        var dialogParameters = new DialogParameters
+        {
+            { "ContentText", $"Are you sure you want to delete '{targetName}'?" }
+        };
         var dialog = DialogService.Show<ConfirmDialog>("Confirm deletion", dialogParameters, new DialogOptions());
         var result = await dialog.Result;
         return !result.Cancelled;

@@ -43,7 +43,7 @@ public class AgentCacheService : IAgentCacheService
             var response = await _httpClient.GetFromJsonAsync<PortDto>($"{baseUrl}/flow/ports/{portId}/{iterationId}");
             if(response == null)
             {
-                _logger.LogWarning($"Could not get port {portId} for iteration {iterationId} from {baseUrl}");
+                _logger.LogWarning("Could not get port {portId} for iteration {iterationId} from {baseUrl}", portId, iterationId, baseUrl);
                 throw new Exception($"Could not get port {portId} for iteration {iterationId} from {baseUrl}");
             }
             return response;

@@ -13,7 +13,6 @@ public partial class Projects : ComponentBase
 {
     private string _baseUrl = string.Empty;
     private bool _hasServiceError = false;
-    private ServiceRegistryEntryDto _serviceDetails = new ServiceRegistryEntryDto();
     private IEnumerable<ProjectMetaDto> _readyProjects = new List<ProjectMetaDto>();
     private IEnumerable<ProjectMetaDto> _draftProjects = new List<ProjectMetaDto>();
 
@@ -66,8 +65,10 @@ public partial class Projects : ComponentBase
     private async void OnProjectDeleteClicked(ProjectMetaDto projectDto)
     {
         var options = new DialogOptions();
-        var parameters = new DialogParameters();
-        parameters.Add("ContentText", $"Are you sure you want to delete project '{projectDto.Name}'?");
+        var parameters = new DialogParameters
+        {
+            { "ContentText", $"Are you sure you want to delete project '{projectDto.Name}'?" }
+        };
         var dialog = DialogService.Show<ConfirmDialog>("Delete project", parameters, options);
         var result = await dialog.Result;
         if(!result.Cancelled)
@@ -82,8 +83,10 @@ public partial class Projects : ComponentBase
     private async void OnSaveAsReadyClicked(ProjectMetaDto projectDto)
     {
         var options = new DialogOptions();
-        var parameters = new DialogParameters();
-        parameters.Add("ContentText", $"Are you sure you want to save project '{projectDto.Name}' as ready?");
+        var parameters = new DialogParameters
+        {
+            { "ContentText", $"Are you sure you want to save project '{projectDto.Name}' as ready?" }
+        };
         var dialog = DialogService.Show<ConfirmDialog>("Save project as ready", parameters, options);
         var result = await dialog.Result;
         if(!result.Cancelled)
@@ -98,8 +101,10 @@ public partial class Projects : ComponentBase
     private async Task OnNewProjectClicked()
     {
         var options = new DialogOptions();
-        var parameters = new DialogParameters();
-        parameters.Add("BaseUrl", _baseUrl);
+        var parameters = new DialogParameters
+        {
+            { "BaseUrl", _baseUrl }
+        };
         var dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
         var result = await dialog.Result;
         if(!result.Cancelled)

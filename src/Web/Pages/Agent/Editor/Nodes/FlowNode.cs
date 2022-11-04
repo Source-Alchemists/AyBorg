@@ -43,7 +43,6 @@ public class FlowNode : NodeModel, IDisposable
         if (step.Ports == null) return;
         foreach (var port in step.Ports)
         {
-            if (port == null) throw new ArgumentNullException(nameof(port));
             AddPort(new FlowPort(this, port, step, _flowService, _mqttClientProvider, _stateService));
         }
 

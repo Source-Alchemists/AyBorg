@@ -1,6 +1,5 @@
 using Blazor.Diagrams.Core.Models;
 using Microsoft.AspNetCore.Components;
-using Atomy.SDK;
 using Atomy.SDK.Common.Ports;
 using Atomy.Web.Pages.Agent.Shared.Fields;
 
@@ -10,9 +9,8 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
 {
     [Parameter]
     public FlowNode Node { get; set; } = null!;
+    private string NodeClass => Node.Selected ? "flow node box selected" : "flow node box";
 
-    private string nodeClass => Node.Selected ? "flow node box selected" : "flow node box";
-    private int _portRowCount = 0;
     private IEnumerable<PortModel> _outputPorts = new List<PortModel>();
     private IEnumerable<PortModel> _inputPorts = new List<PortModel>();
 
@@ -32,7 +30,6 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
     {
         _inputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Left); // Left for input
         _outputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Right); // Right for output
-        _portRowCount = _inputPorts.Count() + _outputPorts.Count();
 
         Node.StepChanged += OnChangedAsync;
         foreach (var ip in _inputPorts.Cast<FlowPort>())
@@ -55,7 +52,7 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
         await port.SendValueAsync();
      }
 
-     private string GetPortClass(PortModel port)
+     private static string GetPortClass(PortModel port)
      {
         var fp = (FlowPort)port;
         var directionClass = fp.Direction == PortDirection.Input ? " input" : " output";
