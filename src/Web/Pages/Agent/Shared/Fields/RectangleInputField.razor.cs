@@ -6,7 +6,7 @@ namespace Atomy.Web.Pages.Agent.Shared.Fields;
 
 public partial class RectangleInputField : BaseInputField
 {
-    private RectangleDto _value = new RectangleDto();
+    private RectangleDto _value = new();
     private bool _isXEditing = false;
     private bool _isYEditing = false;
     private bool _isWidthEditing = false;

@@ -9,7 +9,6 @@ namespace Atomy.Agent.Services;
 public class ProjectManagementService : IProjectManagementService
 {
     private readonly ILogger<ProjectManagementService> _logger;
-    private readonly IConfiguration _configuration;
     private readonly IDbContextFactory<ProjectContext> _projectContextFactory;
     private readonly IEngineHost _engineHost;
     private readonly IRuntimeToStorageMapper _runtimeToStorageMapper;
@@ -48,7 +47,6 @@ public class ProjectManagementService : IProjectManagementService
                                     IRuntimeConverterService runtimeConverterService)
     {
         _logger = logger;
-        _configuration = configuration;
         _projectContextFactory = projectContextFactory;
         _engineHost = runtimeHost;
         _runtimeToStorageMapper = runtimeToStorageMapper;
@@ -79,7 +77,7 @@ public class ProjectManagementService : IProjectManagementService
 
         var result = await context.AtomyProjects!.AddAsync(emptyProjectRecord);
         await context.SaveChangesAsync();
-        _logger.LogTrace($"Created new project [{result.Entity.Meta.Name} | {result.Entity.DbId}].");
+        _logger.LogTrace("Created new project [{result.Entity.Meta.Name} | {result.Entity.DbId}].", result.Entity.Meta.Name, result.Entity.DbId);
         if (!context.AtomyProjects.Any(p => p.Meta.IsActive && p.Meta.ServiceUniqueName == _serviceUniqueName))
         {
             if (await TryActivateAsync(result.Entity.Meta.DbId, true))
@@ -122,7 +120,7 @@ public class ProjectManagementService : IProjectManagementService
         context.AtomyProjects!.Remove(orgProjectRecord);
         await context.SaveChangesAsync();
 
-        _logger.LogTrace($"Removed project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}].");
+        _logger.LogTrace("Removed project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}].", orgMetaRecord.Name, orgMetaRecord.DbId);
         return true;
     }
 
@@ -144,7 +142,7 @@ public class ProjectManagementService : IProjectManagementService
 
         if(orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
         {
-            _logger.LogWarning($"Project [{orgMetaRecord.Name}] is not owned by this service.");
+            _logger.LogWarning("Project [{orgMetaRecord.Name}] is not owned by this service.", orgMetaRecord.Name);
             return false;
         }
 
@@ -162,7 +160,7 @@ public class ProjectManagementService : IProjectManagementService
             }
 
             lastActiveMetaRecord.IsActive = false;
-            _logger.LogTrace($"Project [{lastActiveMetaRecord.DbId}] deactivated.");
+            _logger.LogTrace("Project [{lastActiveMetaRecord.DbId}] deactivated.", lastActiveMetaRecord.DbId);
         }
 
         // The whole project record need to be loaded and converted to a runtime project.
@@ -170,17 +168,23 @@ public class ProjectManagementService : IProjectManagementService
         {
             IQueryable<ProjectRecord> queryProject = CreateFullProjectQuery(context);
             var orgProjectRecord = await queryProject.FirstAsync(x => x.Meta.DbId.Equals(projectId));
-            _logger.LogTrace($"Loading project [{orgProjectRecord.Meta.Name}] with step count [{orgProjectRecord.Steps.Count}].");
+            _logger.LogTrace("Loading project [{orgProjectRecord.Meta.Name}] with step count [{orgProjectRecord.Steps.Count}].", orgProjectRecord.Meta.Name, orgProjectRecord.Steps.Count);
             var project = await _runtimeConverterService.ConvertAsync(orgProjectRecord);
             if (!await _engineHost.TryActivateProjectAsync(project))
             {
-                _logger.LogWarning($"Could not activate project [{projectId}].");
+                _logger.LogWarning("Could not activate project [{projectId}].", projectId);
                 return false;
             }
         }
 
         orgMetaRecord.IsActive = isActive;
-        _logger.LogInformation(isActive ? $"Project [{orgMetaRecord.Name}] set active." : $"Project [{orgMetaRecord.Name}] set inactive.");
+        if(isActive)
+        {
+            _logger.LogInformation("Project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}] activated.", orgMetaRecord.Name, orgMetaRecord.DbId);
+        } else
+        {
+            _logger.LogInformation("Project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}] deactivated.", orgMetaRecord.Name, orgMetaRecord.DbId);
+        }
         await context.SaveChangesAsync();
 
         return true;
@@ -204,25 +208,25 @@ public class ProjectManagementService : IProjectManagementService
 
         if(orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
         {
-            _logger.LogWarning($"Project [{orgMetaRecord.Name}] is not owned by this service.");
+            _logger.LogWarning("Project [{orgMetaRecord.Name}] is not owned by this service.", orgMetaRecord.Name);
             return false;
         }
 
         if (orgMetaRecord.State == state)
         {
-            _logger.LogWarning($"Project is already in state [{state}].");
+            _logger.LogWarning("Project is already in state [{state}].", state);
             return false;
         }
 
         if (orgMetaRecord.State == ProjectState.Ready)
         {
-            _logger.LogWarning($"Project is already in state [{state}]. Cannot change state from [{orgMetaRecord.State}] to [{state}].");
+            _logger.LogWarning("Project is already in state [{state}]. Cannot change state from [{orgMetaRecord.State}] to [{state}].", state, orgMetaRecord.State, state);
             return false;
         }
 
         orgMetaRecord.State = state;
         orgMetaRecord.UpdatedDate = DateTime.UtcNow;
-        _logger.LogTrace($"Project [{orgMetaRecord.DbId}] set state to [{state}].");
+        _logger.LogTrace("Project [{orgMetaRecord.DbId}] set state to [{state}].", orgMetaRecord.DbId, state);
         await context.SaveChangesAsync();
         return true;
     }
@@ -303,7 +307,7 @@ public class ProjectManagementService : IProjectManagementService
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, $"Could not update project [{projectRecord.Meta.Name}].");
+            _logger.LogError(ex, "Could not update project [{projectRecord.Meta.Name}].", projectRecord.Meta.Name);
             return false;
         }
 
@@ -316,7 +320,7 @@ public class ProjectManagementService : IProjectManagementService
         {
             if (!databaseProjectRecord.Steps.Any(x => x.Id.Equals(step.Id)))
             {
-                _logger.LogTrace($"Adding step [{step.Id}] to project [{projectRecord.Meta.Name}] with id [{projectRecord.DbId}].");
+                _logger.LogTrace("Adding step [{step.Id}] to project [{projectRecord.Meta.Name}] with id [{projectRecord.DbId}].", step.Id, projectRecord.Meta.Name, projectRecord.DbId);
             }
             else
             {
@@ -331,7 +335,7 @@ public class ProjectManagementService : IProjectManagementService
         {
             if (!databaseProjectRecord.Links.Any(x => x.Id.Equals(link.Id)))
             {
-                _logger.LogTrace($"Adding link [{link.Id}] to project [{projectRecord.Meta.Name}] with id [{projectRecord.DbId}].");
+                _logger.LogTrace("Adding link [{link.Id}] to project [{projectRecord.Meta.Name}] with id [{projectRecord.DbId}].", link.Id, projectRecord.Meta.Name, projectRecord.DbId);
             }
             else
             {

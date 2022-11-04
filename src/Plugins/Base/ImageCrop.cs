@@ -9,9 +9,9 @@ namespace Atomy.Plugins.Base;
 public sealed class ImageCrop : IStepBody, IDisposable
 {
     private readonly ILogger<ImageCrop> _logger;
-    private readonly ImagePort _inputImagePort = new ImagePort("Image", PortDirection.Input, null!);
-    private readonly RectanglePort _cropRectanglePort = new RectanglePort("Region", PortDirection.Input, new Rectangle());
-    private readonly ImagePort _outputImagePort = new ImagePort("Cropped image", PortDirection.Output, null!);
+    private readonly ImagePort _inputImagePort = new("Image", PortDirection.Input, null!);
+    private readonly RectanglePort _cropRectanglePort = new("Region", PortDirection.Input, new Rectangle());
+    private readonly ImagePort _outputImagePort = new("Cropped image", PortDirection.Output, null!);
     private bool disposedValue;
 
     public string DefaultName => "Image.Crop";

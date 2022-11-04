@@ -11,7 +11,7 @@ public partial class DirectoryBrowser : ComponentBase
     [Inject] protected IStateService StateService { get; set; } = null!;
     [Parameter] public string? RootPath { get; set; }
     
-    private HashSet<DirectoryItem> _items = new HashSet<DirectoryItem>();
+    private readonly HashSet<DirectoryItem> _items = new();
     private DirectoryItem? _selectedItem;
 
     protected override async Task OnParametersSetAsync()

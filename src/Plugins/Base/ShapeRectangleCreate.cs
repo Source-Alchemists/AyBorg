@@ -6,11 +6,11 @@ namespace Atomy.Plugins.Base;
 
 public sealed class ShapeRectangleCreate : IStepBody
 {
-    private readonly NumericPort _xPort = new NumericPort("X", PortDirection.Input, 0d, 0d);
-    private readonly NumericPort _yPort = new NumericPort("Y", PortDirection.Input, 0d, 0d);
-    private readonly NumericPort _widthPort = new NumericPort("Width", PortDirection.Input, 1d, 1d);
-    private readonly NumericPort _heightPort = new NumericPort("Height", PortDirection.Input, 1d, 1d);
-    private readonly RectanglePort _rectanglePort = new RectanglePort("Rectangle", PortDirection.Output, new Rectangle());
+    private readonly NumericPort _xPort = new("X", PortDirection.Input, 0d, 0d);
+    private readonly NumericPort _yPort = new("Y", PortDirection.Input, 0d, 0d);
+    private readonly NumericPort _widthPort = new("Width", PortDirection.Input, 1d, 1d);
+    private readonly NumericPort _heightPort = new("Height", PortDirection.Input, 1d, 1d);
+    private readonly RectanglePort _rectanglePort = new("Rectangle", PortDirection.Output, new Rectangle());
     public string DefaultName => "Shape.Rectangle.Create";
 
     public IEnumerable<IPort> Ports { get; }

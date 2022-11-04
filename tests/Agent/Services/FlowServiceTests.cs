@@ -10,7 +10,7 @@ namespace Atomy.Agent.Tests.Services;
 
 public class FlowServiceTests
 {
-    private readonly NullLogger<FlowService> _logger = new NullLogger<FlowService>();
+    private readonly NullLogger<FlowService> _logger = new();
 
     [Fact]
     public async Task TestLinkPorts()

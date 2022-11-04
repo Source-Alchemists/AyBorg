@@ -18,7 +18,7 @@ internal static class RandomPasswordGenerator
         public static int MinSpecials { get; } = 1;
 
 
-        private static readonly Dictionary<CharType, string> _chars = new Dictionary<CharType, string>()
+        private static readonly Dictionary<CharType, string> _chars = new()
         {
             { CharType.Lowercase, "abcdefghijklmnopqrstuvwxyz" },
             { CharType.Uppercase, "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
@@ -26,7 +26,7 @@ internal static class RandomPasswordGenerator
             { CharType.Special, "!@#$%^&*()-_=+{}[]?<>.," }
         };
 
-        private static Dictionary<CharType, int> _outstandingChars = new Dictionary<CharType, int>();
+        private static readonly Dictionary<CharType, int> _outstandingChars = new();
 
         public static string Generate()
         {

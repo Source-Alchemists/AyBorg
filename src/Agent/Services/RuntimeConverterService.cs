@@ -70,7 +70,7 @@ public class RuntimeConverterService : IRuntimeConverterService
             case RectanglePort rectanglePort:
                 return UpdateRectanglePortValue(rectanglePort, value);
             case ImagePort imagePort:
-                return UpdateImagePortValue(imagePort, value);
+                return UpdateImagePortValue(imagePort);
         }
 
         _logger.LogWarning("Port type {PortType} is not supported", port.GetType().Name);
@@ -127,7 +127,7 @@ public class RuntimeConverterService : IRuntimeConverterService
         return true;
     }
 
-    private static bool UpdateImagePortValue(ImagePort port, object value)
+    private static bool UpdateImagePortValue(ImagePort port)
     {
         port.Value = null!; // Nothing to do, images will be created at runtime.
         return true;
@@ -208,7 +208,7 @@ public class RuntimeConverterService : IRuntimeConverterService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to convert link {linkRecord.Id}.");
+                _logger.LogError(ex, "Failed to convert link {linkRecord.Id}.", linkRecord.Id);
             }
         }
     }
@@ -220,7 +220,7 @@ public class RuntimeConverterService : IRuntimeConverterService
             var portRecord = portRecords.FirstOrDefault(x => x.Name == port.Name && x.Direction == port.Direction);
             if (portRecord == null)
             {
-                _logger.LogWarning($"Port record {port.Name} not found! Will use default value.");
+                _logger.LogWarning("Port record {port.Name} not found! Will use default value.", port.Name);
                 continue;
             }
 

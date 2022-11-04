@@ -82,7 +82,7 @@ public class ProjectManagementService : IProjectManagementService
 
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning($"Could not create project '{projectName}' [Code: {response.StatusCode}]!");
+            _logger.LogWarning("Could not create project '{projectName}' [Code: {response.StatusCode}]!", projectName, response.StatusCode);
             return null!;
         }
 
@@ -108,7 +108,7 @@ public class ProjectManagementService : IProjectManagementService
         var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning($"Could not delete project '{projectMeta.Name}' [Code: {response.StatusCode}]!");
+            _logger.LogWarning("Could not delete project '{projectMeta.Name}' [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
             return false;
         }
 
@@ -128,7 +128,7 @@ public class ProjectManagementService : IProjectManagementService
         var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning($"Could not set project '{projectMeta.Name}' to active [Code: {response.StatusCode}]!");
+            _logger.LogWarning("Could not set project '{projectMeta.Name}' to active [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
             return false;
         }
 
@@ -148,7 +148,7 @@ public class ProjectManagementService : IProjectManagementService
         var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning($"Could not set project '{projectMeta.Name}' to ready [Code: {response.StatusCode}]!");
+            _logger.LogWarning("Could not set project '{projectMeta.Name}' to ready [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
             return false;
         }
 
@@ -167,7 +167,7 @@ public class ProjectManagementService : IProjectManagementService
         var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning($"Could not save project '{projectMeta.Name}' [Code: {response.StatusCode}]!");
+            _logger.LogWarning("Could not save project '{projectMeta.Name}' [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
             return false;
         }
 

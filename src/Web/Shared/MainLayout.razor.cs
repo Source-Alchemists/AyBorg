@@ -9,17 +9,16 @@ namespace Atomy.Web.Shared;
 public partial class MainLayout : LayoutComponentBase
 {
     [Inject]
-    protected NavigationManager _navigationManager { get; set; } = null!;
+    protected NavigationManager NavigationManager { get; set; } = null!;
     [Inject]
-    protected IJSRuntime _jsRuntime { get; set; } = null!;
+    protected IJSRuntime JsRuntime { get; set; } = null!;
     [Inject]
-    protected ILocalStorageService _localStorageService { get; set; } = null!;
+    protected ILocalStorageService LocalStorageService { get; set; } = null!;
     public string RouteName = string.Empty;
 
     private bool _isDarkMode = true;
     private bool _isDrawerOpen = true;
-    private MudSwitch<bool>? _themeSwitchRef;
-    private MudTheme _theme = new MudTheme() { 
+    private readonly MudTheme _theme = new() { 
         Palette = new Palette() { 
             Info = "#00BCD4",
         }
@@ -27,23 +26,23 @@ public partial class MainLayout : LayoutComponentBase
 
     protected override void OnInitialized()
     {
-        RouteName = _navigationManager.Uri;
-        _navigationManager.LocationChanged += HandleLocationChanged;
+        RouteName = NavigationManager.Uri;
+        NavigationManager.LocationChanged += HandleLocationChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            _isDarkMode = !(await _localStorageService.GetItemAsync<bool>("Theme.IsDarkModeDisabled"));
-            await _jsRuntime.InvokeVoidAsync("switchTheme", _isDarkMode);
+            _isDarkMode = !(await LocalStorageService.GetItemAsync<bool>("Theme.IsDarkModeDisabled"));
+            await JsRuntime.InvokeVoidAsync("switchTheme", _isDarkMode);
             await InvokeAsync(StateHasChanged);
         }
     }
 
     public void Dispose()
     {
-        _navigationManager.LocationChanged -= HandleLocationChanged;
+        NavigationManager.LocationChanged -= HandleLocationChanged;
     }
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
@@ -55,8 +54,8 @@ public partial class MainLayout : LayoutComponentBase
     private async void OnThemeSwitchChanged(bool value)
     {
         _isDarkMode = !_isDarkMode;
-        await _jsRuntime.InvokeVoidAsync("switchTheme", _isDarkMode);
-        await _localStorageService.SetItemAsync("Theme.IsDarkModeDisabled", !_isDarkMode);
+        await JsRuntime.InvokeVoidAsync("switchTheme", _isDarkMode);
+        await LocalStorageService.SetItemAsync("Theme.IsDarkModeDisabled", !_isDarkMode);
     }
 
     private void DrawerToggle()

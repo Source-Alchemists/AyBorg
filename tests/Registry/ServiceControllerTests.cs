@@ -10,7 +10,7 @@ namespace Atomy.ServiceRegistry.Tests;
 
 public class ServiceControllerTests
 {
-    private readonly NullLogger<ServicesController> _logger = new NullLogger<ServicesController>();
+    private readonly NullLogger<ServicesController> _logger = new();
 
     [Fact]
     public async Task RegisterAsync_success()

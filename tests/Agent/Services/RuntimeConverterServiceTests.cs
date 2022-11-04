@@ -14,7 +14,7 @@ namespace Atomy.Agent.Tests.Services;
 
 public class RuntimeConverterServiceTests
 {
-    private static NullLogger<RuntimeConverterService> _logger = new NullLogger<RuntimeConverterService>();
+    private static readonly NullLogger<RuntimeConverterService> _logger = new();
 
     [Fact]
     public async Task TestConvertProjectRecordToProject()

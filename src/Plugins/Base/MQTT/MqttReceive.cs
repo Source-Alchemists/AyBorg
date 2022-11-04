@@ -8,7 +8,7 @@ namespace Atomy.Plugins.Base.MQTT;
 
 public sealed class MqttReceive : BaseMqttReceiveStep
 {
-    private readonly StringPort _messagePort = new StringPort("Message", PortDirection.Output, string.Empty);
+    private readonly StringPort _messagePort = new("Message", PortDirection.Output, string.Empty);
 
     public override string DefaultName => "MQTT.Receive";
 

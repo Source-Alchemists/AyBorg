@@ -30,7 +30,7 @@ public class EngineFactory : IEngineFactory
     /// <param name="executionType">Type of the execution.</param>
     /// <returns></returns>
     public IEngine CreateEngine(Project project, EngineExecutionType executionType) {
-        _logger.LogTrace($"Creating engine with execution type [{executionType}].");
+        _logger.LogTrace("Creating engine with execution type [{executionType}].", executionType);
         var engineLogger = _loggerFactory.CreateLogger<Engine>();
         return new Engine(engineLogger, _loggerFactory, _mqttClientProvider, project, executionType);
     }

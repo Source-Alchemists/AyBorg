@@ -9,11 +9,10 @@ public sealed class ImageLoad : IStepBody, IDisposable
 {
     private readonly ILogger<ImageLoad> _logger;
     private readonly IEnvironment _environment;
-    private readonly FolderPort _folderPort = new FolderPort("Folder", PortDirection.Input, string.Empty);
-    private readonly ImagePort _imagePort = new ImagePort("Image", PortDirection.Output, null!);
-    private readonly StringPort _filePathPort = new StringPort("File path", PortDirection.Output, string.Empty);
+    private readonly FolderPort _folderPort = new("Folder", PortDirection.Input, string.Empty);
+    private readonly ImagePort _imagePort = new("Image", PortDirection.Output, null!);
+    private readonly StringPort _filePathPort = new("File path", PortDirection.Output, string.Empty);
     private readonly string[] _supportedFileTypes = new[] { ".jpg", ".jpeg", ".png", ".bmp" };
-    private string _lastSelectedPath = string.Empty;
     private int _imageIndex = 0;
     private bool disposedValue;
     private Task<KeyValuePair<string, Image>>? _preloadTask;

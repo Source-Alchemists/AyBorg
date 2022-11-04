@@ -9,7 +9,7 @@ public abstract class BaseMqttStep : IStepBody
 {
     protected readonly ILogger _logger;
     protected readonly IMqttClientProvider _mqttClientProvider = null!;
-    protected readonly StringPort _topicPort = new StringPort("Topic", PortDirection.Input, $"atomy/results/{Guid.NewGuid()}");
+    protected readonly StringPort _topicPort = new("Topic", PortDirection.Input, $"atomy/results/{Guid.NewGuid()}");
     protected IList<IPort> _ports = new List<IPort>();
 
     public abstract string DefaultName { get; }

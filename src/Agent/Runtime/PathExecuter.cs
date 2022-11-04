@@ -31,9 +31,9 @@ public sealed class PathExecuter : IDisposable
     /// Initializes a new instance of the <see cref="PathExecuter"/> class.
     /// </summary>
     /// <param name="pathItem">The path item.</param>
-    /// <param name="abortToken">The abort token.</param>
     /// <param name="iterationId">The iteration identifier.</param>
-    public PathExecuter(ILogger<PathExecuter> logger, PathItem pathItem, CancellationToken abortToken, Guid iterationId)
+    /// <param name="abortToken">The abort token.</param>
+    public PathExecuter(ILogger<PathExecuter> logger, PathItem pathItem, Guid iterationId, CancellationToken abortToken)
     {
         _logger = logger;
         _pathItem = pathItem;
@@ -65,7 +65,7 @@ public sealed class PathExecuter : IDisposable
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, $"Error occurred while executing step [{_pathItem.Step.Name}]");
+                _logger.LogWarning(ex, "Error occurred while executing step [{name}]", _pathItem.Step.Name);
             }
             finally
             {

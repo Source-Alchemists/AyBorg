@@ -12,15 +12,14 @@ public partial class CreateAccountDialog : ComponentBase
     [Inject] RoleManager<IdentityRole> RoleManager { get; set; } = null!;
     [Inject] UserManager<IdentityUser> UserManager { get; set; } = null!;
     [Inject] IJSRuntime JSRuntime { get; set; } = null!;
-
-    private IdentityUser _user = new();
+    
+    private readonly List<Role> _roles = new();
     private string _userName = null!;
     private string _userEmail = null!;
-    private List<Role> _roles = new List<Role>();
     private string _password = string.Empty;
     private bool _success = false;
-    private string[] _errors = {};
-    private string[] _serviceErrors = {};
+    private string[] _errors = Array.Empty<string>();
+    private string[] _serviceErrors = Array.Empty<string>();
     private MudForm _form = null!;
 
     protected override async Task OnInitializedAsync()
@@ -42,8 +41,10 @@ public partial class CreateAccountDialog : ComponentBase
         await _form.Validate();
         if (!_errors.Any())
         {
-            var user = new IdentityUser(_userName);
-            user.Email = _userEmail;
+            var user = new IdentityUser(_userName)
+            {
+                Email = _userEmail
+            };
             var result = await UserManager.CreateAsync(user, _password);
             if (result.Succeeded)
             {

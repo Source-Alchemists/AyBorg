@@ -16,7 +16,7 @@ namespace Atomy.Agent.Tests;
 
 public sealed class ProjectManagementServiceTests : IDisposable
 {
-    private static NullLogger<ProjectManagementService> _logger = new NullLogger<ProjectManagementService>();
+    private static readonly NullLogger<ProjectManagementService> _logger = new();
     private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
     private readonly DbContextOptions<ProjectContext> _contextOptions;
     private readonly IConfiguration _configuration;
@@ -210,8 +210,10 @@ public sealed class ProjectManagementServiceTests : IDisposable
 
         });
 
-        var stepProxy = new StepProxy(stepBodyMock.Object, x, y);
-        stepProxy.Name = name;
+        var stepProxy = new StepProxy(stepBodyMock.Object, x, y)
+        {
+            Name = name
+        };
         return stepProxy;
     }
 

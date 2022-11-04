@@ -130,7 +130,7 @@ public class Pathfinder : IPathfinder
                 }
                 pathItems.AddRange(nextItems);
                 nis.AddRange(nextItems);
-                count += nextItems.Count();
+                count += nextItems.Count;
             }
             lpts = nis;
             if (count == 0) break;

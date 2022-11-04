@@ -20,7 +20,7 @@
     }
     @if(_isStopVisible)
     {
-    <MudButton Color="Color.Secondary" Variant="Variant.Filled" Class="@_stopClass" OnClick="@OnStopClicked" Disabled="@_areButtonsDisabled">
+    <MudButton Color="Color.Secondary" Variant="Variant.Filled" Class="@StopClass" OnClick="@OnStopClicked" Disabled="@_areButtonsDisabled">
         @if (_isButtonLoading)
         {
             <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>

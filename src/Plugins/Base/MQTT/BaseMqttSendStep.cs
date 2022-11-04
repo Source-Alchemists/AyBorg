@@ -8,9 +8,9 @@ namespace Atomy.Plugins.Base.MQTT;
 public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
 {
     private Task _parallelTask = null!;
-    protected readonly EnumPort _qosPort = new EnumPort("QoS", PortDirection.Input, MqttQualityOfServiceLevel.AtMostOnce);
-    protected readonly BooleanPort _retainPort = new BooleanPort("Retain", PortDirection.Input, false);
-    protected readonly BooleanPort _parallelPort = new BooleanPort("Parallel", PortDirection.Input, false);
+    protected readonly EnumPort _qosPort = new("QoS", PortDirection.Input, MqttQualityOfServiceLevel.AtMostOnce);
+    protected readonly BooleanPort _retainPort = new("Retain", PortDirection.Input, false);
+    protected readonly BooleanPort _parallelPort = new("Parallel", PortDirection.Input, false);
     private bool disposedValue;
     
 

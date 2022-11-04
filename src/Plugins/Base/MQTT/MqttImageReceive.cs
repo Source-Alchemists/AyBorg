@@ -9,8 +9,8 @@ namespace Atomy.Plugins.Base.MQTT;
 
 public sealed class MqttImageReceive : BaseMqttReceiveStep
 {
-    private readonly ImagePort _imagePort = new ImagePort("Image", PortDirection.Output, null!);
-    private readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
+    private readonly ImagePort _imagePort = new("Image", PortDirection.Output, null!);
+    private readonly RecyclableMemoryStreamManager _memoryStreamManager = new();
 
     public override string DefaultName => "MQTT.Image.Receive";
 

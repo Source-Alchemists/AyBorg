@@ -6,11 +6,11 @@ namespace Atomy.Plugins.Base;
 
 public sealed class ImageScale : IStepBody, IDisposable
 {
-    private readonly ImagePort _imagePort = new ImagePort("Image", PortDirection.Input, null!);
-    private readonly ImagePort _scaledImagePort = new ImagePort("Scaled image", PortDirection.Output, null!);
-    private readonly NumericPort _widthPort = new NumericPort("Width", PortDirection.Output, 0);
-    private readonly NumericPort _heightPort = new NumericPort("Height", PortDirection.Output, 0);
-    private readonly NumericPort _scalePort = new NumericPort("Scale factor", PortDirection.Input, 0.5d, 0.01d, 2d);
+    private readonly ImagePort _imagePort = new("Image", PortDirection.Input, null!);
+    private readonly ImagePort _scaledImagePort = new("Scaled image", PortDirection.Output, null!);
+    private readonly NumericPort _widthPort = new("Width", PortDirection.Output, 0);
+    private readonly NumericPort _heightPort = new("Height", PortDirection.Output, 0);
+    private readonly NumericPort _scalePort = new("Scale factor", PortDirection.Input, 0.5d, 0.01d, 2d);
     private bool disposedValue;
 
     public string DefaultName => "Image.Scale";

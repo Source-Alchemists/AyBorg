@@ -8,7 +8,7 @@ namespace Atomy.Plugins.Base.MQTT;
 
 public sealed class MqttSend : BaseMqttSendStep, IStepBody
 {
-    private readonly StringPort _messagePort = new StringPort("Message", PortDirection.Input, string.Empty);
+    private readonly StringPort _messagePort = new("Message", PortDirection.Input, string.Empty);
     public override string DefaultName => "MQTT.Send";
 
     public MqttSend(ILogger<MqttSend> logger, IMqttClientProvider mqttClientProvider)

@@ -29,6 +29,7 @@ public class RuntimeController : ControllerBase
         var status = await _engineHost.GetEngineStatusAsync();
         if(status == null)
         {
+            _logger.LogWarning("No engine status found.");
             return NoContent();
         }
 
@@ -46,6 +47,7 @@ public class RuntimeController : ControllerBase
             return Ok(status);
         }
 
+        _logger.LogWarning("Engine status not modified.");
         return StatusCode(StatusCodes.Status304NotModified);
     }
 
@@ -60,6 +62,7 @@ public class RuntimeController : ControllerBase
             return Ok(status);
         }
 
+        _logger.LogWarning("Engine status not modified.");
         return StatusCode(StatusCodes.Status304NotModified);
     }
 
@@ -74,6 +77,7 @@ public class RuntimeController : ControllerBase
             return Ok(status);
         }
 
+        _logger.LogWarning("Engine status not modified.");
         return StatusCode(StatusCodes.Status304NotModified);
     }
 }

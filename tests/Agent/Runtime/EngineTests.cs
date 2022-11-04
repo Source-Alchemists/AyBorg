@@ -11,9 +11,9 @@ namespace Atomy.Agent.Tests.Runtime;
 
 public class EngineTests
 {
-    private readonly NullLogger<Engine> _logger = new NullLogger<Engine>();
-    private readonly NullLoggerFactory _loggerFactory = new NullLoggerFactory();
-    private Mock<IMqttClientProvider> _mqttClientProviderMock;
+    private readonly NullLogger<Engine> _logger = new();
+    private readonly NullLoggerFactory _loggerFactory = new();
+    private readonly Mock<IMqttClientProvider> _mqttClientProviderMock;
 
     public EngineTests()
     {

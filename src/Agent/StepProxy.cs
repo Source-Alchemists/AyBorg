@@ -6,7 +6,7 @@ namespace Atomy.Agent;
 
 public class StepProxy : IStepProxy
 {
-    private readonly Stopwatch _stopwatch = new Stopwatch();
+    private readonly Stopwatch _stopwatch = new();
     private bool _lastResult = false;
     private bool disposedValue;
 

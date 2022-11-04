@@ -10,12 +10,12 @@ public sealed class ImageSave : IStepBody
 {
     private readonly ILogger<ImageSave> _logger;
     private readonly IEnvironment _environment;
-    private readonly ImagePort _imagePort = new ImagePort("Image", PortDirection.Input, null!);
-    private readonly StringPort _fileNamePrefixPort = new StringPort("File name prefix", PortDirection.Input, string.Empty);
-    private readonly StringPort _inputFileNamePort = new StringPort("File name", PortDirection.Input, "{Guid}");
-    private readonly StringPort _fileNameSuffixPort = new StringPort("File name suffix", PortDirection.Input, "_{DateTime}");
-    private readonly FolderPort _folderPort = new FolderPort("Folder", PortDirection.Input, string.Empty);
-    private readonly StringPort _outputFileNamePort = new StringPort("File name", PortDirection.Output, string.Empty);
+    private readonly ImagePort _imagePort = new("Image", PortDirection.Input, null!);
+    private readonly StringPort _fileNamePrefixPort = new("File name prefix", PortDirection.Input, string.Empty);
+    private readonly StringPort _inputFileNamePort = new("File name", PortDirection.Input, "{Guid}");
+    private readonly StringPort _fileNameSuffixPort = new("File name suffix", PortDirection.Input, "_{DateTime}");
+    private readonly FolderPort _folderPort = new("Folder", PortDirection.Input, string.Empty);
+    private readonly StringPort _outputFileNamePort = new("File name", PortDirection.Output, string.Empty);
     public string DefaultName => "Image.Save";
 
     public IEnumerable<IPort> Ports { get;}
@@ -39,7 +39,7 @@ public sealed class ImageSave : IStepBody
     {
         var resultFileName = $"{ReplacePlaceHolder(_fileNamePrefixPort.Value)}{ReplacePlaceHolder(_inputFileNamePort.Value)}{ReplacePlaceHolder(_fileNameSuffixPort.Value)}.png";
         var resultFilePath = Path.Combine($"{_environment.StorageLocation}{_folderPort.Value}", resultFileName);
-        _logger.LogTrace("Saving image to {0}", resultFilePath);
+        _logger.LogTrace("Saving image to {resultFilePath}", resultFilePath);
         Image.Save(_imagePort.Value, resultFilePath, EncoderType.Png);
         _outputFileNamePort.Value = resultFileName;
         return Task.FromResult(true);

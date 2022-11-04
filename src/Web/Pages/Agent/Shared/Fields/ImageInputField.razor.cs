@@ -10,7 +10,7 @@ public partial class ImageInputField : IComponent
     private string? _imageUrl;
     private int _imageWidth;
     private int _imageHeight;
-    private string _imageTooltip => $"Width: {_imageWidth} Height: {_imageHeight}";
+    private string ImageTooltip => $"Width: {_imageWidth} Height: {_imageHeight}";
 
     protected override void OnParametersSet()
     {

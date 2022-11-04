@@ -42,7 +42,7 @@ namespace Atomy.Agent.Services
             {
                 var pluginsDir = Path.GetFullPath(_configuration.GetValue<string>("Atomy:Plugins:Folder"));
 
-                _logger.LogTrace($"Loading plugins in '{pluginsDir}' ...");
+                _logger.LogTrace("Loading plugins in '{pluginsDir}' ...", pluginsDir);
 
                 foreach (var pd in Directory.EnumerateDirectories(pluginsDir))
                 {
@@ -51,7 +51,7 @@ namespace Atomy.Agent.Services
 
                     if (Directory.EnumerateFiles(pd).Where(x => Path.GetFileName(x).Equals(dllName)).Count() == 1)
                     {
-                        _logger.LogTrace($"Detected directory '{pd}'.");
+                        _logger.LogTrace("Detected directory '{pd}'.", pd);
                         var assembly = Assembly.LoadFile($"{Path.Combine(pd, dllName)}");
                         if (!TryLoadPlugins(assembly))
                         {
@@ -88,8 +88,7 @@ namespace Atomy.Agent.Services
         /// <returns></returns>
         public IStepProxy CreateInstance(IStepBody stepBody)
         {
-            var newInstance = ActivatorUtilities.CreateInstance(_serviceProvider, stepBody.GetType()) as IStepBody;
-            if (newInstance == null)
+            if (ActivatorUtilities.CreateInstance(_serviceProvider, stepBody.GetType()) is not IStepBody newInstance)
             {
                 throw new InvalidOperationException($"Step body '{stepBody.GetType().FullName}' is not a valid step body.");
             }
@@ -109,7 +108,7 @@ namespace Atomy.Agent.Services
                     if (ActivatorUtilities.CreateInstance(_serviceProvider, sp) is IStepBody si)
                     {
                         _stepPlugins.Add(new StepProxy(si));
-                        _logger.LogTrace($"Added step plugin '{si.GetType().Name}'.");
+                        _logger.LogTrace("Added step plugin '{si.GetType.Name}'.", si.GetType().Name);
                     }
                 }
                 return true;
