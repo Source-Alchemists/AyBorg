@@ -4,7 +4,7 @@ using Atomy.SDK.Projects;
 
 namespace Atomy.Agent.Services;
 
-internal interface IRuntimeConverterService
+public interface IRuntimeConverterService
 {
     /// <summary>
     /// Converts the specified project.

@@ -1,11 +1,13 @@
 using System.Globalization;
 using System.Text.Json;
+using System.Runtime.CompilerServices;
 using Atomy.SDK.Data.DAL;
 using Atomy.SDK.ImageProcessing.Shapes;
 using Atomy.SDK.Common.Ports;
 using Atomy.SDK.Projects;
 using Atomy.SDK.Common;
 
+[assembly: InternalsVisibleTo("Atomy.Agent.Tests")]
 namespace Atomy.Agent.Services;
 
 internal sealed class RuntimeConverterService : IRuntimeConverterService
