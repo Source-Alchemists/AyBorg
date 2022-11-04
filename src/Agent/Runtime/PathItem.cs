@@ -2,7 +2,7 @@ using Atomy.SDK.Common;
 
 namespace Atomy.Agent.Runtime;
 
-public record PathItem 
+internal sealed record PathItem 
 {
     /// <summary>
     // Gets the identifier of the path item.

@@ -3,7 +3,7 @@ using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Agent.Runtime;
 
-public class Pathfinder : IPathfinder
+internal sealed class Pathfinder : IPathfinder
 {
     /// <summary>
     /// Gets the start steps of the path.

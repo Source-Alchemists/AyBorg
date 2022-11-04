@@ -1,6 +1,6 @@
 namespace Atomy.Agent.Runtime;
 
-public sealed class PathExecuter : IDisposable
+internal sealed class PathExecuter : IDisposable
 {
     private readonly ILogger<PathExecuter> _logger;
     private readonly PathItem _pathItem;

@@ -1,6 +1,6 @@
 namespace Atomy.Agent.Runtime;
 
-public enum PathExecutionState
+internal enum PathExecutionState
 {
     /// <summary>
     /// The path item is ready to be executed.

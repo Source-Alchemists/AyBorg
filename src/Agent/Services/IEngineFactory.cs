@@ -4,7 +4,7 @@ using Atomy.SDK.System.Runtime;
 
 namespace Atomy.Agent.Services;
 
-public interface IEngineFactory
+internal interface IEngineFactory
 {
     /// <summary>
     /// Creates the engine.

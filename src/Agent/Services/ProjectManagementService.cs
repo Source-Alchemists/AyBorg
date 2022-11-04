@@ -6,7 +6,7 @@ using Atomy.SDK.Projects;
 
 namespace Atomy.Agent.Services;
 
-public class ProjectManagementService : IProjectManagementService
+internal sealed class ProjectManagementService : IProjectManagementService
 {
     private readonly ILogger<ProjectManagementService> _logger;
     private readonly IDbContextFactory<ProjectContext> _projectContextFactory;

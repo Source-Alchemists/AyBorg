@@ -4,7 +4,7 @@ using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Agent;
 
-public class StepProxy : IStepProxy
+public sealed class StepProxy : IStepProxy
 {
     private readonly Stopwatch _stopwatch = new();
     private bool _lastResult = false;
@@ -135,7 +135,7 @@ public class StepProxy : IStepProxy
         }
     }
 
-    protected virtual void Dispose(bool disposing)
+    public void Dispose(bool disposing)
     {
         if (!disposedValue)
         {

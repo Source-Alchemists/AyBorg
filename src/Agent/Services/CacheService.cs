@@ -8,7 +8,7 @@ using Atomy.SDK.Common;
 
 namespace Atomy.Agent.Services;
 
-public class CacheService : ICacheService
+internal sealed class CacheService : ICacheService
 {
     private readonly ILogger<CacheService> _logger;
     private readonly IDtoMapper _mapper;

@@ -9,7 +9,7 @@ namespace Atomy.Agent.Controllers;
 [ApiController]
 [Route("[controller]")]
 [JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer })]
-public class RuntimeController : ControllerBase
+public sealed class RuntimeController : ControllerBase
 {
     private readonly ILogger<RuntimeController> _logger;
     private readonly IEngineHost _engineHost;

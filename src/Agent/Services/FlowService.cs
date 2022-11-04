@@ -4,7 +4,7 @@ using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Agent.Services;
 
-public class FlowService : IFlowService
+internal sealed class FlowService : IFlowService
 {
     private readonly ILogger<FlowService> _logger;
     private readonly IPluginsService _pluginsService;

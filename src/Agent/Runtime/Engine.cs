@@ -11,7 +11,7 @@ namespace Atomy.Agent.Runtime;
 /// </summary>
 /// <remarks>To keep things simple, the engine is always running once and is not beeing reused. 
 /// Each single/continuous run will create a new engine, with a new ID starting from idle state.</remarks>
-public sealed class Engine : IEngine
+internal sealed class Engine : IEngine
 {
     private readonly ILogger<Engine> _logger;
     private readonly ILogger<PathExecuter> _pathExecuterLogger;

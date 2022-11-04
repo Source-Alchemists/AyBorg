@@ -3,7 +3,7 @@ using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Agent.Runtime;
 
-public interface IPathfinder
+internal interface IPathfinder
 {
     /// <summary>
     /// Creates a path from the given steps and links.

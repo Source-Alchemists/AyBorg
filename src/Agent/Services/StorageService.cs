@@ -2,7 +2,7 @@ using Atomy.SDK.Common;
 
 namespace Atomy.Agent.Services;
 
-public class StorageService : IStorageService
+internal sealed class StorageService : IStorageService
 {
     private const string VIRTUAL_ROOT_PATH = "/";
     private readonly ILogger<StorageService> _logger;

@@ -10,7 +10,7 @@ namespace Atomy.Agent.Controllers;
 [ApiController]
 [Route("[controller]")]
 [JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer })]
-public class FlowController : ControllerBase
+public sealed class FlowController : ControllerBase
 {
     private readonly ILogger<FlowController> _logger;
     private readonly IFlowService _flowService;

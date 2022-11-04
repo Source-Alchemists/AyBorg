@@ -5,7 +5,7 @@ using Atomy.SDK.System.Runtime;
 
 namespace Atomy.Agent.Services;
 
-public class EngineFactory : IEngineFactory
+internal sealed class EngineFactory : IEngineFactory
 {
     private readonly ILogger<EngineFactory> _logger;
     private readonly ILoggerFactory _loggerFactory;

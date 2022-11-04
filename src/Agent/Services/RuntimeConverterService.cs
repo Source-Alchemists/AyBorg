@@ -8,7 +8,7 @@ using Atomy.SDK.Common;
 
 namespace Atomy.Agent.Services;
 
-public class RuntimeConverterService : IRuntimeConverterService
+internal sealed class RuntimeConverterService : IRuntimeConverterService
 {
     private readonly ILogger<RuntimeConverterService> _logger;
     private readonly IServiceProvider _serviceProvider;

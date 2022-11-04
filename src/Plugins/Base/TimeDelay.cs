@@ -3,7 +3,7 @@ using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Plugins.Base;
 
-public class TimeDelay : IStepBody
+public sealed class TimeDelay : IStepBody
 {
     private readonly NumericPort _milliseconds = new("Milliseconds", PortDirection.Input, 1000, 0);
 
