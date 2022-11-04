@@ -32,8 +32,6 @@
     <ProjectReference Include="..\SDK\src\Data\Mapper\Atomy.SDK.Data.Mapper.csproj" />
     <ProjectReference Include="..\SDK\src\Authorization\Atomy.SDK.Authorization.csproj" />
     <ProjectReference Include="..\SDK\src\Communication\MQTT\Atomy.SDK.Communication.MQTT.csproj" />
-    <ProjectReference Include="..\SDK\src\Common\Atomy.SDK.Common.csproj" />
-    <ProjectReference Include="..\SDK\src\Projects\Atomy.SDK.Projects.csproj" />
   </ItemGroup>
 
 </Project>
