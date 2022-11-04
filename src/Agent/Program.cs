@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Atomy.Agent.Hubs;
 using Atomy.Agent.Services;
-using Atomy.SDK.System.Mapper;
+using Atomy.SDK.Data.Mapper;
 using Atomy.Database.Data;
 using Atomy.SDK.Authorization;
 using Atomy.SDK.System.Services;

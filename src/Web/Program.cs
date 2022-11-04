@@ -9,7 +9,7 @@ using Atomy.Web.Services.Agent;
 using Atomy.Web.Services;
 using Atomy.Database.Data;
 using Atomy.SDK.Communication.MQTT;
-using Atomy.SDK.System.Mapper;
+using Atomy.SDK.Data.Mapper;
 using Atomy.Web;
 using Atomy.SDK.Authorization;
 

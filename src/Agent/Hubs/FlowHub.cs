@@ -1,4 +1,4 @@
-using Atomy.SDK.System.Mapper;
+using Atomy.SDK.Data.Mapper;
 using Atomy.SDK.Common.Ports;
 using Microsoft.AspNetCore.SignalR;
 

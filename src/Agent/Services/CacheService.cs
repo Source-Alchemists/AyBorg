@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Caching.Memory;
 using Atomy.SDK.Data.DTOs;
-using Atomy.SDK.System.Mapper;
+using Atomy.SDK.Data.Mapper;
 using Atomy.SDK.Common.Ports;
 using Atomy.SDK.Projects;
 using Atomy.SDK.System.Caching;

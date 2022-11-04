@@ -31,7 +31,7 @@
     <ProjectReference Include="..\SDK\database\Atomy.Database.Data\Atomy.Database.Data.csproj" />
     <ProjectReference Include="..\SDK\database\migrations\Atomy.Database.Migrations.SqlLite\Atomy.Database.Migrations.SqlLite.csproj" />
     <ProjectReference Include="..\SDK\database\migrations\Atomy.Database.Migrations.PostgreSql\Atomy.Database.Migrations.PostgreSql.csproj" />
-    <ProjectReference Include="..\SDK\src\System\Atomy.SDK.System.csproj" />
+    <ProjectReference Include="..\SDK\src\Data\Mapper\Atomy.SDK.Data.Mapper.csproj" />
   </ItemGroup>
 
   <ItemGroup>

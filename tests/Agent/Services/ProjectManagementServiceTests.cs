@@ -1,7 +1,7 @@
 using Atomy.Database.Data;
 using Atomy.Agent.Services;
 using Atomy.SDK.Data.DAL;
-using Atomy.SDK.System.Mapper;
+using Atomy.SDK.Data.Mapper;
 using Atomy.SDK.Common.Ports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
