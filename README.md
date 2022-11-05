@@ -57,9 +57,9 @@ Steps are called the plugins, provding methods executed in the runtime flow:
 ### StepBody
 The step body is all what a developer need to write to have a fully executable plugin/step.
 ```c#
-public class TimeDelay : IStepBody
+public sealed class TimeDelay : IStepBody
 {
-    private readonly NumericPort _milliseconds = new NumericPort("Milliseconds", PortDirection.Input, 1000, 0);
+    private readonly NumericPort _milliseconds = new("Milliseconds", PortDirection.Input, 1000, 0);
 
     /// Display name for the step.
     public string DefaultName => "Time.Delay";
@@ -68,7 +68,7 @@ public class TimeDelay : IStepBody
     {
         Ports = new List<IPort> { _milliseconds };
     }
-
+    
     /// Ports provided.
     public IEnumerable<IPort> Ports { get; }
 
