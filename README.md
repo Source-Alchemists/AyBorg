@@ -15,7 +15,7 @@ Atomy stays for **A**u**to**mation **m**ade eas**y**!
 - **Data secure!** Keep the data on your edge device or send it to the cloud. Your solution, your choice!
 - **Open for extensions!**
     - You need a new fancy plugin? Go for it, Atomy is open to be extented.
-    - Atomy is not only easy to use, it is also easy to extend! (See **StepBody**)
+    - Atomy is not only easy to use, it is also easy to extend! (See [StepBody](#stepBody))
     - You write your logic, Atomy does the rest!
 
 ## Transfer protocols
