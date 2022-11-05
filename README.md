@@ -15,7 +15,7 @@ Atomy stays for **A**u**to**mation **m**ade eas**y**!
 - **Data secure!** Keep the data on your edge device or send it to the cloud. Your solution, your choice!
 - **Open for extensions!**
     - You need a new fancy plugin? Go for it, Atomy is open to be extented.
-    - Atomy is not only easy to use, it is also easy to extend! (See [StepBody](#stepBody))
+    - Atomy is not only easy to use, it is also easy to extend! (See [StepBody](doc/agent/plugins/custom-plugins.md#stepBody))
     - You write your logic, Atomy does the rest!
 
 ## Transfer protocols
@@ -37,58 +37,22 @@ We support following databases:
 
 The ready to use Docker composition is targeting PostgreSql but can easily modified to target other database providers.
 
-## Atomy.Agent
-### Ports
-| Name          | Type      | Category | Convertable                       |
-| ------------- | --------- | -------- | --------------------------------- |
-| StringPort    | String    | Field    | Numeric, Boolean, Rectangle, Enum |
-| NumericPort   | Double    | Field    | String, Boolean, Enum             |
-| BooleanPort   | Boolean   | Field    | String, Numeric                   |
-| EnumPort      | Enum      | Field    | String, Numeric                   |
-| FolderPort    | String    | Field    | String                            |
-| RectanglePort | Rectangle | Shape    | String                            |
-| ImagePort     | Image     | Image    |                                   |    
-
 ### Steps
 Steps are called the plugins, provding methods executed in the runtime flow:
 
 ![FlowScreenshot01](doc/img/FlowScreenshot01.png)
 
-### StepBody
-The step body is all what a developer need to write to have a fully executable plugin/step.
-```c#
-public sealed class TimeDelay : IStepBody
-{
-    private readonly NumericPort _milliseconds = new("Milliseconds", PortDirection.Input, 1000, 0);
+## Getting started
+Because Atomy is orchastrated into multipe microservices, you need to start each service separately.
+The services will also work without each other, but in most cases the following setup makes sense:
 
-    /// Display name for the step.
-    public string DefaultName => "Time.Delay";
+1. A MQTT broker (e.g. [Eclipse-Mosquitto](https://mosquitto.org))
+2. Atomy.Registry
+3. Atomy.Web
+4. One or more [Atomy.Agent(s)](doc/agent/agent.md)
 
-    public TimeDelay()
-    {
-        Ports = new List<IPort> { _milliseconds };
-    }
-    
-    /// Ports provided.
-    public IEnumerable<IPort> Ports { get; }
+The default appsettings give you a good starting point and will also work locally, but for real scenarios, you will need to change the settings.
 
-    /// The method that runs the step.
-    public async Task<bool> TryRunAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            var targetDelay = System.Convert.ToInt32(_milliseconds.Value);
-            await Task.Delay(targetDelay, cancellationToken);
-        }
-        catch (TaskCanceledException)
-        {
-            return false;
-        }
+> :info: Atomy default user "**SystemAdmin**" with password "**SystemAdmin123!**".
 
-        return true;
-    }
-}
-```
-The resulting step would look like this:
-
-![Time.Delay Screenshot](doc/img/TimeDelayStep.png)
+> :warning: **The default password should be changed immediately!**
