@@ -61,7 +61,7 @@ internal sealed class PathExecuter : IDisposable
             bool stepResult = false;
             try
             {
-                stepResult = await _pathItem.Step.TryRunAsync(_abortToken, TargetIterationId);
+                stepResult = await _pathItem.Step.TryRunAsync(TargetIterationId, _abortToken);
             }
             catch (Exception ex)
             {

@@ -94,10 +94,10 @@ public sealed class StepProxy : IStepProxy
     /// <summary>
     /// Executes the step.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="iterationId">The iteration identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns></returns>
-    public async Task<bool> TryRunAsync(CancellationToken cancellationToken, Guid iterationId)
+    public async Task<bool> TryRunAsync(Guid iterationId, CancellationToken cancellationToken)
     {
         if (IterationId == iterationId)
         {
