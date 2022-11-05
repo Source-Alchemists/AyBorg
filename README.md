@@ -53,6 +53,6 @@ The services will also work without each other, but in most cases the following 
 
 The default appsettings give you a good starting point and will also work locally, but for real scenarios, you will need to change the settings.
 
-> :information: Atomy default user "**SystemAdmin**" with password "**SystemAdmin123!**".
+> Atomy default user "**SystemAdmin**" with password "**SystemAdmin123!**".
 
 > :warning: **The default password should be changed immediately!**

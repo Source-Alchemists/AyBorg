@@ -16,5 +16,5 @@ The version of the project should be increased.
 ## Ready
 The project is ready and approved.
 
-> :information: While the "Draft" project table is always visible, the tables for "Waiting for approval" and "Ready" are only displayed if a project with the according state exists.
+> While the "Draft" project table is always visible, the tables for "Waiting for approval" and "Ready" are only displayed if a project with the according state exists.
 
