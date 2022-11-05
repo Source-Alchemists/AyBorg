@@ -1,14 +1,14 @@
 using MQTTnet.Protocol;
 using Microsoft.Extensions.Logging;
-using Atomy.SDK;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Communication.MQTT;
+using Atomy.SDK.Common;
 
 namespace Atomy.Plugins.Base.MQTT;
 
 public sealed class MqttSend : BaseMqttSendStep, IStepBody
 {
-    private readonly StringPort _messagePort = new StringPort("Message", PortDirection.Input, string.Empty);
+    private readonly StringPort _messagePort = new("Message", PortDirection.Input, string.Empty);
     public override string DefaultName => "MQTT.Send";
 
     public MqttSend(ILogger<MqttSend> logger, IMqttClientProvider mqttClientProvider)

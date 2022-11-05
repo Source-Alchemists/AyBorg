@@ -1,4 +1,4 @@
-using Atomy.SDK.Runtime;
+using Atomy.SDK.System.Runtime;
 using Atomy.Web.Shared.Models;
 
 namespace Atomy.Web.Services.Agent;
@@ -8,8 +8,7 @@ public class AgentOverviewService : IAgentOverviewService
     private readonly IRegistryService _registryService;
     private readonly IRuntimeService _runtimeService;
     private readonly IProjectManagementService _projectManagementService;
-    private readonly IStateService _stateService;
-    private readonly List<AgentServiceEntry> _AgentServices = new List<AgentServiceEntry>();
+    private readonly List<AgentServiceEntry> _AgentServices = new();
     
     private int _AgentsCount = 0;
     private int _activeAgentsCount = 0;
@@ -20,12 +19,11 @@ public class AgentOverviewService : IAgentOverviewService
     public int ActiveAgentsCount => _activeAgentsCount;
     public int InactiveAgentsCount => _inactiveAgentsCount;
 
-    public AgentOverviewService(IRegistryService registryService, IRuntimeService runtimeService, IProjectManagementService projectManagementService, IStateService stateService)
+    public AgentOverviewService(IRegistryService registryService, IRuntimeService runtimeService, IProjectManagementService projectManagementService)
     {
         _registryService = registryService;
         _runtimeService = runtimeService;
         _projectManagementService = projectManagementService;
-        _stateService = stateService;
     }
 
     public async Task UpdateAsync()

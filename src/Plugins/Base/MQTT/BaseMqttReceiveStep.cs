@@ -1,14 +1,14 @@
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using Atomy.SDK;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Common;
+using Atomy.SDK.Communication.MQTT;
 
 namespace Atomy.Plugins.Base.MQTT;
 
 public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
 {
-    protected readonly NumericPort _timeoutMsPort = new NumericPort("Timeout (ms)", PortDirection.Input, 10000, -1, int.MaxValue);
+    protected readonly NumericPort _timeoutMsPort = new("Timeout (ms)", PortDirection.Input, 10000, -1, int.MaxValue);
     protected string _lastTopic = string.Empty;
     protected MqttSubscription _subscription = null!;
     protected bool _hasNewMessage = false;
@@ -33,6 +33,8 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
         int count = 0;
         while(!_hasNewMessage && !cancellationToken.IsCancellationRequested)
         {
+            // Dont add the cancellation token here, because we want to wait for the timeout
+            // Else the MQTT client will be disposed
             await Task.Delay(1);
             count++;
             if(count > _timeoutMsPort.Value && _timeoutMsPort.Value != -1)

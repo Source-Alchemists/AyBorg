@@ -1,12 +1,12 @@
 ﻿using System.Diagnostics;
-using Atomy.SDK;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Agent;
 
-public class StepProxy : IStepProxy
+public sealed class StepProxy : IStepProxy
 {
-    private readonly Stopwatch _stopwatch = new Stopwatch();
+    private readonly Stopwatch _stopwatch = new();
     private bool _lastResult = false;
     private bool disposedValue;
 
@@ -94,10 +94,10 @@ public class StepProxy : IStepProxy
     /// <summary>
     /// Executes the step.
     /// </summary>
-    /// <param name="cancellationToken">The cancellation token.</param>
     /// <param name="iterationId">The iteration identifier.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns></returns>
-    public async Task<bool> TryRunAsync(CancellationToken cancellationToken, Guid iterationId)
+    public async Task<bool> TryRunAsync(Guid iterationId, CancellationToken cancellationToken)
     {
         if (IterationId == iterationId)
         {
@@ -135,7 +135,7 @@ public class StepProxy : IStepProxy
         }
     }
 
-    protected virtual void Dispose(bool disposing)
+    public void Dispose(bool disposing)
     {
         if (!disposedValue)
         {

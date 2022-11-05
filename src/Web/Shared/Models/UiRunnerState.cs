@@ -1,5 +1,5 @@
 using System.Text.Json.Serialization;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 
 namespace Atomy.Web.Shared.Models;
 

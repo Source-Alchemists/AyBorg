@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
 using Atomy.ServiceRegistry.Models;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Atomy.ServiceRegistry.Mapper;
 using Atomy.Database.Data;
 
@@ -12,12 +12,12 @@ public sealed class KeeperService : IKeeperService, IDisposable
 {
     private const int HeartbeatPollingTimeMs = 1000;
     private const int HeartbeatValidationTimeoutMs = 60000;
-    private readonly BlockingCollection<ServiceEntry> _availableServices = new BlockingCollection<ServiceEntry>();
+    private readonly BlockingCollection<ServiceEntry> _availableServices = new();
     private readonly Task _heartbeatTask;
     private readonly ILogger<KeeperService> _logger;
     private readonly IDalMapper _dalMapper;
     private readonly IDbContextFactory<RegistryContext> _registryContextFactory;
-    private readonly BlockingCollection<ServiceRegistryEntryDto> _registryEntries = new BlockingCollection<ServiceRegistryEntryDto>();
+    private readonly BlockingCollection<ServiceRegistryEntryDto> _registryEntries = new();
     private readonly ServiceRegistryEntryDto _selfServiceEntry;
     private bool _isDisposed = false;
     private bool _isHeartbeatTaskTerminated = false;
@@ -80,7 +80,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
         var result = _registryEntries.Where(x => x.Name.Equals(name));
         if (_selfServiceEntry.Name.Equals(name))
         {
-            result.Append(_selfServiceEntry);
+            result = result.Append(_selfServiceEntry);
         }
         await Task.CompletedTask;
         return result;
@@ -142,7 +142,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
             knownService.Name = serviceRegistryEntry.Name;
             serviceEntry = _dalMapper.Map(knownService);
             serviceEntry.LastConnectionTime = DateTime.UtcNow;
-            _logger.LogTrace($"Service {serviceEntry.Name} ({serviceEntry.Url}) is already registered and will be used with same id [{serviceEntry.Id}].");
+            _logger.LogTrace("Service {serviceEntry.Name} ({serviceEntry.Url}) is already registered and will be used with same id [{serviceEntry.Id}].", serviceEntry.Name, serviceEntry.Url, serviceEntry.Id);
         }
         else
         {
@@ -227,7 +227,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     {
         var tmpCollection = new List<ServiceEntry>();
         ServiceEntry? removedEntry = null;
-        while (_availableServices.AsEnumerable().Count() > 0)
+        while (_availableServices.AsEnumerable().Any())
         {
             var lastEntry = _availableServices.Take();
             if (!lastEntry.Id.Equals(serviceId))
@@ -254,7 +254,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     private void RemoveServiceRegistryEntry(ServiceEntry serviceEntry)
     {
         var tmpCollection = new List<ServiceRegistryEntryDto>();
-        while (_registryEntries.AsEnumerable().Count() > 0)
+        while (_registryEntries.AsEnumerable().Any())
         {
             var lastEntry = _registryEntries.Take();
             if (!(lastEntry.Url.Equals(serviceEntry.Url)))
@@ -281,9 +281,9 @@ public sealed class KeeperService : IKeeperService, IDisposable
                     var utcHeartbeat = serviceItem.LastConnectionTime.AddMilliseconds(HeartbeatValidationTimeoutMs);
                     if ((utcHeartbeat - utcNow).TotalMilliseconds < 0)
                     {
-                        _logger.LogWarning($"Service '{serviceItem.Name}' with id '{serviceItem.Id}' time out and will be removed!");
+                        _logger.LogWarning("Service '{serviceItem.Name}' with id '{serviceItem.Id}' time out and will be removed!", serviceItem.Name, serviceItem.Id);
                         RemoveService(serviceItem.Id);
-                        _logger.LogInformation($"Service '{serviceItem.Name}' (Url: '{serviceItem.Url}') removed!");
+                        _logger.LogInformation("Service '{serviceItem.Name}' (Url: '{serviceItem.Url}') removed!", serviceItem.Name, serviceItem.Url);
                     }
                 }
 

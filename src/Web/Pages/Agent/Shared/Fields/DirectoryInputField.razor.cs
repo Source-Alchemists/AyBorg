@@ -24,8 +24,10 @@ public partial class DirectoryInputField : BaseInputField
             MaxWidth = MaxWidth.Medium,
             FullWidth = true
         };
-        var parameters = new DialogParameters();
-        parameters.Add("RootPath", _value);
+        var parameters = new DialogParameters
+        {
+            { "RootPath", _value }
+        };
         var dialog = DialogService.Show<DirectoryBrowser>("Directory browser", parameters, options);
         var result = await dialog.Result;
         if (!result.Cancelled)

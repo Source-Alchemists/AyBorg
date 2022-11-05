@@ -1,5 +1,5 @@
-using Atomy.SDK.DAL;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DAL;
+using Atomy.SDK.Data.DTOs;
 using Atomy.ServiceRegistry.Models;
 using AutoMapper;
 

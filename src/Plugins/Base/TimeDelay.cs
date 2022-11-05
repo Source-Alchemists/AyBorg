@@ -1,11 +1,11 @@
-using Atomy.SDK;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Plugins.Base;
 
-public class TimeDelay : IStepBody
+public sealed class TimeDelay : IStepBody
 {
-    private readonly NumericPort _milliseconds = new NumericPort("Milliseconds", PortDirection.Input, 1000, 0);
+    private readonly NumericPort _milliseconds = new("Milliseconds", PortDirection.Input, 1000, 0);
 
     /// <inheritdoc />
     public string DefaultName => "Time.Delay";

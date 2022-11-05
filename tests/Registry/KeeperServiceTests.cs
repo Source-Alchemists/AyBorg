@@ -1,5 +1,5 @@
 using Atomy.ServiceRegistry.Services;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Atomy.ServiceRegistry.Mapper;
@@ -11,7 +11,7 @@ namespace Atomy.ServiceRegistry.Tests;
 
 public sealed class KeeperServiceTests : IDisposable
 {
-    private static NullLogger<KeeperService> _logger = new NullLogger<KeeperService>();
+    private static readonly NullLogger<KeeperService> _logger = new();
     private readonly IConfiguration _configuration;
     private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
     private readonly DbContextOptions<RegistryContext> _contextOptions;

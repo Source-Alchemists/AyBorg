@@ -1,6 +1,6 @@
 using System.Net;
 using Microsoft.AspNetCore.SignalR.Client;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Newtonsoft.Json;
 using System.Text;
 
@@ -189,8 +189,10 @@ public class FlowService : IFlowService
     /// <returns></returns>
     public async Task<bool> TrySetPortValueAsync(string baseUrl, PortDto port)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/flow/ports");
-        request.Content = new StringContent(JsonConvert.SerializeObject(port), Encoding.UTF8, "application/json");
+        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/flow/ports")
+        {
+            Content = new StringContent(JsonConvert.SerializeObject(port), Encoding.UTF8, "application/json")
+        };
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
         var response = await _httpClient.SendAsync(request);
         return response.IsSuccessStatusCode;

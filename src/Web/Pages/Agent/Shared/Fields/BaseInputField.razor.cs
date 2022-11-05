@@ -1,5 +1,5 @@
-using Atomy.SDK.DTOs;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Data.DTOs;
+using Atomy.SDK.Common.Ports;
 using Microsoft.AspNetCore.Components;
 
 namespace Atomy.Web.Pages.Agent.Shared.Fields;

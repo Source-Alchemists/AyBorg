@@ -16,7 +16,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SDK\src\Atomy.SDK.csproj" />
+    <ProjectReference Include="..\..\SDK\src\Communication\MQTT\Atomy.SDK.Communication.MQTT.csproj" />
+    <ProjectReference Include="..\..\SDK\src\Common\Atomy.SDK.Common.csproj" />
   </ItemGroup>
 
 </Project>

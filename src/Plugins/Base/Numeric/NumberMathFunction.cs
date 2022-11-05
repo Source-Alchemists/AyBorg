@@ -1,14 +1,14 @@
-using Atomy.SDK;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Plugins.Base.Numeric;
 
 public sealed class NumberMathFunction : IStepBody
 {
-    private readonly EnumPort _functionPort = new EnumPort("Function", PortDirection.Input, MathFunctions.Add);
-    private readonly NumericPort _valueAPort = new NumericPort("Value A", PortDirection.Input, 0);
-    private readonly NumericPort _valueBPort = new NumericPort("Value B", PortDirection.Input, 0);
-    private readonly NumericPort _resultPort = new NumericPort("Result", PortDirection.Output, 0);
+    private readonly EnumPort _functionPort = new("Function", PortDirection.Input, MathFunctions.Add);
+    private readonly NumericPort _valueAPort = new("Value A", PortDirection.Input, 0);
+    private readonly NumericPort _valueBPort = new("Value B", PortDirection.Input, 0);
+    private readonly NumericPort _resultPort = new("Result", PortDirection.Output, 0);
     public string DefaultName => "Number.Math.Function";
     public IEnumerable<IPort> Ports { get; }
 

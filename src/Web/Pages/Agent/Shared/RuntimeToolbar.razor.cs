@@ -2,8 +2,8 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using MQTTnet;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Runtime;
+using Atomy.SDK.Communication.MQTT;
+using Atomy.SDK.System.Runtime;
 using Atomy.Web.Services.Agent;
 
 
@@ -25,6 +25,8 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
 
     [Inject] IMqttClientProvider MqttClientProvider { get; set; }
 
+    private string StopClass => _isAbortVisible ? "w50" : "mud-full-width";
+
     private EngineMeta _status = null;
     private bool _isFirstUpdate = true;
     private bool _isStopVisible = false;
@@ -32,8 +34,6 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
     private bool _areButtonsDisabled = false;
     private bool _isButtonLoading = false;
     private MqttSubscription _statusSubscription;
-
-    private string _stopClass => _isAbortVisible ? "w50" : "mud-full-width";
 
     public async ValueTask DisposeAsync()
     {

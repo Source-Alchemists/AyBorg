@@ -1,15 +1,14 @@
 using System.Text;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using Atomy.SDK;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Communication.MQTT;
 
 namespace Atomy.Plugins.Base.MQTT;
 
 public sealed class MqttReceive : BaseMqttReceiveStep
 {
-    private readonly StringPort _messagePort = new StringPort("Message", PortDirection.Output, string.Empty);
+    private readonly StringPort _messagePort = new("Message", PortDirection.Output, string.Empty);
 
     public override string DefaultName => "MQTT.Receive";
 

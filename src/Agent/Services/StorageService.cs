@@ -1,9 +1,8 @@
-
-using Atomy.SDK;
+using Atomy.SDK.Common;
 
 namespace Atomy.Agent.Services;
 
-public class StorageService : IStorageService
+internal sealed class StorageService : IStorageService
 {
     private const string VIRTUAL_ROOT_PATH = "/";
     private readonly ILogger<StorageService> _logger;
@@ -24,7 +23,7 @@ public class StorageService : IStorageService
             try
             {
                 Directory.CreateDirectory(_environment.StorageLocation);
-                _logger.LogInformation("Created storage directory at {0}", _environment.StorageLocation);
+                _logger.LogInformation("Created storage directory at {StorageLocation}", _environment.StorageLocation);
             }
             catch (Exception ex)
             {
@@ -33,7 +32,7 @@ public class StorageService : IStorageService
         }
         else
         {
-            _logger.LogInformation("Using storage directory at {0}", _environment.StorageLocation);
+            _logger.LogInformation("Using storage directory at {StorageLocation}", _environment.StorageLocation);
         }
     }
 
@@ -44,7 +43,7 @@ public class StorageService : IStorageService
     /// <returns></returns>
     public IEnumerable<string> GetDirectories(string virtualPath)
     {
-        string realPath = string.Empty;
+        string realPath;
 
         if (virtualPath.Equals(VIRTUAL_ROOT_PATH)
             || virtualPath.Equals(Path.DirectorySeparatorChar.ToString())
@@ -58,7 +57,7 @@ public class StorageService : IStorageService
                 || virtualPath.StartsWith(Path.DirectorySeparatorChar.ToString())
                 || virtualPath.StartsWith(Path.AltDirectorySeparatorChar.ToString()))
             {
-                virtualPath = virtualPath.Substring(1);
+                virtualPath = virtualPath[1..];
             }
 
             virtualPath = virtualPath.Replace("..", string.Empty);

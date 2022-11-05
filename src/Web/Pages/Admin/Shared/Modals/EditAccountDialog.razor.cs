@@ -12,19 +12,21 @@ public partial class EditAccountDialog : ComponentBase
     [Inject] RoleManager<IdentityRole> RoleManager { get; set; } = null!;
     [Inject] UserManager<IdentityUser> UserManager { get; set; } = null!;
 
+    private readonly List<Role> _roles = new();
     private MudForm _form = null!;
     private string _userEmail = string.Empty;
-    private List<Role> _roles = new List<Role>();
     private bool _success = false;
-    private string[] _errors = { };
+    private string[] _errors = Array.Empty<string>();
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
         RoleManager.Roles.ToList().ForEach(async r =>
         {
-            var role = new Role(r);
-            role.Checked = await UserManager.IsInRoleAsync(User, r.Name);
+            var role = new Role(r)
+            {
+                Checked = await UserManager.IsInRoleAsync(User, r.Name)
+            };
             if (r.Name == Roles.Administrator && User.UserName == "SystemAdmin")
             {
                 role.Disabled = true;

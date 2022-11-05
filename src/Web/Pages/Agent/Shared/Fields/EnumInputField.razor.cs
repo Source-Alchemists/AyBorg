@@ -1,13 +1,13 @@
 using System.Text.Json;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 
 namespace Atomy.Web.Pages.Agent.Shared.Fields;
 
 public partial class EnumInputField : BaseInputField
 {
-    private EnumDto _value = new EnumDto();
-    private IList<string> _selectedNames = new List<string>();
-    private string[] _names = new string[0];
+    private EnumDto _value = new();
+    private readonly IList<string> _selectedNames = new List<string>();
+    private string[] _names = Array.Empty<string>();
 
     protected override Task OnParametersSetAsync()
     {
@@ -28,7 +28,7 @@ public partial class EnumInputField : BaseInputField
         }
 
         _selectedNames.Add(_value.Name ?? string.Empty);
-        _names = _value.Names ?? new string[0];
+        _names = _value.Names ?? Array.Empty<string>();
         return base.OnParametersSetAsync();
     }
 

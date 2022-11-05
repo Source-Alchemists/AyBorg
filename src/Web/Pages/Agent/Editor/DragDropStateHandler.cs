@@ -1,4 +1,4 @@
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 
 /// <summary>
 /// Work around class, because DataTransfer is not supported in Blazor.

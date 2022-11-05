@@ -14,7 +14,7 @@
                     <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
                     <MudSpacer />
                     <MudIcon Icon="@Icons.Filled.WbSunny" />
-                    <MudSwitch @ref="_themeSwitchRef" T="bool" Checked="@_isDarkMode" CheckedChanged="OnThemeSwitchChanged"></MudSwitch>
+                    <MudSwitch T="bool" Checked="@_isDarkMode" CheckedChanged="OnThemeSwitchChanged"></MudSwitch>
                     <UserMenu />
                 </MudAppBar>
                 

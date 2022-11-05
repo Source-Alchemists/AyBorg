@@ -1,17 +1,16 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using MQTTnet;
-using Atomy.SDK;
 using Atomy.SDK.ImageProcessing;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Communication.MQTT;
 
 namespace Atomy.Plugins.Base.MQTT;
 
 public sealed class MqttImageReceive : BaseMqttReceiveStep
 {
-    private readonly ImagePort _imagePort = new ImagePort("Image", PortDirection.Output, null!);
-    private readonly RecyclableMemoryStreamManager _memoryStreamManager = new RecyclableMemoryStreamManager();
+    private readonly ImagePort _imagePort = new("Image", PortDirection.Output, null!);
+    private readonly RecyclableMemoryStreamManager _memoryStreamManager = new();
 
     public override string DefaultName => "MQTT.Image.Receive";
 

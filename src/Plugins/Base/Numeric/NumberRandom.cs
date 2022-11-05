@@ -1,14 +1,14 @@
-using Atomy.SDK;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Plugins.Base.Numeric;
 
 public sealed class NumberRandom : IStepBody
 {
-    private readonly NumericPort _seedPort = new NumericPort("Seed", PortDirection.Input, -1, -1, int.MaxValue);
-    private readonly NumericPort _minPort = new NumericPort("Min", PortDirection.Input, 0);
-    private readonly NumericPort _maxPort = new NumericPort("Max", PortDirection.Input, 1);
-    private readonly NumericPort _resultPort = new NumericPort("Result", PortDirection.Output, 0);
+    private readonly NumericPort _seedPort = new("Seed", PortDirection.Input, -1, -1, int.MaxValue);
+    private readonly NumericPort _minPort = new("Min", PortDirection.Input, 0);
+    private readonly NumericPort _maxPort = new("Max", PortDirection.Input, 1);
+    private readonly NumericPort _resultPort = new("Result", PortDirection.Output, 0);
 
     private Random _random = null!;
     private int _seed = -1;

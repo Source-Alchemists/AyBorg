@@ -1,6 +1,8 @@
-using Atomy.SDK;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Runtime;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Communication.MQTT;
+using Atomy.SDK.Projects;
+using Atomy.SDK.System.Runtime;
 
 namespace Atomy.Agent.Runtime;
 
@@ -9,15 +11,15 @@ namespace Atomy.Agent.Runtime;
 /// </summary>
 /// <remarks>To keep things simple, the engine is always running once and is not beeing reused. 
 /// Each single/continuous run will create a new engine, with a new ID starting from idle state.</remarks>
-public sealed class Engine : IEngine
+internal sealed class Engine : IEngine
 {
     private readonly ILogger<Engine> _logger;
     private readonly ILogger<PathExecuter> _pathExecuterLogger;
     private readonly ILoggerFactory _loggerFactory;
     private readonly IMqttClientProvider _mqttClientProvider;
     private readonly Project _project;
-    private readonly CancellationTokenSource _abortTokenSource = new CancellationTokenSource();
-    private readonly CancellationTokenSource _stopTokenSource = new CancellationTokenSource();
+    private readonly CancellationTokenSource _abortTokenSource = new();
+    private readonly CancellationTokenSource _stopTokenSource = new();
     private Task? _executionTask;
     private bool _isDisposed = false;
     private Guid _iterationId = Guid.Empty;
@@ -69,7 +71,7 @@ public sealed class Engine : IEngine
             step.Completed += StepCompleted;
         }
 
-        _logger.LogTrace($"Engine [{Id}] with execution type [{executionType}] created.");
+        _logger.LogTrace("Engine [{Id}] with execution type [{executionType}] created.", Id, executionType);
     }
 
     /// <summary>
@@ -84,16 +86,16 @@ public sealed class Engine : IEngine
             return false;
         }
 
-        _logger.LogTrace($"Engine [{Id}] starting.");
+        _logger.LogTrace("Engine [{Id}] starting.", Id);
         State = EngineState.Starting;
         StateChanged?.Invoke(this, State);
 
         var pathfinder = new Pathfinder();
         var pathItems = await pathfinder.CreatePathAsync(_project.Steps, _project.Links);
-        _logger.LogTrace($"Engine [{Id}] path created.");
+        _logger.LogTrace("Engine [{Id}] path created.", Id);
 
         _executionTask = Task.Factory.StartNew(async () => await ExecutePathAsync(pathItems, _stopTokenSource.Token, _abortTokenSource.Token), TaskCreationOptions.LongRunning);
-        _logger.LogTrace($"Engine [{Id}] execution started.");
+        _logger.LogTrace("Engine [{Id}] execution started.", Id);
 
         State = EngineState.Running;
         StateChanged?.Invoke(this, State);
@@ -117,7 +119,7 @@ public sealed class Engine : IEngine
             return false;
         }
 
-        _logger.LogTrace($"Engine [{Id}] stopping.");
+        _logger.LogTrace("Engine [{Id}] stopping.", Id);
         State = EngineState.Stopping;
         StateChanged?.Invoke(this, State);
         _stopTokenSource.Cancel();
@@ -136,7 +138,7 @@ public sealed class Engine : IEngine
             return false;
         }
 
-        _logger.LogTrace($"Engine [{Id}] aborting.");
+        _logger.LogTrace("Engine [{Id}] aborting.", Id);
         State = EngineState.Aborting;
         StateChanged?.Invoke(this, State);
         _abortTokenSource.Cancel();
@@ -158,7 +160,7 @@ public sealed class Engine : IEngine
         {
             if (_executionTask != null && !_executionTask.IsCompleted)
             {
-                _logger.LogWarning($"Engine [{Id}] is still running while disposing. Aborting.");
+                _logger.LogWarning("Engine [{Id}] is still running while disposing. Aborting.", Id);
                 _abortTokenSource.Cancel();
                 _executionTask.Wait();
                 _executionTask.Dispose();
@@ -183,7 +185,7 @@ public sealed class Engine : IEngine
         while (!stopToken.IsCancellationRequested && !abortToken.IsCancellationRequested)
         {
             _iterationId = Guid.NewGuid();
-            _logger.LogTrace($"Engine [{Id}] iteration [{_iterationId}] started.");
+            _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] started.", Id, _iterationId);
 
             // Create a new executer for each path item.
             foreach (var pathItem in pathItems)
@@ -194,7 +196,7 @@ public sealed class Engine : IEngine
                     continue;
                 }
 
-                executers.Add(new PathExecuter(_pathExecuterLogger, pathItem, abortToken, _iterationId));
+                executers.Add(new PathExecuter(_pathExecuterLogger, pathItem, _iterationId, abortToken));
             }
 
             // Wait till all path items are done with there work.
@@ -215,7 +217,7 @@ public sealed class Engine : IEngine
             // All steps are executed and the iteration is finished.
             IterationFinished?.Invoke(this, new IterationFinishedEventArgs(_iterationId, executers.All(e => e.State == PathExecutionState.Completed)));
 
-            _logger.LogTrace($"Engine [{Id}] iteration [{_iterationId}] finished.");
+            _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] finished.", Id, _iterationId);
 
             // If the execution type is single run, stop the engine.
             if (ExecutionType == EngineExecutionType.SingleRun)
@@ -230,17 +232,17 @@ public sealed class Engine : IEngine
         if (_abortTokenSource.IsCancellationRequested)
         {
             State = EngineState.Aborted;
-            _logger.LogTrace($"Engine [{Id}] aborted.");
+            _logger.LogTrace("Engine [{Id}] aborted.", Id);
         }
         else if (_stopTokenSource.IsCancellationRequested)
         {
             State = EngineState.Stopped;
-            _logger.LogTrace($"Engine [{Id}] stopped.");
+            _logger.LogTrace("Engine [{Id}] stopped.", Id);
         }
         else
         {
             State = EngineState.Finished;
-            _logger.LogTrace($"Engine [{Id}] single run finished.");
+            _logger.LogTrace("Engine [{Id}] single run finished.", Id);
         }
         StateChanged?.Invoke(this, State);
     }
@@ -249,10 +251,10 @@ public sealed class Engine : IEngine
     {
         if (sender is not IStepProxy stepProxy) return;
 
-        _logger.LogTrace($"Step [{stepProxy.Name}] [{stepProxy.Id}] completed with result [{success}].");
+        _logger.LogTrace("Step [{stepProxy.Name}] [{stepProxy.Id}] completed with result [{success}].", stepProxy.Name, stepProxy.Id, success);
         if (!success)
         {
-            _logger.LogWarning($"Step [{stepProxy.Name}] failed.");
+            _logger.LogWarning("Step [{stepProxy.Name}] failed.", stepProxy.Name);
         }
 
         await SendStepInfoAsync(stepProxy);

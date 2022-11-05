@@ -7,7 +7,7 @@ namespace Atomy.Agent.Controllers;
 [ApiController]
 [Route("[controller]")]
 [JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer })]
-public class StorageController : ControllerBase
+public sealed class StorageController : ControllerBase
 {
     private readonly ILogger<StorageController> _logger;
     private readonly IStorageService _storageService;

@@ -89,8 +89,6 @@ namespace Atomy.Web.Areas.Identity.Pages.Account
 
             var result = await _signInManager.TwoFactorRecoveryCodeSignInAsync(recoveryCode);
 
-            var userId = await _userManager.GetUserIdAsync(user);
-
             if (result.Succeeded)
             {
                 _logger.LogInformation("User with ID '{UserId}' logged in with a recovery code.", user.Id);

@@ -1,4 +1,4 @@
-@using Atomy.SDK.Runtime
+@using Atomy.SDK.System.Runtime
 <MudTable Items="@Agents" Hover="true" Elevation="0">
     <HeaderContent>
         <MudTh Style="width: 33%">State</MudTh>
@@ -27,7 +27,14 @@
         </MudTd>
         <MudTd DataLabel="Project">
             <MudLink Href="@context.ProjectsLink" Underline="Underline.None">
-                @context.ActiveProjectName
+                @if(context.ActiveProjectName == string.Empty)
+                {
+                    <span>None</span>
+                }
+                else
+                {
+                    <span>@context.ActiveProjectName</span>
+                }
             </MudLink>
         </MudTd>
     </RowTemplate>

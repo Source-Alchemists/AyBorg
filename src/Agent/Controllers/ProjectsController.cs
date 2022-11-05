@@ -1,19 +1,18 @@
 using Microsoft.AspNetCore.Mvc;
 using Atomy.Agent.Services;
-using Atomy.SDK;
-using Atomy.SDK.DTOs;
-using Atomy.SDK.Mapper;
+using Atomy.SDK.Data.DTOs;
+using Atomy.SDK.Data.Mapper;
 using Atomy.SDK.Authorization;
+using Atomy.SDK.Projects;
 
 namespace Atomy.Agent.Controllers;
 
 [ApiController]
 [Route("[controller]")]
 [JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer })]
-public class ProjectsController : ControllerBase
+public sealed class ProjectsController : ControllerBase
 {
     private readonly ILogger<ProjectsController> _logger;
-    private readonly IConfiguration _configuration;
     private readonly IProjectManagementService _projectManagementService;
     private readonly IDtoMapper _storageToDtoMapper;
     private readonly string _serviceUniqueName;
@@ -28,7 +27,6 @@ public class ProjectsController : ControllerBase
     public ProjectsController(ILogger<ProjectsController> logger, IConfiguration configuration, IProjectManagementService projectManagementService, IDtoMapper storageToDtoMapper)
     {
         _logger = logger;
-        _configuration = configuration;
         _projectManagementService = projectManagementService;
         _storageToDtoMapper = storageToDtoMapper;
         _serviceUniqueName = configuration.GetValue<string>("Atomy:Service:UniqueName");
@@ -54,6 +52,7 @@ public class ProjectsController : ControllerBase
         var activeProjectMeta = metas.FirstOrDefault(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
         if(activeProjectMeta == null)
         {
+            _logger.LogWarning("No active project found.");
             return NotFound();
         }
 
@@ -100,6 +99,7 @@ public class ProjectsController : ControllerBase
     {
         if(_projectManagementService.ActiveProjectId != id)
         {
+            _logger.LogWarning("Project {id} is not active.", id);
             // The project is not active anymore.
             return Conflict();
         }

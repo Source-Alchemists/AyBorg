@@ -1,6 +1,6 @@
 namespace Atomy.Agent.Runtime;
 
-public class IterationFinishedEventArgs : EventArgs
+internal sealed class IterationFinishedEventArgs : EventArgs
 {
     /// <summary>
     /// Gets the iteration identifier.

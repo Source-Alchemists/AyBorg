@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Atomy.SDK.ImageProcessing.Encoding;
 
 namespace Atomy.Web.Pages.Agent.Shared.Fields;
@@ -10,7 +10,7 @@ public partial class ImageInputField : IComponent
     private string? _imageUrl;
     private int _imageWidth;
     private int _imageHeight;
-    private string _imageTooltip => $"Width: {_imageWidth} Height: {_imageHeight}";
+    private string ImageTooltip => $"Width: {_imageWidth} Height: {_imageHeight}";
 
     protected override void OnParametersSet()
     {

@@ -1,17 +1,16 @@
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
-using Atomy.SDK;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common.Ports;
 using Atomy.SDK.ImageProcessing.Encoding;
+using Atomy.SDK.Communication.MQTT;
 
 namespace Atomy.Plugins.Base.MQTT;
 
 public sealed class MqttImageSend : BaseMqttSendStep
 {
-    private readonly ImagePort _imagePort = new ImagePort("Image", PortDirection.Input, null!);
-    private readonly EnumPort _encodingPort = new EnumPort("Encoding", PortDirection.Input, EncoderType.Jpeg);
-    private readonly NumericPort _qualityPort = new NumericPort("Quality", PortDirection.Input, 80, 1, 100);
+    private readonly ImagePort _imagePort = new("Image", PortDirection.Input, null!);
+    private readonly EnumPort _encodingPort = new("Encoding", PortDirection.Input, EncoderType.Jpeg);
+    private readonly NumericPort _qualityPort = new("Quality", PortDirection.Input, 80, 1, 100);
 
     public override string DefaultName => "MQTT.Image.Send";
 

@@ -1,6 +1,6 @@
 namespace Atomy.Agent.Runtime;
 
-public sealed class PathExecuter : IDisposable
+internal sealed class PathExecuter : IDisposable
 {
     private readonly ILogger<PathExecuter> _logger;
     private readonly PathItem _pathItem;
@@ -31,9 +31,9 @@ public sealed class PathExecuter : IDisposable
     /// Initializes a new instance of the <see cref="PathExecuter"/> class.
     /// </summary>
     /// <param name="pathItem">The path item.</param>
-    /// <param name="abortToken">The abort token.</param>
     /// <param name="iterationId">The iteration identifier.</param>
-    public PathExecuter(ILogger<PathExecuter> logger, PathItem pathItem, CancellationToken abortToken, Guid iterationId)
+    /// <param name="abortToken">The abort token.</param>
+    public PathExecuter(ILogger<PathExecuter> logger, PathItem pathItem, Guid iterationId, CancellationToken abortToken)
     {
         _logger = logger;
         _pathItem = pathItem;
@@ -61,11 +61,11 @@ public sealed class PathExecuter : IDisposable
             bool stepResult = false;
             try
             {
-                stepResult = await _pathItem.Step.TryRunAsync(_abortToken, TargetIterationId);
+                stepResult = await _pathItem.Step.TryRunAsync(TargetIterationId, _abortToken);
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, $"Error occurred while executing step [{_pathItem.Step.Name}]");
+                _logger.LogWarning(ex, "Error occurred while executing step [{name}]", _pathItem.Step.Name);
             }
             finally
             {

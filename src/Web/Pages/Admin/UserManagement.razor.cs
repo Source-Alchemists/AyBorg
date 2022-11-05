@@ -8,7 +8,6 @@ namespace Atomy.Web.Pages.Admin;
 
 public partial class UserManagement : ComponentBase
 {
-    [Inject] RoleManager<IdentityRole> RoleManager { get; set; } = null!;
     [Inject] UserManager<IdentityUser> UserManager { get; set; } = null!;
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
@@ -37,8 +36,10 @@ public partial class UserManagement : ComponentBase
     private async Task OnEditAccountClicked(IdentityUser listUser)
     {
         var dialogOptions = new DialogOptions();
-        var dialogParameters = new DialogParameters();
-        dialogParameters.Add("User", listUser);
+        var dialogParameters = new DialogParameters
+        {
+            { "User", listUser }
+        };
         var dialog = DialogService.Show<EditAccountDialog>("Edit Account", dialogParameters, dialogOptions);
         var result = await dialog.Result;
         if (!result.Cancelled)

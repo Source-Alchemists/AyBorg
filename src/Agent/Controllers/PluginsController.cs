@@ -1,7 +1,7 @@
 ﻿using Atomy.Agent.Services;
 using Atomy.SDK.Authorization;
-using Atomy.SDK.DTOs;
-using Atomy.SDK.Mapper;
+using Atomy.SDK.Data.DTOs;
+using Atomy.SDK.Data.Mapper;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Atomy.Agent.Controllers;
@@ -9,7 +9,7 @@ namespace Atomy.Agent.Controllers;
 [ApiController]
 [Route("[controller]")]
 [JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer })]
-public class PluginsController : ControllerBase
+public sealed class PluginsController : ControllerBase
 {
 	private readonly ILogger<PluginsController> _logger;
 	private readonly IPluginsService _pluginsService;

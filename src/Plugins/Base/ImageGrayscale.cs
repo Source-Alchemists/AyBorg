@@ -1,13 +1,13 @@
-using Atomy.SDK;
 using Atomy.SDK.ImageProcessing;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Common;
 
 namespace Atomy.Plugins.Base;
 
 public sealed class ImageGrayscale : IStepBody, IDisposable
 {
-    private readonly ImagePort _imagePort = new ImagePort("Image", PortDirection.Input, null!);
-    private readonly ImagePort _grayscaleImagePort = new ImagePort("Grayscale image", PortDirection.Output, null!);
+    private readonly ImagePort _imagePort = new("Image", PortDirection.Input, null!);
+    private readonly ImagePort _grayscaleImagePort = new("Grayscale image", PortDirection.Output, null!);
     private bool disposedValue;
 
     public string DefaultName => "Image.Grayscale";

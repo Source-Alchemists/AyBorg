@@ -1,4 +1,4 @@
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Atomy.ServiceRegistry.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -20,7 +20,7 @@ public class ServicesController : ControllerBase
     public ServicesController(ILogger<ServicesController> logger, IKeeperService keeperService)
     {
         _logger = logger;
-        _keeperService = keeperService ?? throw new ArgumentException(nameof(keeperService));
+        _keeperService = keeperService ?? throw new ArgumentNullException(nameof(keeperService));
     }
 
     /// <summary>
@@ -37,12 +37,12 @@ public class ServicesController : ControllerBase
         try
         {
             var id = await _keeperService.RegisterAsync(serviceRegistryEntry);
-            _logger.LogInformation($"Registered {serviceRegistryEntry.Name} ({serviceRegistryEntry.Url}) with id [{serviceRegistryEntry.Id}].");
+            _logger.LogInformation("Registered {Name} ({Url}) with id [{Id}].", serviceRegistryEntry.Name, serviceRegistryEntry.Url, id);
             return Ok(id);
         }
         catch (InvalidOperationException ex)
         {
-            _logger.LogWarning(ex.Message);
+            _logger.LogWarning("Failed to register", ex);
             return new StatusCodeResult(StatusCodes.Status208AlreadyReported);
         }
     }
@@ -58,12 +58,12 @@ public class ServicesController : ControllerBase
         try
         {
             await _keeperService.UnregisterAsync(id);
-            _logger.LogInformation($"Unregistered {id}.");
+            _logger.LogInformation("Unregistered {id}.", id);
             return Ok();
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogWarning(ex.Message);
+            _logger.LogWarning("Failed to unregister", ex);
             return NoContent();
         }
     }
@@ -128,7 +128,7 @@ public class ServicesController : ControllerBase
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogWarning(ex.Message);
+            _logger.LogWarning("Failed to update", ex);
             return NoContent();
         }
     }

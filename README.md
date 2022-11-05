@@ -15,7 +15,7 @@ Atomy stays for **A**u**to**mation **m**ade eas**y**!
 - **Data secure!** Keep the data on your edge device or send it to the cloud. Your solution, your choice!
 - **Open for extensions!**
     - You need a new fancy plugin? Go for it, Atomy is open to be extented.
-    - Atomy is not only easy to use, it is also easy to extend! (See **StepBody**)
+    - Atomy is not only easy to use, it is also easy to extend! (See [StepBody](#stepBody))
     - You write your logic, Atomy does the rest!
 
 ## Transfer protocols
@@ -57,9 +57,9 @@ Steps are called the plugins, provding methods executed in the runtime flow:
 ### StepBody
 The step body is all what a developer need to write to have a fully executable plugin/step.
 ```c#
-public class TimeDelay : IStepBody
+public sealed class TimeDelay : IStepBody
 {
-    private readonly NumericPort _milliseconds = new NumericPort("Milliseconds", PortDirection.Input, 1000, 0);
+    private readonly NumericPort _milliseconds = new("Milliseconds", PortDirection.Input, 1000, 0);
 
     /// Display name for the step.
     public string DefaultName => "Time.Delay";
@@ -68,7 +68,7 @@ public class TimeDelay : IStepBody
     {
         Ports = new List<IPort> { _milliseconds };
     }
-
+    
     /// Ports provided.
     public IEnumerable<IPort> Ports { get; }
 

@@ -1,16 +1,15 @@
-using Atomy.SDK;
 using Atomy.SDK.ImageProcessing;
-using Atomy.SDK.ImageProcessing.Mirroring;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Common;
 
 namespace Atomy.Plugins.Base;
 
 public sealed class ImageMirror : IStepBody, IDisposable
 {
-    private readonly BooleanPort _mirrorVertical = new BooleanPort("Vertical", PortDirection.Input, false);
-    private readonly BooleanPort _mirrorHorizontal = new BooleanPort("Horizontal", PortDirection.Input, false);
-    private readonly ImagePort _inputImage = new ImagePort("Image", PortDirection.Input, null!);
-    private readonly ImagePort _outputImage = new ImagePort("Mirrored image", PortDirection.Output, null!);
+    private readonly BooleanPort _mirrorVertical = new("Vertical", PortDirection.Input, false);
+    private readonly BooleanPort _mirrorHorizontal = new("Horizontal", PortDirection.Input, false);
+    private readonly ImagePort _inputImage = new("Image", PortDirection.Input, null!);
+    private readonly ImagePort _outputImage = new("Mirrored image", PortDirection.Output, null!);
     private bool disposedValue;
 
     public string DefaultName => "Image.Mirror";

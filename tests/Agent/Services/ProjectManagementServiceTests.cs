@@ -1,13 +1,14 @@
 using Atomy.Database.Data;
 using Atomy.Agent.Services;
-using Atomy.SDK;
-using Atomy.SDK.DAL;
-using Atomy.SDK.Mapper;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Data.DAL;
+using Atomy.SDK.Data.Mapper;
+using Atomy.SDK.Common.Ports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
+using Atomy.SDK.Common;
+using Atomy.SDK.Projects;
 
 namespace Atomy.Agent.Tests;
 
@@ -15,7 +16,7 @@ namespace Atomy.Agent.Tests;
 
 public sealed class ProjectManagementServiceTests : IDisposable
 {
-    private static NullLogger<ProjectManagementService> _logger = new NullLogger<ProjectManagementService>();
+    private static readonly NullLogger<ProjectManagementService> _logger = new();
     private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
     private readonly DbContextOptions<ProjectContext> _contextOptions;
     private readonly IConfiguration _configuration;
@@ -209,8 +210,10 @@ public sealed class ProjectManagementServiceTests : IDisposable
 
         });
 
-        var stepProxy = new StepProxy(stepBodyMock.Object, x, y);
-        stepProxy.Name = name;
+        var stepProxy = new StepProxy(stepBodyMock.Object, x, y)
+        {
+            Name = name
+        };
         return stepProxy;
     }
 

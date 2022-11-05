@@ -2,14 +2,14 @@ using System.Text;
 using System.Text.Json;
 using Blazor.Diagrams.Core.Models;
 using MQTTnet;
-using Atomy.SDK;
-using Atomy.SDK.DTOs;
-using Atomy.SDK.Ports;
-using Atomy.Web.Pages.Agent.Editor.Nodes;
+using Atomy.SDK.Data.DTOs;
+using Atomy.SDK.Common.Ports;
 using Atomy.Web.Services.Agent;
-using Atomy.SDK.MQTT;
+using Atomy.SDK.Communication.MQTT;
 using Atomy.Web.Services;
 using System.Globalization;
+
+namespace Atomy.Web.Pages.Agent.Editor.Nodes;
 
 public class FlowPort : PortModel, IDisposable
 {
@@ -17,7 +17,7 @@ public class FlowPort : PortModel, IDisposable
     private readonly IStateService _stateService;
     private readonly IMqttClientProvider _mqttClientProvider;
     private readonly StepDto _step;
-    private Atomy.SDK.MQTT.MqttSubscription? _subscription;
+    private Atomy.SDK.Communication.MQTT.MqttSubscription? _subscription;
     private bool disposedValue;
 
     /// <summary>

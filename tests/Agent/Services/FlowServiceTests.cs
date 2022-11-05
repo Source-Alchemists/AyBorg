@@ -1,7 +1,8 @@
 using Atomy.Agent.Hubs;
 using Atomy.Agent.Services;
-using Atomy.SDK;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Projects;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
@@ -9,7 +10,7 @@ namespace Atomy.Agent.Tests.Services;
 
 public class FlowServiceTests
 {
-    private readonly NullLogger<FlowService> _logger = new NullLogger<FlowService>();
+    private readonly NullLogger<FlowService> _logger = new();
 
     [Fact]
     public async Task TestLinkPorts()

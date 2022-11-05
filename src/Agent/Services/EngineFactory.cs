@@ -1,11 +1,11 @@
 using Atomy.Agent.Runtime;
-using Atomy.SDK;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Runtime;
+using Atomy.SDK.Communication.MQTT;
+using Atomy.SDK.Projects;
+using Atomy.SDK.System.Runtime;
 
 namespace Atomy.Agent.Services;
 
-public class EngineFactory : IEngineFactory
+internal sealed class EngineFactory : IEngineFactory
 {
     private readonly ILogger<EngineFactory> _logger;
     private readonly ILoggerFactory _loggerFactory;
@@ -30,7 +30,7 @@ public class EngineFactory : IEngineFactory
     /// <param name="executionType">Type of the execution.</param>
     /// <returns></returns>
     public IEngine CreateEngine(Project project, EngineExecutionType executionType) {
-        _logger.LogTrace($"Creating engine with execution type [{executionType}].");
+        _logger.LogTrace("Creating engine with execution type [{executionType}].", executionType);
         var engineLogger = _loggerFactory.CreateLogger<Engine>();
         return new Engine(engineLogger, _loggerFactory, _mqttClientProvider, project, executionType);
     }

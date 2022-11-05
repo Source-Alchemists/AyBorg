@@ -1,9 +1,9 @@
-using Atomy.SDK;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Agent.Runtime;
 
-public class Pathfinder : IPathfinder
+internal sealed class Pathfinder : IPathfinder
 {
     /// <summary>
     /// Gets the start steps of the path.
@@ -130,7 +130,7 @@ public class Pathfinder : IPathfinder
                 }
                 pathItems.AddRange(nextItems);
                 nis.AddRange(nextItems);
-                count += nextItems.Count();
+                count += nextItems.Count;
             }
             lpts = nis;
             if (count == 0) break;

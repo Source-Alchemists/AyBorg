@@ -1,8 +1,8 @@
-using Atomy.SDK.Runtime;
+using Atomy.SDK.System.Runtime;
 
 namespace Atomy.Agent.Runtime;
 
-public interface IEngine : IDisposable
+internal interface IEngine : IDisposable
 {
     /// <summary>
     /// Called when the iteration is finished.

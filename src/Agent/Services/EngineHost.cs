@@ -1,12 +1,12 @@
 using System.Text.Json;
 using Atomy.Agent.Runtime;
-using Atomy.SDK;
-using Atomy.SDK.MQTT;
-using Atomy.SDK.Runtime;
+using Atomy.SDK.Communication.MQTT;
+using Atomy.SDK.Projects;
+using Atomy.SDK.System.Runtime;
 
 namespace Atomy.Agent.Services;
 
-public class EngineHost : IEngineHost
+internal sealed class EngineHost : IEngineHost
 {
     private readonly ILogger<EngineHost> _logger;
     private readonly IEngineFactory _engineFactory;
@@ -96,7 +96,7 @@ public class EngineHost : IEngineHost
 
         _engineMeta.State = _engine.State;
 
-        _logger.LogTrace($"Engine status: {_engine.State}, {_engine.ExecutionType}");
+        _logger.LogTrace("Engine status: {_engine.State}, {_engine.ExecutionType}", _engine.State, _engine.ExecutionType);
         return await Task.FromResult(_engineMeta);
     }
 
@@ -241,23 +241,23 @@ public class EngineHost : IEngineHost
 
         _engineMeta.State = state;
 
-        _logger.LogTrace($"Engine state changed to '{state}'.");
+        _logger.LogTrace("Engine state changed to '{state}'.", state);
 
         if (state == EngineState.Stopped)
         {
-            _logger.LogInformation($"Engine stopped at {DateTime.UtcNow} (UTC).");
+            _logger.LogInformation("Engine stopped at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
         }
         else if (state == EngineState.Aborted)
         {
-            _logger.LogInformation($"Engine aborted at {DateTime.UtcNow} (UTC).");
+            _logger.LogInformation("Engine aborted at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
         }
         else if (state == EngineState.Finished)
         {
-            _logger.LogInformation($"Engine finished single run at {DateTime.UtcNow} (UTC).");
+            _logger.LogInformation("Engine finished single run at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
         }
         else if (state == EngineState.Running)
         {
-            _logger.LogInformation($"Engine started at {DateTime.UtcNow} (UTC).");
+            _logger.LogInformation("Engine started at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
         }
 
         if (state == EngineState.Stopped || state == EngineState.Aborted || state == EngineState.Finished)

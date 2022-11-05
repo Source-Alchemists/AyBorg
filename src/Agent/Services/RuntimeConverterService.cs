@@ -1,14 +1,16 @@
 using System.Globalization;
 using System.Text.Json;
-using Atomy.SDK;
-using Atomy.SDK.DAL;
-using Atomy.SDK.DTOs;
+using System.Runtime.CompilerServices;
+using Atomy.SDK.Data.DAL;
 using Atomy.SDK.ImageProcessing.Shapes;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common.Ports;
+using Atomy.SDK.Projects;
+using Atomy.SDK.Common;
 
+[assembly: InternalsVisibleTo("Atomy.Agent.Tests")]
 namespace Atomy.Agent.Services;
 
-public class RuntimeConverterService : IRuntimeConverterService
+internal sealed class RuntimeConverterService : IRuntimeConverterService
 {
     private readonly ILogger<RuntimeConverterService> _logger;
     private readonly IServiceProvider _serviceProvider;
@@ -70,7 +72,7 @@ public class RuntimeConverterService : IRuntimeConverterService
             case RectanglePort rectanglePort:
                 return UpdateRectanglePortValue(rectanglePort, value);
             case ImagePort imagePort:
-                return UpdateImagePortValue(imagePort, value);
+                return UpdateImagePortValue(imagePort);
         }
 
         _logger.LogWarning("Port type {PortType} is not supported", port.GetType().Name);
@@ -127,7 +129,7 @@ public class RuntimeConverterService : IRuntimeConverterService
         return true;
     }
 
-    private static bool UpdateImagePortValue(ImagePort port, object value)
+    private static bool UpdateImagePortValue(ImagePort port)
     {
         port.Value = null!; // Nothing to do, images will be created at runtime.
         return true;
@@ -208,7 +210,7 @@ public class RuntimeConverterService : IRuntimeConverterService
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Failed to convert link {linkRecord.Id}.");
+                _logger.LogError(ex, "Failed to convert link {linkRecord.Id}.", linkRecord.Id);
             }
         }
     }
@@ -220,7 +222,7 @@ public class RuntimeConverterService : IRuntimeConverterService
             var portRecord = portRecords.FirstOrDefault(x => x.Name == port.Name && x.Direction == port.Direction);
             if (portRecord == null)
             {
-                _logger.LogWarning($"Port record {port.Name} not found! Will use default value.");
+                _logger.LogWarning("Port record {port.Name} not found! Will use default value.", port.Name);
                 continue;
             }
 

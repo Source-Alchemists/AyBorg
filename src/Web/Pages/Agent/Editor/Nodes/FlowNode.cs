@@ -2,9 +2,9 @@
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
 using MQTTnet;
-using Atomy.SDK.DTOs;
+using Atomy.SDK.Data.DTOs;
 using Atomy.Web.Services.Agent;
-using Atomy.SDK.MQTT;
+using Atomy.SDK.Communication.MQTT;
 using Atomy.Web.Services;
 
 namespace Atomy.Web.Pages.Agent.Editor.Nodes;
@@ -14,7 +14,7 @@ public class FlowNode : NodeModel, IDisposable
     private readonly IFlowService _flowService;
     private readonly IStateService _stateService;
     private readonly IMqttClientProvider _mqttClientProvider;
-    private Atomy.SDK.MQTT.MqttSubscription? _subscription;
+    private Atomy.SDK.Communication.MQTT.MqttSubscription? _subscription;
     private bool disposedValue;
 
     public StepDto Step { get; private set; }
@@ -43,7 +43,6 @@ public class FlowNode : NodeModel, IDisposable
         if (step.Ports == null) return;
         foreach (var port in step.Ports)
         {
-            if (port == null) throw new ArgumentNullException(nameof(port));
             AddPort(new FlowPort(this, port, step, _flowService, _mqttClientProvider, _stateService));
         }
 

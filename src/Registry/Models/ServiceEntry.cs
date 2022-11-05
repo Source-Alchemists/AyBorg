@@ -1,4 +1,4 @@
-using Atomy.SDK.DAL;
+using Atomy.SDK.Data.DAL;
 
 namespace Atomy.ServiceRegistry.Models;
 

@@ -1,10 +1,10 @@
 using Atomy.Agent.Hubs;
-using Atomy.SDK;
-using Atomy.SDK.Ports;
+using Atomy.SDK.Common;
+using Atomy.SDK.Common.Ports;
 
 namespace Atomy.Agent.Services;
 
-public class FlowService : IFlowService
+internal sealed class FlowService : IFlowService
 {
     private readonly ILogger<FlowService> _logger;
     private readonly IPluginsService _pluginsService;
@@ -80,7 +80,7 @@ public class FlowService : IFlowService
 
         if (pluginProxy == null)
         {
-            _logger.LogWarning($"Step with id '{stepId}' not found.");
+            _logger.LogWarning("Step with id '{stepId}' not found.", stepId);
             return null!;
         }
 
@@ -109,7 +109,7 @@ public class FlowService : IFlowService
         var step = project.Steps.FirstOrDefault(s => s.Id == stepId);
         if(step == null)
         {
-            _logger.LogWarning($"Step with id '{stepId}' not found.");
+            _logger.LogWarning("Step with id '{stepId}' not found.", stepId);
             return false;
         }
 
@@ -158,7 +158,7 @@ public class FlowService : IFlowService
         var step = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Id == stepId);
         if (step == null)
         {
-            _logger.LogWarning($"Step with id '{stepId}' not found.");
+            _logger.LogWarning("Step with id '{stepId}' not found.", stepId);
             return false;
         }
         step.X = x;
@@ -205,32 +205,32 @@ public class FlowService : IFlowService
 
         if (sourcePort == null || targetPort == null)
         {
-            _logger.LogWarning($"Ports with ids '{sourcePortId}' and/or '{targetPortId}' not found.");
+            _logger.LogWarning("Ports with ids '{sourcePortId}' and/or '{targetPortId}' not found.", sourcePortId, targetPortId);
             return null!;
         }
 
         if (sourceStep!.Id == targetStep!.Id)
         {
-            _logger.LogWarning($"Ports with ids '{sourcePortId}' and '{targetPortId}' are in the same step.");
+            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are in the same step.", sourcePortId, targetPortId);
             return null!;
         }
 
         if (sourcePort.Direction != PortDirection.Output || targetPort.Direction != PortDirection.Input)
         {
-            _logger.LogWarning($"Ports with ids '{sourcePortId}' and '{targetPortId}' are not compatible.");
+            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are not compatible.", sourcePortId, targetPortId);
             return null!;
         }
 
         if (sourceStep.Links.Any(x => x.SourceId == sourcePortId && x.TargetId == targetPortId)
             || targetStep.Links.Any(x => x.SourceId == sourcePortId && x.TargetId == targetPortId))
         {
-            _logger.LogWarning($"Ports with ids '{sourcePortId}' and '{targetPortId}' are already linked.");
+            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are already linked.", sourcePortId, targetPortId);
             return null!;
         }
 
         if(!PortConverter.IsConvertable(sourcePort, targetPort))
         {
-            _logger.LogWarning($"Ports with ids '{sourcePortId}' and '{targetPortId}' are not convertable.");
+            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are not convertable.", sourcePortId, targetPortId);
             return null!;
         }
 
@@ -260,7 +260,7 @@ public class FlowService : IFlowService
         var steps = _runtimeHost.ActiveProject.Steps.Where(s => s.Links.Any(l => l.Id == linkId));
         if(!steps.Any())
         {
-            _logger.LogTrace($"Link with id '{linkId}' not found. Already removed.");
+            _logger.LogTrace("Link with id '{linkId}' not found. Already removed.", linkId);
             return true;
         }
 
@@ -296,7 +296,7 @@ public class FlowService : IFlowService
         var targetStep = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Ports.Any(p => p.Id == portId));
         if (targetStep == null)
         {
-            _logger.LogTrace($"Port with id '{portId}' not found. Already removed.");
+            _logger.LogTrace("Port with id '{portId}' not found. Already removed.", portId);
             return null!;
         }
 
@@ -320,7 +320,7 @@ public class FlowService : IFlowService
         var targetStep = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Ports.Any(p => p.Id == portId));
         if (targetStep == null)
         {
-            _logger.LogWarning($"Port with id '{portId}' not found.");
+            _logger.LogWarning("Port with id '{portId}' not found.", portId);
             return false;
         }
 
