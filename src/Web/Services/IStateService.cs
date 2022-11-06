@@ -1,6 +1,6 @@
-using Atomy.Web.Shared.Models;
+using Autodroid.Web.Shared.Models;
 
-namespace Atomy.Web.Services;
+namespace Autodroid.Web.Services;
 
 public interface IStateService
 {

@@ -1,10 +1,10 @@
-using Atomy.Web.Pages.Admin.Shared.Modals;
-using Atomy.Web.Shared.Modals;
+using Autodroid.Web.Pages.Admin.Shared.Modals;
+using Autodroid.Web.Shared.Modals;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using MudBlazor;
 
-namespace Atomy.Web.Pages.Admin;
+namespace Autodroid.Web.Pages.Admin;
 
 public partial class UserManagement : ComponentBase
 {

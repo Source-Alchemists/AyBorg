@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Caching.Memory;
-using Atomy.SDK.Data.DTOs;
-using Atomy.SDK.Data.Mapper;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.Projects;
-using Atomy.SDK.System.Caching;
-using Atomy.SDK.Common;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.SDK.Data.Mapper;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Projects;
+using Autodroid.SDK.System.Caching;
+using Autodroid.SDK.Common;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 internal sealed class CacheService : ICacheService
 {

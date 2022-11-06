@@ -1,9 +1,9 @@
 using System.Text;
 using System.Text.Json;
-using Atomy.SDK.Data.DTOs;
-using Atomy.SDK.Projects;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.SDK.Projects;
 
-namespace Atomy.Web.Services.Agent;
+namespace Autodroid.Web.Services.Agent;
 
 public class ProjectManagementService : IProjectManagementService
 {

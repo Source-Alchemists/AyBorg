@@ -1,7 +1,7 @@
-using Atomy.SDK.Authorization;
+using Autodroid.SDK.Authorization;
 using Microsoft.AspNetCore.Identity;
 
-namespace Atomy.Web;
+namespace Autodroid.Web;
 
 internal static class IdentityInitializer
 {

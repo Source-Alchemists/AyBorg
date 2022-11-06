@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.JSInterop;
 using MudBlazor;
 
-namespace Atomy.Web.Pages.Admin.Shared.Modals;
+namespace Autodroid.Web.Pages.Admin.Shared.Modals;
 
 public partial class CreateAccountDialog : ComponentBase
 {

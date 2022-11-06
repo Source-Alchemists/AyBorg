@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using Atomy.Agent.Hubs;
-using Atomy.Agent.Services;
-using Atomy.SDK.Data.Mapper;
-using Atomy.Database.Data;
-using Atomy.SDK.Authorization;
-using Atomy.SDK.System.Services;
-using Atomy.SDK.Common;
-using Atomy.SDK.Communication.MQTT;
+using Autodroid.Agent.Hubs;
+using Autodroid.Agent.Services;
+using Autodroid.SDK.Data.Mapper;
+using Autodroid.Database.Data;
+using Autodroid.SDK.Authorization;
+using Autodroid.SDK.System.Services;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Communication.MQTT;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +18,9 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("Atomy.Database.Migrations.SqlLite")),
+                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.SqlLite")),
         "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection"),
-                        x => x.MigrationsAssembly("Atomy.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );
@@ -35,7 +35,7 @@ builder.Services.AddHostedService<RegistryService>();
 
 builder.Services.AddMemoryCache();
 
-builder.Services.AddSingleton<IEnvironment, Atomy.SDK.Common.Environment>();
+builder.Services.AddSingleton<IEnvironment, Autodroid.SDK.Common.Environment>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
 builder.Services.AddSingleton<IRuntimeConverterService, RuntimeConverterService>();

@@ -1,8 +1,8 @@
-using Atomy.SDK.Data.DTOs;
-using Atomy.ServiceRegistry.Services;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.ServiceRegistry.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Atomy.ServiceRegistry.Controllers;
+namespace Autodroid.ServiceRegistry.Controllers;
 
 [ApiController]
 [Route("[controller]")]

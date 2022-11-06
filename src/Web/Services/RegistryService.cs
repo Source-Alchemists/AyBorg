@@ -1,6 +1,6 @@
-﻿using Atomy.SDK.Data.DTOs;
+﻿using Autodroid.SDK.Data.DTOs;
 
-namespace Atomy.Web.Services;
+namespace Autodroid.Web.Services;
 
 public class RegistryService : IRegistryService
 {
@@ -15,7 +15,7 @@ public class RegistryService : IRegistryService
     {
         _logger = logger;
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri(configuration.GetValue<string>("Atomy:ServiceRegistry:Url"));
+        _httpClient.BaseAddress = new Uri(configuration.GetValue<string>("Autodroid:ServiceRegistry:Url"));
     }
 
     /// <summary>

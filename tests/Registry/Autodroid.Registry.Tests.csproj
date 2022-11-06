@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Registry\Atomy.Registry.csproj" />
+    <ProjectReference Include="..\..\src\Registry\Autodroid.Registry.csproj" />
   </ItemGroup>
 
 </Project>

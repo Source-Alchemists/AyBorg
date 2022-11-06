@@ -1,8 +1,8 @@
-using Atomy.SDK.Common;
-using Atomy.SDK.Common.Ports;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
 using Moq;
 
-namespace Atomy.Agent.Tests;
+namespace Autodroid.Agent.Tests;
 
 public static class MockHelper
 {

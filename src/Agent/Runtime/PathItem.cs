@@ -1,6 +1,6 @@
-using Atomy.SDK.Common;
+using Autodroid.SDK.Common;
 
-namespace Atomy.Agent.Runtime;
+namespace Autodroid.Agent.Runtime;
 
 internal sealed record PathItem 
 {

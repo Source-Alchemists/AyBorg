@@ -1,6 +1,6 @@
-using Atomy.SDK.Data.DTOs;
+using Autodroid.SDK.Data.DTOs;
 
-namespace Atomy.ServiceRegistry.Services;
+namespace Autodroid.ServiceRegistry.Services;
 
 public interface IKeeperService
 {

@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Atomy.Agent.Runtime;
-using Atomy.SDK.Communication.MQTT;
-using Atomy.SDK.Projects;
-using Atomy.SDK.System.Runtime;
+using Autodroid.Agent.Runtime;
+using Autodroid.SDK.Communication.MQTT;
+using Autodroid.SDK.Projects;
+using Autodroid.SDK.System.Runtime;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 internal sealed class EngineHost : IEngineHost
 {
@@ -266,7 +266,7 @@ internal sealed class EngineHost : IEngineHost
             _logger.LogTrace($"Engine is done. Removing engine.");
         }
 
-        await _mqttClientProvider.PublishAsync($"atomy/agents/{_mqttClientProvider.ServiceUniqueName}/engine/status", JsonSerializer.Serialize(_engineMeta), new MqttPublishOptions());
+        await _mqttClientProvider.PublishAsync($"Autodroid/agents/{_mqttClientProvider.ServiceUniqueName}/engine/status", JsonSerializer.Serialize(_engineMeta), new MqttPublishOptions());
     }
 
     private void DisposeEngine()

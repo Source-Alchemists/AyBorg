@@ -1,7 +1,7 @@
-using Atomy.Database.Data;
-using Atomy.SDK.Data.Mapper;
-using Atomy.ServiceRegistry.Mapper;
-using Atomy.ServiceRegistry.Services;
+using Autodroid.Database.Data;
+using Autodroid.SDK.Data.Mapper;
+using Autodroid.ServiceRegistry.Mapper;
+using Autodroid.ServiceRegistry.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +13,9 @@ builder.Services.AddDbContextFactory<RegistryContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("Atomy.Database.Migrations.SqlLite")),
+                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.SqlLite")),
         "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection"),
-                        x => x.MigrationsAssembly("Atomy.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );

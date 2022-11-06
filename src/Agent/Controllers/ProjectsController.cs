@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
-using Atomy.Agent.Services;
-using Atomy.SDK.Data.DTOs;
-using Atomy.SDK.Data.Mapper;
-using Atomy.SDK.Authorization;
-using Atomy.SDK.Projects;
+using Autodroid.Agent.Services;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.SDK.Data.Mapper;
+using Autodroid.SDK.Authorization;
+using Autodroid.SDK.Projects;
 
-namespace Atomy.Agent.Controllers;
+namespace Autodroid.Agent.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -29,7 +29,7 @@ public sealed class ProjectsController : ControllerBase
         _logger = logger;
         _projectManagementService = projectManagementService;
         _storageToDtoMapper = storageToDtoMapper;
-        _serviceUniqueName = configuration.GetValue<string>("Atomy:Service:UniqueName");
+        _serviceUniqueName = configuration.GetValue<string>("Autodroid:Service:UniqueName");
     }
 
     [HttpGet]

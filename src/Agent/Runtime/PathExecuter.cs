@@ -1,4 +1,4 @@
-namespace Atomy.Agent.Runtime;
+namespace Autodroid.Agent.Runtime;
 
 internal sealed class PathExecuter : IDisposable
 {

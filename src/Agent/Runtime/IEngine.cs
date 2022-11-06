@@ -1,6 +1,6 @@
-using Atomy.SDK.System.Runtime;
+using Autodroid.SDK.System.Runtime;
 
-namespace Atomy.Agent.Runtime;
+namespace Autodroid.Agent.Runtime;
 
 internal interface IEngine : IDisposable
 {

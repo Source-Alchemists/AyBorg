@@ -1,8 +1,8 @@
-using Atomy.Agent.Hubs;
-using Atomy.SDK.Common;
-using Atomy.SDK.Common.Ports;
+using Autodroid.Agent.Hubs;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 internal sealed class FlowService : IFlowService
 {

@@ -2,19 +2,19 @@
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
 using MQTTnet;
-using Atomy.SDK.Data.DTOs;
-using Atomy.Web.Services.Agent;
-using Atomy.SDK.Communication.MQTT;
-using Atomy.Web.Services;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.Web.Services.Agent;
+using Autodroid.SDK.Communication.MQTT;
+using Autodroid.Web.Services;
 
-namespace Atomy.Web.Pages.Agent.Editor.Nodes;
+namespace Autodroid.Web.Pages.Agent.Editor.Nodes;
 
 public class FlowNode : NodeModel, IDisposable
 {
     private readonly IFlowService _flowService;
     private readonly IStateService _stateService;
     private readonly IMqttClientProvider _mqttClientProvider;
-    private Atomy.SDK.Communication.MQTT.MqttSubscription? _subscription;
+    private Autodroid.SDK.Communication.MQTT.MqttSubscription? _subscription;
     private bool disposedValue;
 
     public StepDto Step { get; private set; }
@@ -51,7 +51,7 @@ public class FlowNode : NodeModel, IDisposable
 
     private async void MqttSubscribe()
     {
-        _subscription = await _mqttClientProvider.SubscribeAsync($"atomy/agents/{_stateService.AgentState.UniqueName}/engine/steps/{Step.Id}/executionTimeMs");
+        _subscription = await _mqttClientProvider.SubscribeAsync($"Autodroid/agents/{_stateService.AgentState.UniqueName}/engine/steps/{Step.Id}/executionTimeMs");
         _subscription.MessageReceived += MqttMessageReceived;
     }
 

@@ -1,11 +1,11 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using MQTTnet;
-using Atomy.SDK.ImageProcessing;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.Communication.MQTT;
+using Autodroid.SDK.ImageProcessing;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Communication.MQTT;
 
-namespace Atomy.Plugins.Base.MQTT;
+namespace Autodroid.Plugins.Base.MQTT;
 
 public sealed class MqttImageReceive : BaseMqttReceiveStep
 {

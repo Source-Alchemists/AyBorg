@@ -1,9 +1,9 @@
 
-using Atomy.Web.Shared.Modals;
+using Autodroid.Web.Shared.Modals;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Atomy.Web.Pages.Agent.Shared.Fields;
+namespace Autodroid.Web.Pages.Agent.Shared.Fields;
 
 public partial class DirectoryInputField : BaseInputField
 {

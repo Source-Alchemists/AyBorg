@@ -1,8 +1,8 @@
-using Atomy.Web.Services;
+using Autodroid.Web.Services;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Atomy.Web.Shared.Modals;
+namespace Autodroid.Web.Shared.Modals;
 
 public partial class DirectoryBrowser : ComponentBase
 {

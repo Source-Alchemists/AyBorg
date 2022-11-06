@@ -1,4 +1,4 @@
-namespace Atomy.Plugins.Base.Numeric;
+namespace Autodroid.Plugins.Base.Numeric;
 
 public enum MathFunctions
 {

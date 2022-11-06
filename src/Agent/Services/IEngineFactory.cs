@@ -1,8 +1,8 @@
-using Atomy.Agent.Runtime;
-using Atomy.SDK.Projects;
-using Atomy.SDK.System.Runtime;
+using Autodroid.Agent.Runtime;
+using Autodroid.SDK.Projects;
+using Autodroid.SDK.System.Runtime;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 internal interface IEngineFactory
 {

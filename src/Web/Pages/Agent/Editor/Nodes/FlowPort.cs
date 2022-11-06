@@ -2,14 +2,14 @@ using System.Text;
 using System.Text.Json;
 using Blazor.Diagrams.Core.Models;
 using MQTTnet;
-using Atomy.SDK.Data.DTOs;
-using Atomy.SDK.Common.Ports;
-using Atomy.Web.Services.Agent;
-using Atomy.SDK.Communication.MQTT;
-using Atomy.Web.Services;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.Web.Services.Agent;
+using Autodroid.SDK.Communication.MQTT;
+using Autodroid.Web.Services;
 using System.Globalization;
 
-namespace Atomy.Web.Pages.Agent.Editor.Nodes;
+namespace Autodroid.Web.Pages.Agent.Editor.Nodes;
 
 public class FlowPort : PortModel, IDisposable
 {
@@ -17,7 +17,7 @@ public class FlowPort : PortModel, IDisposable
     private readonly IStateService _stateService;
     private readonly IMqttClientProvider _mqttClientProvider;
     private readonly StepDto _step;
-    private Atomy.SDK.Communication.MQTT.MqttSubscription? _subscription;
+    private Autodroid.SDK.Communication.MQTT.MqttSubscription? _subscription;
     private bool disposedValue;
 
     /// <summary>
@@ -94,7 +94,7 @@ public class FlowPort : PortModel, IDisposable
 
     private async void MqttSubscribe()
     {
-        _subscription = await _mqttClientProvider.SubscribeAsync($"atomy/agents/{_stateService.AgentState.UniqueName}/engine/steps/{_step.Id}/ports/{Port.Id}/#");
+        _subscription = await _mqttClientProvider.SubscribeAsync($"Autodroid/agents/{_stateService.AgentState.UniqueName}/engine/steps/{_step.Id}/ports/{Port.Id}/#");
         _subscription.MessageReceived += MqttMessageReceived;
     }
 

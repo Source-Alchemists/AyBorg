@@ -1,10 +1,10 @@
-using Atomy.Agent.Services;
-using Atomy.SDK.Authorization;
-using Atomy.SDK.System.Runtime;
+using Autodroid.Agent.Services;
+using Autodroid.SDK.Authorization;
+using Autodroid.SDK.System.Runtime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Atomy.Agent.Controllers;
+namespace Autodroid.Agent.Controllers;
 
 [ApiController]
 [Route("[controller]")]

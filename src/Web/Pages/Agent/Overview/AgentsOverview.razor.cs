@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using Atomy.Web.Services.Agent;
+using Autodroid.Web.Services.Agent;
 
-namespace Atomy.Web.Pages.Agent.Overview;
+namespace Autodroid.Web.Pages.Agent.Overview;
 
 public partial class AgentsOverview : ComponentBase, IAsyncDisposable
 {
