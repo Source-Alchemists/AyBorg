@@ -1,9 +1,9 @@
 using Autodroid.SDK.Data.DAL;
 using Autodroid.SDK.Data.DTOs;
-using Autodroid.ServiceRegistry.Models;
+using Autodroid.Registry.Models;
 using AutoMapper;
 
-namespace Autodroid.ServiceRegistry.Mapper;
+namespace Autodroid.Registry.Mapper;
 
 public class DalMapper : IDalMapper
 {
@@ -17,8 +17,8 @@ public class DalMapper : IDalMapper
         var config = new MapperConfiguration(config =>
         {
             config.CreateMap<ServiceEntry, ServiceEntryRecord>().ReverseMap();
-            config.CreateMap<ServiceRegistryEntryDto, ServiceEntryRecord>().ReverseMap();
-            config.CreateMap<ServiceEntry, ServiceRegistryEntryDto>().ReverseMap();
+            config.CreateMap<RegistryEntryDto, ServiceEntryRecord>().ReverseMap();
+            config.CreateMap<ServiceEntry, RegistryEntryDto>().ReverseMap();
         });
 
         _mapper = new AutoMapper.Mapper(config);
@@ -39,6 +39,6 @@ public class DalMapper : IDalMapper
     /// <summary>
     /// Maps the specified service registry entry dto.
     /// </summary>
-    /// <param name="serviceRegistryEntryDto">The service registry entry dto.</param>
-    public ServiceEntry Map(ServiceRegistryEntryDto serviceEntryDto) => _mapper.Map<ServiceEntry>(serviceEntryDto);
+    /// <param name="RegistryEntryDto">The service registry entry dto.</param>
+    public ServiceEntry Map(RegistryEntryDto serviceEntryDto) => _mapper.Map<ServiceEntry>(serviceEntryDto);
 }

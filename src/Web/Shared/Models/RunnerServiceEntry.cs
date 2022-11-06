@@ -11,7 +11,7 @@ public record AgentServiceEntry
     public string ActiveProjectName { get; init; } = string.Empty;
     public EngineMeta Status { get; init; } = new EngineMeta();
 
-    public AgentServiceEntry(ServiceRegistryEntryDto dto)
+    public AgentServiceEntry(RegistryEntryDto dto)
     {
         Name = dto.Name.Replace("Autodroid.", string.Empty);
         EditorLink = $"agents/editor/{dto.Id}";

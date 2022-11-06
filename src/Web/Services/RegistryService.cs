@@ -15,19 +15,19 @@ public class RegistryService : IRegistryService
     {
         _logger = logger;
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri(configuration.GetValue<string>("Autodroid:ServiceRegistry:Url"));
+        _httpClient.BaseAddress = new Uri(configuration.GetValue<string>("Autodroid:Registry:Url"));
     }
 
     /// <summary>
     /// Gets the URL.
     /// </summary>
-    /// <param name="serviceRegistryEntryDtos">The service registry entry dtos.</param>
+    /// <param name="RegistryEntryDtos">The service registry entry dtos.</param>
     /// <param name="serviceId">The service identifier.</param>
     /// <returns></returns>
-    public string GetUrl(IEnumerable<ServiceRegistryEntryDto> serviceRegistryEntryDtos, string serviceId)
+    public string GetUrl(IEnumerable<RegistryEntryDto> RegistryEntryDtos, string serviceId)
     {
         var id = Guid.Parse(serviceId);
-        var serviceDetails = serviceRegistryEntryDtos.FirstOrDefault(x => x.Id.Equals(id));
+        var serviceDetails = RegistryEntryDtos.FirstOrDefault(x => x.Id.Equals(id));
         if (serviceDetails == null) return string.Empty;
         return serviceDetails.Url;
     }
@@ -36,16 +36,16 @@ public class RegistryService : IRegistryService
     /// <returns>
     ///   Service registry entries.
     /// </returns>
-    public async Task<IEnumerable<ServiceRegistryEntryDto>> ReceiveAllAvailableServicesAsync()
+    public async Task<IEnumerable<RegistryEntryDto>> ReceiveAllAvailableServicesAsync()
     {
-        var result = await _httpClient.GetFromJsonAsync<ServiceRegistryEntryDto[]>("/Services");
+        var result = await _httpClient.GetFromJsonAsync<RegistryEntryDto[]>("/Services");
         if (result != null)
         {
             return result;
         } 
 
         _logger.LogWarning("Failed to receive service registry entries!");
-        return new List<ServiceRegistryEntryDto>();
+        return new List<RegistryEntryDto>();
     }
 
     /// <summary>
@@ -53,15 +53,15 @@ public class RegistryService : IRegistryService
     /// </summary>
     /// <param name="typeName">The name.</param>
     /// <returns></returns>
-    public async Task<IEnumerable<ServiceRegistryEntryDto>> ReceiveAllAvailableServicesAsync(string typeName)
+    public async Task<IEnumerable<RegistryEntryDto>> ReceiveAllAvailableServicesAsync(string typeName)
     {
-        var result = await _httpClient.GetFromJsonAsync<ServiceRegistryEntryDto[]>($"/Services/type/{typeName}");
+        var result = await _httpClient.GetFromJsonAsync<RegistryEntryDto[]>($"/Services/type/{typeName}");
         if (result != null)
         {
             return result;
         } 
 
         _logger.LogWarning("Failed to receive service registry entries!");
-        return new List<ServiceRegistryEntryDto>();
+        return new List<RegistryEntryDto>();
     }
 }

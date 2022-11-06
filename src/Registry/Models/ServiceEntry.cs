@@ -1,6 +1,6 @@
 using Autodroid.SDK.Data.DAL;
 
-namespace Autodroid.ServiceRegistry.Models;
+namespace Autodroid.Registry.Models;
 
 /// <summary>
 /// Service entry.

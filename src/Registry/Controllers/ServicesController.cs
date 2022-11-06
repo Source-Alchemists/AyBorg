@@ -1,8 +1,8 @@
 using Autodroid.SDK.Data.DTOs;
-using Autodroid.ServiceRegistry.Services;
+using Autodroid.Registry.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Autodroid.ServiceRegistry.Controllers;
+namespace Autodroid.Registry.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -26,18 +26,18 @@ public class ServicesController : ControllerBase
     /// <summary>
     /// Gets services.
     /// </summary>
-    /// <param name="serviceRegistryEntry">The service registry entry.</param>
+    /// <param name="RegistryEntry">The service registry entry.</param>
     /// <returns></returns>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status208AlreadyReported)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Guid>> RegisterAsync(ServiceRegistryEntryDto serviceRegistryEntry)
+    public async Task<ActionResult<Guid>> RegisterAsync(RegistryEntryDto RegistryEntry)
     {
         try
         {
-            var id = await _keeperService.RegisterAsync(serviceRegistryEntry);
-            _logger.LogInformation("Registered {Name} ({Url}) with id [{Id}].", serviceRegistryEntry.Name, serviceRegistryEntry.Url, id);
+            var id = await _keeperService.RegisterAsync(RegistryEntry);
+            _logger.LogInformation("Registered {Name} ({Url}) with id [{Id}].", RegistryEntry.Name, RegistryEntry.Url, id);
             return Ok(id);
         }
         catch (InvalidOperationException ex)
@@ -74,9 +74,9 @@ public class ServicesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServiceRegistryEntryDto[]>> GetAsync()
+    public async Task<ActionResult<RegistryEntryDto[]>> GetAsync()
     {
-        return Ok(await _keeperService.GetAllServiceRegistryEntriesAsync());
+        return Ok(await _keeperService.GetAllRegistryEntriesAsync());
     }
 
     /// <summary>
@@ -84,9 +84,9 @@ public class ServicesController : ControllerBase
     /// </summary>
     [HttpGet("{name}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServiceRegistryEntryDto[]>> GetAsync(string name)
+    public async Task<ActionResult<RegistryEntryDto[]>> GetAsync(string name)
     {
-        return Ok(await _keeperService.FindServiceRegistryEntriesAsync(name));
+        return Ok(await _keeperService.FindRegistryEntriesAsync(name));
     }
 
     /// <summary>
@@ -94,9 +94,9 @@ public class ServicesController : ControllerBase
     /// </summary>
     [HttpGet("type/{typeName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ServiceRegistryEntryDto[]>> GetByTypeNameAsync(string typeName)
+    public async Task<ActionResult<RegistryEntryDto[]>> GetByTypeNameAsync(string typeName)
     {
-        var services = await _keeperService.GetAllServiceRegistryEntriesAsync();
+        var services = await _keeperService.GetAllRegistryEntriesAsync();
         return Ok(services.Where(s => s.Type == typeName));
     }
 
@@ -106,9 +106,9 @@ public class ServicesController : ControllerBase
     [HttpGet("Id/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ServiceRegistryEntryDto>> GetAsync(Guid id)
+    public async Task<ActionResult<RegistryEntryDto>> GetAsync(Guid id)
     {
-        var result = await _keeperService.GetServiceRegistryEntryAsync(id);
+        var result = await _keeperService.GetRegistryEntryAsync(id);
         return result != null ? Ok(result) : NotFound();
     }
 
@@ -119,11 +119,11 @@ public class ServicesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Update(ServiceRegistryEntryDto serviceRegistryEntry)
+    public async Task<ActionResult> Update(RegistryEntryDto RegistryEntry)
     {
         try
         {
-            await _keeperService.UpdateTimestamp(serviceRegistryEntry);
+            await _keeperService.UpdateTimestamp(RegistryEntry);
             return Ok();
         }
         catch (KeyNotFoundException ex)

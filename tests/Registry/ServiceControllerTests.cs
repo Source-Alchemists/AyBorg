@@ -2,11 +2,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using Autodroid.ServiceRegistry.Controllers;
-using Autodroid.ServiceRegistry.Services;
+using Autodroid.Registry.Controllers;
+using Autodroid.Registry.Services;
 
 
-namespace Autodroid.ServiceRegistry.Tests;
+namespace Autodroid.Registry.Tests;
 
 public class ServiceControllerTests
 {
@@ -16,7 +16,7 @@ public class ServiceControllerTests
     public async Task RegisterAsync_success()
     {
         // Arrange
-        var entry = new SDK.Data.DTOs.ServiceRegistryEntryDto { Name = "Test", Url = "https://myservice:7777" };
+        var entry = new SDK.Data.DTOs.RegistryEntryDto { Name = "Test", Url = "https://myservice:7777" };
         var mockedService = new Mock<IKeeperService>();
         mockedService.Setup(x => x.RegisterAsync(entry)).Returns(Task.Run(() => Guid.NewGuid()));
 
@@ -36,7 +36,7 @@ public class ServiceControllerTests
     public async Task RegisterAsync_alreadyReported()
     {
         // Arrange
-        var entry = new SDK.Data.DTOs.ServiceRegistryEntryDto { Name = "Test", Url = "https://myservice:7777" };
+        var entry = new SDK.Data.DTOs.RegistryEntryDto { Name = "Test", Url = "https://myservice:7777" };
         var mockedService = new Mock<IKeeperService>();
         mockedService.Setup(x => x.RegisterAsync(entry)).Throws<InvalidOperationException>();
 

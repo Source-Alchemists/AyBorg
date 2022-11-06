@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "ServiceRegistry": {
+    "Registry": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

@@ -17,7 +17,7 @@ public record UiAgentState
     {
     }
 
-    public UiAgentState(ServiceRegistryEntryDto entry)
+    public UiAgentState(RegistryEntryDto entry)
     {
         Name = entry.Name;
         UniqueName = entry.UniqueName;

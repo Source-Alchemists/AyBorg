@@ -8,14 +8,14 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <OutputPath>bin\debug\Autodroid.ServiceRegistry</OutputPath>
+    <OutputPath>bin\debug\Autodroid.Registry</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>bin\release\Autodroid.ServiceRegistry</OutputPath>
+    <OutputPath>bin\release\Autodroid.Registry</OutputPath>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(RunConfiguration)' == 'ServiceRegistry' " />
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'Registry' " />
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.10">

@@ -1,12 +1,12 @@
 using System.Reflection;
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
-using Autodroid.ServiceRegistry.Models;
+using Autodroid.Registry.Models;
 using Autodroid.SDK.Data.DTOs;
-using Autodroid.ServiceRegistry.Mapper;
+using Autodroid.Registry.Mapper;
 using Autodroid.Database.Data;
 
-namespace Autodroid.ServiceRegistry.Services;
+namespace Autodroid.Registry.Services;
 
 public sealed class KeeperService : IKeeperService, IDisposable
 {
@@ -17,8 +17,8 @@ public sealed class KeeperService : IKeeperService, IDisposable
     private readonly ILogger<KeeperService> _logger;
     private readonly IDalMapper _dalMapper;
     private readonly IDbContextFactory<RegistryContext> _registryContextFactory;
-    private readonly BlockingCollection<ServiceRegistryEntryDto> _registryEntries = new();
-    private readonly ServiceRegistryEntryDto _selfServiceEntry;
+    private readonly BlockingCollection<RegistryEntryDto> _registryEntries = new();
+    private readonly RegistryEntryDto _selfServiceEntry;
     private bool _isDisposed = false;
     private bool _isHeartbeatTaskTerminated = false;
 
@@ -48,12 +48,12 @@ public sealed class KeeperService : IKeeperService, IDisposable
             serverUrl = configuration.GetValue<string>("Kestrel:Endpoints:Http:Url");
         }
 
-        _selfServiceEntry = new ServiceRegistryEntryDto
+        _selfServiceEntry = new RegistryEntryDto
         {
             Id = Guid.NewGuid(),
-            Name = "Autodroid.ServiceRegistry",
-            UniqueName = "Autodroid.ServiceRegistry",
-            Type = "Autodroid.ServiceRegistry",
+            Name = "Autodroid.Registry",
+            UniqueName = "Autodroid.Registry",
+            Type = "Autodroid.Registry",
             Url = serverUrl,
             Version = versionString
         };
@@ -74,7 +74,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// </summary>
     /// <param name="name">The searched name.</param>
     /// <returns>Array of entries. Empty array if no entry match the name.</returns>
-    public async Task<IEnumerable<ServiceRegistryEntryDto>> FindServiceRegistryEntriesAsync(string name)
+    public async Task<IEnumerable<RegistryEntryDto>> FindRegistryEntriesAsync(string name)
     {
 
         var result = _registryEntries.Where(x => x.Name.Equals(name));
@@ -90,11 +90,11 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// Get all service registry entries.
     /// </summary>
     /// <returns>All service registry entries.</returns>
-    public async Task<IEnumerable<ServiceRegistryEntryDto>> GetAllServiceRegistryEntriesAsync()
+    public async Task<IEnumerable<RegistryEntryDto>> GetAllRegistryEntriesAsync()
     {
         return await Task.Run(() =>
         {
-            var result = new List<ServiceRegistryEntryDto>
+            var result = new List<RegistryEntryDto>
             {
                 _selfServiceEntry
             };
@@ -109,7 +109,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// </summary>
     /// <param name="serviceId">The service identifier.</param>
     /// <returns></returns>
-    public async Task<ServiceRegistryEntryDto?> GetServiceRegistryEntryAsync(Guid serviceId)
+    public async Task<RegistryEntryDto?> GetRegistryEntryAsync(Guid serviceId)
     {
         var result = _registryEntries.FirstOrDefault(x => x.Id == serviceId);
         await Task.CompletedTask;
@@ -119,46 +119,46 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// <summary>
     /// Register a new service.
     /// </summary>
-    /// <param name="serviceRegistryEntry">Service registry entry.</param>
+    /// <param name="RegistryEntry">Service registry entry.</param>
     /// <returns>Id for the new service.</returns>
     /// <exception cref="InvalidOperationException">Thrown if the same service instance is added multiple times.</exception>
-    public async Task<Guid> RegisterAsync(ServiceRegistryEntryDto serviceRegistryEntry)
+    public async Task<Guid> RegisterAsync(RegistryEntryDto RegistryEntry)
     {
-        var matchingService = FindAvailableService(serviceRegistryEntry);
+        var matchingService = FindAvailableService(RegistryEntry);
 
         if (matchingService != null)
         {
-            throw new InvalidOperationException($"Adding the same service instance multiple times is not allowed ({serviceRegistryEntry.Name} | {serviceRegistryEntry.Url})!");
+            throw new InvalidOperationException($"Adding the same service instance multiple times is not allowed ({RegistryEntry.Name} | {RegistryEntry.Url})!");
         }
 
         using var context = await _registryContextFactory.CreateDbContextAsync();
-        var knownService = await context.ServiceEntries!.FirstOrDefaultAsync(x => x.UniqueName == serviceRegistryEntry.UniqueName && x.Type == serviceRegistryEntry.Type);
+        var knownService = await context.ServiceEntries!.FirstOrDefaultAsync(x => x.UniqueName == RegistryEntry.UniqueName && x.Type == RegistryEntry.Type);
         ServiceEntry serviceEntry;
         if (knownService != null)
         {
             // Identified existing service by unique name and type.
             // Update address, port and name, as they may has changed.
-            knownService.Url = serviceRegistryEntry.Url;
-            knownService.Name = serviceRegistryEntry.Name;
+            knownService.Url = RegistryEntry.Url;
+            knownService.Name = RegistryEntry.Name;
             serviceEntry = _dalMapper.Map(knownService);
             serviceEntry.LastConnectionTime = DateTime.UtcNow;
             _logger.LogTrace("Service {serviceEntry.Name} ({serviceEntry.Url}) is already registered and will be used with same id [{serviceEntry.Id}].", serviceEntry.Name, serviceEntry.Url, serviceEntry.Id);
         }
         else
         {
-            if (await context.ServiceEntries!.AnyAsync(x => x.UniqueName == serviceRegistryEntry.UniqueName))
+            if (await context.ServiceEntries!.AnyAsync(x => x.UniqueName == RegistryEntry.UniqueName))
             {
-                throw new InvalidOperationException($"Adding a service with unique name ({serviceRegistryEntry.UniqueName} is not allowed! A service with the name is already registered.");
+                throw new InvalidOperationException($"Adding a service with unique name ({RegistryEntry.UniqueName} is not allowed! A service with the name is already registered.");
             }
-            serviceEntry = _dalMapper.Map(serviceRegistryEntry);
+            serviceEntry = _dalMapper.Map(RegistryEntry);
             serviceEntry.Id = Guid.NewGuid();
             await context.ServiceEntries!.AddAsync(serviceEntry);
         }
 
         await context.SaveChangesAsync();
-        serviceRegistryEntry.Id = serviceEntry.Id;
+        RegistryEntry.Id = serviceEntry.Id;
         _availableServices.Add(serviceEntry);
-        _registryEntries.Add(serviceRegistryEntry);
+        _registryEntries.Add(RegistryEntry);
 
         return serviceEntry.Id;
     }
@@ -187,15 +187,15 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// Updates the service timestamp.
     /// If not updated frequencly, the service will be recognized as not available and be removed to available service collection.
     /// </summary>
-    /// <param name="serviceRegistryEntry">The desired service.</param>
+    /// <param name="RegistryEntry">The desired service.</param>
     /// <returns>Task.</returns>
-    public async Task UpdateTimestamp(ServiceRegistryEntryDto serviceRegistryEntry)
+    public async Task UpdateTimestamp(RegistryEntryDto RegistryEntry)
     {
-        var matchingService = FindAvailableService(serviceRegistryEntry);
+        var matchingService = FindAvailableService(RegistryEntry);
 
         if (matchingService == null)
         {
-            throw new KeyNotFoundException($"Service with url '{serviceRegistryEntry.Url}' not found!");
+            throw new KeyNotFoundException($"Service with url '{RegistryEntry.Url}' not found!");
         }
 
         matchingService.LastConnectionTime = DateTime.UtcNow;
@@ -219,7 +219,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
         }
     }
 
-    private ServiceEntry? FindAvailableService(ServiceRegistryEntryDto serviceRegistryEntry) => _availableServices.FirstOrDefault(x => x.Url.Equals(serviceRegistryEntry.Url));
+    private ServiceEntry? FindAvailableService(RegistryEntryDto RegistryEntry) => _availableServices.FirstOrDefault(x => x.Url.Equals(RegistryEntry.Url));
 
     private ServiceEntry? FindAvailableService(Guid id) => _availableServices.FirstOrDefault(x => x.Id.Equals(id));
 
@@ -247,13 +247,13 @@ public sealed class KeeperService : IKeeperService, IDisposable
 
         if (removedEntry != null)
         {
-            RemoveServiceRegistryEntry(removedEntry);
+            RemoveRegistryEntry(removedEntry);
         }
     }
 
-    private void RemoveServiceRegistryEntry(ServiceEntry serviceEntry)
+    private void RemoveRegistryEntry(ServiceEntry serviceEntry)
     {
-        var tmpCollection = new List<ServiceRegistryEntryDto>();
+        var tmpCollection = new List<RegistryEntryDto>();
         while (_registryEntries.AsEnumerable().Any())
         {
             var lastEntry = _registryEntries.Take();
