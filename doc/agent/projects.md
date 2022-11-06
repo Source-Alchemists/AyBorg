@@ -2,14 +2,14 @@
 
 The project page is splittet into multiple stages, while the path of state changes appears in following order:
 
-Draft -> Waiting for approval -> Ready
+Draft -> Review -> Ready
 
 The project state can be changed from "Ready" back to "Draft", for example if a critical failure in the project setup is found. In this case, the project need to be approved again.
 
 ## Draft
 Initialy a project will be saved as draft. While in this stage, the user can make changes without any need of approval. Also while in draft stage, no new version will be created.
 
-## Waiting for approval
+## Review
 The project is in pending state, a approval from a second user with the right to approve is needed.
 The version of the project should be increased.
 

@@ -14,6 +14,7 @@ public partial class Projects : ComponentBase
     private string _baseUrl = string.Empty;
     private bool _hasServiceError = false;
     private IEnumerable<ProjectMetaDto> _readyProjects = new List<ProjectMetaDto>();
+    private IEnumerable<ProjectMetaDto> _reviewProjects = new List<ProjectMetaDto>();
     private IEnumerable<ProjectMetaDto> _draftProjects = new List<ProjectMetaDto>();
 
     [Parameter]
@@ -50,6 +51,7 @@ public partial class Projects : ComponentBase
     {
         var allProjectMetas = await ProjectManagementService.GetMetasAsync(_baseUrl);
         _readyProjects = allProjectMetas.Where(p => p.State == ProjectState.Ready);
+        _reviewProjects = allProjectMetas.Where(p => p.State == ProjectState.Review);
         _draftProjects = allProjectMetas.Where(p => p.State == ProjectState.Draft);
         await InvokeAsync(StateHasChanged);
     }
@@ -77,6 +79,24 @@ public partial class Projects : ComponentBase
             {
                 await ReceiveProjectsAsync();
             }
+        }
+    }
+    
+    private async void OnSaveAsReviewClicked(ProjectMetaDto projectDto)
+    {
+        var options = new DialogOptions();
+        var parameters = new DialogParameters
+        {
+            { "Project", projectDto }
+        };
+        var dialog = DialogService.Show<CreateReviewProjectDialog>($"Create review for {projectDto.Name}", parameters, options);
+        var result = await dialog.Result;
+        if(!result.Cancelled)
+        {
+            // if (await ProjectManagementService.TrySaveAsReviewAsync(_baseUrl, projectDto))
+            // {
+            //     await ReceiveProjectsAsync();
+            // }
         }
     }
 

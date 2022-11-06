@@ -47,9 +47,9 @@
 </MudToolBar>
 <MudGrid Class="editor-container" hidden="@(_projectMeta == null)">	
 	<MudHidden Breakpoint="Breakpoint.Sm" Invert="false">
-		<MudItem md="5" lg="4" xl="2">
-			<MudCard Style="height: 100%">
-				<MudCardHeader>
+		<MudItem md="5" lg="3" xl="2">
+			<MudCard Style="height: calc(100vh - 148px)" class="d-flex justify-center flex-column">
+				<MudCardHeader class="order-0">
 					<CardHeaderAvatar>
 						<MudIcon Icon="@Icons.Filled.Apps" />
 					</CardHeaderAvatar>
@@ -57,7 +57,7 @@
 						<MudText Typo="Typo.h6">Steps</MudText>
 					</CardHeaderContent>
 				</MudCardHeader>
-				<MudCardContent class="pt-0 mt-0">
+				<MudCardContent style="height: calc(100% - 30px)" class="pt-0 mt-0 order-1">
 					@if(!_areSubComponentsHidden)
 					{
 						<StepsSelection ServiceId="@ServiceId" />			
@@ -66,7 +66,7 @@
 			</MudCard>
 		</MudItem>
 	</MudHidden>
-	<MudItem xs="12" md="7" lg="8" xl="10" class="mud-width-full">
+	<MudItem xs="12" md="7" lg="9" xl="10" class="mud-width-full">
 		<MudCard class="mud-height-full mud-width-full">
 			<MudCardHeader>
 				<CardHeaderAvatar>

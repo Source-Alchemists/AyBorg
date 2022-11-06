@@ -24,26 +24,51 @@
                     Projects="@_draftProjects" 
                     OnProjectActivateClicked="@OnActivateProjectClicked" 
                     OnProjectDeleteClicked="@OnProjectDeleteClicked"
-                    OnProjectSaveAsReady="@OnSaveAsReadyClicked" />
+                    OnProjectSaveAsReview="@OnSaveAsReviewClicked" />
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem xs="12">
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderAvatar>
-                    <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Medium" Color="Color.Info" />
-                </CardHeaderAvatar>
-                <CardHeaderContent>
-				    <MudText Typo="Typo.h6">Ready</MudText>
-                </CardHeaderContent>
-			</MudCardHeader>
-            <MudCardContent>
-                <ProjectsTable 
-                    Projects="@_readyProjects" 
-                    OnProjectActivateClicked="@OnActivateProjectClicked" 
-                    OnProjectDeleteClicked="@OnProjectDeleteClicked" />
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
+    @if(_reviewProjects.Any())
+    {
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Medium" Color="Color.Info" />
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Review</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <ProjectsTable 
+                        Projects="@_reviewProjects" 
+                        OnProjectActivateClicked="@OnActivateProjectClicked" 
+                        OnProjectDeleteClicked="@OnProjectDeleteClicked"
+                        OnProjectSaveAsReady="@OnSaveAsReadyClicked" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+    @if(_readyProjects.Any())
+    {
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Medium" Color="Color.Info" />
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Ready</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <ProjectsTable 
+                        Projects="@_readyProjects" 
+                        OnProjectActivateClicked="@OnActivateProjectClicked" 
+                        OnProjectDeleteClicked="@OnProjectDeleteClicked" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
 </MudGrid>

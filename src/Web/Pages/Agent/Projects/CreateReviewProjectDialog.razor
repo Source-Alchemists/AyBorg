@@ -1,0 +1,12 @@
+<MudDialog style="min-width: 400px">
+    <DialogContent>
+        <MudAlert Severity="Severity.Info">
+            The project is saved as a review.
+        </MudAlert>
+        <MudTextField Label="Version" @bind-Value="Project.VersionName" Required="true" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="OnCloseClicked">Close</MudButton>
+        <MudButton Color="Color.Primary" OnClick="OnCreateClicked">Create</MudButton>
+    </DialogActions>
+</MudDialog>
