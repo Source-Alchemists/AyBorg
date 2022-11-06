@@ -1,7 +1,7 @@
-using Atomy.Web.Services;
+using Autodroid.Web.Services;
 using Microsoft.AspNetCore.Components;
 
-namespace Atomy.Web.Shared;
+namespace Autodroid.Web.Shared;
 
 public partial class NavMenu : ComponentBase
 {

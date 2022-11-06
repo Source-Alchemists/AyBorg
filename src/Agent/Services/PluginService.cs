@@ -1,8 +1,8 @@
-﻿using Atomy.SDK.Common;
-using Atomy.SDK.Data.DAL;
+﻿using Autodroid.SDK.Common;
+using Autodroid.SDK.Data.DAL;
 using System.Reflection;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 internal sealed class PluginsService : IPluginsService
 {
     private readonly ILogger<PluginsService> _logger;
@@ -39,7 +39,7 @@ internal sealed class PluginsService : IPluginsService
         _stepPlugins.Clear();
         try
         {
-            var pluginsDir = Path.GetFullPath(_configuration.GetValue<string>("Atomy:Plugins:Folder"));
+            var pluginsDir = Path.GetFullPath(_configuration.GetValue<string>("Autodroid:Plugins:Folder"));
 
             _logger.LogTrace("Loading plugins in '{pluginsDir}' ...", pluginsDir);
 

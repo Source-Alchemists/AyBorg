@@ -5,14 +5,14 @@ using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
 using MudBlazor;
-using Atomy.SDK.Data.DTOs;
-using Atomy.Web.Pages.Agent.Editor.Nodes;
-using Atomy.Web.Services.Agent;
-using Atomy.SDK.Communication.MQTT;
-using Atomy.Web.Services;
-using Atomy.Web.Shared.Modals;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.Web.Pages.Agent.Editor.Nodes;
+using Autodroid.Web.Services.Agent;
+using Autodroid.SDK.Communication.MQTT;
+using Autodroid.Web.Services;
+using Autodroid.Web.Shared.Modals;
 
-namespace Atomy.Web.Pages.Agent.Editor;
+namespace Autodroid.Web.Pages.Agent.Editor;
 
 public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 {

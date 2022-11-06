@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
 
-namespace Atomy.Web.Areas.Identity.Pages.Account
+namespace Autodroid.Web.Areas.Identity.Pages.Account
 {
     public class LogoutModel : PageModel
     {

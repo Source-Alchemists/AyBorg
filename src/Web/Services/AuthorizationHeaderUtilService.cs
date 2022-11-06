@@ -1,8 +1,8 @@
 using System.Net.Http.Headers;
-using Atomy.SDK.Authorization;
+using Autodroid.SDK.Authorization;
 using Microsoft.AspNetCore.Identity;
 
-namespace Atomy.Web.Services;
+namespace Autodroid.Web.Services;
 
 public class AuthorizationHeaderUtilService : IAuthorizationHeaderUtilService
 {

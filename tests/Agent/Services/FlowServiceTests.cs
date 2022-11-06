@@ -1,12 +1,12 @@
-using Atomy.Agent.Hubs;
-using Atomy.Agent.Services;
-using Atomy.SDK.Common;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.Projects;
+using Autodroid.Agent.Hubs;
+using Autodroid.Agent.Services;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Projects;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace Atomy.Agent.Tests.Services;
+namespace Autodroid.Agent.Tests.Services;
 
 public class FlowServiceTests
 {

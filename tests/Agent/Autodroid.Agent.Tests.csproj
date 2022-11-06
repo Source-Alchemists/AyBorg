@@ -24,8 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Agent\Atomy.Agent.csproj" />
-    <ProjectReference Include="..\..\src\SDK\database\Atomy.Database.Data\Atomy.Database.Data.csproj" />
+    <ProjectReference Include="..\..\src\Agent\Autodroid.Agent.csproj" />
+    <ProjectReference Include="..\..\src\SDK\database\Autodroid.Database.Data\Autodroid.Database.Data.csproj" />
   </ItemGroup>
 
 </Project>

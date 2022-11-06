@@ -1,4 +1,4 @@
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 public interface IStorageService
 {

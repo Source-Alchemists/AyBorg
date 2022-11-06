@@ -2,11 +2,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using Atomy.ServiceRegistry.Controllers;
-using Atomy.ServiceRegistry.Services;
+using Autodroid.ServiceRegistry.Controllers;
+using Autodroid.ServiceRegistry.Services;
 
 
-namespace Atomy.ServiceRegistry.Tests;
+namespace Autodroid.ServiceRegistry.Tests;
 
 public class ServiceControllerTests
 {

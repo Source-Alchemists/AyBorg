@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.ImageProcessing.Encoding;
-using Atomy.SDK.Communication.MQTT;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.ImageProcessing.Encoding;
+using Autodroid.SDK.Communication.MQTT;
 
-namespace Atomy.Plugins.Base.MQTT;
+namespace Autodroid.Plugins.Base.MQTT;
 
 public sealed class MqttImageSend : BaseMqttSendStep
 {

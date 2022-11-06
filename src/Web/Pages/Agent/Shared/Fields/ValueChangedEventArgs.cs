@@ -1,6 +1,6 @@
-using Atomy.SDK.Data.DTOs;
+using Autodroid.SDK.Data.DTOs;
 
-namespace Atomy.Web.Pages.Agent.Shared.Fields;
+namespace Autodroid.Web.Pages.Agent.Shared.Fields;
 
 public class ValueChangedEventArgs : EventArgs
 {

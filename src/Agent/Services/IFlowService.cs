@@ -1,7 +1,7 @@
-using Atomy.SDK.Common;
-using Atomy.SDK.Common.Ports;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 public interface IFlowService
 {

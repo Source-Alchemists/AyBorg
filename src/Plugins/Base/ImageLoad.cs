@@ -1,9 +1,9 @@
-using Atomy.SDK.ImageProcessing;
-using Atomy.SDK.Common.Ports;
+using Autodroid.SDK.ImageProcessing;
+using Autodroid.SDK.Common.Ports;
 using Microsoft.Extensions.Logging;
-using Atomy.SDK.Common;
+using Autodroid.SDK.Common;
 
-namespace Atomy.Plugins.Base;
+namespace Autodroid.Plugins.Base;
 
 public sealed class ImageLoad : IStepBody, IDisposable
 {

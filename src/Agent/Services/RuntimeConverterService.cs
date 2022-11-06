@@ -1,14 +1,14 @@
 using System.Globalization;
 using System.Text.Json;
 using System.Runtime.CompilerServices;
-using Atomy.SDK.Data.DAL;
-using Atomy.SDK.ImageProcessing.Shapes;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.Projects;
-using Atomy.SDK.Common;
+using Autodroid.SDK.Data.DAL;
+using Autodroid.SDK.ImageProcessing.Shapes;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Projects;
+using Autodroid.SDK.Common;
 
-[assembly: InternalsVisibleTo("Atomy.Agent.Tests")]
-namespace Atomy.Agent.Services;
+[assembly: InternalsVisibleTo("Autodroid.Agent.Tests")]
+namespace Autodroid.Agent.Services;
 
 internal sealed class RuntimeConverterService : IRuntimeConverterService
 {

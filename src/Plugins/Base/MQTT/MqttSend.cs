@@ -1,10 +1,10 @@
 using MQTTnet.Protocol;
 using Microsoft.Extensions.Logging;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.Communication.MQTT;
-using Atomy.SDK.Common;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Communication.MQTT;
+using Autodroid.SDK.Common;
 
-namespace Atomy.Plugins.Base.MQTT;
+namespace Autodroid.Plugins.Base.MQTT;
 
 public sealed class MqttSend : BaseMqttSendStep, IStepBody
 {

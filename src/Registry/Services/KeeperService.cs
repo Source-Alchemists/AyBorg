@@ -1,12 +1,12 @@
 using System.Reflection;
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
-using Atomy.ServiceRegistry.Models;
-using Atomy.SDK.Data.DTOs;
-using Atomy.ServiceRegistry.Mapper;
-using Atomy.Database.Data;
+using Autodroid.ServiceRegistry.Models;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.ServiceRegistry.Mapper;
+using Autodroid.Database.Data;
 
-namespace Atomy.ServiceRegistry.Services;
+namespace Autodroid.ServiceRegistry.Services;
 
 public sealed class KeeperService : IKeeperService, IDisposable
 {
@@ -51,9 +51,9 @@ public sealed class KeeperService : IKeeperService, IDisposable
         _selfServiceEntry = new ServiceRegistryEntryDto
         {
             Id = Guid.NewGuid(),
-            Name = "Atomy.ServiceRegistry",
-            UniqueName = "Atomy.ServiceRegistry",
-            Type = "Atomy.ServiceRegistry",
+            Name = "Autodroid.ServiceRegistry",
+            UniqueName = "Autodroid.ServiceRegistry",
+            Type = "Autodroid.ServiceRegistry",
             Url = serverUrl,
             Version = versionString
         };

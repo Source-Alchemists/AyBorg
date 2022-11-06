@@ -1,8 +1,8 @@
-using Atomy.SDK.Data.Mapper;
-using Atomy.SDK.Common.Ports;
+using Autodroid.SDK.Data.Mapper;
+using Autodroid.SDK.Common.Ports;
 using Microsoft.AspNetCore.SignalR;
 
-namespace Atomy.Agent.Hubs;
+namespace Autodroid.Agent.Hubs;
 
 public class FlowHub : IFlowHub
 {

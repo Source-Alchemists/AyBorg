@@ -20,13 +20,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SDK\database\Atomy.Database.Data\Atomy.Database.Data.csproj" />
-    <ProjectReference Include="..\SDK\database\migrations\Atomy.Database.Migrations.SqlLite\Atomy.Database.Migrations.SqlLite.csproj" />
-    <ProjectReference Include="..\SDK\database\migrations\Atomy.Database.Migrations.PostgreSql\Atomy.Database.Migrations.PostgreSql.csproj" />
-    <ProjectReference Include="..\SDK\src\Common\Atomy.SDK.Common.csproj" />
-    <ProjectReference Include="..\SDK\src\System\Atomy.SDK.System.csproj" />
-    <ProjectReference Include="..\SDK\src\Authorization\Atomy.SDK.Authorization.csproj" />
-    <ProjectReference Include="..\SDK\src\Communication\MQTT\Atomy.SDK.Communication.MQTT.csproj" />
+    <ProjectReference Include="..\SDK\database\Autodroid.Database.Data\Autodroid.Database.Data.csproj" />
+    <ProjectReference Include="..\SDK\database\migrations\Autodroid.Database.Migrations.SqlLite\Autodroid.Database.Migrations.SqlLite.csproj" />
+    <ProjectReference Include="..\SDK\database\migrations\Autodroid.Database.Migrations.PostgreSql\Autodroid.Database.Migrations.PostgreSql.csproj" />
+    <ProjectReference Include="..\SDK\src\Common\Autodroid.SDK.Common.csproj" />
+    <ProjectReference Include="..\SDK\src\System\Autodroid.SDK.System.csproj" />
+    <ProjectReference Include="..\SDK\src\Authorization\Autodroid.SDK.Authorization.csproj" />
+    <ProjectReference Include="..\SDK\src\Communication\MQTT\Autodroid.SDK.Communication.MQTT.csproj" />
   </ItemGroup>
 
   <ItemGroup>

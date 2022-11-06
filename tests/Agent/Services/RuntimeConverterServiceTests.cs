@@ -1,16 +1,16 @@
 using System.Globalization;
-using Atomy.Agent.Services;
-using Atomy.Agent.Tests.Dummies;
-using Atomy.SDK.Data.DAL;
-using Atomy.SDK.Common.Ports;
+using Autodroid.Agent.Services;
+using Autodroid.Agent.Tests.Dummies;
+using Autodroid.SDK.Data.DAL;
+using Autodroid.SDK.Common.Ports;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Atomy.SDK.Projects;
-using Atomy.SDK.Common;
+using Autodroid.SDK.Projects;
+using Autodroid.SDK.Common;
 
 #nullable disable
 
-namespace Atomy.Agent.Tests.Services;
+namespace Autodroid.Agent.Tests.Services;
 
 public class RuntimeConverterServiceTests
 {

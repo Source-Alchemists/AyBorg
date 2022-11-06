@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Atomy.Web.Shared.Modals;
+namespace Autodroid.Web.Shared.Modals;
 
 public partial class ConfirmDialog : ComponentBase
 {

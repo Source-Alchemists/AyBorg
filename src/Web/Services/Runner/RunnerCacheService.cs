@@ -1,8 +1,8 @@
-using Atomy.SDK.System.Caching;
-using Atomy.SDK.Data.DTOs;
+using Autodroid.SDK.System.Caching;
+using Autodroid.SDK.Data.DTOs;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Atomy.Web.Services.Agent;
+namespace Autodroid.Web.Services.Agent;
 
 public class AgentCacheService : IAgentCacheService
 {

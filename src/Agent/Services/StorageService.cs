@@ -1,6 +1,6 @@
-using Atomy.SDK.Common;
+using Autodroid.SDK.Common;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 internal sealed class StorageService : IStorageService
 {

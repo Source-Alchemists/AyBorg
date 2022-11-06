@@ -1,9 +1,9 @@
-using Atomy.SDK.Data.DAL;
-using Atomy.SDK.Data.DTOs;
-using Atomy.ServiceRegistry.Models;
+using Autodroid.SDK.Data.DAL;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.ServiceRegistry.Models;
 using AutoMapper;
 
-namespace Atomy.ServiceRegistry.Mapper;
+namespace Autodroid.ServiceRegistry.Mapper;
 
 public class DalMapper : IDalMapper
 {

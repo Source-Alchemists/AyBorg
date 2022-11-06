@@ -1,8 +1,8 @@
-using Atomy.SDK.Data.DTOs;
-using Atomy.SDK.Communication.MQTT;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.SDK.Communication.MQTT;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace Atomy.Web.Services.Agent;
+namespace Autodroid.Web.Services.Agent;
 
 public interface IFlowService
 {

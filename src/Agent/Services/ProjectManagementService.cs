@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Atomy.Database.Data;
-using Atomy.SDK.Data.DAL;
-using Atomy.SDK.Data.Mapper;
-using Atomy.SDK.Projects;
+using Autodroid.Database.Data;
+using Autodroid.SDK.Data.DAL;
+using Autodroid.SDK.Data.Mapper;
+using Autodroid.SDK.Projects;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 internal sealed class ProjectManagementService : IProjectManagementService
 {
@@ -52,7 +52,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         _runtimeToStorageMapper = runtimeToStorageMapper;
         _runtimeConverterService = runtimeConverterService;
 
-        _serviceUniqueName = configuration.GetValue<string>("Atomy:Service:UniqueName");
+        _serviceUniqueName = configuration.GetValue<string>("Autodroid:Service:UniqueName");
     }
 
     /// <summary>
@@ -75,10 +75,10 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
         };
 
-        var result = await context.AtomyProjects!.AddAsync(emptyProjectRecord);
+        var result = await context.AutodroidProjects!.AddAsync(emptyProjectRecord);
         await context.SaveChangesAsync();
         _logger.LogTrace("Created new project [{result.Entity.Meta.Name} | {result.Entity.DbId}].", result.Entity.Meta.Name, result.Entity.DbId);
-        if (!context.AtomyProjects.Any(p => p.Meta.IsActive && p.Meta.ServiceUniqueName == _serviceUniqueName))
+        if (!context.AutodroidProjects.Any(p => p.Meta.IsActive && p.Meta.ServiceUniqueName == _serviceUniqueName))
         {
             if (await TryActivateAsync(result.Entity.Meta.DbId, true))
             {
@@ -98,8 +98,8 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async Task<bool> TryDeleteAsync(Guid projectId)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var metas = context.AtomyProjectMetas!.ToList();
-        var orgMetaRecord = await context.AtomyProjectMetas!.FindAsync(projectId);
+        var metas = context.AutodroidProjectMetas!.ToList();
+        var orgMetaRecord = await context.AutodroidProjectMetas!.FindAsync(projectId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project found to delete.");
@@ -116,8 +116,8 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
         }
 
-        var orgProjectRecord = await context.AtomyProjects!.FirstAsync(x => x.Meta.DbId.Equals(projectId));
-        context.AtomyProjects!.Remove(orgProjectRecord);
+        var orgProjectRecord = await context.AutodroidProjects!.FirstAsync(x => x.Meta.DbId.Equals(projectId));
+        context.AutodroidProjects!.Remove(orgProjectRecord);
         await context.SaveChangesAsync();
 
         _logger.LogTrace("Removed project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}].", orgMetaRecord.Name, orgMetaRecord.DbId);
@@ -133,7 +133,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async Task<bool> TryActivateAsync(Guid projectId, bool isActive)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var orgMetaRecord = await context.AtomyProjectMetas!.FindAsync(projectId);
+        var orgMetaRecord = await context.AutodroidProjectMetas!.FindAsync(projectId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project found to activate.");
@@ -146,7 +146,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return false;
         }
 
-        var lastActiveMetaRecord = await context.AtomyProjectMetas.FirstOrDefaultAsync(x => x.IsActive && x.ServiceUniqueName == _serviceUniqueName);
+        var lastActiveMetaRecord = await context.AutodroidProjectMetas.FirstOrDefaultAsync(x => x.IsActive && x.ServiceUniqueName == _serviceUniqueName);
         if (lastActiveMetaRecord == null)
         {
             _logger.LogTrace("No active project.");
@@ -199,7 +199,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async Task<bool> TryChangeProjectStateAsync(Guid projectId, ProjectState state)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var orgMetaRecord = await context.AtomyProjectMetas!.FindAsync(projectId);
+        var orgMetaRecord = await context.AutodroidProjectMetas!.FindAsync(projectId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project for state change found.");
@@ -237,7 +237,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async Task<IEnumerable<ProjectMetaRecord>> GetAllMetasAsync()
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        return await context.AtomyProjectMetas!.ToListAsync();
+        return await context.AutodroidProjectMetas!.ToListAsync();
     }
 
     /// <summary>
@@ -247,7 +247,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async Task<bool> TryLoadActiveProjectAsync()
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var projectMetaRecord = await context.AtomyProjectMetas!.FirstOrDefaultAsync(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
+        var projectMetaRecord = await context.AutodroidProjectMetas!.FirstOrDefaultAsync(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
         if (projectMetaRecord == null)
         {
             _logger.LogWarning("No active project.");
@@ -270,14 +270,14 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
 
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var projectMetaRecord = await context.AtomyProjectMetas!.FirstOrDefaultAsync(p => p.DbId.Equals(_engineHost.ActiveProject.Meta.Id));
+        var projectMetaRecord = await context.AutodroidProjectMetas!.FirstOrDefaultAsync(p => p.DbId.Equals(_engineHost.ActiveProject.Meta.Id));
         if (projectMetaRecord == null)
         {
             _logger.LogWarning($"No project found to save.");
             return false;
         }
 
-        var databaseProjectRecord = await context.AtomyProjects!.Include(x => x.Steps)
+        var databaseProjectRecord = await context.AutodroidProjects!.Include(x => x.Steps)
                                                             .ThenInclude(x => x.Ports)
                                                             .Include(x => x.Links)
                                                             .AsSplitQuery()
@@ -346,7 +346,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
     private static IQueryable<ProjectRecord> CreateFullProjectQuery(ProjectContext context)
     {
-        return context.AtomyProjects!.Include(x => x.Meta)
+        return context.AutodroidProjects!.Include(x => x.Meta)
                                 .Include(x => x.Steps)
                                 .ThenInclude(x => x.MetaInfo)
                                 .Include(x => x.Steps)

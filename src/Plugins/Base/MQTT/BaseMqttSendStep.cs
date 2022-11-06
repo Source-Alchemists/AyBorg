@@ -1,9 +1,9 @@
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.Communication.MQTT;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Communication.MQTT;
 
-namespace Atomy.Plugins.Base.MQTT;
+namespace Autodroid.Plugins.Base.MQTT;
 
 public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
 {

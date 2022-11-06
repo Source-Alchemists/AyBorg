@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using MudBlazor;
 
-namespace Atomy.Web.Shared;
+namespace Autodroid.Web.Shared;
 
 public partial class MainLayout : LayoutComponentBase
 {

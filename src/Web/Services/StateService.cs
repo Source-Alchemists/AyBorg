@@ -1,7 +1,7 @@
-using Atomy.Web.Shared.Models;
+using Autodroid.Web.Shared.Models;
 using Blazored.LocalStorage;
 
-namespace Atomy.Web.Services;
+namespace Autodroid.Web.Services;
 
 public class StateService : IStateService
 {

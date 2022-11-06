@@ -1,6 +1,6 @@
-using Atomy.Web.Shared.Models;
+using Autodroid.Web.Shared.Models;
 
-namespace Atomy.Web.Services.Agent;
+namespace Autodroid.Web.Services.Agent;
 
 public interface IAgentOverviewService
 {

@@ -1,8 +1,8 @@
-using Atomy.SDK.Data.DAL;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.Projects;
+using Autodroid.SDK.Data.DAL;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Projects;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 public interface IRuntimeConverterService
 {
