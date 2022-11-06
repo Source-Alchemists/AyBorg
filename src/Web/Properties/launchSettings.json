@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "Atomy.Web": {
+    "Autodroid.Web": {
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {

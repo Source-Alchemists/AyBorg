@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Atomy.SDK.Data.DTOs;
+using Autodroid.SDK.Data.DTOs;
 
-namespace Atomy.Web.Shared.Models;
+namespace Autodroid.Web.Shared.Models;
 
 public record UiAgentState
 {

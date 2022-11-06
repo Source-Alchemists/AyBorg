@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
-using Atomy.SDK.Common;
-using Atomy.SDK.Common.Ports;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
 
-namespace Atomy.Agent;
+namespace Autodroid.Agent;
 
 public sealed class StepProxy : IStepProxy
 {

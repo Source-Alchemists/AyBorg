@@ -1,10 +1,10 @@
 using System.Net;
 using Microsoft.AspNetCore.SignalR.Client;
-using Atomy.SDK.Data.DTOs;
+using Autodroid.SDK.Data.DTOs;
 using Newtonsoft.Json;
 using System.Text;
 
-namespace Atomy.Web.Services.Agent;
+namespace Autodroid.Web.Services.Agent;
 
 public class FlowService : IFlowService
 {

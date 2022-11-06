@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Atomy.Web.Services;
+namespace Autodroid.Web.Services;
 
 public class StorageService : IStorageService
 {

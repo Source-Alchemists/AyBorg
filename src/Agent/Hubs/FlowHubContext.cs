@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.SignalR;
 
-namespace Atomy.Agent.Hubs;
+namespace Autodroid.Agent.Hubs;
 
 public class FlowHubContext : Hub
 {

@@ -1,8 +1,8 @@
-using Atomy.SDK.ImageProcessing;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.Common;
+using Autodroid.SDK.ImageProcessing;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Common;
 
-namespace Atomy.Plugins.Base;
+namespace Autodroid.Plugins.Base;
 
 public sealed class ImageScale : IStepBody, IDisposable
 {

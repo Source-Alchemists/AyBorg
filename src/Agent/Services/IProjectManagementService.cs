@@ -1,7 +1,7 @@
-﻿using Atomy.SDK.Data.DAL;
-using Atomy.SDK.Projects;
+﻿using Autodroid.SDK.Data.DAL;
+using Autodroid.SDK.Projects;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 public interface IProjectManagementService
 {
     /// <summary>

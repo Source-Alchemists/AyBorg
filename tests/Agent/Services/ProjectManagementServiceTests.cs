@@ -1,16 +1,16 @@
-using Atomy.Database.Data;
-using Atomy.Agent.Services;
-using Atomy.SDK.Data.DAL;
-using Atomy.SDK.Data.Mapper;
-using Atomy.SDK.Common.Ports;
+using Autodroid.Database.Data;
+using Autodroid.Agent.Services;
+using Autodroid.SDK.Data.DAL;
+using Autodroid.SDK.Data.Mapper;
+using Autodroid.SDK.Common.Ports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Atomy.SDK.Common;
-using Atomy.SDK.Projects;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Projects;
 
-namespace Atomy.Agent.Tests;
+namespace Autodroid.Agent.Tests;
 
 #nullable disable
 
@@ -34,7 +34,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
         context.Database.EnsureCreated();
 
         var settings = new Dictionary<string, string> { 
-            {"Atomy:Service:UniqueName", "TestAgent"}
+            {"Autodroid:Service:UniqueName", "TestAgent"}
         };
 
         _configuration = new ConfigurationBuilder()
@@ -109,7 +109,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
         // Assert
         Assert.True(result);
         using var testContext = new ProjectContext(_contextOptions);
-        Assert.Empty(testContext.AtomyProjects);
+        Assert.Empty(testContext.AutodroidProjects);
     }
 
     [Fact]
@@ -183,7 +183,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
     private async Task<ProjectRecord> CreateDatabaseProject(string name, bool isActive, ProjectState state)
     {
         using var context = new ProjectContext(_contextOptions);
-        context.AtomyProjects.Add(new ProjectRecord
+        context.AutodroidProjects.Add(new ProjectRecord
         {
             Meta = new ProjectMetaRecord
             {
@@ -194,7 +194,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
         });
         await context.SaveChangesAsync();
 
-        return await context.AtomyProjects.FirstOrDefaultAsync(x => x.Meta.Name == "test");
+        return await context.AutodroidProjects.FirstOrDefaultAsync(x => x.Meta.Name == "test");
     }
 
     private static StepProxy CreateStepProxy(string name, int x = 0, int y = 0)
@@ -219,7 +219,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
 
     private static IQueryable<ProjectRecord> CreateCompleteProjectRecordQuery(ProjectContext context)
     {
-        return context.AtomyProjects.Include(x => x.Meta)
+        return context.AutodroidProjects.Include(x => x.Meta)
                                 .Include(x => x.Steps)
                                 .ThenInclude(x => x.MetaInfo)
                                 .Include(x => x.Steps)

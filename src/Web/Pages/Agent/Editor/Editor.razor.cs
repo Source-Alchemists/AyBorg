@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Components;
-using Atomy.SDK.Data.DTOs;
-using Atomy.Web.Services;
-using Atomy.Web.Services.Agent;
-using Atomy.Web.Shared.Models;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.Web.Services;
+using Autodroid.Web.Services.Agent;
+using Autodroid.Web.Shared.Models;
 
-namespace Atomy.Web.Pages.Agent.Editor;
+namespace Autodroid.Web.Pages.Agent.Editor;
 
 public partial class Editor : ComponentBase
 {
@@ -22,7 +22,7 @@ public partial class Editor : ComponentBase
     [Parameter]
     public string ServiceId { get; set; } = string.Empty;
 
-    [Inject] Atomy.Web.Services.IRegistryService? RegistryService { get; set; }
+    [Inject] Autodroid.Web.Services.IRegistryService? RegistryService { get; set; }
     [Inject] IProjectManagementService? ProjectManagementService { get; set; }
     [Inject] IStateService StateService { get; set; } = null!;
 

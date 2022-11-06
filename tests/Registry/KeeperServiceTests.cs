@@ -1,13 +1,13 @@
-using Atomy.ServiceRegistry.Services;
-using Atomy.SDK.Data.DTOs;
+using Autodroid.ServiceRegistry.Services;
+using Autodroid.SDK.Data.DTOs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
-using Atomy.ServiceRegistry.Mapper;
+using Autodroid.ServiceRegistry.Mapper;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Atomy.Database.Data;
+using Autodroid.Database.Data;
 
-namespace Atomy.ServiceRegistry.Tests;
+namespace Autodroid.ServiceRegistry.Tests;
 
 public sealed class KeeperServiceTests : IDisposable
 {

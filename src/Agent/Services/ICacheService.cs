@@ -1,9 +1,9 @@
-using Atomy.SDK.Data.DTOs;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.Projects;
-using Atomy.SDK.Common;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Projects;
+using Autodroid.SDK.Common;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 public interface ICacheService
 {

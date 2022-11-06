@@ -1,8 +1,8 @@
-using Atomy.Agent.Runtime;
-using Atomy.SDK.Common;
-using Atomy.SDK.Common.Ports;
+using Autodroid.Agent.Runtime;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
 
-namespace Atomy.Agent.Tests.Runtime;
+namespace Autodroid.Agent.Tests.Runtime;
 
 #nullable disable
 

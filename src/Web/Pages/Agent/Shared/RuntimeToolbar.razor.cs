@@ -2,12 +2,12 @@ using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components;
 using MQTTnet;
-using Atomy.SDK.Communication.MQTT;
-using Atomy.SDK.System.Runtime;
-using Atomy.Web.Services.Agent;
+using Autodroid.SDK.Communication.MQTT;
+using Autodroid.SDK.System.Runtime;
+using Autodroid.Web.Services.Agent;
 
 
-namespace Atomy.Web.Pages.Agent.Shared;
+namespace Autodroid.Web.Pages.Agent.Shared;
 
 #nullable disable
 
@@ -54,7 +54,7 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
             _statusSubscription.MessageReceived -= OnMqttMessageReceived;
             await MqttClientProvider.UnsubscribeAsync(_statusSubscription);
         }
-        _statusSubscription = await MqttClientProvider.SubscribeAsync($"atomy/agents/{ServiceUniqueName}/engine/status");
+        _statusSubscription = await MqttClientProvider.SubscribeAsync($"Autodroid/agents/{ServiceUniqueName}/engine/status");
         _statusSubscription.MessageReceived += OnMqttMessageReceived;
 
         await base.OnParametersSetAsync();

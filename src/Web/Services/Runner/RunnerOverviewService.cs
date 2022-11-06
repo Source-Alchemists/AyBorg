@@ -1,7 +1,7 @@
-using Atomy.SDK.System.Runtime;
-using Atomy.Web.Shared.Models;
+using Autodroid.SDK.System.Runtime;
+using Autodroid.Web.Shared.Models;
 
-namespace Atomy.Web.Services.Agent;
+namespace Autodroid.Web.Services.Agent;
 
 public class AgentOverviewService : IAgentOverviewService
 {
@@ -29,7 +29,7 @@ public class AgentOverviewService : IAgentOverviewService
     public async Task UpdateAsync()
     {
         var tmpAgentList = new List<AgentServiceEntry>();
-        foreach (var Agent in await _registryService!.ReceiveAllAvailableServicesAsync("Atomy.Agent"))
+        foreach (var Agent in await _registryService!.ReceiveAllAvailableServicesAsync("Autodroid.Agent"))
         {
             var baseUrl = Agent.Url;
             var projectMeta = await _projectManagementService!.GetActiveMetaAsync(baseUrl);

@@ -1,13 +1,13 @@
 using Microsoft.AspNetCore.Components;
-using Atomy.SDK.Data.DTOs;
-using Atomy.Web.Services;
-using Atomy.Web.Services.Agent;
-using Atomy.Web.Shared.Modals;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.Web.Services;
+using Autodroid.Web.Services.Agent;
+using Autodroid.Web.Shared.Modals;
 using MudBlazor;
-using Atomy.Web.Shared.Models;
-using Atomy.SDK.Projects;
+using Autodroid.Web.Shared.Models;
+using Autodroid.SDK.Projects;
 
-namespace Atomy.Web.Pages.Agent.Projects;
+namespace Autodroid.Web.Pages.Agent.Projects;
 
 public partial class Projects : ComponentBase
 {

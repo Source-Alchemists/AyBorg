@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Atomy.Web.Pages.Agent.Shared.Fields;
+namespace Autodroid.Web.Pages.Agent.Shared.Fields;
 
 public partial class BooleanInputField : BaseInputField
 {

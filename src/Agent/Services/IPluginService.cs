@@ -1,7 +1,7 @@
-﻿using Atomy.SDK.Common;
-using Atomy.SDK.Data.DAL;
+﻿using Autodroid.SDK.Common;
+using Autodroid.SDK.Data.DAL;
 
-namespace Atomy.Agent.Services;
+namespace Autodroid.Agent.Services;
 
 public interface IPluginsService
 {

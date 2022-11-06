@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.SignalR.Client;
-using Atomy.SDK.System.Runtime;
+using Autodroid.SDK.System.Runtime;
 
 
-namespace Atomy.Web.Services.Agent;
+namespace Autodroid.Web.Services.Agent;
 
 public interface IRuntimeService
 {

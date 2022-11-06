@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Atomy.Agent": {
+    "Autodroid.Agent": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

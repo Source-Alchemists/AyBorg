@@ -1,7 +1,7 @@
-using Atomy.SDK.Data.DTOs;
-using Atomy.SDK.System.Runtime;
+using Autodroid.SDK.Data.DTOs;
+using Autodroid.SDK.System.Runtime;
 
-namespace Atomy.Web.Shared.Models;
+namespace Autodroid.Web.Shared.Models;
 
 public record AgentServiceEntry
 {
@@ -13,7 +13,7 @@ public record AgentServiceEntry
 
     public AgentServiceEntry(ServiceRegistryEntryDto dto)
     {
-        Name = dto.Name.Replace("Atomy.", string.Empty);
+        Name = dto.Name.Replace("Autodroid.", string.Empty);
         EditorLink = $"agents/editor/{dto.Id}";
         ProjectsLink = $"agents/projects/{dto.Id}";
     }

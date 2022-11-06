@@ -1,10 +1,10 @@
-using Atomy.SDK.Common;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.Communication.MQTT;
-using Atomy.SDK.Projects;
-using Atomy.SDK.System.Runtime;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Communication.MQTT;
+using Autodroid.SDK.Projects;
+using Autodroid.SDK.System.Runtime;
 
-namespace Atomy.Agent.Runtime;
+namespace Autodroid.Agent.Runtime;
 
 /// <summary>
 /// Represents the engine.
@@ -264,13 +264,13 @@ internal sealed class Engine : IEngine
     {
         await SendStepInputPortsAsync(stepProxy);
 
-        var baseTopic = $"atomy/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/";
+        var baseTopic = $"Autodroid/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/";
         await _mqttClientProvider.PublishAsync($"{baseTopic}executionTimeMs", stepProxy.ExecutionTimeMs.ToString(), new MqttPublishOptions());
     }
 
     private async Task SendStepInputPortsAsync(IStepProxy stepProxy)
     {
-        var baseTopic = $"atomy/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/ports/";
+        var baseTopic = $"Autodroid/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/ports/";
 
         var inputPorts = stepProxy.StepBody.Ports.Where(p => p.Direction == PortDirection.Input);
         var token = CancellationToken.None;

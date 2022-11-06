@@ -1,7 +1,7 @@
-using Atomy.SDK.Common;
-using Atomy.SDK.Common.Ports;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
 
-namespace Atomy.Agent.Runtime;
+namespace Autodroid.Agent.Runtime;
 
 internal sealed class Pathfinder : IPathfinder
 {

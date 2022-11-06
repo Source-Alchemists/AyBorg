@@ -1,4 +1,4 @@
-namespace Atomy.Web.Services;
+namespace Autodroid.Web.Services;
 
 public interface IStorageService
 {

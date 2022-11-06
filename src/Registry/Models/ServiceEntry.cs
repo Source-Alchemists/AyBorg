@@ -1,6 +1,6 @@
-using Atomy.SDK.Data.DAL;
+using Autodroid.SDK.Data.DAL;
 
-namespace Atomy.ServiceRegistry.Models;
+namespace Autodroid.ServiceRegistry.Models;
 
 /// <summary>
 /// Service entry.

@@ -1,13 +1,13 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Atomy.Agent.Runtime;
-using Atomy.SDK.Common.Ports;
-using Atomy.SDK.System.Runtime;
-using Atomy.SDK.Communication.MQTT;
-using Atomy.SDK.Common;
-using Atomy.SDK.Projects;
+using Autodroid.Agent.Runtime;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.System.Runtime;
+using Autodroid.SDK.Communication.MQTT;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Projects;
 
-namespace Atomy.Agent.Tests.Runtime;
+namespace Autodroid.Agent.Tests.Runtime;
 
 public class EngineTests
 {

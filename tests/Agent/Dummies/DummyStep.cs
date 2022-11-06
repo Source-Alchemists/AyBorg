@@ -1,12 +1,12 @@
-using Atomy.SDK.Common;
-using Atomy.SDK.Common.Ports;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
 
-namespace Atomy.Agent.Tests.Dummies;
+namespace Autodroid.Agent.Tests.Dummies;
 
 /// <summary>
 /// We need a "real" step instead of a mock to test the valid behaviour.
 /// </summary>
-/// <seealso cref="Atomy.SDK.IStepBody" />
+/// <seealso cref="Autodroid.SDK.IStepBody" />
 public class DummyStep : IStepBody
 {
     public DummyStep()

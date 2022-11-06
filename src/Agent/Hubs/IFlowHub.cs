@@ -1,6 +1,6 @@
-using Atomy.SDK.Common.Ports;
+using Autodroid.SDK.Common.Ports;
 
-namespace Atomy.Agent.Hubs;
+namespace Autodroid.Agent.Hubs;
 
 public interface  IFlowHub
 {

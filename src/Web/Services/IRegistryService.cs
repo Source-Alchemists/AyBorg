@@ -1,6 +1,6 @@
-using Atomy.SDK.Data.DTOs;
+using Autodroid.SDK.Data.DTOs;
 
-namespace Atomy.Web.Services;
+namespace Autodroid.Web.Services;
 
 public interface IRegistryService
 {

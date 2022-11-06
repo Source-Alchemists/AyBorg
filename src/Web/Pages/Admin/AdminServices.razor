@@ -2,9 +2,9 @@
 @attribute [Authorize(Roles = Roles.Administrator)]
 @using SDK.Authorization
 @using SDK.Data.DTOs
-@inject Atomy.Web.Services.IRegistryService registryService
+@inject Autodroid.Web.Services.IRegistryService registryService
 
-<PageTitle>Atomy - Admin/Services</PageTitle>
+<PageTitle>Autodroid - Admin/Services</PageTitle>
 
 @if (serviceEntries == null)
 {

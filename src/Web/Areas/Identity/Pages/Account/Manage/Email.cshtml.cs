@@ -13,7 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace Atomy.Web.Areas.Identity.Pages.Account.Manage
+namespace Autodroid.Web.Areas.Identity.Pages.Account.Manage
 {
     public class EmailModel : PageModel
     {
