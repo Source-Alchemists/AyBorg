@@ -9,6 +9,14 @@ public partial class CreateReviewProjectDialog : ComponentBase
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     [Parameter] public ProjectMetaDto Project { get; set; } = null!;
 
+    private ProjectMetaDto TmpProject = null!;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        TmpProject = Project with { };
+    }
+
     private void OnCloseClicked()
     {
         MudDialog.Cancel();
@@ -16,6 +24,6 @@ public partial class CreateReviewProjectDialog : ComponentBase
 
     private void OnCreateClicked()
     {
-        MudDialog.Close(DialogResult.Ok(Project));
+        MudDialog.Close(DialogResult.Ok(TmpProject));
     }
 }

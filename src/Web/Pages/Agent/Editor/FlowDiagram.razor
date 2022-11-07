@@ -1,8 +1,21 @@
 ﻿@using Blazor.Diagrams.Components
 
-<div Class="diagram-container" dropzone="none" ondragover="event.preventDefault();" @ondragenter="OnDragEnter" @ondrop="OnDrop">
-	<CascadingValue Value="_diagram">
-		<DiagramCanvas Class="grid">
-		</DiagramCanvas>
-	</CascadingValue>
-</div>
+<MudCard class="mud-height-full mud-width-full">
+	<MudCardHeader>
+		<CardHeaderAvatar>
+			<MudIcon Icon="@Icons.Filled.Hub" />
+		</CardHeaderAvatar>
+		<CardHeaderContent>
+			<MudText Typo="Typo.h6">Automation</MudText>
+		</CardHeaderContent>
+	</MudCardHeader>
+	<MudCardContent Style="height: calc(100% - 60px)" class="pt-0 mt-0">
+		<div Class="diagram-container" dropzone="none" ondragover="event.preventDefault();" @ondragenter="OnDragEnter"
+			@ondrop="OnDrop">
+			<CascadingValue Value="_diagram">
+				<DiagramCanvas Class="grid">
+				</DiagramCanvas>
+			</CascadingValue>
+		</div>
+	</MudCardContent>
+</MudCard>

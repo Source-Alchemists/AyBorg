@@ -2,33 +2,47 @@
 @inject Autodroid.Web.Services.IRegistryService registryService
 @inject Autodroid.Web.Services.Agent.PluginsService AgentPluginsService;
 
-<MudList Clickable="true" style="height: 100%" class="overflow-auto">
-    <MudListSubheader>
-        Drag & drop to the automation flow
-    </MudListSubheader>
-    @foreach(var step in _availableSteps)
-    {
-        <MudListItem Icon="@Icons.Filled.DragIndicator" IconColor="Color.Primary" draggable="true" @ondragstart="(args) => OnDragStart(args, step)">
-            <MudText>@step.Name</MudText>
-        </MudListItem>
-    }
-</MudList>
+<MudCard Style="height: calc(100vh - 148px)" class="d-flex justify-center flex-column">
+    <MudCardHeader class="order-0">
+        <CardHeaderAvatar>
+            <MudIcon Icon="@Icons.Filled.Apps" />
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Steps</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent style="height: calc(100% - 60px)" class="pt-0 mt-0 order-1">
+        <MudList Clickable="true" style="height: 100%" class="overflow-auto">
+            <MudListSubheader>
+                Drag & drop to the automation flow
+            </MudListSubheader>
+            @foreach (var step in _availableSteps)
+            {
+                <MudListItem Icon="@Icons.Filled.DragIndicator" IconColor="Color.Primary" draggable="true"
+                @ondragstart="(args) => OnDragStart(args, step)">
+                    <MudText>@step.Name</MudText>
+                </MudListItem>
+            }
+        </MudList>
+    </MudCardContent>
+</MudCard>
 
 @code {
     private string _baseUrl = string.Empty;
     private IEnumerable<StepDto> _availableSteps = new List<StepDto>();
 
     [Parameter]
-	public string ServiceId { get; set; } = string.Empty;
+    public string ServiceId { get; set; } = string.Empty;
 
     protected override async Task OnParametersSetAsync()
     {
         var services = await registryService.ReceiveAllAvailableServicesAsync();
-		_baseUrl = registryService.GetUrl(services, ServiceId);
-		if (_baseUrl == string.Empty) {
-			return;
-		}
-		_availableSteps = await AgentPluginsService.ReceiveStepsAsync(_baseUrl);
+        _baseUrl = registryService.GetUrl(services, ServiceId);
+        if (_baseUrl == string.Empty)
+        {
+            return;
+        }
+        _availableSteps = await AgentPluginsService.ReceiveStepsAsync(_baseUrl);
         await base.OnParametersSetAsync();
     }
 
