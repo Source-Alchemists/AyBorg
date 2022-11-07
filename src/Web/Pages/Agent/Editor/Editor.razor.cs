@@ -50,8 +50,7 @@ public partial class Editor : ComponentBase
                 return;
             }
 
-            StateService.AgentState = new UiAgentState(service);
-            await StateService.RefreshAsync();
+            await StateService.SetAgentStateAsync(new UiAgentState(service));
 
             _projectMeta = await ProjectManagementService!.GetActiveMetaAsync(_baseUrl);
 

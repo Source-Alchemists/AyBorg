@@ -39,8 +39,7 @@ public partial class Projects : ComponentBase
                 return;
             }
 
-            StateService.AgentState = new UiAgentState(service);
-            await StateService.RefreshAsync();
+            await StateService.SetAgentStateAsync(new UiAgentState(service));
 
             await ReceiveProjectsAsync();
             await InvokeAsync(StateHasChanged);

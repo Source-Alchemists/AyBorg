@@ -73,6 +73,8 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
             await ConnectHubEventsAsync();
             await CreateFlow();
             _diagram.Refresh();
+            var zoom = await StateService.UpdateAutomationFlowZoomFromLocalstorageAsync();
+            _diagram.SetZoom(zoom);
         }
     }
 
@@ -335,7 +337,20 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         return !result.Cancelled;
     }
 
-    private void OnZoomInClicked() => _diagram.SetZoom(_diagram.Zoom + 0.1);
-    private void OnZoomOutClicked() => _diagram.SetZoom(_diagram.Zoom - 0.1);
-    private void OnZoomResetClicked() => _diagram.SetZoom(1.0);
+    private async void OnZoomInClicked()
+    {
+        _diagram.SetZoom(_diagram.Zoom + 0.1);
+        await StateService.SetAutomationFlowZoomAsync(_diagram.Zoom);
+    }
+    private async void OnZoomOutClicked()
+    {
+        _diagram.SetZoom(_diagram.Zoom - 0.1);
+        await StateService.SetAutomationFlowZoomAsync(_diagram.Zoom);
+
+    }
+    private async void OnZoomResetClicked()
+    {
+        _diagram.SetZoom(1.0);
+        await StateService.SetAutomationFlowZoomAsync(_diagram.Zoom);
+    }
 }

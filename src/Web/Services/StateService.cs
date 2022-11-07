@@ -9,31 +9,51 @@ public class StateService : IStateService
 
     public Action OnUpdate { get; set; } = null!;
 
-    public UiAgentState AgentState { get; set; } = null!;
+    public UiAgentState AgentState { get; private set; } = null!;
+
+    public double AutomationFlowZoom { get; private set; } = 1.0;
 
     public StateService(ILocalStorageService localStorageService)
     {
         _localStorageService = localStorageService;
     }
 
-    public async Task UpdateFromLocalstorageAsync()
+    public async Task UpdateAgentStateFromLocalstorageAsync()
     {
         var result = await _localStorageService.GetItemAsync<UiAgentState>("AgentState");
         if (result != null)
         {
             var lastUrl = AgentState == null ? string.Empty : AgentState.BaseUrl;
-            AgentState = result;
             if (!string.IsNullOrEmpty(lastUrl))
             {
-                AgentState.BaseUrl = lastUrl;
+                result.BaseUrl = lastUrl;
             }
-            await RefreshAsync();
+            await SetAgentStateAsync(result);
         }
     }
 
-    public async Task RefreshAsync()
+    public async Task SetAgentStateAsync(UiAgentState agentState)
     {
-        await _localStorageService.SetItemAsync("AgentState", AgentState);
+        AgentState = agentState;
+        await _localStorageService.SetItemAsync("AgentState", agentState);
         OnUpdate?.Invoke();
+    }
+
+    public async Task SetAutomationFlowZoomAsync(double zoom)
+    {
+        AutomationFlowZoom = zoom;
+        await _localStorageService.SetItemAsync("AutomationFlowZoom", zoom);
+    }
+
+    public async Task<double> UpdateAutomationFlowZoomFromLocalstorageAsync()
+    {
+        var result = await _localStorageService.GetItemAsync<double>("AutomationFlowZoom");
+        if (result != 0)
+        {
+            AutomationFlowZoom = result;
+            return result;
+        }
+        result = 1.0;
+        return result;
     }
 }
