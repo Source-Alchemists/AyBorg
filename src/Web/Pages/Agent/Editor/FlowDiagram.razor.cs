@@ -334,4 +334,8 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         var result = await dialog.Result;
         return !result.Cancelled;
     }
+
+    private void OnZoomInClicked() => _diagram.SetZoom(_diagram.Zoom + 0.1);
+    private void OnZoomOutClicked() => _diagram.SetZoom(_diagram.Zoom - 0.1);
+    private void OnZoomResetClicked() => _diagram.SetZoom(1.0);
 }
