@@ -45,13 +45,15 @@
     // },
 
     // Use 'forwardPorts' to make a list of ports inside the container available locally.
-    // "forwardPorts": [],
+    "forwardPorts": [ 5010, 5011, 5432],
 
     // Use the appPort property: If you reference an image or Dockerfile in devcontainer.json, you can use the appPort property to publish ports to the host.
-    "appPort": [ 5010, 5011, 5432 ]
+    // "appPort": [ 5010, 5011, 5432, 1883],
+    
 
     // Uncomment the next line to run commands after the container is created - for example installing curl.
-    // "postStartCommand": "",
+    "postStartCommand": "sudo /etc/init.d/postgresql start",
+    "postAttachCommand": "sleep 10 && mosquitto -d"
 
     // Uncomment when using a ptrace-based debugger like C++, Go, and Rust
     // "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
@@ -60,9 +62,6 @@
 
     // Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
     // "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
-
-    // Uncomment to connect as a non-root user if you've added one. See https://aka.ms/vscode-remote/containers/non-root.
-    // "remoteUser": "vscode"
 
 
 }

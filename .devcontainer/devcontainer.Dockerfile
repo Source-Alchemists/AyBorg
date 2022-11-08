@@ -41,6 +41,7 @@ RUN  apt-get update \
 
 
 ########### START -- install mosquitto as provider ###########
+# default port 1883
 RUN apt-add-repository ppa:mosquitto-dev/mosquitto-ppa
 RUN apt-get update
 RUN apt-get install mosquitto -y
@@ -51,6 +52,13 @@ RUN apt-get install mosquitto -y
 ########### START -- install posgres as db ###########
 # default port for postgres 5432 for pgadmin as example
 RUN apt-get install -y tzdata
+# Set the locale
+RUN apt-get -y install locales
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8  
 RUN apt-get update
 RUN apt-get install postgresql postgresql-contrib -y
 # user postgres installed by postgre package
@@ -61,5 +69,5 @@ RUN    /etc/init.d/postgresql start &&\
 USER root
 ########### END -- install posgres as db ###########
 
-RUN dotnet dev-certs https --trust
 USER $USERNAME
+RUN dotnet dev-certs https --trust
