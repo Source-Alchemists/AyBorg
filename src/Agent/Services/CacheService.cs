@@ -65,11 +65,18 @@ internal sealed class CacheService : ICacheService
     public PortDto GetOrCreatePortEntry(Guid iterationId, IPort port)
     {
         var key = new PortCacheKey(iterationId, port.Id);
-        return _cache.GetOrCreate<PortDto>(key, entry =>
+        var result = _cache.GetOrCreate(key, entry =>
         {
             entry.SetOptions(_cacheEntryOptions);
             return _mapper.Map(port);
         });
+        
+        if(result == null)
+        {
+            _logger.LogWarning("No port entry found or created for iteration {IterationId} and port {PortId}.", iterationId, port.Id);
+            throw new InvalidOperationException($"No port entry found or created for iteration {iterationId} and port {port.Id}.");
+        }
+        return result;
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Reflection;
+using Microsoft.EntityFrameworkCore;
 using Autodroid.Database.Data;
 using Autodroid.SDK.Data.DAL;
 using Autodroid.SDK.Data.Mapper;
@@ -52,7 +53,16 @@ internal sealed class ProjectManagementService : IProjectManagementService
         _runtimeToStorageMapper = runtimeToStorageMapper;
         _runtimeConverterService = runtimeConverterService;
 
-        _serviceUniqueName = configuration.GetValue<string>("Autodroid:Service:UniqueName");
+        var serviceUniqueName = configuration.GetValue<string>("Autodroid:Service:UniqueName");
+        if (serviceUniqueName == null)
+        {
+            _logger.LogWarning("Service unique name is not set in configuration. Using default value. (Hint: Autodroid:Service:UniqueName)");
+            _serviceUniqueName = Assembly.GetExecutingAssembly().GetName().Name!;
+        }
+        else
+        {
+            _serviceUniqueName = serviceUniqueName;
+        }
     }
 
     /// <summary>
@@ -140,7 +150,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return false;
         }
 
-        if(orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
+        if (orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
         {
             _logger.LogWarning("Project [{orgMetaRecord.Name}] is not owned by this service.", orgMetaRecord.Name);
             return false;
@@ -178,10 +188,11 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
 
         orgMetaRecord.IsActive = isActive;
-        if(isActive)
+        if (isActive)
         {
             _logger.LogInformation("Project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}] activated.", orgMetaRecord.Name, orgMetaRecord.DbId);
-        } else
+        }
+        else
         {
             _logger.LogInformation("Project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}] deactivated.", orgMetaRecord.Name, orgMetaRecord.DbId);
         }
@@ -206,7 +217,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return false;
         }
 
-        if(orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
+        if (orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
         {
             _logger.LogWarning("Project [{orgMetaRecord.Name}] is not owned by this service.", orgMetaRecord.Name);
             return false;
