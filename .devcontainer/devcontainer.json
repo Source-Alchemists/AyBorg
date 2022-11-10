@@ -1,0 +1,67 @@
+{
+    "name": "devcontainer",
+
+    // Sets the run context to one level up instead of the .devcontainer folder.
+    "context": "..",
+
+    // Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+    "dockerFile": "./devcontainer.Dockerfile",
+
+    // Set *default* container specific settings.json values on container create.
+    "settings": {
+      "terminal.integrated.defaultProfile.linux": "bash"
+    },
+
+    "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=delegated",
+    "workspaceFolder": "/workspace",
+
+    // Add the IDs of extensions you want installed when the container is created.
+    "extensions": [
+        "ms-dotnettools.csharp",
+        "formulahendry.dotnet-test-explorer",
+        "alexiv.vscode-angular2-files",
+        "angular.ng-template",
+        "steoates.autoimport",
+        "fudge.auto-using",
+        "k--kato.docomment",
+        "magicstack.magicpython",
+        "esbenp.prettier-vscode",
+        "mohsen1.prettify-json",
+        "donjayamanne.python-extension-pack",
+        "dskwrk.vscode-generate-getter-setter",
+        "kreativ-software.csharpextensions",
+        "ms-vscode.cpptools",
+        "donjayamanne.githistory",
+        "heaths.vscode-guid",
+        "mike-co.import-sorter",
+        "rogalmic.bash-debug",
+        "dbaeumer.vscode-eslint"
+    ],
+
+    // use this build arg to change access token on build if so desired
+    // "build": {
+    //   "args": {
+    //   }
+    // },
+
+    // Use 'forwardPorts' to make a list of ports inside the container available locally.
+    "forwardPorts": [ 5010, 5011, 5432],
+
+    // Use the appPort property: If you reference an image or Dockerfile in devcontainer.json, you can use the appPort property to publish ports to the host.
+    // "appPort": [ 5010, 5011, 5432, 1883],
+    
+
+    // Uncomment the next line to run commands after the container is created - for example installing curl.
+    "postStartCommand": "sudo /etc/init.d/postgresql start",
+    "postAttachCommand": "sleep 10 && mosquitto -d"
+
+    // Uncomment when using a ptrace-based debugger like C++, Go, and Rust
+    // "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+    // "runArgs": [ "--net=host"]
+
+
+    // Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
+    // "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
+
+
+}
