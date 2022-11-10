@@ -32,6 +32,7 @@
     <ProjectReference Include="..\SDK\database\migrations\Autodroid.Database.Migrations.SqlLite\Autodroid.Database.Migrations.SqlLite.csproj" />
     <ProjectReference Include="..\SDK\database\migrations\Autodroid.Database.Migrations.PostgreSql\Autodroid.Database.Migrations.PostgreSql.csproj" />
     <ProjectReference Include="..\SDK\src\Data\Mapper\Autodroid.SDK.Data.Mapper.csproj" />
+    <ProjectReference Include="..\SDK\src\System\Autodroid.SDK.System.csproj" />
   </ItemGroup>
 
   <ItemGroup>

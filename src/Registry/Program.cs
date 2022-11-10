@@ -3,6 +3,7 @@ using Autodroid.SDK.Data.Mapper;
 using Autodroid.Registry.Mapper;
 using Autodroid.Registry.Services;
 using Microsoft.EntityFrameworkCore;
+using Autodroid.SDK.System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<IRegistryConfiguration, RegistryConfiguration>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IDalMapper, DalMapper>();
 builder.Services.AddSingleton<IKeeperService, KeeperService>();

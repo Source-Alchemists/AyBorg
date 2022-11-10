@@ -1,10 +1,10 @@
-using System.Reflection;
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
 using Autodroid.Registry.Models;
 using Autodroid.SDK.Data.DTOs;
 using Autodroid.Registry.Mapper;
 using Autodroid.Database.Data;
+using Autodroid.SDK.System.Configuration;
 
 namespace Autodroid.Registry.Services;
 
@@ -29,19 +29,12 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// <param name="configuration">The configuration.</param>
     /// <param name="dalMapper">The dal mapper.</param>
     /// <param name="registryContextFactory">The registry context.</param>
-    public KeeperService(ILogger<KeeperService> logger, IConfiguration configuration, IDalMapper dalMapper, IDbContextFactory<RegistryContext> registryContextFactory)
+    public KeeperService(ILogger<KeeperService> logger, IConfiguration configuration, IRegistryConfiguration registryConfiguration, IDalMapper dalMapper, IDbContextFactory<RegistryContext> registryContextFactory)
     {
         _logger = logger;
         _dalMapper = dalMapper;
         _registryContextFactory = registryContextFactory;
 
-        var assembly = Assembly.GetEntryAssembly();
-        var version = assembly?.GetName()?.Version;
-        var versionString = "unknown";
-        if (version != null)
-        {
-            versionString = version.ToString();
-        }
         var serverUrl = configuration.GetValue<string>("Kestrel:Endpoints:Https:Url");
         if (serverUrl == null || serverUrl.Equals(string.Empty))
         {
@@ -57,11 +50,11 @@ public sealed class KeeperService : IKeeperService, IDisposable
         _selfServiceEntry = new RegistryEntryDto
         {
             Id = Guid.NewGuid(),
-            Name = "Autodroid.Registry",
-            UniqueName = "Autodroid.Registry",
-            Type = "Autodroid.Registry",
+            Name = registryConfiguration.DisplayName,
+            UniqueName = registryConfiguration.UniqueName,
+            Type = registryConfiguration.TypeName,
             Url = serverUrl,
-            Version = versionString
+            Version = registryConfiguration.Version
         };
         _heartbeatTask = StartHeartbeatsValidation();
     }
