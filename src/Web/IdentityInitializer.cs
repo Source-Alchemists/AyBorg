@@ -23,8 +23,8 @@ internal static class IdentityInitializer
             await userManager.FindByNameAsync(defaultAdminUser).ContinueWith(task =>
             {
                 var user = task.Result;
-                userManager.AddToRoleAsync(user, "Administrator");
-                user.EmailConfirmed = true;
+                userManager.AddToRoleAsync(user!, "Administrator");
+                user!.EmailConfirmed = true;
                 user.LockoutEnabled = false;
                 userManager.UpdateAsync(user);
             });

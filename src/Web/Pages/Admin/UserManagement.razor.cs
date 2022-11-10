@@ -11,6 +11,7 @@ public partial class UserManagement : ComponentBase
     [Inject] UserManager<IdentityUser> UserManager { get; set; } = null!;
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
+    [Inject] ILogger<UserManagement> Logger { get; set; } = null!;
 
     private List<IdentityUser> _users = null!;
 
@@ -111,6 +112,14 @@ public partial class UserManagement : ComponentBase
     private async Task<IdentityUser> FindActualUserAsync(IdentityUser user)
     {
         // This method is needed because the user could be changed in the background or from a other admin page.
-        return await UserManager.FindByIdAsync(user.Id);
+        var identity = await UserManager.FindByIdAsync(user.Id);
+        if (identity == null)
+        {
+            Logger.LogWarning("User with id '{Id}' not found.", user.Id);
+            Snackbar.Add("User not found.", Severity.Error);
+            return null!;
+        }
+        
+        return identity;
     }
 }

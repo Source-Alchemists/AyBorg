@@ -1,4 +1,5 @@
 ﻿using Autodroid.SDK.Data.DTOs;
+using Autodroid.SDK.System.Configuration;
 
 namespace Autodroid.Web.Services;
 
@@ -9,13 +10,13 @@ public class RegistryService : IRegistryService
     
     /// <summary>Initializes a new instance of the <see cref="RegistryService" /> class.</summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="configuration">The configuration.</param>
+    /// <param name="serviceConfiguration">The service configuration.</param>
     /// <param name="httpClient">The HTTP client.</param>
-    public RegistryService(ILogger<RegistryService> logger, IConfiguration configuration, HttpClient httpClient)
+    public RegistryService(ILogger<RegistryService> logger, IServiceConfiguration serviceConfiguration, HttpClient httpClient)
     {
         _logger = logger;
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri(configuration.GetValue<string>("Autodroid:Registry:Url"));
+        _httpClient.BaseAddress = new Uri(serviceConfiguration.RegistryUrl);
     }
 
     /// <summary>

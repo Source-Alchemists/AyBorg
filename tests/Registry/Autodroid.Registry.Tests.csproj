@@ -25,6 +25,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Registry\Autodroid.Registry.csproj" />
+    <ProjectReference Include="..\..\src\SDK\src\System\Autodroid.SDK.System.csproj" />
   </ItemGroup>
 
 </Project>

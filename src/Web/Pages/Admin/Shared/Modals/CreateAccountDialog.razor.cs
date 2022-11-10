@@ -50,7 +50,7 @@ public partial class CreateAccountDialog : ComponentBase
             {
                 foreach(var role in _roles.Where(r => r.Checked))
                 {
-                    var roleResult = await UserManager.AddToRoleAsync(user, role.IdentityRole.Name);
+                    var roleResult = await UserManager.AddToRoleAsync(user, role.IdentityRole.Name!);
                     if(!roleResult.Succeeded)
                     {
                         _serviceErrors = roleResult.Errors.Select(e => e.Description).ToArray();
