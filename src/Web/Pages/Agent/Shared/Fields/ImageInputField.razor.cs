@@ -1,11 +1,10 @@
 using System.Text.Json;
-using Microsoft.AspNetCore.Components;
 using Autodroid.SDK.Data.DTOs;
 using Autodroid.SDK.ImageProcessing.Encoding;
 
 namespace Autodroid.Web.Pages.Agent.Shared.Fields;
 
-public partial class ImageInputField : IComponent
+public partial class ImageInputField : BaseInputField
 {
     private string? _imageUrl;
     private int _imageWidth;

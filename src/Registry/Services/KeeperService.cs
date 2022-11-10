@@ -48,6 +48,12 @@ public sealed class KeeperService : IKeeperService, IDisposable
             serverUrl = configuration.GetValue<string>("Kestrel:Endpoints:Http:Url");
         }
 
+        if(string.IsNullOrEmpty(serverUrl))
+        {
+            _logger.LogError("Server url is not set in configuration. (Hint: Kestrel:Endpoints:Https:Url or Kestrel:Endpoints:Http:Url)");
+            throw new InvalidOperationException("Server url is not set in configuration.");
+        }
+
         _selfServiceEntry = new RegistryEntryDto
         {
             Id = Guid.NewGuid(),

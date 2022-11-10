@@ -14,7 +14,7 @@ public partial class CreateNewProjectDialog : ComponentBase
     [Inject] ProjectManagementService ProjectManagementService { get; set; } = null!;
 
     [Parameter] public string BaseUrl { get; set; } = string.Empty;
-    private readonly ProjectMetaDto _newProject = new();
+    private readonly ProjectMetaDto _newProject = new() { VersionName = "__DRAFT__" };
     private readonly IList<string> _errors = new List<string>();
 
 
@@ -26,7 +26,7 @@ public partial class CreateNewProjectDialog : ComponentBase
     private async void OnValidSubmit()
     {
         var validationResults = new List<ValidationResult>();
-        if(!Validator.TryValidateObject(_newProject, new System.ComponentModel.DataAnnotations.ValidationContext(_newProject), validationResults, true))
+        if(!Validator.TryValidateObject(_newProject, new ValidationContext(_newProject), validationResults, true))
         {
             validationResults.ForEach(r => _errors.Add(r.ErrorMessage!));
             return;

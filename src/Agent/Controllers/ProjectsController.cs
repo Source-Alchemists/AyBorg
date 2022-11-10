@@ -1,3 +1,4 @@
+using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Autodroid.Agent.Services;
 using Autodroid.SDK.Data.DTOs;
@@ -29,7 +30,16 @@ public sealed class ProjectsController : ControllerBase
         _logger = logger;
         _projectManagementService = projectManagementService;
         _storageToDtoMapper = storageToDtoMapper;
-        _serviceUniqueName = configuration.GetValue<string>("Autodroid:Service:UniqueName");
+        var serviceUniqueName = configuration.GetValue<string>("Autodroid:Service:UniqueName");
+        if(serviceUniqueName == null)
+        {
+            _logger.LogWarning("Service unique name is not set in configuration. Using default value. (Hint: Autodroid:Service:UniqueName)");
+            _serviceUniqueName = Assembly.GetExecutingAssembly().GetName().Name!;
+        }
+        else
+        {
+            _serviceUniqueName = serviceUniqueName;
+        }
     }
 
     [HttpGet]

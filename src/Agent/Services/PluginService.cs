@@ -39,7 +39,14 @@ internal sealed class PluginsService : IPluginsService
         _stepPlugins.Clear();
         try
         {
-            var pluginsDir = Path.GetFullPath(_configuration.GetValue<string>("Autodroid:Plugins:Folder"));
+            var configFolder = _configuration.GetValue<string>("Autodroid:Plugins:Folder");
+            if(configFolder == null)
+            {
+                _logger.LogWarning("No plugin folder specified in configuration. (Hint: Autodroid:Plugins:Folder)");
+                return;
+            }
+
+            var pluginsDir = Path.GetFullPath(configFolder);
 
             _logger.LogTrace("Loading plugins in '{pluginsDir}' ...", pluginsDir);
 
