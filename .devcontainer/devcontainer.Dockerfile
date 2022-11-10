@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/dotnet/sdk:6.0.402-jammy
+FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy
 
 ########### START -- environment variables ###########
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
