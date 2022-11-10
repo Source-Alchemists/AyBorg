@@ -196,10 +196,7 @@ public class PathfinderTests
         {
             var stepMock = MockHelper.CreateStepProxyMock($"Step {index}", numberOfInputPorts, numberOfOutputPorts);
             var step = stepMock.Object;
-            if (startStep == null)
-            {
-                startStep = step;
-            }
+            startStep ??= step;
 
             endStep = step;
 

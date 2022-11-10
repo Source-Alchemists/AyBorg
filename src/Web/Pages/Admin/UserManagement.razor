@@ -39,7 +39,7 @@
                                 <MudMenuItem Icon="@Icons.Filled.Edit" @onclick="() => OnEditAccountClicked(context)">
                                     Edit
                                 </MudMenuItem>
-                                @if(!@context.UserName.Equals("SystemAdmin"))
+                                @if(!@context.UserName!.Equals("SystemAdmin"))
                                 {
                                     <MudMenuItem Icon="@Icons.Filled.Password" @onclick="() => OnResetPasswordClicked(context)">
                                         Reset Password

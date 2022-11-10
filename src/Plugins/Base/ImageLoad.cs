@@ -36,8 +36,7 @@ public sealed class ImageLoad : IStepBody, IDisposable
     public async Task<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _imagePort.Value?.Dispose();
-        if (_preloadTask == null)
-            _preloadTask = PreloadImage();
+        _preloadTask ??= PreloadImage();
         var result = await _preloadTask;
         _imagePort.Value = result.Value;
         _filePathPort.Value = result.Key;

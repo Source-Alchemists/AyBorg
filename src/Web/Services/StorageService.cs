@@ -4,21 +4,17 @@ namespace Autodroid.Web.Services;
 
 public class StorageService : IStorageService
 {
-    private readonly ILogger<StorageService> _logger;
     private readonly HttpClient _httpClient;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StorageService"/> class.
     /// </summary>
-    /// <param name="logger">The logger.</param>
     /// <param name="httpClient">The HTTP client.</param>
     /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
-    public StorageService(ILogger<StorageService> logger,
-                            HttpClient httpClient,
+    public StorageService(HttpClient httpClient,
                             IAuthorizationHeaderUtilService authorizationHeaderUtilService)
     {
-        _logger = logger;
         _httpClient = httpClient;
         _authorizationHeaderUtilService = authorizationHeaderUtilService;
     }

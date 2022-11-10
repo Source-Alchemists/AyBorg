@@ -11,19 +11,16 @@ namespace Autodroid.Agent.Controllers;
 [JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer })]
 public sealed class PluginsController : ControllerBase
 {
-	private readonly ILogger<PluginsController> _logger;
 	private readonly IPluginsService _pluginsService;
 	private readonly IDtoMapper _dtoMapper;
 
 	/// <summary>
 	/// Initializes a new instance of the <see cref="PluginsController"/> class.
 	/// </summary>
-	/// <param name="logger">The logger.</param>
 	/// <param name="pluginsService">The plugins service.</param>
 	/// <param name="dtoMapper">The dto mapper.</param>
-	public PluginsController(ILogger<PluginsController> logger, IPluginsService pluginsService, IDtoMapper dtoMapper)
+	public PluginsController(IPluginsService pluginsService, IDtoMapper dtoMapper)
 	{
-		_logger = logger;
 		_pluginsService = pluginsService;
 		_dtoMapper = dtoMapper;
 	}

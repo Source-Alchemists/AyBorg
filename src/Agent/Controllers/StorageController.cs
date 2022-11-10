@@ -9,12 +9,10 @@ namespace Autodroid.Agent.Controllers;
 [JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer })]
 public sealed class StorageController : ControllerBase
 {
-    private readonly ILogger<StorageController> _logger;
     private readonly IStorageService _storageService;
 
-    public StorageController(ILogger<StorageController> logger, IStorageService storageService)
+    public StorageController(IStorageService storageService)
     {
-        _logger = logger;
         _storageService = storageService;
     }
 
