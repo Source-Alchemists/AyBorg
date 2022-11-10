@@ -12,6 +12,7 @@ using Autodroid.SDK.Communication.MQTT;
 using Autodroid.SDK.Data.Mapper;
 using Autodroid.Web;
 using Autodroid.SDK.Authorization;
+using Autodroid.SDK.System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +69,7 @@ builder.Services.AddHttpClient<IRuntimeService>();
 
 builder.Services.AddHostedService<Autodroid.SDK.System.Services.RegistryService>();
 
+builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
 builder.Services.AddSingleton<IAgentCacheService, AgentCacheService>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();

@@ -1,9 +1,9 @@
-﻿using System.Reflection;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Autodroid.Database.Data;
 using Autodroid.SDK.Data.DAL;
 using Autodroid.SDK.Data.Mapper;
 using Autodroid.SDK.Projects;
+using Autodroid.SDK.System.Configuration;
 
 namespace Autodroid.Agent.Services;
 
@@ -35,13 +35,13 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// Initializes a new instance of the <see cref="ProjectManagementService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="configuration">The configuration.</param>
+    /// <param name="serviceConfiguration">The service configuration.</param>
     /// <param name="projectContextFactory">The project context.</param>
     /// <param name="runtimeHost">The runtime host.</param>
     /// <param name="runtimeToStorageMapper">The runtime to storage mapper.</param>
     /// <param name="runtimeConverterService">The runtime converter service.</param>
     public ProjectManagementService(ILogger<ProjectManagementService> logger,
-                                    IConfiguration configuration,
+                                    IServiceConfiguration serviceConfiguration,
                                     IDbContextFactory<ProjectContext> projectContextFactory,
                                     IEngineHost runtimeHost,
                                     IRuntimeToStorageMapper runtimeToStorageMapper,
@@ -52,17 +52,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         _engineHost = runtimeHost;
         _runtimeToStorageMapper = runtimeToStorageMapper;
         _runtimeConverterService = runtimeConverterService;
-
-        var serviceUniqueName = configuration.GetValue<string>("Autodroid:Service:UniqueName");
-        if (serviceUniqueName == null)
-        {
-            _logger.LogWarning("Service unique name is not set in configuration. Using default value. (Hint: Autodroid:Service:UniqueName)");
-            _serviceUniqueName = Assembly.GetExecutingAssembly().GetName().Name!;
-        }
-        else
-        {
-            _serviceUniqueName = serviceUniqueName;
-        }
+        _serviceUniqueName = serviceConfiguration.UniqueName;
     }
 
     /// <summary>

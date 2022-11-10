@@ -8,6 +8,7 @@ using Autodroid.SDK.Authorization;
 using Autodroid.SDK.System.Services;
 using Autodroid.SDK.Common;
 using Autodroid.SDK.Communication.MQTT;
+using Autodroid.SDK.System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,7 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
                         x => x.MigrationsAssembly("Autodroid.Database.Migrations.SqlLite")),
-        "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection"),
+        "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
                         x => x.MigrationsAssembly("Autodroid.Database.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
@@ -36,6 +37,7 @@ builder.Services.AddHostedService<RegistryService>();
 builder.Services.AddMemoryCache();
 
 builder.Services.AddSingleton<IEnvironment, Autodroid.SDK.Common.Environment>();
+builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
 builder.Services.AddSingleton<IRuntimeConverterService, RuntimeConverterService>();

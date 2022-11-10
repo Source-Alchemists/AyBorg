@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Autodroid.SDK.Common;
 using Autodroid.SDK.Projects;
+using Autodroid.SDK.System.Configuration;
 
 namespace Autodroid.Agent.Tests;
 
@@ -16,10 +17,11 @@ namespace Autodroid.Agent.Tests;
 
 public sealed class ProjectManagementServiceTests : IDisposable
 {
-    private static readonly NullLogger<ProjectManagementService> _logger = new();
+    private static readonly NullLogger<ProjectManagementService> _projLogger = new();
+    private static readonly NullLogger<IServiceConfiguration> _serviceLogger = new();
     private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
     private readonly DbContextOptions<ProjectContext> _contextOptions;
-    private readonly IConfiguration _configuration;
+    private readonly IServiceConfiguration _serviceConfiguration;
     private bool _disposed = false;
 
     public ProjectManagementServiceTests()
@@ -37,9 +39,10 @@ public sealed class ProjectManagementServiceTests : IDisposable
             {"Autodroid:Service:UniqueName", "TestAgent"}
         };
 
-        _configuration = new ConfigurationBuilder()
+        var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(settings)
             .Build();
+        _serviceConfiguration = new ServiceConfiguration(_serviceLogger, configuration);
     }
 
     [Fact]
@@ -52,8 +55,8 @@ public sealed class ProjectManagementServiceTests : IDisposable
 
         runtimeHostMock.Setup(x => x.TryActivateProjectAsync(It.IsAny<Project>())).ReturnsAsync(true);
 
-        var service = new ProjectManagementService(_logger,
-                                                    _configuration,
+        var service = new ProjectManagementService(_projLogger,
+                                                    _serviceConfiguration,
                                                     CreateContextFactoryMock().Object,
                                                     runtimeHostMock.Object,
                                                     runtimeStorageMapperMock.Object,
@@ -96,8 +99,8 @@ public sealed class ProjectManagementServiceTests : IDisposable
 
         runtimeHostMock.Setup(x => x.TryDeactivateProjectAsync()).ReturnsAsync(true);
 
-        var service = new ProjectManagementService(_logger,
-                                                    _configuration,
+        var service = new ProjectManagementService(_projLogger,
+                                                    _serviceConfiguration,
                                                     CreateContextFactoryMock().Object,
                                                     runtimeHostMock.Object,
                                                     runtimeStorageMapperMock.Object,
@@ -139,8 +142,8 @@ public sealed class ProjectManagementServiceTests : IDisposable
 
         runtimeHostMock.Setup(x => x.ActiveProject).Returns(runtimeProject);
 
-        var service = new ProjectManagementService(_logger,
-                                                    _configuration,
+        var service = new ProjectManagementService(_projLogger,
+                                                    _serviceConfiguration,
                                                     CreateContextFactoryMock().Object,
                                                     runtimeHostMock.Object,
                                                     new RuntimeToStorageMapper(),

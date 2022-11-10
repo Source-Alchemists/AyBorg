@@ -14,7 +14,7 @@ builder.Services.AddDbContextFactory<RegistryContext>(options =>
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
                         x => x.MigrationsAssembly("Autodroid.Database.Migrations.SqlLite")),
-        "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection"),
+        "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
                         x => x.MigrationsAssembly("Autodroid.Database.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }

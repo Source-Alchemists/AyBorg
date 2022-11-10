@@ -1,10 +1,10 @@
-using System.Reflection;
 using Microsoft.AspNetCore.Mvc;
 using Autodroid.Agent.Services;
 using Autodroid.SDK.Data.DTOs;
 using Autodroid.SDK.Data.Mapper;
 using Autodroid.SDK.Authorization;
 using Autodroid.SDK.Projects;
+using Autodroid.SDK.System.Configuration;
 
 namespace Autodroid.Agent.Controllers;
 
@@ -22,24 +22,15 @@ public sealed class ProjectsController : ControllerBase
     /// Initializes a new instance of the <see cref="ProjectsController"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="configuration">The configuration.</param>
+    /// <param name="serviceConfiguration">The service configuration.</param>
     /// <param name="projectManagementService">The project management service.</param>
     /// <param name="storageToDtoMapper">The storage to dto mapper.</param>
-    public ProjectsController(ILogger<ProjectsController> logger, IConfiguration configuration, IProjectManagementService projectManagementService, IDtoMapper storageToDtoMapper)
+    public ProjectsController(ILogger<ProjectsController> logger, IServiceConfiguration serviceConfiguration, IProjectManagementService projectManagementService, IDtoMapper storageToDtoMapper)
     {
         _logger = logger;
         _projectManagementService = projectManagementService;
         _storageToDtoMapper = storageToDtoMapper;
-        var serviceUniqueName = configuration.GetValue<string>("Autodroid:Service:UniqueName");
-        if(serviceUniqueName == null)
-        {
-            _logger.LogWarning("Service unique name is not set in configuration. Using default value. (Hint: Autodroid:Service:UniqueName)");
-            _serviceUniqueName = Assembly.GetExecutingAssembly().GetName().Name!;
-        }
-        else
-        {
-            _serviceUniqueName = serviceUniqueName;
-        }
+        _serviceUniqueName = serviceConfiguration.UniqueName;
     }
 
     [HttpGet]
