@@ -1,4 +1,4 @@
-using Autodroid.Web.Services;
+using Autodroid.Web.Services.AppState;
 using Microsoft.AspNetCore.Components;
 
 namespace Autodroid.Web.Shared;

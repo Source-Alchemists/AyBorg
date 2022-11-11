@@ -1,8 +1,9 @@
-using Microsoft.AspNetCore.Components;
 using Autodroid.SDK.Data.DTOs;
 using Autodroid.Web.Services;
 using Autodroid.Web.Services.Agent;
+using Autodroid.Web.Services.AppState;
 using Autodroid.Web.Shared.Models;
+using Microsoft.AspNetCore.Components;
 
 namespace Autodroid.Web.Pages.Agent.Editor;
 
@@ -22,7 +23,7 @@ public partial class Editor : ComponentBase
     [Parameter]
     public string ServiceId { get; set; } = string.Empty;
 
-    [Inject] Autodroid.Web.Services.IRegistryService? RegistryService { get; set; }
+    [Inject] IRegistryService? RegistryService { get; set; }
     [Inject] IProjectManagementService? ProjectManagementService { get; set; }
     [Inject] IStateService StateService { get; set; } = null!;
 

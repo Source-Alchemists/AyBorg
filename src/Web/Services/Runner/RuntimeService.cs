@@ -1,6 +1,7 @@
 using System.Net;
-using Microsoft.AspNetCore.SignalR.Client;
 using Autodroid.SDK.System.Runtime;
+using Autodroid.Web.Services.AppState;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace Autodroid.Web.Services.Agent;
 
@@ -18,9 +19,9 @@ public class RuntimeService : IRuntimeService
     /// <param name="httpClient">The HTTP client.</param>
     /// <param name="stateService">The state service.</param>
     /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
-    public RuntimeService(ILogger<RuntimeService> logger, 
-                            HttpClient httpClient, 
-                            IStateService stateService, 
+    public RuntimeService(ILogger<RuntimeService> logger,
+                            HttpClient httpClient,
+                            IStateService stateService,
                             IAuthorizationHeaderUtilService authorizationHeaderUtilService)
     {
         _logger = logger;

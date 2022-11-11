@@ -1,11 +1,12 @@
-using Microsoft.AspNetCore.Components;
 using Autodroid.SDK.Data.DTOs;
+using Autodroid.SDK.Projects;
 using Autodroid.Web.Services;
 using Autodroid.Web.Services.Agent;
+using Autodroid.Web.Services.AppState;
 using Autodroid.Web.Shared.Modals;
-using MudBlazor;
 using Autodroid.Web.Shared.Models;
-using Autodroid.SDK.Projects;
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace Autodroid.Web.Pages.Agent.Projects;
 
@@ -72,7 +73,7 @@ public partial class Projects : ComponentBase
         };
         var dialog = DialogService.Show<ConfirmDialog>("Delete project", parameters, options);
         var result = await dialog.Result;
-        if(!result.Cancelled)
+        if (!result.Cancelled)
         {
             if (await ProjectManagementService.TryDeleteAsync(_baseUrl, projectDto))
             {
@@ -80,7 +81,7 @@ public partial class Projects : ComponentBase
             }
         }
     }
-    
+
     private async void OnSaveAsReviewClicked(ProjectMetaDto projectDto)
     {
         var options = new DialogOptions();
@@ -90,7 +91,7 @@ public partial class Projects : ComponentBase
         };
         var dialog = DialogService.Show<CreateReviewProjectDialog>($"Create review for {projectDto.Name}", parameters, options);
         var result = await dialog.Result;
-        if(!result.Cancelled)
+        if (!result.Cancelled)
         {
             // if (await ProjectManagementService.TrySaveAsReviewAsync(_baseUrl, projectDto))
             // {
@@ -108,7 +109,7 @@ public partial class Projects : ComponentBase
         };
         var dialog = DialogService.Show<ConfirmDialog>("Save project as ready", parameters, options);
         var result = await dialog.Result;
-        if(!result.Cancelled)
+        if (!result.Cancelled)
         {
             if (await ProjectManagementService.TrySaveAsReadyAsync(_baseUrl, projectDto))
             {
@@ -126,7 +127,7 @@ public partial class Projects : ComponentBase
         };
         var dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
         var result = await dialog.Result;
-        if(!result.Cancelled)
+        if (!result.Cancelled)
         {
             await ReceiveProjectsAsync();
         }

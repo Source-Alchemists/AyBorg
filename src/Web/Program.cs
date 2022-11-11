@@ -1,18 +1,19 @@
+using Autodroid.Database.Data;
+using Autodroid.SDK.Authorization;
+using Autodroid.SDK.Communication.MQTT;
+using Autodroid.SDK.Data.Mapper;
+using Autodroid.SDK.System.Configuration;
+using Autodroid.Web;
+using Autodroid.Web.Areas.Identity;
+using Autodroid.Web.Services;
+using Autodroid.Web.Services.Agent;
+using Autodroid.Web.Services.AppState;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
-using Blazored.LocalStorage;
-using Autodroid.Web.Areas.Identity;
-using Autodroid.Web.Services.Agent;
-using Autodroid.Web.Services;
-using Autodroid.Database.Data;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Data.Mapper;
-using Autodroid.Web;
-using Autodroid.SDK.Authorization;
-using Autodroid.SDK.System.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -33,9 +34,10 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Add authentication services.
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => {
-        options.SignIn.RequireConfirmedAccount = false;
-    })
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
     .AddRoles<IdentityRole>()
     .AddRoleManager<RoleManager<IdentityRole>>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -45,7 +47,8 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/Identity/Account/Logout";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
 });
-builder.Services.AddAuthorization(options => {
+builder.Services.AddAuthorization(options =>
+{
     options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole(Roles.Administrator));
     options.AddPolicy("RequireEngineerRole", policy => policy.RequireRole(Roles.Engineer));
     options.AddPolicy("RequireAuditorRole", policy => policy.RequireRole(Roles.Auditor));

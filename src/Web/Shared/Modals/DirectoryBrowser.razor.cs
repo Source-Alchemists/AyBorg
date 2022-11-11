@@ -1,4 +1,5 @@
 using Autodroid.Web.Services;
+using Autodroid.Web.Services.AppState;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -10,7 +11,7 @@ public partial class DirectoryBrowser : ComponentBase
     [Inject] protected IStorageService StorageService { get; set; } = null!;
     [Inject] protected IStateService StateService { get; set; } = null!;
     [Parameter] public string? RootPath { get; set; }
-    
+
     private readonly HashSet<DirectoryItem> _items = new();
     private DirectoryItem? _selectedItem;
 

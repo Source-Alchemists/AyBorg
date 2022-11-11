@@ -1,8 +1,8 @@
 using Autodroid.SDK.Communication.MQTT;
 using Autodroid.SDK.Data.DTOs;
 using Autodroid.Web.Pages.Agent.Editor.Nodes;
-using Autodroid.Web.Services;
 using Autodroid.Web.Services.Agent;
+using Autodroid.Web.Services.AppState;
 using Autodroid.Web.Shared.Modals;
 using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Models;
@@ -59,6 +59,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         _diagram.Links.Added += OnLinkAdded;
         _diagram.Links.Removed += OnLinkRemovedAsync;
         _diagram.ZoomChanged += OnZoomChanged;
+        _diagram.PanChanged += OnPanChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -74,8 +75,10 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
             await ConnectHubEventsAsync();
             await CreateFlow();
             _diagram.Refresh();
-            var zoom = await StateService.UpdateAutomationFlowZoomFromLocalstorageAsync();
+            var zoom = await StateService.AutomationFlowState.UpdateZoomAsync();
             _diagram.SetZoom(zoom);
+            var pan = await StateService.AutomationFlowState.UpdateOffsetAsync();
+            _diagram.SetPan(pan.offsetX, pan.offsetY);
         }
     }
 
@@ -344,6 +347,11 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
     private async void OnZoomChanged()
     {
-        await StateService.SetAutomationFlowZoomAsync(_diagram.Zoom);
+        await StateService.AutomationFlowState.SetZoomAsync(_diagram.Zoom);
+    }
+
+    private async void OnPanChanged()
+    {
+        await StateService.AutomationFlowState.SetOffsetAsync(_diagram.Pan.X, _diagram.Pan.Y);
     }
 }

@@ -1,7 +1,7 @@
 using Autodroid.Web.Shared.Models;
 using Blazored.LocalStorage;
 
-namespace Autodroid.Web.Services;
+namespace Autodroid.Web.Services.AppState;
 
 public class StateService : IStateService
 {
@@ -11,16 +11,17 @@ public class StateService : IStateService
 
     public UiAgentState AgentState { get; private set; } = null!;
 
-    public double AutomationFlowZoom { get; private set; } = 1.0;
+    public AutomationFlowState AutomationFlowState { get; private set; } = null!;
 
     public StateService(ILocalStorageService localStorageService)
     {
         _localStorageService = localStorageService;
+        AutomationFlowState = new AutomationFlowState(_localStorageService);
     }
 
     public async Task UpdateAgentStateFromLocalstorageAsync()
     {
-        var result = await _localStorageService.GetItemAsync<UiAgentState>("AgentState");
+        var result = await _localStorageService.GetItemAsync<UiAgentState>("Agent_State");
         if (result != null)
         {
             var lastUrl = AgentState == null ? string.Empty : AgentState.BaseUrl;
@@ -35,25 +36,7 @@ public class StateService : IStateService
     public async Task SetAgentStateAsync(UiAgentState agentState)
     {
         AgentState = agentState;
-        await _localStorageService.SetItemAsync("AgentState", agentState);
+        await _localStorageService.SetItemAsync("Agent_State", agentState);
         OnUpdate?.Invoke();
-    }
-
-    public async Task SetAutomationFlowZoomAsync(double zoom)
-    {
-        AutomationFlowZoom = zoom;
-        await _localStorageService.SetItemAsync("AutomationFlowZoom", zoom);
-    }
-
-    public async Task<double> UpdateAutomationFlowZoomFromLocalstorageAsync()
-    {
-        var result = await _localStorageService.GetItemAsync<double>("AutomationFlowZoom");
-        if (result != 0)
-        {
-            AutomationFlowZoom = result;
-            return result;
-        }
-        result = 1.0;
-        return result;
     }
 }
