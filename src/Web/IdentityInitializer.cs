@@ -5,7 +5,7 @@ namespace Autodroid.Web;
 
 internal static class IdentityInitializer
 {
-    public static async Task InitializeAsync(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
+    public static async ValueTask InitializeAsync(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager)
     {
         await CreateRoleAsync(roleManager, Roles.Administrator);
         await CreateRoleAsync(roleManager, Roles.Engineer);
@@ -31,7 +31,7 @@ internal static class IdentityInitializer
         }
     }
 
-    private static async Task CreateRoleAsync(RoleManager<IdentityRole> roleManager, string roleName)
+    private static async ValueTask CreateRoleAsync(RoleManager<IdentityRole> roleManager, string roleName)
     {
         if(!await roleManager.RoleExistsAsync(roleName))
         {

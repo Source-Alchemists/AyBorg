@@ -69,7 +69,7 @@ internal sealed class FlowService : IFlowService
     /// <param name="x">The x.</param>
     /// <param name="y">The y.</param>
     /// <returns></returns>
-    public async Task<IStepProxy> AddStepAsync(Guid stepId, int x, int y)
+    public async ValueTask<IStepProxy> AddStepAsync(Guid stepId, int x, int y)
     {
         var pluginProxy = _pluginsService.Find(stepId);
         if(_runtimeHost.ActiveProject == null)
@@ -90,14 +90,14 @@ internal sealed class FlowService : IFlowService
 
         _runtimeHost.ActiveProject.Steps.Add(stepProxy);
 
-        return await Task.FromResult(stepProxy);
+        return await ValueTask.FromResult(stepProxy);
     }
 
     /// <summary>
     /// Removes the step.
     /// </summary>
     /// <param name="stepId">The step identifier.</param>
-    public async Task<bool> TryRemoveStepAsync(Guid stepId)
+    public async ValueTask<bool> TryRemoveStepAsync(Guid stepId)
     {
         if (_runtimeHost.ActiveProject == null)
         {
@@ -137,7 +137,7 @@ internal sealed class FlowService : IFlowService
             }
         }
         // ToDo: Dispose step if needed.
-        return await Task.FromResult(true);
+        return await ValueTask.FromResult(true);
     }
 
     /// <summary>
@@ -147,7 +147,7 @@ internal sealed class FlowService : IFlowService
     /// <param name="x">The x.</param>
     /// <param name="y">The y.</param>
     /// <returns></returns>
-    public async Task<bool> TryMoveStepAsync(Guid stepId, int x, int y)
+    public async ValueTask<bool> TryMoveStepAsync(Guid stepId, int x, int y)
     {
         if (_runtimeHost.ActiveProject == null)
         {
@@ -164,8 +164,7 @@ internal sealed class FlowService : IFlowService
         step.X = x;
         step.Y = y;
 
-        await Task.CompletedTask;
-        return true;
+        return await ValueTask.FromResult(true);
     }
 
     /// <summary>
@@ -174,7 +173,7 @@ internal sealed class FlowService : IFlowService
     /// <param name="sourcePortId">The source port identifier.</param>
     /// <param name="targetPortId">The target port identifier.</param>
     /// <returns></returns>
-    public async Task<PortLink> LinkPortsAsync(Guid sourcePortId, Guid targetPortId)
+    public async ValueTask<PortLink> LinkPortsAsync(Guid sourcePortId, Guid targetPortId)
     {
         if (_runtimeHost.ActiveProject == null)
         {
@@ -241,7 +240,7 @@ internal sealed class FlowService : IFlowService
         targetStep.Links.Add(link);
         _runtimeHost.ActiveProject.Links.Add(link);
         await _flowHub.SendLinkChangedAsync(link);
-        return await Task.FromResult<PortLink>(link);
+        return await ValueTask.FromResult(link);
     }
 
     /// <summary>
@@ -249,7 +248,7 @@ internal sealed class FlowService : IFlowService
     /// </summary>
     /// <param name="linkId">The link identifier.</param>
     /// <returns></returns>
-    public async Task<bool> TryUnlinkPortsAsync(Guid linkId)
+    public async ValueTask<bool> TryUnlinkPortsAsync(Guid linkId)
     {
         if (_runtimeHost.ActiveProject == null)
         {
@@ -277,7 +276,7 @@ internal sealed class FlowService : IFlowService
 
         _runtimeHost.ActiveProject.Links.Remove(link);
         await _flowHub.SendLinkChangedAsync(link, true);
-        return await Task.FromResult(true);
+        return await ValueTask.FromResult(true);
     }
 
     /// <summary>
@@ -285,7 +284,7 @@ internal sealed class FlowService : IFlowService
     /// </summary>
     /// <param name="portId">The port identifier.</param>
     /// <returns></returns>
-    public async Task<IPort> GetPortAsync(Guid portId)
+    public async ValueTask<IPort> GetPortAsync(Guid portId)
     {
         if (_runtimeHost.ActiveProject == null)
         {
@@ -300,7 +299,7 @@ internal sealed class FlowService : IFlowService
             return null!;
         }
 
-        return await Task.FromResult(targetStep.Ports.First(p => p.Id == portId));
+        return await ValueTask.FromResult(targetStep.Ports.First(p => p.Id == portId));
     }
 
     /// <summary>
@@ -309,7 +308,7 @@ internal sealed class FlowService : IFlowService
     /// <param name="portId">The port identifier.</param>
     /// <param name="value">The value.</param>
     /// <returns></returns>
-    public async Task<bool> TryUpdatePortValueAsync(Guid portId, object value)
+    public async ValueTask<bool> TryUpdatePortValueAsync(Guid portId, object value)
     {
         if (_runtimeHost.ActiveProject == null)
         {

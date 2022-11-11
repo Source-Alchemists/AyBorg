@@ -48,7 +48,7 @@ public class RevalidatingIdentityAuthenticationStateProvider<TUser>
         }
     }
 
-    private async Task<bool> ValidateSecurityStampAsync(UserManager<TUser> userManager, ClaimsPrincipal principal)
+    private async ValueTask<bool> ValidateSecurityStampAsync(UserManager<TUser> userManager, ClaimsPrincipal principal)
     {
         var user = await userManager.GetUserAsync(principal);
         if (user == null)

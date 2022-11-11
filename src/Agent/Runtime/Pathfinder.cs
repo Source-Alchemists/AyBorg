@@ -31,7 +31,7 @@ internal sealed class Pathfinder : IPathfinder
     /// <param name="steps">The steps to create the path from.</param>
     /// <param name="links">The links to create the path from.</param>
     /// <returns>The path.</returns>
-    public async Task<IEnumerable<PathItem>> CreatePathAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
+    public async ValueTask<IEnumerable<PathItem>> CreatePathAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
     {
         StartSteps = await FindStepsWithoutIncomingLinksAsync(steps, links);
         EndSteps = await FindStepsWithoutOutgoingLinksAsync(steps, links);
@@ -106,7 +106,7 @@ internal sealed class Pathfinder : IPathfinder
             // Internal it will call onInitilaizeAsync for each stepBody.
             await pathItem.Step.InitializeAsync();
         }
-        return await Task.FromResult(allPathItems);
+        return await ValueTask.FromResult(allPathItems);
     }
 
     private static IEnumerable<PathItem> CreatePath(IEnumerable<PathItem> lastPathItems, IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
@@ -169,7 +169,7 @@ internal sealed class Pathfinder : IPathfinder
         }
     }
 
-    private static async Task<IEnumerable<IStepProxy>> FindStepsWithoutOutgoingLinksAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
+    private static async ValueTask<IEnumerable<IStepProxy>> FindStepsWithoutOutgoingLinksAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
     {
         // Possible endpoints are steps without outgoing links
         var hashSet = new HashSet<IStepProxy>();
@@ -183,10 +183,10 @@ internal sealed class Pathfinder : IPathfinder
             hashSet.Add(s);
         }
 
-        return await Task.FromResult(hashSet);
+        return await ValueTask.FromResult(hashSet);
     }
 
-    private static async Task<IEnumerable<IStepProxy>> FindStepsWithoutIncomingLinksAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
+    private static async ValueTask<IEnumerable<IStepProxy>> FindStepsWithoutIncomingLinksAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
     {
         var hashSet = new HashSet<IStepProxy>();
         // Possible startpoints are steps without incoming links
@@ -200,22 +200,22 @@ internal sealed class Pathfinder : IPathfinder
         }
         // var stepsWithoutIncomingPorts = steps.Where(s => s.Ports.Where(p => p.Direction == PortDirection.Input && !links.Any(l => l.TargetId.Equals(p.Id))).Any());
 
-        return await Task.FromResult(hashSet);
+        return await ValueTask.FromResult(hashSet);
     }
 
-    private static async Task<IEnumerable<IStepProxy>> FindMergeStepsAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
+    private static async ValueTask<IEnumerable<IStepProxy>> FindMergeStepsAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
     {
         // Merge steps are steps with multiple incoming links
         var mergeSteps = steps.Where(s => s.Ports.Where(p => links.Where(l => l.TargetId.Equals(p.Id)).Any()).Count() > 1);
 
-        return await Task.FromResult(mergeSteps);
+        return await ValueTask.FromResult(mergeSteps);
     }
 
-    private static async Task<IEnumerable<IStepProxy>> FindForkStepsAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
+    private static async ValueTask<IEnumerable<IStepProxy>> FindForkStepsAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
     {
         // Split steps are steps with multiple outgoing links
         var splitSteps = steps.Where(s => s.Ports.Where(p => p.Direction == PortDirection.Output && links.Where(l => l.SourceId.Equals(p.Id)).Count() > 1).Any());
 
-        return await Task.FromResult(splitSteps);
+        return await ValueTask.FromResult(splitSteps);
     }
 }

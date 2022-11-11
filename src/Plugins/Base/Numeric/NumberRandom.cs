@@ -22,13 +22,13 @@ public sealed class NumberRandom : IStepBody
         Ports = new IPort[] { _seedPort, _minPort, _maxPort, _resultPort };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
-        if(_random == null || _seed != System.Convert.ToInt32(_seedPort.Value)) {
-            _seed = System.Convert.ToInt32(_seedPort.Value == -1 ? (int)DateTime.Now.Ticks : _seedPort.Value);
+        if(_random == null || _seed != Convert.ToInt32(_seedPort.Value)) {
+            _seed = Convert.ToInt32(_seedPort.Value == -1 ? (int)DateTime.Now.Ticks : _seedPort.Value);
             _random = new Random(_seed);
         }
-        _resultPort.Value = _random.Next(System.Convert.ToInt32(_minPort.Value), System.Convert.ToInt32(_maxPort.Value) + 1);
-        return Task.FromResult(true);
+        _resultPort.Value = _random.Next(Convert.ToInt32(_minPort.Value), Convert.ToInt32(_maxPort.Value) + 1);
+        return ValueTask.FromResult(true);
     }
 }

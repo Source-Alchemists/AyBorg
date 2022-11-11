@@ -17,7 +17,7 @@ public sealed class MqttSend : BaseMqttSendStep, IStepBody
         _ports.Insert(0, _messagePort);
     }
 
-    protected override async Task<bool> Send(CancellationToken cancellationToken)
+    protected override async ValueTask<bool> Send(CancellationToken cancellationToken)
     {
         try
         {

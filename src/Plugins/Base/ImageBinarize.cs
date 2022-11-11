@@ -28,14 +28,14 @@ public sealed class ImageBinarize : IStepBody, IDisposable
         };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         var threshold = System.Convert.ToSingle(_thresholdPort.Value, CultureInfo.InvariantCulture);
         var mode = (BinaryThresholdMode)_thresholdTypePort.Value;
         _outputImagePort.Value?.Dispose();
         _outputImagePort.Value = _inputImagePort.Value.Binarize(threshold, mode);
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     public void Dispose()

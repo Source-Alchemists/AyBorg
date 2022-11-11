@@ -18,9 +18,9 @@ public sealed class StorageController : ControllerBase
 
     [HttpGet("directories")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<string[]>> GetDirectories(string path)
+    public async ValueTask<ActionResult<string[]>> GetDirectories(string path)
     {
         var directories = _storageService.GetDirectories(path);
-        return await Task.FromResult(Ok(directories));
+        return await ValueTask.FromResult(Ok(directories));
     }
 }

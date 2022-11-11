@@ -21,7 +21,7 @@ public class DummyStep : IStepBody
 
     public string DefaultName =>  "Dummy";
     public IEnumerable<IPort> Ports { get; }
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

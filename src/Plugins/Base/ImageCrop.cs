@@ -29,17 +29,17 @@ public sealed class ImageCrop : IStepBody, IDisposable
         };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _outputImagePort.Value?.Dispose();
         if(_cropRectanglePort.Value.Width <= 0 || _cropRectanglePort.Value.Height <= 0)
         {
             _logger.LogWarning("Invalid crop region.");
-            return Task.FromResult(false);
+            return ValueTask.FromResult(false);
         }
         
         _outputImagePort.Value = _inputImagePort.Value.Crop(_cropRectanglePort.Value);
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     private void Dispose(bool disposing)

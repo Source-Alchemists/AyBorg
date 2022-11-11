@@ -30,7 +30,7 @@ public sealed class PluginsController : ControllerBase
 	/// </summary>
 	[HttpGet("Steps")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<StepDto>>> GetStepsAsync()
+    public async ValueTask<ActionResult<IEnumerable<StepDto>>> GetStepsAsync()
 	{
 		var plugins = _pluginsService.Steps;
 		var pluginDtos = new List<StepDto>();
@@ -41,7 +41,6 @@ public sealed class PluginsController : ControllerBase
 			pluginDtos.Add(dto);
 		}
 
-		await Task.CompletedTask;
-		return Ok(pluginDtos);
+		return await ValueTask.FromResult(Ok(pluginDtos));
 	}
 }

@@ -73,7 +73,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// </summary>
     /// <param name="name">The searched name.</param>
     /// <returns>Array of entries. Empty array if no entry match the name.</returns>
-    public async Task<IEnumerable<RegistryEntryDto>> FindRegistryEntriesAsync(string name)
+    public async ValueTask<IEnumerable<RegistryEntryDto>> FindRegistryEntriesAsync(string name)
     {
 
         var result = _registryEntries.Where(x => x.Name.Equals(name));
@@ -81,15 +81,14 @@ public sealed class KeeperService : IKeeperService, IDisposable
         {
             result = result.Append(_selfServiceEntry);
         }
-        await Task.CompletedTask;
-        return result;
+        return await ValueTask.FromResult(result);
     }
 
     /// <summary>
     /// Get all service registry entries.
     /// </summary>
     /// <returns>All service registry entries.</returns>
-    public async Task<IEnumerable<RegistryEntryDto>> GetAllRegistryEntriesAsync()
+    public async ValueTask<IEnumerable<RegistryEntryDto>> GetAllRegistryEntriesAsync()
     {
         return await Task.Run(() =>
         {
@@ -108,11 +107,10 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// </summary>
     /// <param name="serviceId">The service identifier.</param>
     /// <returns></returns>
-    public async Task<RegistryEntryDto?> GetRegistryEntryAsync(Guid serviceId)
+    public async ValueTask<RegistryEntryDto?> GetRegistryEntryAsync(Guid serviceId)
     {
         var result = _registryEntries.FirstOrDefault(x => x.Id == serviceId);
-        await Task.CompletedTask;
-        return result;
+        return await ValueTask.FromResult(result);
     }
 
     /// <summary>
@@ -178,8 +176,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
         }
 
         RemoveService(serviceId);
-
-        await Task.CompletedTask;
+        await ValueTask.CompletedTask;
     }
 
     /// <summary>
@@ -188,7 +185,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// </summary>
     /// <param name="RegistryEntry">The desired service.</param>
     /// <returns>Task.</returns>
-    public async Task UpdateTimestamp(RegistryEntryDto RegistryEntry)
+    public async ValueTask UpdateTimestamp(RegistryEntryDto RegistryEntry)
     {
         var matchingService = FindAvailableService(RegistryEntry);
 
@@ -199,7 +196,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
 
         matchingService.LastConnectionTime = DateTime.UtcNow;
 
-        await Task.CompletedTask;
+        await ValueTask.CompletedTask;
     }
     private async void Dispose(bool disposing)
     {

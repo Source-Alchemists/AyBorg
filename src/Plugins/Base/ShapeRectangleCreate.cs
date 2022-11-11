@@ -27,12 +27,12 @@ public sealed class ShapeRectangleCreate : IStepBody
         };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _rectanglePort.Value = new Rectangle(System.Convert.ToInt32(_xPort.Value), 
                                                 System.Convert.ToInt32(_yPort.Value), 
                                                 System.Convert.ToInt32(_widthPort.Value), 
                                                 System.Convert.ToInt32(_heightPort.Value));
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 }

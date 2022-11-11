@@ -33,7 +33,7 @@ public sealed class ImageLoad : IStepBody, IDisposable
         };
     }
 
-    public async Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _imagePort.Value?.Dispose();
         _preloadTask ??= PreloadImage();
@@ -43,7 +43,7 @@ public sealed class ImageLoad : IStepBody, IDisposable
         _preloadTask.Dispose();
         _preloadTask = PreloadImage();
 
-        return await Task.FromResult(true);
+        return await ValueTask.FromResult(true);
     }
 
     private Task<KeyValuePair<string, Image>> PreloadImage()

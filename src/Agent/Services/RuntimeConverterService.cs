@@ -34,7 +34,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
     /// </summary>
     /// <param name="projectRecord">The project.</param>
     /// <returns></returns>
-    public async Task<Project> ConvertAsync(ProjectRecord projectRecord)
+    public async ValueTask<Project> ConvertAsync(ProjectRecord projectRecord)
     {
         var project = new Project
         {
@@ -57,7 +57,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
     /// <param name="port">The port.</param>
     /// <param name="value">The value.</param>
     /// <returns></returns>
-    public async Task<bool> TryUpdatePortValueAsync(IPort port, object value)
+    public async ValueTask<bool> TryUpdatePortValueAsync(IPort port, object value)
     {
         switch (port)
         {
@@ -76,7 +76,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         }
 
         _logger.LogWarning("Port type {PortType} is not supported", port.GetType().Name);
-        return await Task.FromResult(false);
+        return await ValueTask.FromResult(false);
     }
 
     private static bool UpdateNumericPortValue(NumericPort port, object value)
@@ -151,7 +151,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         return true;
     }
 
-    private async Task<ICollection<IStepProxy>> ConvertStepsAsync(ICollection<StepRecord> stepRecords)
+    private async ValueTask<ICollection<IStepProxy>> ConvertStepsAsync(ICollection<StepRecord> stepRecords)
     {
         var steps = new List<IStepProxy>();
         foreach (var stepRecord in stepRecords)
@@ -163,7 +163,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         return steps;
     }
 
-    private async Task<IStepProxy> ConvertStepAsync(StepRecord stepRecord)
+    private async ValueTask<IStepProxy> ConvertStepAsync(StepRecord stepRecord)
     {
         var proxyInstance = _pluginsService.Find(stepRecord);
         if (proxyInstance == null) throw new KeyNotFoundException(nameof(stepRecord.MetaInfo.TypeName));
@@ -215,7 +215,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         }
     }
 
-    private async Task ChangePortsValues(IEnumerable<IPort> ports, IEnumerable<PortRecord> portRecords)
+    private async ValueTask ChangePortsValues(IEnumerable<IPort> ports, IEnumerable<PortRecord> portRecords)
     {
         foreach (var port in ports)
         {
@@ -230,7 +230,5 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
             await TryUpdatePortValueAsync(port, portRecord.Value);
         }
-
-        await Task.CompletedTask;
     }
 }

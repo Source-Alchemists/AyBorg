@@ -22,5 +22,5 @@ public abstract class BaseMqttStep : IStepBody
         _mqttClientProvider = mqttClientProvider;
     }
 
-    public abstract Task<bool> TryRunAsync(CancellationToken cancellationToken);
+    public abstract ValueTask<bool> TryRunAsync(CancellationToken cancellationToken);
 }

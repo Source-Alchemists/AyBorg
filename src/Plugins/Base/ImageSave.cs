@@ -35,14 +35,14 @@ public sealed class ImageSave : IStepBody
         };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         var resultFileName = $"{ReplacePlaceHolder(_fileNamePrefixPort.Value)}{ReplacePlaceHolder(_inputFileNamePort.Value)}{ReplacePlaceHolder(_fileNameSuffixPort.Value)}.png";
         var resultFilePath = Path.Combine($"{_environment.StorageLocation}{_folderPort.Value}", resultFileName);
         _logger.LogTrace("Saving image to {resultFilePath}", resultFilePath);
         Image.Save(_imagePort.Value, resultFilePath, EncoderType.Png);
         _outputFileNamePort.Value = resultFileName;
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     private static string ReplacePlaceHolder(string value)

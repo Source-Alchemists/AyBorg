@@ -17,7 +17,7 @@ public sealed class NumberMathFunction : IStepBody
         Ports = new IPort[] { _functionPort, _valueAPort, _valueBPort, _resultPort };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         switch(_functionPort.Value)
         {
@@ -35,6 +35,6 @@ public sealed class NumberMathFunction : IStepBody
                 break;
         }
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 }

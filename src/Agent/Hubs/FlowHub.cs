@@ -23,7 +23,7 @@ public class FlowHub : IFlowHub
     /// </summary>
     /// <param name="link">The link.</param>
     /// <param name="removed">if set to <c>true</c> [remove].</param>
-    public async Task SendLinkChangedAsync(PortLink link, bool removed)
+    public async ValueTask SendLinkChangedAsync(PortLink link, bool removed)
     {
         var dtoLink = _mapper.Map(link);
         await _hubContext.Clients.All.SendAsync("LinkChanged", dtoLink, removed);

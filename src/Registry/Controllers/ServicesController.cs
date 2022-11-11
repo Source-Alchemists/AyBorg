@@ -32,7 +32,7 @@ public class ServicesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status208AlreadyReported)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult<Guid>> RegisterAsync(RegistryEntryDto RegistryEntry)
+    public async ValueTask<ActionResult<Guid>> RegisterAsync(RegistryEntryDto RegistryEntry)
     {
         try
         {
@@ -53,7 +53,7 @@ public class ServicesController : ControllerBase
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<ActionResult> UnregisterAsync(Guid id)
+    public async ValueTask<ActionResult> UnregisterAsync(Guid id)
     {
         try
         {
@@ -74,7 +74,7 @@ public class ServicesController : ControllerBase
     /// <returns></returns>
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<RegistryEntryDto[]>> GetAsync()
+    public async ValueTask<ActionResult<RegistryEntryDto[]>> GetAsync()
     {
         return Ok(await _keeperService.GetAllRegistryEntriesAsync());
     }
@@ -84,7 +84,7 @@ public class ServicesController : ControllerBase
     /// </summary>
     [HttpGet("{name}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<RegistryEntryDto[]>> GetAsync(string name)
+    public async ValueTask<ActionResult<RegistryEntryDto[]>> GetAsync(string name)
     {
         return Ok(await _keeperService.FindRegistryEntriesAsync(name));
     }
@@ -94,7 +94,7 @@ public class ServicesController : ControllerBase
     /// </summary>
     [HttpGet("type/{typeName}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<RegistryEntryDto[]>> GetByTypeNameAsync(string typeName)
+    public async ValueTask<ActionResult<RegistryEntryDto[]>> GetByTypeNameAsync(string typeName)
     {
         var services = await _keeperService.GetAllRegistryEntriesAsync();
         return Ok(services.Where(s => s.Type == typeName));
@@ -106,7 +106,7 @@ public class ServicesController : ControllerBase
     [HttpGet("Id/{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<RegistryEntryDto>> GetAsync(Guid id)
+    public async ValueTask<ActionResult<RegistryEntryDto>> GetAsync(Guid id)
     {
         var result = await _keeperService.GetRegistryEntryAsync(id);
         return result != null ? Ok(result) : NotFound();
@@ -119,7 +119,7 @@ public class ServicesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> Update(RegistryEntryDto RegistryEntry)
+    public async ValueTask<ActionResult> Update(RegistryEntryDto RegistryEntry)
     {
         try
         {

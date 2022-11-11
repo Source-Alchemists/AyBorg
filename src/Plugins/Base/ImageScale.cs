@@ -29,14 +29,14 @@ public sealed class ImageScale : IStepBody, IDisposable
         };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _scaledImagePort.Value?.Dispose();
         var sourceImage = _imagePort.Value;
         if (_scalePort.Value.Equals(1m))
         {
             _scaledImagePort.Value = sourceImage;
-            return Task.FromResult(true);
+            return ValueTask.FromResult(true);
         }
 
         int w = (int)(sourceImage.Width * _scalePort.Value);
@@ -44,7 +44,7 @@ public sealed class ImageScale : IStepBody, IDisposable
         _scaledImagePort.Value = sourceImage.Resize(w, h);
         _widthPort.Value = w;
         _heightPort.Value = h;
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     public void Dispose()

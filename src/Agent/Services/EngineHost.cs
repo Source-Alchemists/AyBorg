@@ -42,18 +42,17 @@ internal sealed class EngineHost : IEngineHost
     /// Tries to activate the specified project.
     /// </summary>
     /// <param name="project">The project.</param>
-    public async Task<bool> TryActivateProjectAsync(Project project)
+    public async ValueTask<bool> TryActivateProjectAsync(Project project)
     {
         ActiveProject = project;
-        await Task.CompletedTask;
-        return true;
+        return await ValueTask.FromResult(true);
     }
 
     /// <summary>
     /// Tries to deactivate the project.
     /// </summary>
     /// <returns></returns>
-    public async Task<bool> TryDeactivateProjectAsync()
+    public async ValueTask<bool> TryDeactivateProjectAsync()
     {
         if(ActiveProject is null)
         {
@@ -73,14 +72,14 @@ internal sealed class EngineHost : IEngineHost
         }
         
         ActiveProject = null;
-        return await Task.FromResult(true);
+        return await ValueTask.FromResult(true);
     }
 
     /// <summary>
     /// Gets the engine status asynchronous.
     /// </summary>
     /// <returns></returns>
-    public async Task<EngineMeta> GetEngineStatusAsync()
+    public async ValueTask<EngineMeta> GetEngineStatusAsync()
     {
         if (_engine == null)
         {
@@ -97,7 +96,7 @@ internal sealed class EngineHost : IEngineHost
         _engineMeta.State = _engine.State;
 
         _logger.LogTrace("Engine status: {_engine.State}, {_engine.ExecutionType}", _engine.State, _engine.ExecutionType);
-        return await Task.FromResult(_engineMeta);
+        return await ValueTask.FromResult(_engineMeta);
     }
 
     /// <summary>
@@ -105,7 +104,7 @@ internal sealed class EngineHost : IEngineHost
     /// </summary>
     /// <param name="executionType">The execution type.</param>
     /// <returns>Engine meta informations.</returns>
-    public async Task<EngineMeta> StartRunAsync(EngineExecutionType executionType)
+    public async ValueTask<EngineMeta> StartRunAsync(EngineExecutionType executionType)
     {
         if (ActiveProject == null)
         {
@@ -148,7 +147,7 @@ internal sealed class EngineHost : IEngineHost
     /// Stops the engine.
     /// </summary>
     /// <returns>Engine meta informations.</returns>
-    public async Task<EngineMeta> StopRunAsync()
+    public async ValueTask<EngineMeta> StopRunAsync()
     {
         if (_engine == null)
         {
@@ -183,7 +182,7 @@ internal sealed class EngineHost : IEngineHost
     /// Aborts the engine.
     /// </summary>
     /// <returns>Engine meta informations.</returns>
-    public async Task<EngineMeta> AbortRunAsync()
+    public async ValueTask<EngineMeta> AbortRunAsync()
     {
         if (_engine == null)
         {
@@ -287,6 +286,6 @@ internal sealed class EngineHost : IEngineHost
         }
         
         _cacheService.CreateCache(e.IterationId, ActiveProject);
-        await Task.CompletedTask;
+        await ValueTask.CompletedTask;
     }
 }

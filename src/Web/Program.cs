@@ -117,8 +117,7 @@ app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbCont
 
 // Initialize identity
 var scopedServiceProvider = app.Services.CreateScope().ServiceProvider;
-IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).Wait();
-
-app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().Wait();
+await IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).AsTask();
+await app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().AsTask()!;
 
 app.Run();

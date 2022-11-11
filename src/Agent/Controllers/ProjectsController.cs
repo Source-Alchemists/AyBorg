@@ -47,7 +47,7 @@ public sealed class ProjectsController : ControllerBase
     [HttpGet("active")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<ProjectMetaDto>> GetActiveAsync()
+    public async ValueTask<ActionResult<ProjectMetaDto>> GetActiveAsync()
     {
         var metas = await _projectManagementService.GetAllMetasAsync();
         var activeProjectMeta = metas.FirstOrDefault(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
@@ -63,7 +63,7 @@ public sealed class ProjectsController : ControllerBase
 
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<ProjectMetaDto>> CreateAsync(string name)
+    public async ValueTask<ActionResult<ProjectMetaDto>> CreateAsync(string name)
     {
         var record = await _projectManagementService.CreateAsync(name);
         return Ok(_storageToDtoMapper.Map(record.Meta));
@@ -72,7 +72,7 @@ public sealed class ProjectsController : ControllerBase
     [HttpDelete]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> DeleteAsync(Guid id)
+    public async ValueTask<ActionResult> DeleteAsync(Guid id)
     {
         return await _projectManagementService.TryDeleteAsync(id) ? Ok() : NotFound();
     }
@@ -80,7 +80,7 @@ public sealed class ProjectsController : ControllerBase
     [HttpPut("{id}/active/{isActive}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> ActivateAsync(Guid id, bool isActive)
+    public async ValueTask<ActionResult> ActivateAsync(Guid id, bool isActive)
     {
         return await _projectManagementService.TryActivateAsync(id, isActive) ? Ok() : NotFound();
     }
@@ -88,7 +88,7 @@ public sealed class ProjectsController : ControllerBase
     [HttpPut("{id}/state/{state}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult> ChangeStateAsync(Guid id, ProjectState state)
+    public async ValueTask<ActionResult> ChangeStateAsync(Guid id, ProjectState state)
     {
         return await _projectManagementService.TryChangeProjectStateAsync(id, state) ? Ok() : Conflict();
     }
@@ -96,7 +96,7 @@ public sealed class ProjectsController : ControllerBase
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult> SaveAsync(Guid id)
+    public async ValueTask<ActionResult> SaveAsync(Guid id)
     {
         if(_projectManagementService.ActiveProjectId != id)
         {

@@ -11,5 +11,5 @@ internal interface IPathfinder
     /// <param name="steps">The steps to create the path from.</param>
     /// <param name="links">The links to create the path from.</param>
     /// <returns>The path.</returns>
-    Task<IEnumerable<PathItem>> CreatePathAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links);
+    ValueTask<IEnumerable<PathItem>> CreatePathAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links);
 }

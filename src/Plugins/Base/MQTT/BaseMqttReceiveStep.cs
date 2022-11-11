@@ -19,12 +19,12 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
         _ports.Add(_timeoutMsPort);
     }
 
-    public async Task OnInitializeAsync()
+    public async ValueTask OnInitializeAsync()
     {
         await SubcripeAsync();
     }
 
-    public override async Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public override async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _hasNewMessage = false;
 
@@ -47,7 +47,7 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
         return true;
     }
 
-    protected virtual async Task SubcripeAsync()
+    protected virtual async ValueTask SubcripeAsync()
     {
         if(_subscription != null && _lastTopic != _topicPort.Value)
         {

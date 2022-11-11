@@ -60,7 +60,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// </summary>
     /// <param name="name">The name.</param>
     /// <returns></returns>
-    public async Task<ProjectRecord> CreateAsync(string name)
+    public async ValueTask<ProjectRecord> CreateAsync(string name)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
         var emptyProjectRecord = new ProjectRecord
@@ -95,7 +95,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// </summary>
     /// <param name="projectId">The project id.</param>
     /// <returns></returns>
-    public async Task<bool> TryDeleteAsync(Guid projectId)
+    public async ValueTask<bool> TryDeleteAsync(Guid projectId)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
         var metas = context.AutodroidProjectMetas!.ToList();
@@ -130,7 +130,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <param name="projectId">The project identifier.</param>
     /// <param name="isActive">if set to <c>true</c> [is active].</param>
     /// <returns></returns>
-    public async Task<bool> TryActivateAsync(Guid projectId, bool isActive)
+    public async ValueTask<bool> TryActivateAsync(Guid projectId, bool isActive)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
         var orgMetaRecord = await context.AutodroidProjectMetas!.FindAsync(projectId);
@@ -197,7 +197,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <param name="projectId">The project identifier.</param>
     /// <param name="state">The state.</param>
     /// <returns></returns>
-    public async Task<bool> TryChangeProjectStateAsync(Guid projectId, ProjectState state)
+    public async ValueTask<bool> TryChangeProjectStateAsync(Guid projectId, ProjectState state)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
         var orgMetaRecord = await context.AutodroidProjectMetas!.FindAsync(projectId);
@@ -235,7 +235,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <summary>
     /// Gets all project metas asynchronous.
     /// </summary>
-    public async Task<IEnumerable<ProjectMetaRecord>> GetAllMetasAsync()
+    public async ValueTask<IEnumerable<ProjectMetaRecord>> GetAllMetasAsync()
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
         return await context.AutodroidProjectMetas!.ToListAsync();
@@ -245,7 +245,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// Loads the active project asynchronous.
     /// </summary>
     /// <returns></returns>
-    public async Task<bool> TryLoadActiveProjectAsync()
+    public async ValueTask<bool> TryLoadActiveProjectAsync()
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
         var projectMetaRecord = await context.AutodroidProjectMetas!.FirstOrDefaultAsync(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
@@ -262,7 +262,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// Save active project asynchronous.
     /// </summary>
     /// <returns></returns>
-    public async Task<bool> TrySaveActiveProjectAsync()
+    public async ValueTask<bool> TrySaveActiveProjectAsync()
     {
         if (_engineHost.ActiveProject == null)
         {

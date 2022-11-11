@@ -37,7 +37,7 @@ public sealed class FlowController : ControllerBase
     [AllowAnonymous]
     public async IAsyncEnumerable<StepDto> GetStepsAsync()
     {
-        await Task.CompletedTask;
+        await ValueTask.CompletedTask;
         foreach (var s in _flowService.GetSteps())
         {
             var dto = _dtoMapper.Map(s);
@@ -48,7 +48,7 @@ public sealed class FlowController : ControllerBase
     [HttpPost("steps/{stepId}/{x}/{y}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult<StepDto>> AddStepAsync(Guid stepId, int x, int y)
+    public async ValueTask<ActionResult<StepDto>> AddStepAsync(Guid stepId, int x, int y)
     {
         var stepProxy = await _flowService.AddStepAsync(stepId, x, y);
         if (stepProxy == null)
@@ -63,7 +63,7 @@ public sealed class FlowController : ControllerBase
     [HttpDelete("steps/{stepId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> DeleteStepAsync(Guid stepId)
+    public async ValueTask<ActionResult> DeleteStepAsync(Guid stepId)
     {
         if (await _flowService.TryRemoveStepAsync(stepId))
         {
@@ -76,7 +76,7 @@ public sealed class FlowController : ControllerBase
     [HttpPut("steps/{stepId}/{x}/{y}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<ActionResult> MoveStepAsync(Guid stepId, int x, int y)
+    public async ValueTask<ActionResult> MoveStepAsync(Guid stepId, int x, int y)
     {
         if (await _flowService.TryMoveStepAsync(stepId, x, y))
         {
@@ -90,7 +90,7 @@ public sealed class FlowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async IAsyncEnumerable<LinkDto> GetLinksAsync()
     {
-        await Task.CompletedTask;
+        await ValueTask.CompletedTask;
         foreach (var l in _flowService.GetLinks())
         {
             var dto = _dtoMapper.Map(l);
@@ -101,7 +101,7 @@ public sealed class FlowController : ControllerBase
     [HttpPost("links/{sourcePortId}/{targetPortId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<LinkDto>> LinkPortsAsync(Guid sourcePortId, Guid targetPortId)
+    public async ValueTask<ActionResult<LinkDto>> LinkPortsAsync(Guid sourcePortId, Guid targetPortId)
     {
         var result = await _flowService.LinkPortsAsync(sourcePortId, targetPortId);
         if (result == null)
@@ -114,7 +114,7 @@ public sealed class FlowController : ControllerBase
 
     [HttpDelete("links/{linkId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult> UnlinkPortsAsync(Guid linkId)
+    public async ValueTask<ActionResult> UnlinkPortsAsync(Guid linkId)
     {
         if (await _flowService.TryUnlinkPortsAsync(linkId))
         {
@@ -127,7 +127,7 @@ public sealed class FlowController : ControllerBase
     [HttpGet("ports/{portId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<ActionResult<PortDto>> GetPortAsync(Guid portId)
+    public async ValueTask<ActionResult<PortDto>> GetPortAsync(Guid portId)
     {
         var port = await _flowService.GetPortAsync(portId);
         if (port == null)
@@ -141,7 +141,7 @@ public sealed class FlowController : ControllerBase
     [HttpGet("ports/{portId}/{iterationId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<ActionResult<PortDto>> GetPortFromIterationAsync(Guid portId, Guid iterationId)
+    public async ValueTask<ActionResult<PortDto>> GetPortFromIterationAsync(Guid portId, Guid iterationId)
     {
         var port = await _flowService.GetPortAsync(portId);
         if (port == null)
@@ -155,7 +155,7 @@ public sealed class FlowController : ControllerBase
     [HttpPut("ports")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public async Task<ActionResult> UpdatePortAsync(PortDto portDto)
+    public async ValueTask<ActionResult> UpdatePortAsync(PortDto portDto)
     {
         if (portDto.Value == null)
         {
@@ -174,7 +174,7 @@ public sealed class FlowController : ControllerBase
     [HttpGet("steps/{stepId}/executiontime/{iterationId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    public async Task<ActionResult<long>> GetStepExecutionTimeAsync(Guid stepId, Guid iterationId)
+    public async ValueTask<ActionResult<long>> GetStepExecutionTimeAsync(Guid stepId, Guid iterationId)
     {
         var step = _flowService.GetSteps().FirstOrDefault(s => s.Id == stepId);
         if (step == null)
@@ -183,6 +183,6 @@ public sealed class FlowController : ControllerBase
         }
 
         var entry = _cacheService.GetOrCreateStepExecutionTimeEntry(iterationId, step);
-        return await Task.FromResult(Ok(entry));
+        return await ValueTask.FromResult(Ok(entry));
     }
 }

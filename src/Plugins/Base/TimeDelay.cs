@@ -22,7 +22,7 @@ public sealed class TimeDelay : IStepBody
     public IEnumerable<IPort> Ports { get; }
 
     /// <inheritdoc />
-    public async Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         try
         {

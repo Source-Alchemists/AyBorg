@@ -56,7 +56,7 @@ internal sealed class PathExecuter : IDisposable
         if (State != PathExecutionState.Ready) throw new InvalidOperationException("Path item is not ready to be executed.");
 
         State = PathExecutionState.Running;
-        return Task.Run<bool>(async () =>
+        return Task.Run(async () =>
         {
             bool stepResult = false;
             try

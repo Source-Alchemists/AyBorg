@@ -27,7 +27,7 @@ public sealed class ImageMirror : IStepBody, IDisposable
         };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _outputImage.Value?.Dispose();
         
@@ -35,7 +35,7 @@ public sealed class ImageMirror : IStepBody, IDisposable
         {
             // No mirror, just copy the input to the output
             _outputImage.Value = new Image(_inputImage.Value);
-            return Task.FromResult(true);
+            return ValueTask.FromResult(true);
         }
 
         var mirrorMode = MirrorMode.Horizontal;
@@ -50,7 +50,7 @@ public sealed class ImageMirror : IStepBody, IDisposable
 
         _outputImage.Value = new Image(_inputImage.Value.Mirror(mirrorMode));
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     public void Dispose()

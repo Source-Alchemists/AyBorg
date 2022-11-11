@@ -23,7 +23,7 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
         _ports.Add(_parallelPort);
     }
 
-    public override async Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public override async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         if (_parallelPort.Value)
         {
@@ -49,7 +49,7 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
         return true;
     }
 
-    protected abstract Task<bool> Send(CancellationToken cancellationToken);
+    protected abstract ValueTask<bool> Send(CancellationToken cancellationToken);
 
     protected virtual void Dispose(bool disposing)
     {

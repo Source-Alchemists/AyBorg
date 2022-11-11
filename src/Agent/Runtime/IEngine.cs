@@ -33,17 +33,17 @@ internal interface IEngine : IDisposable
     /// Starts the engine.
     /// </summary>
     /// <returns></returns>
-    Task<bool> TryStartAsync();
+    ValueTask<bool> TryStartAsync();
 
     /// <summary>
     /// Stops the engine.
     /// </summary>
     /// <returns></returns>
-    Task<bool> TryStopAsync();
+    ValueTask<bool> TryStopAsync();
 
     /// <summary>
     /// Aborts the engine.
     /// </summary>
     /// <returns></returns>
-    Task<bool> TryAbortAsync();
+    ValueTask<bool> TryAbortAsync();
 }

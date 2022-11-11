@@ -24,7 +24,7 @@ public sealed class RuntimeController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [AllowAnonymous]
-    public async Task<ActionResult<EngineMeta>> GetStatusAsync()
+    public async ValueTask<ActionResult<EngineMeta>> GetStatusAsync()
     {
         var status = await _engineHost.GetEngineStatusAsync();
         if(status == null)
@@ -39,7 +39,7 @@ public sealed class RuntimeController : ControllerBase
     [HttpPost("start/{executionType}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
-    public async Task<ActionResult<EngineMeta>> StartRunAsync(EngineExecutionType executionType)
+    public async ValueTask<ActionResult<EngineMeta>> StartRunAsync(EngineExecutionType executionType)
     {
         var status = await _engineHost.StartRunAsync(executionType);
         if(status != null)
@@ -54,7 +54,7 @@ public sealed class RuntimeController : ControllerBase
     [HttpPost("stop")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
-    public async Task<ActionResult<EngineMeta>> StopRunAsync()
+    public async ValueTask<ActionResult<EngineMeta>> StopRunAsync()
     {
         var status = await _engineHost.StopRunAsync();
         if (status != null)
@@ -69,7 +69,7 @@ public sealed class RuntimeController : ControllerBase
     [HttpPost("abort")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
-    public async Task<ActionResult<EngineMeta>> AbortRunAsync()
+    public async ValueTask<ActionResult<EngineMeta>> AbortRunAsync()
     {
         var status = await _engineHost.AbortRunAsync();
         if (status != null)

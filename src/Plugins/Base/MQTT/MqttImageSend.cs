@@ -22,7 +22,7 @@ public sealed class MqttImageSend : BaseMqttSendStep
         _ports.Insert(2, _qualityPort);
     }
 
-    protected override async Task<bool> Send(CancellationToken cancellationToken)
+    protected override async ValueTask<bool> Send(CancellationToken cancellationToken)
     {
         try
         {
