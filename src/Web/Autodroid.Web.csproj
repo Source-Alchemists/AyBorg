@@ -4,7 +4,7 @@
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <UserSecretsId>aspnet-Autodroid.Web-bcaead62-bf10-4a90-9b18-201f697037ae</UserSecretsId>
   </PropertyGroup>
 
