@@ -1,6 +1,6 @@
-using Autodroid.SDK.ImageProcessing;
-using Autodroid.SDK.Common.Ports;
 using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.ImageProcessing;
 
 namespace Autodroid.Plugins.Base;
 
@@ -30,7 +30,7 @@ public sealed class ImageMirror : IStepBody, IDisposable
     public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _outputImage.Value?.Dispose();
-        
+
         if (_mirrorHorizontal.Value == false && _mirrorVertical.Value == false)
         {
             // No mirror, just copy the input to the output

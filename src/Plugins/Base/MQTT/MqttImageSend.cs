@@ -1,8 +1,8 @@
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Communication.MQTT;
+using Autodroid.SDK.ImageProcessing.Encoding;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.ImageProcessing.Encoding;
-using Autodroid.SDK.Communication.MQTT;
 
 namespace Autodroid.Plugins.Base.MQTT;
 

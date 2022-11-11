@@ -1,6 +1,6 @@
+using Autodroid.Registry.Models;
 using Autodroid.SDK.Data.DAL;
 using Autodroid.SDK.Data.DTOs;
-using Autodroid.Registry.Models;
 using AutoMapper;
 
 namespace Autodroid.Registry.Mapper;

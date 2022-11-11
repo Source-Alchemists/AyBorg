@@ -1,6 +1,6 @@
-using Autodroid.SDK.ImageProcessing.Shapes;
-using Autodroid.SDK.Common.Ports;
 using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.ImageProcessing.Shapes;
 
 namespace Autodroid.Plugins.Base;
 
@@ -29,9 +29,9 @@ public sealed class ShapeRectangleCreate : IStepBody
 
     public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
-        _rectanglePort.Value = new Rectangle(System.Convert.ToInt32(_xPort.Value), 
-                                                System.Convert.ToInt32(_yPort.Value), 
-                                                System.Convert.ToInt32(_widthPort.Value), 
+        _rectanglePort.Value = new Rectangle(System.Convert.ToInt32(_xPort.Value),
+                                                System.Convert.ToInt32(_yPort.Value),
+                                                System.Convert.ToInt32(_widthPort.Value),
                                                 System.Convert.ToInt32(_heightPort.Value));
         return ValueTask.FromResult(true);
     }

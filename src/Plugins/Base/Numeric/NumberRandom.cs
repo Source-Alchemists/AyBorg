@@ -24,7 +24,8 @@ public sealed class NumberRandom : IStepBody
 
     public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
-        if(_random == null || _seed != Convert.ToInt32(_seedPort.Value)) {
+        if (_random == null || _seed != Convert.ToInt32(_seedPort.Value))
+        {
             _seed = Convert.ToInt32(_seedPort.Value == -1 ? (int)DateTime.Now.Ticks : _seedPort.Value);
             _random = new Random(_seed);
         }

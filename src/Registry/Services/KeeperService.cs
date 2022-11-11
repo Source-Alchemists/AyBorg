@@ -1,10 +1,10 @@
 using System.Collections.Concurrent;
-using Microsoft.EntityFrameworkCore;
+using Autodroid.Database.Data;
+using Autodroid.Registry.Mapper;
 using Autodroid.Registry.Models;
 using Autodroid.SDK.Data.DTOs;
-using Autodroid.Registry.Mapper;
-using Autodroid.Database.Data;
 using Autodroid.SDK.System.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 namespace Autodroid.Registry.Services;
 
@@ -41,7 +41,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
             serverUrl = configuration.GetValue<string>("Kestrel:Endpoints:Http:Url");
         }
 
-        if(string.IsNullOrEmpty(serverUrl))
+        if (string.IsNullOrEmpty(serverUrl))
         {
             _logger.LogError("Server url is not set in configuration. (Hint: Kestrel:Endpoints:Https:Url or Kestrel:Endpoints:Http:Url)");
             throw new InvalidOperationException("Server url is not set in configuration.");

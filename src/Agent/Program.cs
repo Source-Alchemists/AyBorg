@@ -1,14 +1,14 @@
-using Microsoft.AspNetCore.ResponseCompression;
-using Microsoft.EntityFrameworkCore;
 using Autodroid.Agent.Hubs;
 using Autodroid.Agent.Services;
-using Autodroid.SDK.Data.Mapper;
 using Autodroid.Database.Data;
 using Autodroid.SDK.Authorization;
-using Autodroid.SDK.System.Services;
 using Autodroid.SDK.Common;
 using Autodroid.SDK.Communication.MQTT;
+using Autodroid.SDK.Data.Mapper;
 using Autodroid.SDK.System.Configuration;
+using Autodroid.SDK.System.Services;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

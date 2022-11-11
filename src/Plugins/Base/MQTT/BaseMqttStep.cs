@@ -1,7 +1,7 @@
-using Autodroid.SDK.Common.Ports;
-using Microsoft.Extensions.Logging;
-using Autodroid.SDK.Communication.MQTT;
 using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
+using Autodroid.SDK.Communication.MQTT;
+using Microsoft.Extensions.Logging;
 
 namespace Autodroid.Plugins.Base.MQTT;
 

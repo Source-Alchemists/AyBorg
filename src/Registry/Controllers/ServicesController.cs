@@ -1,5 +1,5 @@
-using Autodroid.SDK.Data.DTOs;
 using Autodroid.Registry.Services;
+using Autodroid.SDK.Data.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Autodroid.Registry.Controllers;

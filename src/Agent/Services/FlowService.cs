@@ -72,7 +72,7 @@ internal sealed class FlowService : IFlowService
     public async ValueTask<IStepProxy> AddStepAsync(Guid stepId, int x, int y)
     {
         var pluginProxy = _pluginsService.Find(stepId);
-        if(_runtimeHost.ActiveProject == null)
+        if (_runtimeHost.ActiveProject == null)
         {
             _logger.LogWarning("No active project found.");
             return null!;
@@ -107,7 +107,7 @@ internal sealed class FlowService : IFlowService
 
         var project = _runtimeHost.ActiveProject;
         var step = project.Steps.FirstOrDefault(s => s.Id == stepId);
-        if(step == null)
+        if (step == null)
         {
             _logger.LogWarning("Step with id '{stepId}' not found.", stepId);
             return false;
@@ -116,23 +116,24 @@ internal sealed class FlowService : IFlowService
         project.Steps.Remove(step);
 
         var stepLinks = new List<PortLink>();
-        foreach(var link in step.Links)
+        foreach (var link in step.Links)
         {
             stepLinks.Add(link);
-            if(project.Links.Contains(link))
+            if (project.Links.Contains(link))
             {
                 project.Links.Remove(link);
             }
         }
 
-        foreach(var link in stepLinks) {
-            foreach(var linkedStep in project.Steps.Where(s => s.Links.Contains(link)))
+        foreach (var link in stepLinks)
+        {
+            foreach (var linkedStep in project.Steps.Where(s => s.Links.Contains(link)))
             {
-                foreach(var linkedPort in linkedStep.Ports.Where(p => p.Id == link.SourceId || p.Id == link.TargetId))
+                foreach (var linkedPort in linkedStep.Ports.Where(p => p.Id == link.SourceId || p.Id == link.TargetId))
                 {
                     linkedPort.Disconnect();
                 }
-                
+
                 linkedStep.Links.Remove(link);
             }
         }
@@ -227,7 +228,7 @@ internal sealed class FlowService : IFlowService
             return null!;
         }
 
-        if(!PortConverter.IsConvertable(sourcePort, targetPort))
+        if (!PortConverter.IsConvertable(sourcePort, targetPort))
         {
             _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are not convertable.", sourcePortId, targetPortId);
             return null!;
@@ -257,7 +258,7 @@ internal sealed class FlowService : IFlowService
         }
 
         var steps = _runtimeHost.ActiveProject.Steps.Where(s => s.Links.Any(l => l.Id == linkId));
-        if(!steps.Any())
+        if (!steps.Any())
         {
             _logger.LogTrace("Link with id '{linkId}' not found. Already removed.", linkId);
             return true;

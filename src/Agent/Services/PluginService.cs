@@ -1,6 +1,6 @@
-﻿using Autodroid.SDK.Common;
+﻿using System.Reflection;
+using Autodroid.SDK.Common;
 using Autodroid.SDK.Data.DAL;
-using System.Reflection;
 
 namespace Autodroid.Agent.Services;
 internal sealed class PluginsService : IPluginsService
@@ -40,7 +40,7 @@ internal sealed class PluginsService : IPluginsService
         try
         {
             var configFolder = _configuration.GetValue<string>("Autodroid:Plugins:Folder");
-            if(configFolder == null)
+            if (configFolder == null)
             {
                 _logger.LogWarning("No plugin folder specified in configuration. (Hint: Autodroid:Plugins:Folder)");
                 return;

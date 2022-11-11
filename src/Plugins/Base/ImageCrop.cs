@@ -1,8 +1,8 @@
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
 using Autodroid.SDK.ImageProcessing;
 using Autodroid.SDK.ImageProcessing.Shapes;
-using Autodroid.SDK.Common.Ports;
 using Microsoft.Extensions.Logging;
-using Autodroid.SDK.Common;
 
 namespace Autodroid.Plugins.Base;
 
@@ -32,12 +32,12 @@ public sealed class ImageCrop : IStepBody, IDisposable
     public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _outputImagePort.Value?.Dispose();
-        if(_cropRectanglePort.Value.Width <= 0 || _cropRectanglePort.Value.Height <= 0)
+        if (_cropRectanglePort.Value.Width <= 0 || _cropRectanglePort.Value.Height <= 0)
         {
             _logger.LogWarning("Invalid crop region.");
             return ValueTask.FromResult(false);
         }
-        
+
         _outputImagePort.Value = _inputImagePort.Value.Crop(_cropRectanglePort.Value);
         return ValueTask.FromResult(true);
     }

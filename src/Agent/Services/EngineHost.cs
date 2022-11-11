@@ -22,8 +22,8 @@ internal sealed class EngineHost : IEngineHost
     /// <param name="logger">The logger.</param>
     /// <param name="engineFactory">The engine factory.</param>
     /// <param name="mqttClientProvider">The MQTT client provider.</param>
-    public EngineHost(ILogger<EngineHost> logger, 
-                        IEngineFactory engineFactory, 
+    public EngineHost(ILogger<EngineHost> logger,
+                        IEngineFactory engineFactory,
                         IMqttClientProvider mqttClientProvider,
                         ICacheService cacheService)
     {
@@ -54,23 +54,23 @@ internal sealed class EngineHost : IEngineHost
     /// <returns></returns>
     public async ValueTask<bool> TryDeactivateProjectAsync()
     {
-        if(ActiveProject is null)
+        if (ActiveProject is null)
         {
             _logger.LogTrace("No active project to deactivate.");
             return true;
         }
 
-        if(_engine != null)
+        if (_engine != null)
         {
             _engine.Dispose();
             _engine = null;
         }
 
-        foreach(var step in ActiveProject.Steps)
+        foreach (var step in ActiveProject.Steps)
         {
             step.Dispose();
         }
-        
+
         ActiveProject = null;
         return await ValueTask.FromResult(true);
     }
@@ -87,7 +87,7 @@ internal sealed class EngineHost : IEngineHost
             return null!;
         }
 
-        if(_engineMeta == null)
+        if (_engineMeta == null)
         {
             _logger.LogWarning("Engine meta is null.");
             return null!;
@@ -161,7 +161,7 @@ internal sealed class EngineHost : IEngineHost
             return null!;
         }
 
-        if(_engineMeta == null)
+        if (_engineMeta == null)
         {
             _logger.LogWarning("Engine meta is null.");
             return null!;
@@ -196,7 +196,7 @@ internal sealed class EngineHost : IEngineHost
             return null!;
         }
 
-        if(_engineMeta == null)
+        if (_engineMeta == null)
         {
             _logger.LogWarning("Engine meta is null.");
             return null!;
@@ -223,7 +223,7 @@ internal sealed class EngineHost : IEngineHost
 
     private void Dispose(bool isDisposing)
     {
-        if(isDisposing && !_isDisposed)
+        if (isDisposing && !_isDisposed)
         {
             DisposeEngine();
             _isDisposed = true;
@@ -232,11 +232,11 @@ internal sealed class EngineHost : IEngineHost
 
     private async void EngineStateChanged(object? sender, EngineState state)
     {
-        if(_engineMeta == null)
+        if (_engineMeta == null)
         {
             _logger.LogWarning("Engine meta is null.");
             return;
-        }	
+        }
 
         _engineMeta.State = state;
 
@@ -270,7 +270,7 @@ internal sealed class EngineHost : IEngineHost
 
     private void DisposeEngine()
     {
-        if(_engine == null) return;
+        if (_engine == null) return;
         _engine.StateChanged -= EngineStateChanged;
         _engine.IterationFinished -= EngineIterationFinished;
         _engine.Dispose();
@@ -279,12 +279,12 @@ internal sealed class EngineHost : IEngineHost
 
     private async void EngineIterationFinished(object? sender, IterationFinishedEventArgs e)
     {
-        if(ActiveProject == null)
+        if (ActiveProject == null)
         {
             _logger.LogWarning("No active project.");
             return;
         }
-        
+
         _cacheService.CreateCache(e.IterationId, ActiveProject);
         await ValueTask.CompletedTask;
     }

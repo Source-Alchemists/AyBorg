@@ -19,7 +19,7 @@ public sealed class NumberMathFunction : IStepBody
 
     public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
-        switch(_functionPort.Value)
+        switch (_functionPort.Value)
         {
             case MathFunctions.Add:
                 _resultPort.Value = _valueAPort.Value + _valueBPort.Value;

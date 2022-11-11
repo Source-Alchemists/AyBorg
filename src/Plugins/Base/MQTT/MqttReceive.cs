@@ -1,8 +1,8 @@
 using System.Text;
-using Microsoft.Extensions.Logging;
-using MQTTnet;
 using Autodroid.SDK.Common.Ports;
 using Autodroid.SDK.Communication.MQTT;
+using Microsoft.Extensions.Logging;
+using MQTTnet;
 
 namespace Autodroid.Plugins.Base.MQTT;
 
@@ -12,7 +12,7 @@ public sealed class MqttReceive : BaseMqttReceiveStep
 
     public override string DefaultName => "MQTT.Receive";
 
-    public  MqttReceive(ILogger<MqttReceive> logger, IMqttClientProvider mqttClientProvider)
+    public MqttReceive(ILogger<MqttReceive> logger, IMqttClientProvider mqttClientProvider)
         : base(logger, mqttClientProvider)
     {
         _ports.Add(_messagePort);
@@ -20,7 +20,7 @@ public sealed class MqttReceive : BaseMqttReceiveStep
 
     protected override void OnMessageReceived(MqttApplicationMessage message)
     {
-        if(message.Payload == null)
+        if (message.Payload == null)
         {
             _logger.LogWarning("Received message with null payload");
             return;

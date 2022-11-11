@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Mvc;
 using Autodroid.Agent.Services;
+using Autodroid.SDK.Authorization;
 using Autodroid.SDK.Data.DTOs;
 using Autodroid.SDK.Data.Mapper;
-using Autodroid.SDK.Authorization;
 using Autodroid.SDK.Projects;
 using Autodroid.SDK.System.Configuration;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Autodroid.Agent.Controllers;
 
@@ -51,7 +51,7 @@ public sealed class ProjectsController : ControllerBase
     {
         var metas = await _projectManagementService.GetAllMetasAsync();
         var activeProjectMeta = metas.FirstOrDefault(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
-        if(activeProjectMeta == null)
+        if (activeProjectMeta == null)
         {
             _logger.LogWarning("No active project found.");
             return NotFound();
@@ -98,7 +98,7 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async ValueTask<ActionResult> SaveAsync(Guid id)
     {
-        if(_projectManagementService.ActiveProjectId != id)
+        if (_projectManagementService.ActiveProjectId != id)
         {
             _logger.LogWarning("Project {id} is not active.", id);
             // The project is not active anymore.

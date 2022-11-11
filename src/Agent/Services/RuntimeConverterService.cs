@@ -1,11 +1,11 @@
 using System.Globalization;
-using System.Text.Json;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
 using Autodroid.SDK.Data.DAL;
 using Autodroid.SDK.ImageProcessing.Shapes;
-using Autodroid.SDK.Common.Ports;
 using Autodroid.SDK.Projects;
-using Autodroid.SDK.Common;
 
 [assembly: InternalsVisibleTo("Autodroid.Agent.Tests")]
 namespace Autodroid.Agent.Services;

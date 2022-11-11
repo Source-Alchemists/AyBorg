@@ -1,9 +1,9 @@
 using Autodroid.Database.Data;
-using Autodroid.SDK.Data.Mapper;
 using Autodroid.Registry.Mapper;
 using Autodroid.Registry.Services;
-using Microsoft.EntityFrameworkCore;
+using Autodroid.SDK.Data.Mapper;
 using Autodroid.SDK.System.Configuration;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 

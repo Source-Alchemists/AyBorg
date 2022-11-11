@@ -1,8 +1,8 @@
+using Autodroid.SDK.Common;
+using Autodroid.SDK.Common.Ports;
 using Autodroid.SDK.ImageProcessing;
 using Autodroid.SDK.ImageProcessing.Encoding;
-using Autodroid.SDK.Common.Ports;
 using Microsoft.Extensions.Logging;
-using Autodroid.SDK.Common;
 
 namespace Autodroid.Plugins.Base;
 
@@ -18,7 +18,7 @@ public sealed class ImageSave : IStepBody
     private readonly StringPort _outputFileNamePort = new("File name", PortDirection.Output, string.Empty);
     public string DefaultName => "Image.Save";
 
-    public IEnumerable<IPort> Ports { get;}
+    public IEnumerable<IPort> Ports { get; }
 
     public ImageSave(ILogger<ImageSave> logger, IEnvironment environment)
     {
@@ -61,4 +61,4 @@ public sealed class ImageSave : IStepBody
         result = result.Replace("{Millisecond}", DateTime.UtcNow.ToString("fff"));
         return result;
     }
-} 
+}

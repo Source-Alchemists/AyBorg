@@ -1,10 +1,10 @@
+using Autodroid.Registry.Models;
 using Autodroid.SDK.Data.DAL;
 using Autodroid.SDK.Data.DTOs;
-using Autodroid.Registry.Models;
 
 namespace Autodroid.Registry.Mapper;
 
-public interface IDalMapper 
+public interface IDalMapper
 {
     /// <summary>
     /// Maps the specified service entry.

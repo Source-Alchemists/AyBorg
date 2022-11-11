@@ -27,7 +27,7 @@ public sealed class RuntimeController : ControllerBase
     public async ValueTask<ActionResult<EngineMeta>> GetStatusAsync()
     {
         var status = await _engineHost.GetEngineStatusAsync();
-        if(status == null)
+        if (status == null)
         {
             _logger.LogWarning("No engine status found.");
             return NoContent();
@@ -42,7 +42,7 @@ public sealed class RuntimeController : ControllerBase
     public async ValueTask<ActionResult<EngineMeta>> StartRunAsync(EngineExecutionType executionType)
     {
         var status = await _engineHost.StartRunAsync(executionType);
-        if(status != null)
+        if (status != null)
         {
             return Ok(status);
         }
