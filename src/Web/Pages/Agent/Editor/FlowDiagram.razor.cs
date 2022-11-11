@@ -55,9 +55,10 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
         _diagram = new Diagram(options);
         _diagram.RegisterModelComponent<FlowNode, FlowNodeWidget>();
-        _diagram.Nodes.Removed += async (n) => await OnNodeRemovedAsync(n);
-        _diagram.Links.Added += (l) => OnLinkAdded(l);
-        _diagram.Links.Removed += (l) => OnLinkRemovedAsync(l);
+        _diagram.Nodes.Removed += OnNodeRemoved;
+        _diagram.Links.Added += OnLinkAdded;
+        _diagram.Links.Removed += OnLinkRemovedAsync;
+        _diagram.ZoomChanged += OnZoomChanged;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -247,7 +248,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         }
     }
 
-    private static async ValueTask OnDragEnter(DragEventArgs args)
+    private static async Task OnDragEnter(DragEventArgs args)
     {
         if (DragDropStateHandler.DraggedStep == null) args.DataTransfer.DropEffect = "none";
         else args.DataTransfer.DropEffect = "move";
@@ -293,7 +294,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         await tp.UpdateAsync();
     }
 
-    private async Task OnNodeRemovedAsync(NodeModel node)
+    private async void OnNodeRemoved(NodeModel node)
     {
         if (_suspendDiagramRefresh) return;
         if (node is FlowNode flowNode)
@@ -320,7 +321,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         foreach (var node in selectedNodes)
         {
             await ShowDeleteConfirmDialogAsync(node.Title);
-            await OnNodeRemovedAsync(node);
+            OnNodeRemoved(node);
         }
     }
 
@@ -337,20 +338,12 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         return !result.Cancelled;
     }
 
-    private async void OnZoomInClicked()
-    {
-        _diagram.SetZoom(_diagram.Zoom + 0.1);
-        await StateService.SetAutomationFlowZoomAsync(_diagram.Zoom);
-    }
-    private async void OnZoomOutClicked()
-    {
-        _diagram.SetZoom(_diagram.Zoom - 0.1);
-        await StateService.SetAutomationFlowZoomAsync(_diagram.Zoom);
+    private void OnZoomInClicked() => _diagram.SetZoom(_diagram.Zoom + 0.1);
+    private void OnZoomOutClicked() => _diagram.SetZoom(_diagram.Zoom - 0.1);
+    private void OnZoomResetClicked() => _diagram.SetZoom(1.0);
 
-    }
-    private async void OnZoomResetClicked()
+    private async void OnZoomChanged()
     {
-        _diagram.SetZoom(1.0);
         await StateService.SetAutomationFlowZoomAsync(_diagram.Zoom);
     }
 }
