@@ -247,11 +247,11 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         }
     }
 
-    private static async Task OnDragEnter(DragEventArgs args)
+    private static async ValueTask OnDragEnter(DragEventArgs args)
     {
         if (DragDropStateHandler.DraggedStep == null) args.DataTransfer.DropEffect = "none";
         else args.DataTransfer.DropEffect = "move";
-        await Task.CompletedTask;
+        await ValueTask.CompletedTask;
     }
 
     private async Task OnDrop(DragEventArgs args)

@@ -51,29 +51,27 @@ internal sealed class PathExecuter : IDisposable
     /// Executes the path item.
     /// </summary>
     /// <returns>The execution result.</returns>
-    public Task<bool> TryExecuteAsync()
+    public async Task<bool> TryExecuteAsync()
     {
         if (State != PathExecutionState.Ready) throw new InvalidOperationException("Path item is not ready to be executed.");
 
         State = PathExecutionState.Running;
-        return Task.Run(async () =>
-        {
-            bool stepResult = false;
-            try
-            {
-                stepResult = await _pathItem.Step.TryRunAsync(TargetIterationId, _abortToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Error occurred while executing step [{name}]", _pathItem.Step.Name);
-            }
-            finally
-            {
-                State = stepResult ? PathExecutionState.Completed : PathExecutionState.Failed;
 
-            }
-            return stepResult;
-        });
+        bool stepResult = false;
+        try
+        {
+            stepResult = await _pathItem.Step.TryRunAsync(TargetIterationId, _abortToken);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Error occurred while executing step [{name}]", _pathItem.Step.Name);
+        }
+        finally
+        {
+            State = stepResult ? PathExecutionState.Completed : PathExecutionState.Failed;
+
+        }
+        return stepResult;
     }
 
     /// <summary>
