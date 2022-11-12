@@ -1,15 +1,15 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.Web.Services.Agent;
-using Autodroid.Web.Services.AppState;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Services.AppState;
 using Blazor.Diagrams.Core.Models;
 using MQTTnet;
 
-namespace Autodroid.Web.Pages.Agent.Editor.Nodes;
+namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
 public class FlowPort : PortModel, IDisposable
 {
@@ -94,7 +94,7 @@ public class FlowPort : PortModel, IDisposable
 
     private async void MqttSubscribe()
     {
-        _subscription = await _mqttClientProvider.SubscribeAsync($"Autodroid/agents/{_stateService.AgentState.UniqueName}/engine/steps/{_step.Id}/ports/{Port.Id}/#");
+        _subscription = await _mqttClientProvider.SubscribeAsync($"AyBorg/agents/{_stateService.AgentState.UniqueName}/engine/steps/{_step.Id}/ports/{Port.Id}/#");
         _subscription.MessageReceived += MqttMessageReceived;
     }
 

@@ -1,11 +1,11 @@
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.ImageProcessing;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.ImageProcessing;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using MQTTnet;
 
-namespace Autodroid.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.Base.MQTT;
 
 public sealed class MqttImageReceive : BaseMqttReceiveStep
 {

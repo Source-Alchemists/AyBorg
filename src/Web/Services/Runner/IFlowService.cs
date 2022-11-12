@@ -1,8 +1,8 @@
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Communication.MQTT;
 using Microsoft.AspNetCore.SignalR.Client;
 
-namespace Autodroid.Web.Services.Agent;
+namespace AyBorg.Web.Services.Agent;
 
 public interface IFlowService
 {

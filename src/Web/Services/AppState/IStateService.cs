@@ -1,6 +1,6 @@
-using Autodroid.Web.Shared.Models;
+using AyBorg.Web.Shared.Models;
 
-namespace Autodroid.Web.Services.AppState;
+namespace AyBorg.Web.Services.AppState;
 
 public interface IStateService
 {

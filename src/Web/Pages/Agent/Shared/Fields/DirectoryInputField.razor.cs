@@ -1,9 +1,9 @@
 
-using Autodroid.Web.Shared.Modals;
+using AyBorg.Web.Shared.Modals;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Autodroid.Web.Pages.Agent.Shared.Fields;
+namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class DirectoryInputField : BaseInputField
 {

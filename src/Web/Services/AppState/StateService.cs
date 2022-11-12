@@ -1,7 +1,7 @@
-using Autodroid.Web.Shared.Models;
+using AyBorg.Web.Shared.Models;
 using Blazored.LocalStorage;
 
-namespace Autodroid.Web.Services.AppState;
+namespace AyBorg.Web.Services.AppState;
 
 public class StateService : IStateService
 {

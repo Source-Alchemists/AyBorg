@@ -1,9 +1,9 @@
 ﻿@page "/agents/editor/{serviceId}"
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
-@using Autodroid.Web.Pages.Agent.Shared
+@using AyBorg.Web.Pages.Agent.Shared
 @using SDK.Authorization
 
-<PageTitle>Autodroid - Editor</PageTitle>
+<PageTitle>AyBorg - Editor</PageTitle>
 
 <MudGrid hidden="@(_projectMeta?.IsActive != false)">
 	<MudItem xs="12">
@@ -22,7 +22,7 @@
 		</MudCard>
 	</MudItem>
 </MudGrid>
-<Autodroid.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
+<AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
 @if (_projectMeta?.IsActive != false)
 {
 	<MudToolBar Class="px-0" hidden="@(_projectMeta == null)">

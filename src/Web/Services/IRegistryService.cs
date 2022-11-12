@@ -1,6 +1,6 @@
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.SDK.Data.DTOs;
 
-namespace Autodroid.Web.Services;
+namespace AyBorg.Web.Services;
 
 public interface IRegistryService
 {

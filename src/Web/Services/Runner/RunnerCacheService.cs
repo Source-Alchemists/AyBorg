@@ -1,8 +1,8 @@
-using Autodroid.SDK.System.Caching;
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.SDK.System.Caching;
+using AyBorg.SDK.Data.DTOs;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Autodroid.Web.Services.Agent;
+namespace AyBorg.Web.Services.Agent;
 
 public class AgentCacheService : IAgentCacheService
 {

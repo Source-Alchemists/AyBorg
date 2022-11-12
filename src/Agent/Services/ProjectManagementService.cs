@@ -1,11 +1,11 @@
-﻿using Autodroid.Database.Data;
-using Autodroid.SDK.Data.DAL;
-using Autodroid.SDK.Data.Mapper;
-using Autodroid.SDK.Projects;
-using Autodroid.SDK.System.Configuration;
+﻿using AyBorg.Database.Data;
+using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 internal sealed class ProjectManagementService : IProjectManagementService
 {
@@ -75,10 +75,10 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
         };
 
-        var result = await context.AutodroidProjects!.AddAsync(emptyProjectRecord);
+        var result = await context.AyBorgProjects!.AddAsync(emptyProjectRecord);
         await context.SaveChangesAsync();
         _logger.LogTrace("Created new project [{result.Entity.Meta.Name} | {result.Entity.DbId}].", result.Entity.Meta.Name, result.Entity.DbId);
-        if (!context.AutodroidProjects.Any(p => p.Meta.IsActive && p.Meta.ServiceUniqueName == _serviceUniqueName))
+        if (!context.AyBorgProjects.Any(p => p.Meta.IsActive && p.Meta.ServiceUniqueName == _serviceUniqueName))
         {
             if (await TryActivateAsync(result.Entity.Meta.DbId, true))
             {
@@ -98,8 +98,8 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async ValueTask<bool> TryDeleteAsync(Guid projectId)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var metas = context.AutodroidProjectMetas!.ToList();
-        var orgMetaRecord = await context.AutodroidProjectMetas!.FindAsync(projectId);
+        var metas = context.AyBorgProjectMetas!.ToList();
+        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project found to delete.");
@@ -116,8 +116,8 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
         }
 
-        var orgProjectRecord = await context.AutodroidProjects!.FirstAsync(x => x.Meta.DbId.Equals(projectId));
-        context.AutodroidProjects!.Remove(orgProjectRecord);
+        var orgProjectRecord = await context.AyBorgProjects!.FirstAsync(x => x.Meta.DbId.Equals(projectId));
+        context.AyBorgProjects!.Remove(orgProjectRecord);
         await context.SaveChangesAsync();
 
         _logger.LogTrace("Removed project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}].", orgMetaRecord.Name, orgMetaRecord.DbId);
@@ -133,7 +133,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async ValueTask<bool> TryActivateAsync(Guid projectId, bool isActive)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var orgMetaRecord = await context.AutodroidProjectMetas!.FindAsync(projectId);
+        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project found to activate.");
@@ -146,7 +146,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return false;
         }
 
-        var lastActiveMetaRecord = await context.AutodroidProjectMetas.FirstOrDefaultAsync(x => x.IsActive && x.ServiceUniqueName == _serviceUniqueName);
+        var lastActiveMetaRecord = await context.AyBorgProjectMetas.FirstOrDefaultAsync(x => x.IsActive && x.ServiceUniqueName == _serviceUniqueName);
         if (lastActiveMetaRecord == null)
         {
             _logger.LogTrace("No active project.");
@@ -200,7 +200,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async ValueTask<bool> TryChangeProjectStateAsync(Guid projectId, ProjectState state)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var orgMetaRecord = await context.AutodroidProjectMetas!.FindAsync(projectId);
+        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project for state change found.");
@@ -238,7 +238,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async ValueTask<IEnumerable<ProjectMetaRecord>> GetAllMetasAsync()
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        return await context.AutodroidProjectMetas!.ToListAsync();
+        return await context.AyBorgProjectMetas!.ToListAsync();
     }
 
     /// <summary>
@@ -248,7 +248,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async ValueTask<bool> TryLoadActiveProjectAsync()
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var projectMetaRecord = await context.AutodroidProjectMetas!.FirstOrDefaultAsync(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
+        var projectMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
         if (projectMetaRecord == null)
         {
             _logger.LogWarning("No active project.");
@@ -271,14 +271,14 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
 
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var projectMetaRecord = await context.AutodroidProjectMetas!.FirstOrDefaultAsync(p => p.DbId.Equals(_engineHost.ActiveProject.Meta.Id));
+        var projectMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(p => p.DbId.Equals(_engineHost.ActiveProject.Meta.Id));
         if (projectMetaRecord == null)
         {
             _logger.LogWarning($"No project found to save.");
             return false;
         }
 
-        var databaseProjectRecord = await context.AutodroidProjects!.Include(x => x.Steps)
+        var databaseProjectRecord = await context.AyBorgProjects!.Include(x => x.Steps)
                                                             .ThenInclude(x => x.Ports)
                                                             .Include(x => x.Links)
                                                             .AsSplitQuery()
@@ -347,7 +347,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
     private static IQueryable<ProjectRecord> CreateFullProjectQuery(ProjectContext context)
     {
-        return context.AutodroidProjects!.Include(x => x.Meta)
+        return context.AyBorgProjects!.Include(x => x.Meta)
                                 .Include(x => x.Steps)
                                 .ThenInclude(x => x.MetaInfo)
                                 .Include(x => x.Steps)

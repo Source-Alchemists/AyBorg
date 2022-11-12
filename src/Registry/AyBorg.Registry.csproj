@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <OutputPath>bin\debug\Autodroid.Registry</OutputPath>
+    <OutputPath>bin\debug\AyBorg.Registry</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>bin\release\Autodroid.Registry</OutputPath>
+    <OutputPath>bin\release\AyBorg.Registry</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Registry' " />
@@ -28,11 +28,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SDK\database\Autodroid.Database.Data\Autodroid.Database.Data.csproj" />
-    <ProjectReference Include="..\SDK\database\migrations\Autodroid.Database.Migrations.SqlLite\Autodroid.Database.Migrations.SqlLite.csproj" />
-    <ProjectReference Include="..\SDK\database\migrations\Autodroid.Database.Migrations.PostgreSql\Autodroid.Database.Migrations.PostgreSql.csproj" />
-    <ProjectReference Include="..\SDK\src\Data\Mapper\Autodroid.SDK.Data.Mapper.csproj" />
-    <ProjectReference Include="..\SDK\src\System\Autodroid.SDK.System.csproj" />
+    <ProjectReference Include="..\SDK\database\AyBorg.Database.Data\AyBorg.Database.Data.csproj" />
+    <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.SqlLite\AyBorg.Database.Migrations.SqlLite.csproj" />
+    <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.PostgreSql\AyBorg.Database.Migrations.PostgreSql.csproj" />
+    <ProjectReference Include="..\SDK\src\Data\Mapper\AyBorg.SDK.Data.Mapper.csproj" />
+    <ProjectReference Include="..\SDK\src\System\AyBorg.SDK.System.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,6 @@
-using Autodroid.Web.Shared.Models;
+using AyBorg.Web.Shared.Models;
 
-namespace Autodroid.Web.Services.Agent;
+namespace AyBorg.Web.Services.Agent;
 
 public interface IAgentOverviewService
 {

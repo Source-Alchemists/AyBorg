@@ -1,9 +1,9 @@
-using Autodroid.SDK.Authorization;
+using AyBorg.SDK.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using MudBlazor;
 
-namespace Autodroid.Web.Pages.Admin.Shared.Modals;
+namespace AyBorg.Web.Pages.Admin.Shared.Modals;
 
 public partial class EditAccountDialog : ComponentBase
 {

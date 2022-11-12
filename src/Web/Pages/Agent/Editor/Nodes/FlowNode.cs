@@ -1,13 +1,13 @@
 ﻿using System.Text;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.Web.Services.Agent;
-using Autodroid.Web.Services.AppState;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Services.AppState;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
 using MQTTnet;
 
-namespace Autodroid.Web.Pages.Agent.Editor.Nodes;
+namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
 public class FlowNode : NodeModel, IDisposable
 {
@@ -51,7 +51,7 @@ public class FlowNode : NodeModel, IDisposable
 
     private async void MqttSubscribe()
     {
-        _subscription = await _mqttClientProvider.SubscribeAsync($"Autodroid/agents/{_stateService.AgentState.UniqueName}/engine/steps/{Step.Id}/executionTimeMs");
+        _subscription = await _mqttClientProvider.SubscribeAsync($"AyBorg/agents/{_stateService.AgentState.UniqueName}/engine/steps/{Step.Id}/executionTimeMs");
         _subscription.MessageReceived += MqttMessageReceived;
     }
 

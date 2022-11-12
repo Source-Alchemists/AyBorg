@@ -1,11 +1,11 @@
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.Web.Services;
-using Autodroid.Web.Services.Agent;
-using Autodroid.Web.Services.AppState;
-using Autodroid.Web.Shared.Models;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Services;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
 
-namespace Autodroid.Web.Pages.Agent.Editor;
+namespace AyBorg.Web.Pages.Agent.Editor;
 
 public partial class Editor : ComponentBase
 {

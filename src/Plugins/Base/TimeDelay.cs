@@ -1,7 +1,7 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Plugins.Base;
+namespace AyBorg.Plugins.Base;
 
 public sealed class TimeDelay : IStepBody
 {

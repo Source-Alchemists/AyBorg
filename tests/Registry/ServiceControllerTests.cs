@@ -2,11 +2,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using Autodroid.Registry.Controllers;
-using Autodroid.Registry.Services;
+using AyBorg.Registry.Controllers;
+using AyBorg.Registry.Services;
 
 
-namespace Autodroid.Registry.Tests;
+namespace AyBorg.Registry.Tests;
 
 public class ServiceControllerTests
 {

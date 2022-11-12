@@ -5,7 +5,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Version>0.2.0</Version>
-    <UserSecretsId>aspnet-Autodroid.Web-bcaead62-bf10-4a90-9b18-201f697037ae</UserSecretsId>
+    <UserSecretsId>aspnet-AyBorg.Web-bcaead62-bf10-4a90-9b18-201f697037ae</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,13 +25,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SDK\database\migrations\Autodroid.Database.Migrations.SqlLite\Autodroid.Database.Migrations.SqlLite.csproj" />
-    <ProjectReference Include="..\SDK\database\migrations\Autodroid.Database.Migrations.PostgreSql\Autodroid.Database.Migrations.PostgreSql.csproj" />
+    <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.SqlLite\AyBorg.Database.Migrations.SqlLite.csproj" />
+    <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.PostgreSql\AyBorg.Database.Migrations.PostgreSql.csproj" />
     <ProjectReference Include="..\Blazor.Diagrams\src\Blazor.Diagrams\Blazor.Diagrams.csproj" />
-    <ProjectReference Include="..\SDK\src\System\Autodroid.SDK.System.csproj" />
-    <ProjectReference Include="..\SDK\src\Data\Mapper\Autodroid.SDK.Data.Mapper.csproj" />
-    <ProjectReference Include="..\SDK\src\Authorization\Autodroid.SDK.Authorization.csproj" />
-    <ProjectReference Include="..\SDK\src\Communication\MQTT\Autodroid.SDK.Communication.MQTT.csproj" />
+    <ProjectReference Include="..\SDK\src\System\AyBorg.SDK.System.csproj" />
+    <ProjectReference Include="..\SDK\src\Data\Mapper\AyBorg.SDK.Data.Mapper.csproj" />
+    <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
+    <ProjectReference Include="..\SDK\src\Communication\MQTT\AyBorg.SDK.Communication.MQTT.csproj" />
   </ItemGroup>
 
 </Project>

@@ -2,9 +2,9 @@
 @using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
 
-<PageTitle>Autodroid - Projects</PageTitle>
+<PageTitle>AyBorg - Projects</PageTitle>
 
-<Autodroid.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
+<AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
 <MudGrid class="pt-6">
     <MudItem xs="12">
         <MudCard>

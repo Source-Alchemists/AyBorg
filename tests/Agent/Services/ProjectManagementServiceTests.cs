@@ -1,17 +1,17 @@
-using Autodroid.Database.Data;
-using Autodroid.Agent.Services;
-using Autodroid.SDK.Data.DAL;
-using Autodroid.SDK.Data.Mapper;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.Database.Data;
+using AyBorg.Agent.Services;
+using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.Common.Ports;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Projects;
-using Autodroid.SDK.System.Configuration;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Configuration;
 
-namespace Autodroid.Agent.Tests;
+namespace AyBorg.Agent.Tests;
 
 #nullable disable
 
@@ -36,7 +36,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
         context.Database.EnsureCreated();
 
         var settings = new Dictionary<string, string> { 
-            {"Autodroid:Service:UniqueName", "TestAgent"}
+            {"AyBorg:Service:UniqueName", "TestAgent"}
         };
 
         var configuration = new ConfigurationBuilder()
@@ -112,7 +112,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
         // Assert
         Assert.True(result);
         using var testContext = new ProjectContext(_contextOptions);
-        Assert.Empty(testContext.AutodroidProjects);
+        Assert.Empty(testContext.AyBorgProjects);
     }
 
     [Fact]
@@ -186,7 +186,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
     private async Task<ProjectRecord> CreateDatabaseProject(string name, bool isActive, ProjectState state)
     {
         using var context = new ProjectContext(_contextOptions);
-        context.AutodroidProjects.Add(new ProjectRecord
+        context.AyBorgProjects.Add(new ProjectRecord
         {
             Meta = new ProjectMetaRecord
             {
@@ -197,7 +197,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
         });
         await context.SaveChangesAsync();
 
-        return await context.AutodroidProjects.FirstOrDefaultAsync(x => x.Meta.Name == "test");
+        return await context.AyBorgProjects.FirstOrDefaultAsync(x => x.Meta.Name == "test");
     }
 
     private static StepProxy CreateStepProxy(string name, int x = 0, int y = 0)
@@ -222,7 +222,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
 
     private static IQueryable<ProjectRecord> CreateCompleteProjectRecordQuery(ProjectContext context)
     {
-        return context.AutodroidProjects.Include(x => x.Meta)
+        return context.AyBorgProjects.Include(x => x.Meta)
                                 .Include(x => x.Steps)
                                 .ThenInclude(x => x.MetaInfo)
                                 .Include(x => x.Steps)

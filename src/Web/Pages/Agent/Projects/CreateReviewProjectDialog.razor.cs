@@ -1,8 +1,8 @@
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.SDK.Data.DTOs;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Autodroid.Web.Pages.Agent.Projects;
+namespace AyBorg.Web.Pages.Agent.Projects;
 
 public partial class CreateReviewProjectDialog : ComponentBase
 {

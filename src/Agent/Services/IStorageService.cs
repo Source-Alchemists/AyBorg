@@ -1,4 +1,4 @@
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 public interface IStorageService
 {

@@ -1,10 +1,10 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Projects;
-using Autodroid.SDK.System.Runtime;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Runtime;
 
-namespace Autodroid.Agent.Runtime;
+namespace AyBorg.Agent.Runtime;
 
 /// <summary>
 /// Represents the engine.
@@ -264,13 +264,13 @@ internal sealed class Engine : IEngine
     {
         await SendStepInputPortsAsync(stepProxy);
 
-        var baseTopic = $"Autodroid/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/";
+        var baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/";
         await _mqttClientProvider.PublishAsync($"{baseTopic}executionTimeMs", stepProxy.ExecutionTimeMs.ToString(), new MqttPublishOptions());
     }
 
     private async ValueTask SendStepInputPortsAsync(IStepProxy stepProxy)
     {
-        var baseTopic = $"Autodroid/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/ports/";
+        var baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/ports/";
 
         var inputPorts = stepProxy.StepBody.Ports.Where(p => p.Direction == PortDirection.Input);
         var token = CancellationToken.None;

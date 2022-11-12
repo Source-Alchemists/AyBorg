@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Autodroid.Web.Services;
+namespace AyBorg.Web.Services;
 
 public class StorageService : IStorageService
 {

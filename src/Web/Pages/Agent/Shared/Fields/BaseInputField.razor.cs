@@ -1,8 +1,8 @@
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Common.Ports;
 using Microsoft.AspNetCore.Components;
 
-namespace Autodroid.Web.Pages.Agent.Shared.Fields;
+namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class BaseInputField : ComponentBase
 {

@@ -1,6 +1,6 @@
-using Autodroid.SDK.System.Runtime;
+using AyBorg.SDK.System.Runtime;
 
-namespace Autodroid.Agent.Runtime;
+namespace AyBorg.Agent.Runtime;
 
 internal interface IEngine : IDisposable
 {

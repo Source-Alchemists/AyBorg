@@ -1,7 +1,7 @@
-using Autodroid.SDK.Projects;
-using Autodroid.SDK.System.Runtime;
+using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Runtime;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 public interface IEngineHost : IDisposable
 {

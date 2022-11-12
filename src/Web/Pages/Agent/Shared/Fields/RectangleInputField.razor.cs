@@ -1,8 +1,8 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Components.Web;
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.SDK.Data.DTOs;
 
-namespace Autodroid.Web.Pages.Agent.Shared.Fields;
+namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class RectangleInputField : BaseInputField
 {

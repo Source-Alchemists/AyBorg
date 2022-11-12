@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 
-namespace Autodroid.Web.Pages.Admin.Shared.Modals;
+namespace AyBorg.Web.Pages.Admin.Shared.Modals;
 
 public partial class DisplayGeneratedPasswordDialog : ComponentBase
 {

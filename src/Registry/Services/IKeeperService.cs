@@ -1,6 +1,6 @@
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.SDK.Data.DTOs;
 
-namespace Autodroid.Registry.Services;
+namespace AyBorg.Registry.Services;
 
 public interface IKeeperService
 {

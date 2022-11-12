@@ -1,8 +1,8 @@
-using Autodroid.Agent.Runtime;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.Agent.Runtime;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Agent.Tests.Runtime;
+namespace AyBorg.Agent.Tests.Runtime;
 
 #nullable disable
 

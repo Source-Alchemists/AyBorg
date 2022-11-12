@@ -1,8 +1,8 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 using Moq;
 
-namespace Autodroid.Agent.Tests;
+namespace AyBorg.Agent.Tests;
 
 public static class MockHelper
 {

@@ -1,7 +1,7 @@
-﻿using Autodroid.SDK.Common;
-using Autodroid.SDK.Data.DAL;
+﻿using AyBorg.SDK.Common;
+using AyBorg.SDK.Data.DAL;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 public interface IPluginsService
 {

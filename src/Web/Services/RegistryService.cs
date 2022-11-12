@@ -1,7 +1,7 @@
-﻿using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.System.Configuration;
+﻿using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.System.Configuration;
 
-namespace Autodroid.Web.Services;
+namespace AyBorg.Web.Services;
 
 public class RegistryService : IRegistryService
 {

@@ -1,6 +1,6 @@
-using Autodroid.SDK.Data.DAL;
+using AyBorg.SDK.Data.DAL;
 
-namespace Autodroid.Registry.Models;
+namespace AyBorg.Registry.Models;
 
 /// <summary>
 /// Service entry.

@@ -1,9 +1,9 @@
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Communication.MQTT;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
 
-namespace Autodroid.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.Base.MQTT;
 
 public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
 {

@@ -1,7 +1,7 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Plugins.Base.Numeric;
+namespace AyBorg.Plugins.Base.Numeric;
 
 public sealed class NumberRandom : IStepBody
 {

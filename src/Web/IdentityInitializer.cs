@@ -1,7 +1,7 @@
-using Autodroid.SDK.Authorization;
+using AyBorg.SDK.Authorization;
 using Microsoft.AspNetCore.Identity;
 
-namespace Autodroid.Web;
+namespace AyBorg.Web;
 
 internal static class IdentityInitializer
 {

@@ -1,9 +1,9 @@
-using Autodroid.Web.Services;
-using Autodroid.Web.Services.AppState;
+using AyBorg.Web.Services;
+using AyBorg.Web.Services.AppState;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Autodroid.Web.Shared.Modals;
+namespace AyBorg.Web.Shared.Modals;
 
 public partial class DirectoryBrowser : ComponentBase
 {

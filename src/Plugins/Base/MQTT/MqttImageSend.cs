@@ -1,10 +1,10 @@
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.ImageProcessing.Encoding;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.ImageProcessing.Encoding;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
 
-namespace Autodroid.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.Base.MQTT;
 
 public sealed class MqttImageSend : BaseMqttSendStep
 {

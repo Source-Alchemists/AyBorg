@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Data.DAL;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Data.DAL;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 internal sealed class PluginsService : IPluginsService
 {
     private readonly ILogger<PluginsService> _logger;
@@ -39,10 +39,10 @@ internal sealed class PluginsService : IPluginsService
         _stepPlugins.Clear();
         try
         {
-            var configFolder = _configuration.GetValue<string>("Autodroid:Plugins:Folder");
+            var configFolder = _configuration.GetValue<string>("AyBorg:Plugins:Folder");
             if (configFolder == null)
             {
-                _logger.LogWarning("No plugin folder specified in configuration. (Hint: Autodroid:Plugins:Folder)");
+                _logger.LogWarning("No plugin folder specified in configuration. (Hint: AyBorg:Plugins:Folder)");
                 return;
             }
 

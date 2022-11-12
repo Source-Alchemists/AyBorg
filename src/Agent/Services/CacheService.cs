@@ -1,12 +1,12 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.Data.Mapper;
-using Autodroid.SDK.Projects;
-using Autodroid.SDK.System.Caching;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Caching;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 internal sealed class CacheService : ICacheService
 {

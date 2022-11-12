@@ -1,6 +1,6 @@
-using Autodroid.Agent.Tests.Dummies;
+using AyBorg.Agent.Tests.Dummies;
 
-namespace Autodroid.Agent.Tests;
+namespace AyBorg.Agent.Tests;
 
 public class StepProxyTests
 {
@@ -16,7 +16,7 @@ public class StepProxyTests
         // Assert
         Assert.Equal(nameof(DummyStep), proxy.MetaInfo.TypeName);
         Assert.Equal("Dummy", proxy.Name);
-        Assert.Equal("Autodroid.Agent.Tests", proxy.MetaInfo.AssemblyName);
+        Assert.Equal("AyBorg.Agent.Tests", proxy.MetaInfo.AssemblyName);
         Assert.Equal("1.0.0.0", proxy.MetaInfo.AssemblyVersion);
     }
 }

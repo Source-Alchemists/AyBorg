@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Autodroid.Agent.Runtime;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Projects;
-using Autodroid.SDK.System.Runtime;
+using AyBorg.Agent.Runtime;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Runtime;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 internal sealed class EngineHost : IEngineHost
 {
@@ -265,7 +265,7 @@ internal sealed class EngineHost : IEngineHost
             _logger.LogTrace($"Engine is done. Removing engine.");
         }
 
-        await _mqttClientProvider.PublishAsync($"Autodroid/agents/{_mqttClientProvider.ServiceUniqueName}/engine/status", JsonSerializer.Serialize(_engineMeta), new MqttPublishOptions());
+        await _mqttClientProvider.PublishAsync($"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/status", JsonSerializer.Serialize(_engineMeta), new MqttPublishOptions());
     }
 
     private void DisposeEngine()

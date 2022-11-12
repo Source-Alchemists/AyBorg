@@ -1,6 +1,6 @@
-using Autodroid.SDK.Common;
+using AyBorg.SDK.Common;
 
-namespace Autodroid.Agent.Runtime;
+namespace AyBorg.Agent.Runtime;
 
 internal sealed record PathItem 
 {

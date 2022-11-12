@@ -1,12 +1,12 @@
-using Autodroid.Agent.Hubs;
-using Autodroid.Agent.Services;
-using Autodroid.Database.Data;
-using Autodroid.SDK.Authorization;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Data.Mapper;
-using Autodroid.SDK.System.Configuration;
-using Autodroid.SDK.System.Services;
+using AyBorg.Agent.Hubs;
+using AyBorg.Agent.Services;
+using AyBorg.Database.Data;
+using AyBorg.SDK.Authorization;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.System.Configuration;
+using AyBorg.SDK.System.Services;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,9 +19,9 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.SqlLite")),
+                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.SqlLite")),
         "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
-                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );
@@ -36,7 +36,7 @@ builder.Services.AddHostedService<RegistryService>();
 
 builder.Services.AddMemoryCache();
 
-builder.Services.AddSingleton<IEnvironment, Autodroid.SDK.Common.Environment>();
+builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();

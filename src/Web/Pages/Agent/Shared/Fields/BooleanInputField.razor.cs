@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace Autodroid.Web.Pages.Agent.Shared.Fields;
+namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class BooleanInputField : BaseInputField
 {

@@ -1,7 +1,7 @@
-﻿using Autodroid.SDK.Data.DAL;
-using Autodroid.SDK.Projects;
+﻿using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Projects;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 public interface IProjectManagementService
 {
     /// <summary>

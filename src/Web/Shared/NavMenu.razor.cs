@@ -1,7 +1,7 @@
-using Autodroid.Web.Services.AppState;
+using AyBorg.Web.Services.AppState;
 using Microsoft.AspNetCore.Components;
 
-namespace Autodroid.Web.Shared;
+namespace AyBorg.Web.Shared;
 
 public partial class NavMenu : ComponentBase
 {

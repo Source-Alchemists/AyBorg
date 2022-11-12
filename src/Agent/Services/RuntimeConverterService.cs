@@ -1,14 +1,14 @@
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Data.DAL;
-using Autodroid.SDK.ImageProcessing.Shapes;
-using Autodroid.SDK.Projects;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.ImageProcessing.Shapes;
+using AyBorg.SDK.Projects;
 
-[assembly: InternalsVisibleTo("Autodroid.Agent.Tests")]
-namespace Autodroid.Agent.Services;
+[assembly: InternalsVisibleTo("AyBorg.Agent.Tests")]
+namespace AyBorg.Agent.Services;
 
 internal sealed class RuntimeConverterService : IRuntimeConverterService
 {

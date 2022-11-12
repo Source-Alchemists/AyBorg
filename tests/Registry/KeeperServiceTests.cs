@@ -1,14 +1,14 @@
-using Autodroid.Registry.Services;
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.Registry.Services;
+using AyBorg.SDK.Data.DTOs;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
-using Autodroid.Registry.Mapper;
+using AyBorg.Registry.Mapper;
 using Microsoft.EntityFrameworkCore;
 using Moq;
-using Autodroid.Database.Data;
-using Autodroid.SDK.System.Configuration;
+using AyBorg.Database.Data;
+using AyBorg.SDK.System.Configuration;
 
-namespace Autodroid.Registry.Tests;
+namespace AyBorg.Registry.Tests;
 
 public sealed class KeeperServiceTests : IDisposable
 {

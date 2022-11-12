@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Autodroid.Web.Shared.Modals;
+namespace AyBorg.Web.Shared.Modals;
 
 public partial class ConfirmDialog : ComponentBase
 {

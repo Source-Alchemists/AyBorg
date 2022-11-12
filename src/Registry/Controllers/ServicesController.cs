@@ -1,8 +1,8 @@
-using Autodroid.Registry.Services;
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.Registry.Services;
+using AyBorg.SDK.Data.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Autodroid.Registry.Controllers;
+namespace AyBorg.Registry.Controllers;
 
 [ApiController]
 [Route("[controller]")]

@@ -1,10 +1,10 @@
 using System.Text;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Communication.MQTT;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 
-namespace Autodroid.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.Base.MQTT;
 
 public sealed class MqttReceive : BaseMqttReceiveStep
 {

@@ -1,10 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.Web.Services.Agent;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Services.Agent;
 
-namespace Autodroid.Web.Pages.Agent.Projects;
+namespace AyBorg.Web.Pages.Agent.Projects;
 
 public partial class CreateNewProjectDialog : ComponentBase
 {

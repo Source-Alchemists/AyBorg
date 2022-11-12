@@ -1,10 +1,10 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.ImageProcessing;
-using Autodroid.SDK.ImageProcessing.Shapes;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.ImageProcessing;
+using AyBorg.SDK.ImageProcessing.Shapes;
 using Microsoft.Extensions.Logging;
 
-namespace Autodroid.Plugins.Base;
+namespace AyBorg.Plugins.Base;
 
 public sealed class ImageCrop : IStepBody, IDisposable
 {

@@ -1,13 +1,13 @@
-using Autodroid.Database.Data;
-using Autodroid.SDK.Authorization;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Data.Mapper;
-using Autodroid.SDK.System.Configuration;
-using Autodroid.Web;
-using Autodroid.Web.Areas.Identity;
-using Autodroid.Web.Services;
-using Autodroid.Web.Services.Agent;
-using Autodroid.Web.Services.AppState;
+using AyBorg.Database.Data;
+using AyBorg.SDK.Authorization;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.System.Configuration;
+using AyBorg.Web;
+using AyBorg.Web.Areas.Identity;
+using AyBorg.Web.Services;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Services.AppState;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -24,9 +24,9 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.SqlLite")),
+                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.SqlLite")),
         "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
-                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );
@@ -63,14 +63,14 @@ builder.Services.AddMudServices(config =>
 });
 builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddHttpClient("Autodroid.Web.RegistryService");
-builder.Services.AddHttpClient("Autodroid.Web.Services.RegistryService>");
+builder.Services.AddHttpClient("AyBorg.Web.RegistryService");
+builder.Services.AddHttpClient("AyBorg.Web.Services.RegistryService>");
 builder.Services.AddHttpClient<ProjectManagementService>();
 builder.Services.AddHttpClient<PluginsService>();
 builder.Services.AddHttpClient<IFlowService, FlowService>();
 builder.Services.AddHttpClient<IRuntimeService>();
 
-builder.Services.AddHostedService<Autodroid.SDK.System.Services.RegistryService>();
+builder.Services.AddHostedService<AyBorg.SDK.System.Services.RegistryService>();
 
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();

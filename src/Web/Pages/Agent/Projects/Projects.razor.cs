@@ -1,14 +1,14 @@
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.Projects;
-using Autodroid.Web.Services;
-using Autodroid.Web.Services.Agent;
-using Autodroid.Web.Services.AppState;
-using Autodroid.Web.Shared.Modals;
-using Autodroid.Web.Shared.Models;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Projects;
+using AyBorg.Web.Services;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Shared.Modals;
+using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Autodroid.Web.Pages.Agent.Projects;
+namespace AyBorg.Web.Pages.Agent.Projects;
 
 public partial class Projects : ComponentBase
 {

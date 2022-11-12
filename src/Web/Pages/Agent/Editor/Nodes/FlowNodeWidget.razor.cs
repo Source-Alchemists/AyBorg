@@ -1,9 +1,9 @@
 using Blazor.Diagrams.Core.Models;
 using Microsoft.AspNetCore.Components;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.Web.Pages.Agent.Shared.Fields;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.Web.Pages.Agent.Shared.Fields;
 
-namespace Autodroid.Web.Pages.Agent.Editor.Nodes;
+namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
 public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
 {

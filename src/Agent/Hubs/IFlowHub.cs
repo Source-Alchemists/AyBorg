@@ -1,6 +1,6 @@
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Agent.Hubs;
+namespace AyBorg.Agent.Hubs;
 
 public interface  IFlowHub
 {

@@ -1,10 +1,10 @@
-﻿using Autodroid.Agent.Services;
-using Autodroid.SDK.Authorization;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.Data.Mapper;
+﻿using AyBorg.Agent.Services;
+using AyBorg.SDK.Authorization;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Data.Mapper;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Autodroid.Agent.Controllers;
+namespace AyBorg.Agent.Controllers;
 
 [ApiController]
 [Route("[controller]")]

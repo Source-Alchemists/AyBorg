@@ -1,8 +1,8 @@
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Data.DAL;
-using Autodroid.SDK.Projects;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Projects;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 public interface IRuntimeConverterService
 {

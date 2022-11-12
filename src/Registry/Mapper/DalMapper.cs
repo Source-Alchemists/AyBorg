@@ -1,9 +1,9 @@
-using Autodroid.Registry.Models;
-using Autodroid.SDK.Data.DAL;
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.Registry.Models;
+using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Data.DTOs;
 using AutoMapper;
 
-namespace Autodroid.Registry.Mapper;
+namespace AyBorg.Registry.Mapper;
 
 public class DalMapper : IDalMapper
 {

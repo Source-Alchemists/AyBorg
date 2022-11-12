@@ -1,9 +1,9 @@
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.Web.Pages.Agent.Editor.Nodes;
-using Autodroid.Web.Services.Agent;
-using Autodroid.Web.Services.AppState;
-using Autodroid.Web.Shared.Modals;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Pages.Agent.Editor.Nodes;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Shared.Modals;
 using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor;
 
-namespace Autodroid.Web.Pages.Agent.Editor;
+namespace AyBorg.Web.Pages.Agent.Editor;
 
 public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 {

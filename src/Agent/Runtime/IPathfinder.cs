@@ -1,7 +1,7 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Agent.Runtime;
+namespace AyBorg.Agent.Runtime;
 
 internal interface IPathfinder
 {

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using MudBlazor;
 
-namespace Autodroid.Web.Shared;
+namespace AyBorg.Web.Shared;
 
 public partial class MainLayout : LayoutComponentBase
 {

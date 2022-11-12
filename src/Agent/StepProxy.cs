@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Agent;
+namespace AyBorg.Agent;
 
 public sealed class StepProxy : IStepProxy
 {

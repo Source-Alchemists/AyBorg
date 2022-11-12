@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Components;
-using Autodroid.Web.Services.Agent;
+using AyBorg.Web.Services.Agent;
 
-namespace Autodroid.Web.Pages.Agent.Overview;
+namespace AyBorg.Web.Pages.Agent.Overview;
 
 public partial class AgentsOverview : ComponentBase, IAsyncDisposable
 {

@@ -9,7 +9,7 @@
     }
   },
   "profiles": {
-    "Autodroid.Agent": {
+    "AyBorg.Agent": {
       "commandName": "Project",
       "launchBrowser": true,
       "launchUrl": "swagger",

@@ -1,8 +1,8 @@
 using System.Text.Json;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.ImageProcessing.Encoding;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.ImageProcessing.Encoding;
 
-namespace Autodroid.Web.Pages.Agent.Shared.Fields;
+namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class ImageInputField : BaseInputField
 {

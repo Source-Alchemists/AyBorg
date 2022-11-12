@@ -1,9 +1,9 @@
 using System.Text;
 using System.Text.Json;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.Projects;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Projects;
 
-namespace Autodroid.Web.Services.Agent;
+namespace AyBorg.Web.Services.Agent;
 
 public class ProjectManagementService : IProjectManagementService
 {

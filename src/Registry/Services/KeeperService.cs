@@ -1,12 +1,12 @@
 using System.Collections.Concurrent;
-using Autodroid.Database.Data;
-using Autodroid.Registry.Mapper;
-using Autodroid.Registry.Models;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.System.Configuration;
+using AyBorg.Database.Data;
+using AyBorg.Registry.Mapper;
+using AyBorg.Registry.Models;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
 
-namespace Autodroid.Registry.Services;
+namespace AyBorg.Registry.Services;
 
 public sealed class KeeperService : IKeeperService, IDisposable
 {
