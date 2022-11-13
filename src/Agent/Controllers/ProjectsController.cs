@@ -37,10 +37,18 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async IAsyncEnumerable<ProjectMetaDto> GetAsync()
     {
-        foreach (var meta in (await _projectManagementService.GetAllMetasAsync()).Where(x => x.ServiceUniqueName == _serviceUniqueName))
+        foreach (var metaGroup in (await _projectManagementService.GetAllMetasAsync()).Where(x => x.ServiceUniqueName == _serviceUniqueName).GroupBy(p => p.Id))
         {
-            var projectMetaDto = _storageToDtoMapper.Map(meta);
-            yield return projectMetaDto;
+            var activeMeta = metaGroup.FirstOrDefault(g => g.IsActive);
+            if (activeMeta != null)
+            {
+                yield return _storageToDtoMapper.Map(activeMeta);
+            }
+            else
+            {
+                var meta = metaGroup.OrderByDescending(x => x.UpdatedDate).First();
+                yield return _storageToDtoMapper.Map(meta);
+            }
         }
     }
 
@@ -78,12 +86,12 @@ public sealed class ProjectsController : ControllerBase
         return result.IsSuccessful ? Ok() : NotFound(result.Message);
     }
 
-    [HttpPut("{id}/active/{isActive}")]
+    [HttpPut("{dbId}/active/{isActive}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async ValueTask<ActionResult> ActivateAsync(Guid id, bool isActive)
+    public async ValueTask<ActionResult> ActivateAsync(Guid dbId, bool isActive)
     {
-        var result = await _projectManagementService.TryActivateAsync(id, isActive);
+        var result = await _projectManagementService.TryActivateAsync(dbId, isActive);
         return result.IsSuccessful ? Ok() : NotFound(result.Message);
     }
 

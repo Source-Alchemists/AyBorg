@@ -123,7 +123,7 @@ public class ProjectManagementService : IProjectManagementService
     /// <returns></returns>
     public async Task<bool> TryActivateAsync(string baseUrl, ProjectMetaDto projectMeta)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.Id}/active/true");
+        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.DbId}/active/true");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
         var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (!response.IsSuccessStatusCode)

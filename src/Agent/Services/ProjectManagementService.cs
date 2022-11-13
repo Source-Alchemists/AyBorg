@@ -131,10 +131,10 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <param name="projectMetaId">The project identifier.</param>
     /// <param name="isActive">if set to <c>true</c> [is active].</param>
     /// <returns></returns>
-    public async ValueTask<ProjectManagementResult> TryActivateAsync(Guid projectMetaId, bool isActive)
+    public async ValueTask<ProjectManagementResult> TryActivateAsync(Guid projectMetaDbId, bool isActive)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectMetaId);
+        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectMetaDbId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project found to activate.");
@@ -147,7 +147,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "Project is not owned by this service.");
         }
 
-        var lastActiveMetaRecord = await context.AyBorgProjectMetas.FirstOrDefaultAsync(x => x.IsActive && x.ServiceUniqueName == _serviceUniqueName);
+        var lastActiveMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(x => x.IsActive && x.ServiceUniqueName == _serviceUniqueName);
         if (lastActiveMetaRecord == null)
         {
             _logger.LogTrace("No active project.");
@@ -168,12 +168,12 @@ internal sealed class ProjectManagementService : IProjectManagementService
         if (isActive)
         {
             IQueryable<ProjectRecord> queryProject = CreateFullProjectQuery(context);
-            var orgProjectRecord = await queryProject.FirstAsync(x => x.Meta.DbId.Equals(projectMetaId));
+            var orgProjectRecord = await queryProject.FirstAsync(x => x.Meta.DbId.Equals(projectMetaDbId));
             _logger.LogTrace("Loading project [{orgProjectRecord.Meta.Name}] with step count [{orgProjectRecord.Steps.Count}].", orgProjectRecord.Meta.Name, orgProjectRecord.Steps.Count);
             var project = await _runtimeConverterService.ConvertAsync(orgProjectRecord);
             if (!await _engineHost.TryActivateProjectAsync(project))
             {
-                _logger.LogWarning("Could not activate project [{projectId}].", projectMetaId);
+                _logger.LogWarning("Could not activate project [{projectMetaDbId}].", projectMetaDbId);
                 return new ProjectManagementResult(false, "Could not activate project.");
             }
         }
@@ -249,20 +249,29 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async ValueTask<ProjectManagementResult> TryLoadActiveAsync()
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var projectMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
-        if (projectMetaRecord == null)
+        var projectMetas = await context.AyBorgProjectMetas!.Where(p => p.IsActive).ToListAsync();
+        projectMetas = projectMetas.Where(p => p.ServiceUniqueName.Equals(_serviceUniqueName, StringComparison.InvariantCulture)).ToList();
+        if(projectMetas.Count > 1)
         {
-            _logger.LogWarning("No active project.");
-            return new ProjectManagementResult(false, "No active project.");
+            _logger.LogWarning("More than one active project found.");
+            return new ProjectManagementResult(false, "More than one active project found.");
         }
 
-        var result  = (await TryActivateAsync(projectMetaRecord.DbId, true)).IsSuccessful;
+        var projectMetaRecord = projectMetas.FirstOrDefault();
+        if (projectMetaRecord == null)
+        {
+            _logger.LogTrace("No active project found.");
+            return new ProjectManagementResult(false, "No active project found");
+        }
+
+        var result = (await TryActivateAsync(projectMetaRecord.DbId, true)).IsSuccessful;
         if (!result)
         {
             _logger.LogWarning("Could not activate project.");
             return new ProjectManagementResult(false, "Could not activate project.");
         }
 
+        _logger.LogInformation("Project [{projectMetaRecord.Name}] activated.", projectMetaRecord.Name);
         return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
     }
 
@@ -340,7 +349,8 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "No database project found to save.");
         }
 
-        var projectMetaRecord = previousProjectMetaRecord with { 
+        var projectMetaRecord = previousProjectMetaRecord with
+        {
             DbId = Guid.Empty,
             State = projectState,
             VersionName = newVersionName,
