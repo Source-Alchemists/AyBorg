@@ -15,7 +15,7 @@ public interface IProjectManagementService
     /// <param name="projectId">The project identifier.</param>
     /// <param name="isActive">if set to <c>true</c> [is active].</param>
     /// <returns></returns>
-    ValueTask<bool> TryActivateAsync(Guid projectId, bool isActive);
+    ValueTask<ProjectManagementResult> TryActivateAsync(Guid projectId, bool isActive);
 
     /// <summary>
     /// Creates the asynchronous.
@@ -29,7 +29,7 @@ public interface IProjectManagementService
     /// </summary>
     /// <param name="projectId">The project id.</param>
     /// <returns></returns>
-    ValueTask<bool> TryDeleteAsync(Guid projectId);
+    ValueTask<ProjectManagementResult> TryDeleteAsync(Guid projectId);
 
     /// <summary>
     /// Change project state asynchronous.
@@ -37,7 +37,7 @@ public interface IProjectManagementService
     /// <param name="projectId">The project identifier.</param>
     /// <param name="state">The state.</param>
     /// <returns></returns>
-    ValueTask<bool> TryChangeProjectStateAsync(Guid projectId, ProjectState state);
+    ValueTask<ProjectManagementResult> TryChangeStateAsync(Guid projectId, ProjectState state);
 
     /// <summary>
     /// Gets all project metas asynchronous.
@@ -47,11 +47,16 @@ public interface IProjectManagementService
     /// <summary>
     /// Load active project asynchronous.
     /// </summary>
-    ValueTask<bool> TryLoadActiveProjectAsync();
+    ValueTask<ProjectManagementResult> TryLoadActiveAsync();
 
     /// <summary>
     /// Save active project asynchronous.
     /// </summary>
     /// <returns></returns>
-    ValueTask<bool> TrySaveActiveProjectAsync();
+    ValueTask<ProjectManagementResult> TrySaveActiveAsync();
+
+    /// <summary>
+    /// Save the project as new version.
+    /// </summary>
+    ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, string newVersionName, ProjectState projectState);
 }

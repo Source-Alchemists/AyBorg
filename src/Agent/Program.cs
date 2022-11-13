@@ -81,7 +81,7 @@ app.MapHub<FlowHubContext>("/hubs/flow");
 app.Services.GetService<IDbContextFactory<ProjectContext>>()!.CreateDbContext().Database.Migrate();
 
 app.Services.GetService<IPluginsService>()?.Load();
-await app.Services.GetService<IProjectManagementService>()?.TryLoadActiveProjectAsync().AsTask()!;
+await app.Services.GetService<IProjectManagementService>()?.TryLoadActiveAsync().AsTask()!;
 await app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().AsTask()!;
 
 app.Run();

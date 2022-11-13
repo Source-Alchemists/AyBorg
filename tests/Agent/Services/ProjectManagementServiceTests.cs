@@ -110,7 +110,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
         var result = await service.TryDeleteAsync(databaseProjectRecord.Meta.DbId);
 
         // Assert
-        Assert.True(result);
+        Assert.True(result.IsSuccessful);
         using var testContext = new ProjectContext(_contextOptions);
         Assert.Empty(testContext.AyBorgProjects);
     }
@@ -150,10 +150,10 @@ public sealed class ProjectManagementServiceTests : IDisposable
                                                     runtimeConverterServiceMock.Object);
 
         // Act
-        var result = await service.TrySaveActiveProjectAsync();
+        var result = await service.TrySaveActiveAsync();
 
         // Assert
-        Assert.True(result);
+        Assert.True(result.IsSuccessful);
         using var testContext = new ProjectContext(_contextOptions);
         var resultProjectRecord = CreateCompleteProjectRecordQuery(testContext).Single(x => x.DbId.Equals(newDatabaseProjectRecord.DbId));
         Assert.Equal(newDatabaseProjectRecord.Meta.Name, resultProjectRecord.Meta.Name);
@@ -166,6 +166,50 @@ public sealed class ProjectManagementServiceTests : IDisposable
         AssertStepProxy(stepProxy1, resultStep1);
         var resultStep2 = resultProjectRecord.Steps.Single(x => x.Name.Equals(stepProxy2.Name));
         AssertStepProxy(stepProxy2, resultStep2);
+    }
+
+    [Theory]
+    [InlineData(ProjectState.Draft, true, ProjectState.Review, "test_1.2.3")]
+    [InlineData(ProjectState.Draft, false, ProjectState.Review, "test_1.2.3")]
+    [InlineData(ProjectState.Review, true, ProjectState.Ready, "test_1.2.3")]
+    [InlineData(ProjectState.Review, false, ProjectState.Ready, "test_1.2.3")]
+    public async Task TestSaveNewVersionOfProject(ProjectState projectState, 
+                                                    bool expectedActive, ProjectState expectedProjectState, string expectedVersioName)
+    {
+        // Arrange
+        var runtimeHostMock = new Mock<IEngineHost>();
+        var runtimeConverterServiceMock = new Mock<IRuntimeConverterService>();
+        var contextFactory = CreateContextFactoryMock().Object;
+
+        var initialDbProject = await CreateDatabaseProject("test", expectedActive, projectState);
+
+        var service = new ProjectManagementService(_projLogger,
+                                                    _serviceConfiguration,
+                                                    contextFactory,
+                                                    runtimeHostMock.Object,
+                                                    new RuntimeToStorageMapper(),
+                                                    runtimeConverterServiceMock.Object);
+
+        // Act
+        var result = await service.TrySaveNewVersionAsync(initialDbProject.Meta.DbId, expectedVersioName, expectedProjectState);
+
+        // Assert
+        Assert.True(result.IsSuccessful);
+        Assert.Null(result.Message);
+        Assert.NotEqual(Guid.Empty, result.ProjectMetaDbId);
+        Assert.NotNull(result.ProjectMetaDbId);
+        using var context = await contextFactory.CreateDbContextAsync();
+        if(projectState == ProjectState.Draft)
+        {
+            Assert.Single(context.AyBorgProjectMetas.Where(x => x.DbId.Equals(initialDbProject.Meta.DbId)));
+            Assert.Single(context.AyBorgProjects.Where(x => x.DbId.Equals(initialDbProject.DbId)));
+            Assert.Equal(1, context.AyBorgProjectMetas.Count());
+            Assert.Equal(1, context.AyBorgProjects.Count());
+        }
+        var resultProjectMeta = await context.AyBorgProjectMetas.FirstAsync(x => x.DbId.Equals(result.ProjectMetaDbId));
+        Assert.Equal(initialDbProject.Meta.VersionIteration + 1, resultProjectMeta.VersionIteration);
+        Assert.Equal(expectedVersioName, resultProjectMeta.VersionName);
+        Assert.Equal(expectedProjectState, resultProjectMeta.State);
     }
 
     public void Dispose()
@@ -186,15 +230,18 @@ public sealed class ProjectManagementServiceTests : IDisposable
     private async Task<ProjectRecord> CreateDatabaseProject(string name, bool isActive, ProjectState state)
     {
         using var context = new ProjectContext(_contextOptions);
-        context.AyBorgProjects.Add(new ProjectRecord
+        var project = new ProjectRecord
         {
             Meta = new ProjectMetaRecord
             {
+                Id = Guid.NewGuid(),
                 Name = name,
                 IsActive = isActive,
                 State = state
             }
-        });
+        };
+        context.AyBorgProjects.Add(project);
+        context.AyBorgProjectMetas.Add(project.Meta);
         await context.SaveChangesAsync();
 
         return await context.AyBorgProjects.FirstOrDefaultAsync(x => x.Meta.Name == "test");

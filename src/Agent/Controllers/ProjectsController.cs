@@ -74,7 +74,8 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult> DeleteAsync(Guid id)
     {
-        return await _projectManagementService.TryDeleteAsync(id) ? Ok() : NotFound();
+        var result = await _projectManagementService.TryDeleteAsync(id);
+        return result.IsSuccessful ? Ok() : NotFound(result.Message);
     }
 
     [HttpPut("{id}/active/{isActive}")]
@@ -82,7 +83,8 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult> ActivateAsync(Guid id, bool isActive)
     {
-        return await _projectManagementService.TryActivateAsync(id, isActive) ? Ok() : NotFound();
+        var result = await _projectManagementService.TryActivateAsync(id, isActive);
+        return result.IsSuccessful ? Ok() : NotFound(result.Message);
     }
 
     [HttpPut("{id}/state/{state}")]
@@ -90,7 +92,8 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async ValueTask<ActionResult> ChangeStateAsync(Guid id, ProjectState state)
     {
-        return await _projectManagementService.TryChangeProjectStateAsync(id, state) ? Ok() : Conflict();
+        var result = await _projectManagementService.TryChangeStateAsync(id, state);
+        return result.IsSuccessful ? Ok() : Conflict(result.Message);
     }
 
     [HttpPut("{id}")]
@@ -102,10 +105,11 @@ public sealed class ProjectsController : ControllerBase
         {
             _logger.LogWarning("Project {id} is not active.", id);
             // The project is not active anymore.
-            return Conflict();
+            return Conflict($"Project {id} is not active.");
         }
 
-        return await _projectManagementService.TrySaveActiveProjectAsync() ? Ok() : Conflict();
+        var result = await _projectManagementService.TrySaveActiveAsync();
+        return result.IsSuccessful ? Ok() : Conflict(result.Message);
     }
 
 }

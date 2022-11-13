@@ -80,7 +80,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         _logger.LogTrace("Created new project [{result.Entity.Meta.Name} | {result.Entity.DbId}].", result.Entity.Meta.Name, result.Entity.DbId);
         if (!context.AyBorgProjects.Any(p => p.Meta.IsActive && p.Meta.ServiceUniqueName == _serviceUniqueName))
         {
-            if (await TryActivateAsync(result.Entity.Meta.DbId, true))
+            if ((await TryActivateAsync(result.Entity.Meta.DbId, true)).IsSuccessful)
             {
                 result.Entity.Meta.IsActive = true;
                 _logger.LogTrace("Creating active project.");
@@ -93,17 +93,17 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <summary>
     /// Deletes asynchronous.
     /// </summary>
-    /// <param name="projectId">The project id.</param>
+    /// <param name="projectMetaId">The project id.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryDeleteAsync(Guid projectId)
+    public async ValueTask<ProjectManagementResult> TryDeleteAsync(Guid projectMetaId)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
         var metas = context.AyBorgProjectMetas!.ToList();
-        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectId);
+        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectMetaId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project found to delete.");
-            return false;
+            return new ProjectManagementResult(false, "No project found to delete.");
         }
 
         if (_engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(orgMetaRecord.DbId))
@@ -112,38 +112,38 @@ internal sealed class ProjectManagementService : IProjectManagementService
             if (!await _engineHost.TryDeactivateProjectAsync())
             {
                 _logger.LogWarning($"Could not deactivate project.");
-                return false;
+                return new ProjectManagementResult(false, "Could not deactivate project.");
             }
         }
 
-        var orgProjectRecord = await context.AyBorgProjects!.FirstAsync(x => x.Meta.DbId.Equals(projectId));
+        var orgProjectRecord = await context.AyBorgProjects!.FirstAsync(x => x.Meta.DbId.Equals(projectMetaId));
         context.AyBorgProjects!.Remove(orgProjectRecord);
         await context.SaveChangesAsync();
 
         _logger.LogTrace("Removed project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}].", orgMetaRecord.Name, orgMetaRecord.DbId);
-        return true;
+        return new ProjectManagementResult(true, null, orgMetaRecord.DbId);
     }
 
     /// <summary>
     /// Activates asynchronous.
     /// </summary>
-    /// <param name="projectId">The project identifier.</param>
+    /// <param name="projectMetaId">The project identifier.</param>
     /// <param name="isActive">if set to <c>true</c> [is active].</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryActivateAsync(Guid projectId, bool isActive)
+    public async ValueTask<ProjectManagementResult> TryActivateAsync(Guid projectMetaId, bool isActive)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectId);
+        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectMetaId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project found to activate.");
-            return false;
+            return new ProjectManagementResult(false, "No project found to activate.");
         }
 
         if (orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
         {
             _logger.LogWarning("Project [{orgMetaRecord.Name}] is not owned by this service.", orgMetaRecord.Name);
-            return false;
+            return new ProjectManagementResult(false, "Project is not owned by this service.");
         }
 
         var lastActiveMetaRecord = await context.AyBorgProjectMetas.FirstOrDefaultAsync(x => x.IsActive && x.ServiceUniqueName == _serviceUniqueName);
@@ -156,7 +156,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             if (!await _engineHost.TryDeactivateProjectAsync())
             {
                 _logger.LogWarning($"Could not deactivate project.");
-                return false;
+                return new ProjectManagementResult(false, "Could not deactivate project.");
             }
 
             lastActiveMetaRecord.IsActive = false;
@@ -167,13 +167,13 @@ internal sealed class ProjectManagementService : IProjectManagementService
         if (isActive)
         {
             IQueryable<ProjectRecord> queryProject = CreateFullProjectQuery(context);
-            var orgProjectRecord = await queryProject.FirstAsync(x => x.Meta.DbId.Equals(projectId));
+            var orgProjectRecord = await queryProject.FirstAsync(x => x.Meta.DbId.Equals(projectMetaId));
             _logger.LogTrace("Loading project [{orgProjectRecord.Meta.Name}] with step count [{orgProjectRecord.Steps.Count}].", orgProjectRecord.Meta.Name, orgProjectRecord.Steps.Count);
             var project = await _runtimeConverterService.ConvertAsync(orgProjectRecord);
             if (!await _engineHost.TryActivateProjectAsync(project))
             {
-                _logger.LogWarning("Could not activate project [{projectId}].", projectId);
-                return false;
+                _logger.LogWarning("Could not activate project [{projectId}].", projectMetaId);
+                return new ProjectManagementResult(false, "Could not activate project.");
             }
         }
 
@@ -188,7 +188,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
         await context.SaveChangesAsync();
 
-        return true;
+        return new ProjectManagementResult(true, null, orgMetaRecord.DbId);
     }
 
     /// <summary>
@@ -197,39 +197,39 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <param name="projectId">The project identifier.</param>
     /// <param name="state">The state.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryChangeProjectStateAsync(Guid projectId, ProjectState state)
+    public async ValueTask<ProjectManagementResult> TryChangeStateAsync(Guid projectId, ProjectState state)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
         var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project for state change found.");
-            return false;
+            return new ProjectManagementResult(false, "No project for state change found.");
         }
 
         if (orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
         {
             _logger.LogWarning("Project [{orgMetaRecord.Name}] is not owned by this service.", orgMetaRecord.Name);
-            return false;
+            return new ProjectManagementResult(false, "Project is not owned by this service.");
         }
 
         if (orgMetaRecord.State == state)
         {
             _logger.LogWarning("Project is already in state [{state}].", state);
-            return false;
+            return new ProjectManagementResult(false, "Project is already in state.");
         }
 
         if (orgMetaRecord.State == ProjectState.Ready)
         {
             _logger.LogWarning("Project is already in state [{state}]. Cannot change state from [{orgMetaRecord.State}] to [{state}].", state, orgMetaRecord.State, state);
-            return false;
+            return new ProjectManagementResult(false, "Project is already in state.");
         }
 
         orgMetaRecord.State = state;
         orgMetaRecord.UpdatedDate = DateTime.UtcNow;
         _logger.LogTrace("Project [{orgMetaRecord.DbId}] set state to [{state}].", orgMetaRecord.DbId, state);
         await context.SaveChangesAsync();
-        return true;
+        return new ProjectManagementResult(true, null, orgMetaRecord.DbId);
     }
 
     /// <summary>
@@ -245,29 +245,36 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// Loads the active project asynchronous.
     /// </summary>
     /// <returns></returns>
-    public async ValueTask<bool> TryLoadActiveProjectAsync()
+    public async ValueTask<ProjectManagementResult> TryLoadActiveAsync()
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
         var projectMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
         if (projectMetaRecord == null)
         {
             _logger.LogWarning("No active project.");
-            return false;
+            return new ProjectManagementResult(false, "No active project.");
         }
 
-        return await TryActivateAsync(projectMetaRecord.DbId, true);
+        var result  = (await TryActivateAsync(projectMetaRecord.DbId, true)).IsSuccessful;
+        if (!result)
+        {
+            _logger.LogWarning("Could not activate project.");
+            return new ProjectManagementResult(false, "Could not activate project.");
+        }
+
+        return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
     }
 
     /// <summary>
     /// Save active project asynchronous.
     /// </summary>
     /// <returns></returns>
-    public async ValueTask<bool> TrySaveActiveProjectAsync()
+    public async ValueTask<ProjectManagementResult> TrySaveActiveAsync()
     {
         if (_engineHost.ActiveProject == null)
         {
             _logger.LogWarning("No active project.");
-            return false;
+            return new ProjectManagementResult(false, "No active project.");
         }
 
         using var context = await _projectContextFactory.CreateDbContextAsync();
@@ -275,7 +282,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         if (projectMetaRecord == null)
         {
             _logger.LogWarning($"No project found to save.");
-            return false;
+            return new ProjectManagementResult(false, "No project found to save.");
         }
 
         var databaseProjectRecord = await context.AyBorgProjects!.Include(x => x.Steps)
@@ -286,7 +293,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         if (databaseProjectRecord == null)
         {
             _logger.LogWarning($"No database project found to save.");
-            return false;
+            return new ProjectManagementResult(false, "No database project found to save.");
         }
 
         var projectRecord = _runtimeToStorageMapper.Map(_engineHost.ActiveProject);
@@ -309,10 +316,97 @@ internal sealed class ProjectManagementService : IProjectManagementService
         catch (Exception ex)
         {
             _logger.LogError(ex, "Could not update project [{projectRecord.Meta.Name}].", projectRecord.Meta.Name);
-            return false;
+            return new ProjectManagementResult(false, "Could not update project.");
         }
 
-        return true;
+        return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
+    }
+
+    public async ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, string newVersionName, ProjectState projectState)
+    {
+        using var context = await _projectContextFactory.CreateDbContextAsync();
+        var previousProjectMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(p => p.DbId.Equals(projectMetaDbId));
+        if (previousProjectMetaRecord == null)
+        {
+            _logger.LogWarning($"No project found to save.");
+            return new ProjectManagementResult(false, "No project found to save.");
+        }
+
+        if (previousProjectMetaRecord.VersionName.Equals(newVersionName, StringComparison.InvariantCulture))
+        {
+            _logger.LogWarning("Version name [{versionName}] is already used.", newVersionName);
+            return new ProjectManagementResult(false, "Version name is already used.");
+        }
+
+        // Moving from draft to review state.
+        if (previousProjectMetaRecord.State == ProjectState.Draft)
+        {
+            return await TrySaveDraftToReviewAsync(previousProjectMetaRecord, newVersionName, context);
+        }
+
+        var previousProjectRecord = await context.AyBorgProjects!.Include(x => x.Steps)
+                                                            .ThenInclude(x => x.Ports)
+                                                            .Include(x => x.Links)
+                                                            .AsSplitQuery()
+                                                            .FirstOrDefaultAsync(p => p.Meta.DbId.Equals(projectMetaDbId));
+
+        if (previousProjectRecord == null)
+        {
+            _logger.LogWarning($"No database project found to save.");
+            return new ProjectManagementResult(false, "No database project found to save.");
+        }
+
+        var projectMetaRecord = new ProjectMetaRecord
+        {
+            Id = previousProjectMetaRecord.Id,
+            Name = previousProjectMetaRecord.Name,
+            IsActive = previousProjectMetaRecord.IsActive,
+            State = projectState,
+            CreatedDate = previousProjectMetaRecord.CreatedDate,
+            UpdatedDate = DateTime.UtcNow,
+            ServiceUniqueName = _serviceUniqueName,
+            VersionName = newVersionName,
+            VersionIteration = previousProjectMetaRecord.VersionIteration + 1
+        };
+
+        var projectRecord = previousProjectRecord with { DbId = Guid.Empty, Meta = projectMetaRecord };
+
+        // Reset database id so a new record will be created.
+        projectRecord.Steps.ForEach(s => s.DbId = Guid.Empty);
+        projectRecord.Links.ForEach(l => l.DbId = Guid.Empty);
+
+        var result = await context.AyBorgProjects!.AddAsync(projectRecord);
+        await context.SaveChangesAsync();
+        _logger.LogTrace("Project [{projectRecord.Meta.Name}] saved with id [{projectRecord.Meta.DbId}].", projectRecord.Meta.Name, projectRecord.Meta.DbId);
+        return new ProjectManagementResult(true, null, projectRecord.Meta.DbId);
+    }
+
+    private async ValueTask<ProjectManagementResult> TrySaveDraftToReviewAsync(ProjectMetaRecord projectMetaRecord, string versionName, ProjectContext context)
+    {
+        try
+        {
+            var previousVersionIteration = projectMetaRecord.VersionIteration;
+            projectMetaRecord.State = ProjectState.Review;
+            projectMetaRecord.VersionName = versionName;
+            projectMetaRecord.VersionIteration++;
+            projectMetaRecord.UpdatedDate = DateTime.UtcNow;
+
+            // Remove all drafts from the history.
+            var metaQuery = context.AyBorgProjectMetas!.Where(pm => pm.Id.Equals(projectMetaRecord.Id)
+                                                                && pm.State == ProjectState.Draft
+                                                                && pm.VersionIteration.Equals(previousVersionIteration)
+                                                                && pm.DbId != projectMetaRecord.DbId);
+            context.AyBorgProjectMetas!.RemoveRange(metaQuery);
+
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not save project [{projectMetaRecord.Name}] as review.", projectMetaRecord.Name);
+            return new ProjectManagementResult(false, "Could not save project as review.", null);
+        }
+
+        return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
     }
 
     private void UpdateStepRecordsByDatabaseContext(ProjectRecord projectRecord, ProjectRecord databaseProjectRecord)
@@ -356,3 +450,5 @@ internal sealed class ProjectManagementService : IProjectManagementService
                                 .AsSplitQuery();
     }
 }
+
+public record struct ProjectManagementResult(bool IsSuccessful, string? Message, Guid? ProjectMetaDbId = null);
