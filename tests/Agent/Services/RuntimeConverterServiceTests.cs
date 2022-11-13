@@ -50,7 +50,7 @@ public class RuntimeConverterServiceTests
         {
             Id = Guid.NewGuid(),
             Name = "Test step",
-            MetaInfo = new PluginMetaInfo
+            MetaInfo = new PluginMetaInfoRecord
             {
                 TypeName = nameof(DummyStep)
             },

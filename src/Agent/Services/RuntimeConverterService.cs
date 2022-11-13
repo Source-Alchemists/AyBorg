@@ -40,7 +40,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         {
             Meta = new ProjectMeta
             {
-                Id = projectRecord.Meta.DbId,
+                Id = projectRecord.Meta.Id,
                 Name = projectRecord.Meta.Name,
             },
             // First, we need to convert all the steps

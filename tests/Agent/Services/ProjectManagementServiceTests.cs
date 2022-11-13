@@ -91,7 +91,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
             {
                 Meta = new ProjectMeta
                 {
-                    Id = databaseProjectRecord.Meta.DbId,
+                    Id = databaseProjectRecord.Meta.Id,
                     Name = databaseProjectRecord.Meta.Name
                 }
             });
@@ -107,12 +107,12 @@ public sealed class ProjectManagementServiceTests : IDisposable
                                                     runtimeConverterServiceMock.Object);
 
         // Act
-        var result = await service.TryDeleteAsync(databaseProjectRecord.Meta.DbId);
+        var result = await service.TryDeleteAsync(databaseProjectRecord.Meta.Id);
 
         // Assert
         Assert.True(result.IsSuccessful);
-        using var testContext = new ProjectContext(_contextOptions);
-        Assert.Empty(testContext.AyBorgProjects);
+        using var context = new ProjectContext(_contextOptions);
+        Assert.Empty(context.AyBorgProjects);
     }
 
     [Fact]
@@ -121,6 +121,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
         // Arrange
         var runtimeHostMock = new Mock<IEngineHost>();
         var runtimeConverterServiceMock = new Mock<IRuntimeConverterService>();
+        var contextFactory = CreateContextFactoryMock().Object;
 
         var newDatabaseProjectRecord = await CreateDatabaseProject("test", true, ProjectState.Draft);
 
@@ -130,7 +131,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
         {
             Meta = new ProjectMeta
             {
-                Id = newDatabaseProjectRecord.Meta.DbId,
+                Id = newDatabaseProjectRecord.Meta.Id,
                 Name = newDatabaseProjectRecord.Meta.Name
             },
             Steps = new List<IStepProxy>
@@ -144,7 +145,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
 
         var service = new ProjectManagementService(_projLogger,
                                                     _serviceConfiguration,
-                                                    CreateContextFactoryMock().Object,
+                                                    contextFactory,
                                                     runtimeHostMock.Object,
                                                     new RuntimeToStorageMapper(),
                                                     runtimeConverterServiceMock.Object);
@@ -154,11 +155,22 @@ public sealed class ProjectManagementServiceTests : IDisposable
 
         // Assert
         Assert.True(result.IsSuccessful);
-        using var testContext = new ProjectContext(_contextOptions);
-        var resultProjectRecord = CreateCompleteProjectRecordQuery(testContext).Single(x => x.DbId.Equals(newDatabaseProjectRecord.DbId));
+        Assert.Null(result.Message);
+        Assert.NotEqual(Guid.Empty, result.ProjectMetaDbId);
+        Assert.NotNull(result.ProjectMetaDbId);
+        using var context = await contextFactory.CreateDbContextAsync();
+        Assert.Equal(2, context.AyBorgProjectMetas.Count());
+        Assert.Equal(2, context.AyBorgProjects.Count());
+        var resultProjectMetaRecord = context.AyBorgProjectMetas.Single(pm => pm.DbId.Equals(result.ProjectMetaDbId));
+        var resultProjectRecord = CreateCompleteProjectRecordQuery(context).Single(x => x.DbId.Equals(resultProjectMetaRecord.ProjectRecordId));
+        var previousProjectMetaRecord = context.AyBorgProjectMetas.Single(pm => pm.DbId.Equals(newDatabaseProjectRecord.Meta.DbId));
+        Assert.NotEqual(newDatabaseProjectRecord.Meta.DbId, resultProjectMetaRecord.DbId);
+        Assert.NotEqual(newDatabaseProjectRecord.DbId, resultProjectRecord.DbId);
         Assert.Equal(newDatabaseProjectRecord.Meta.Name, resultProjectRecord.Meta.Name);
-        Assert.Equal(newDatabaseProjectRecord.Meta.IsActive, resultProjectRecord.Meta.IsActive);
-        Assert.Equal(newDatabaseProjectRecord.Meta.State, resultProjectRecord.Meta.State);
+        Assert.Equal(newDatabaseProjectRecord.Meta.Id, resultProjectMetaRecord.Id);
+        Assert.False(previousProjectMetaRecord.IsActive);
+        Assert.True(resultProjectRecord.Meta.IsActive);
+        Assert.Equal(ProjectState.Draft, resultProjectRecord.Meta.State);
         Assert.Equal(2, resultProjectRecord.Steps.Count);
         Assert.Single(resultProjectRecord.Steps.Where(x => x.Name.Equals(stepProxy1.Name)));
         Assert.Single(resultProjectRecord.Steps.Where(x => x.Name.Equals(stepProxy2.Name)));

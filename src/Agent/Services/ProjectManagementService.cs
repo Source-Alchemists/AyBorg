@@ -67,6 +67,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         {
             Meta = new ProjectMetaRecord
             {
+                Id = Guid.NewGuid(),
                 Name = name,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow,
@@ -93,20 +94,19 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <summary>
     /// Deletes asynchronous.
     /// </summary>
-    /// <param name="projectMetaId">The project id.</param>
+    /// <param name="projectId">The project id.</param>
     /// <returns></returns>
-    public async ValueTask<ProjectManagementResult> TryDeleteAsync(Guid projectMetaId)
+    public async ValueTask<ProjectManagementResult> TryDeleteAsync(Guid projectId)
     {
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var metas = context.AyBorgProjectMetas!.ToList();
-        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectMetaId);
-        if (orgMetaRecord == null)
+        var metas = await context.AyBorgProjectMetas!.Where(pm => pm.Id.Equals(projectId)).ToListAsync();
+        if (!metas.Any())
         {
-            _logger.LogWarning($"No project found to delete.");
-            return new ProjectManagementResult(false, "No project found to delete.");
+            return new ProjectManagementResult(false, "Project not found.");
         }
 
-        if (_engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(orgMetaRecord.DbId))
+        var activeProjectMeta = metas.FirstOrDefault(pm => pm.IsActive);
+        if (activeProjectMeta != null && _engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(activeProjectMeta.Id))
         {
             // Need to deactivate the project.
             if (!await _engineHost.TryDeactivateProjectAsync())
@@ -116,12 +116,13 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
         }
 
-        var orgProjectRecord = await context.AyBorgProjects!.FirstAsync(x => x.Meta.DbId.Equals(projectMetaId));
-        context.AyBorgProjects!.Remove(orgProjectRecord);
+        var projects = await context.AyBorgProjects!.Where(p => p.Meta.Id.Equals(projectId)).ToListAsync();
+        context.AyBorgProjects!.RemoveRange(projects);
+        context.AyBorgProjectMetas!.RemoveRange(metas);
         await context.SaveChangesAsync();
 
-        _logger.LogTrace("Removed project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}].", orgMetaRecord.Name, orgMetaRecord.DbId);
-        return new ProjectManagementResult(true, null, orgMetaRecord.DbId);
+        _logger.LogTrace("Removed project  with id [{projectId}].", projectId);
+        return new ProjectManagementResult(true, null);
     }
 
     /// <summary>
@@ -160,7 +161,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
 
             lastActiveMetaRecord.IsActive = false;
-            _logger.LogTrace("Project [{lastActiveMetaRecord.DbId}] deactivated.", lastActiveMetaRecord.DbId);
+            _logger.LogTrace("Project [{lastActiveMetaRecord.DbId}] deactivated.", lastActiveMetaRecord.Id);
         }
 
         // The whole project record need to be loaded and converted to a runtime project.
@@ -180,11 +181,11 @@ internal sealed class ProjectManagementService : IProjectManagementService
         orgMetaRecord.IsActive = isActive;
         if (isActive)
         {
-            _logger.LogInformation("Project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}] activated.", orgMetaRecord.Name, orgMetaRecord.DbId);
+            _logger.LogInformation("Project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}] activated.", orgMetaRecord.Name, orgMetaRecord.Id);
         }
         else
         {
-            _logger.LogInformation("Project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}] deactivated.", orgMetaRecord.Name, orgMetaRecord.DbId);
+            _logger.LogInformation("Project [{orgMetaRecord.Name}] with id [{orgMetaRecord.DbId}] deactivated.", orgMetaRecord.Name, orgMetaRecord.Id);
         }
         await context.SaveChangesAsync();
 
@@ -278,40 +279,23 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
 
         using var context = await _projectContextFactory.CreateDbContextAsync();
-        var projectMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(p => p.DbId.Equals(_engineHost.ActiveProject.Meta.Id));
-        if (projectMetaRecord == null)
+        var previousProjectMetaRecord = await context.AyBorgProjectMetas!.Where(p => p.Id.Equals(_engineHost.ActiveProject.Meta.Id)).FirstOrDefaultAsync(p => p.IsActive);
+        if (previousProjectMetaRecord == null)
         {
             _logger.LogWarning($"No project found to save.");
             return new ProjectManagementResult(false, "No project found to save.");
         }
 
-        var databaseProjectRecord = await context.AyBorgProjects!.Include(x => x.Steps)
-                                                            .ThenInclude(x => x.Ports)
-                                                            .Include(x => x.Links)
-                                                            .AsSplitQuery()
-                                                            .FirstOrDefaultAsync(p => p.Meta.DbId.Equals(projectMetaRecord.DbId));
-        if (databaseProjectRecord == null)
-        {
-            _logger.LogWarning($"No database project found to save.");
-            return new ProjectManagementResult(false, "No database project found to save.");
-        }
-
         var projectRecord = _runtimeToStorageMapper.Map(_engineHost.ActiveProject);
-        projectRecord.DbId = databaseProjectRecord.DbId;
-        projectRecord.Meta = databaseProjectRecord.Meta;
+        projectRecord.Meta = previousProjectMetaRecord with { DbId = Guid.Empty, UpdatedDate = DateTime.UtcNow };
 
         try
         {
-            // Always if the projects is be saved, the state is set to draft.
-            // The ready state must be set explicitly.
-            databaseProjectRecord.Meta.State = ProjectState.Draft;
-            databaseProjectRecord.Meta.UpdatedDate = DateTime.UtcNow;
-            // Need to update all database identifiers.
-            UpdateStepRecordsByDatabaseContext(projectRecord, databaseProjectRecord);
-            databaseProjectRecord.Steps = projectRecord.Steps;
-            UpdateLinkRecordsByDatabaseContext(projectRecord, databaseProjectRecord);
-            databaseProjectRecord.Links = projectRecord.Links;
+            await context.AyBorgProjects!.AddAsync(projectRecord);
+            await context.AyBorgProjectMetas!.AddAsync(projectRecord.Meta);
+            previousProjectMetaRecord.IsActive = false;
             await context.SaveChangesAsync();
+            _engineHost.ActiveProject.Meta.Id = projectRecord.Meta.Id;
         }
         catch (Exception ex)
         {
@@ -319,7 +303,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "Could not update project.");
         }
 
-        return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
+        return new ProjectManagementResult(true, null, projectRecord.Meta.DbId);
     }
 
     public async ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, string newVersionName, ProjectState projectState)
@@ -356,17 +340,12 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "No database project found to save.");
         }
 
-        var projectMetaRecord = new ProjectMetaRecord
-        {
-            Id = previousProjectMetaRecord.Id,
-            Name = previousProjectMetaRecord.Name,
-            IsActive = previousProjectMetaRecord.IsActive,
+        var projectMetaRecord = previousProjectMetaRecord with { 
+            DbId = Guid.Empty,
             State = projectState,
-            CreatedDate = previousProjectMetaRecord.CreatedDate,
-            UpdatedDate = DateTime.UtcNow,
-            ServiceUniqueName = _serviceUniqueName,
             VersionName = newVersionName,
-            VersionIteration = previousProjectMetaRecord.VersionIteration + 1
+            VersionIteration = previousProjectMetaRecord.VersionIteration + 1,
+            UpdatedDate = DateTime.UtcNow,
         };
 
         var projectRecord = previousProjectRecord with { DbId = Guid.Empty, Meta = projectMetaRecord };

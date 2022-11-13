@@ -123,5 +123,5 @@ internal sealed class PluginsService : IPluginsService
         return false;
     }
 
-    private static bool IsSameType(Type type, PluginMetaInfo metaInfo) => type.Name == metaInfo.TypeName && type.Assembly.GetName().Name == metaInfo.AssemblyName;
+    private static bool IsSameType(Type type, PluginMetaInfoRecord metaInfo) => type.Name == metaInfo.TypeName && type.Assembly.GetName().Name == metaInfo.AssemblyName;
 }
