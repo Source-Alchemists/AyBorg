@@ -203,7 +203,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
                                                     runtimeConverterServiceMock.Object);
 
         // Act
-        ProjectManagementResult result = await service.TrySaveNewVersionAsync(initialDbProject.Meta.DbId, expectedVersioName, expectedProjectState, string.Empty);
+        ProjectManagementResult result = await service.TrySaveNewVersionAsync(initialDbProject.Meta.DbId, expectedProjectState, expectedVersioName, string.Empty);
 
         // Assert
         Assert.True(result.IsSuccessful);

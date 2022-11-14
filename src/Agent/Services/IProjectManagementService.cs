@@ -31,13 +31,13 @@ public interface IProjectManagementService
     /// <returns></returns>
     ValueTask<ProjectManagementResult> TryDeleteAsync(Guid projectId);
 
-    /// <summary>
-    /// Change project state asynchronous.
-    /// </summary>
-    /// <param name="projectId">The project identifier.</param>
-    /// <param name="state">The state.</param>
-    /// <returns></returns>
-    ValueTask<ProjectManagementResult> TryChangeStateAsync(Guid projectId, ProjectState state);
+    // /// <summary>
+    // /// Change project state asynchronous.
+    // /// </summary>
+    // /// <param name="projectId">The project identifier.</param>
+    // /// <param name="state">The state.</param>
+    // /// <returns></returns>
+    // ValueTask<ProjectManagementResult> TryChangeStateAsync(Guid projectId, ProjectState state);
 
     /// <summary>
     /// Gets all project metas asynchronous.
@@ -58,5 +58,5 @@ public interface IProjectManagementService
     /// <summary>
     /// Save the project as new version.
     /// </summary>
-    ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, string newVersionName, ProjectState projectState, string comment);
+    ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, ProjectState projectState, string newVersionName, string comment);
 }

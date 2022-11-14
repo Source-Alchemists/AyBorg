@@ -3,8 +3,8 @@
         <MudAlert Severity="Severity.Info">
             The project will be saved as review.
         </MudAlert>
-        <MudTextField Label="Version" @bind-Value="TmpProject.VersionName" Required="true" />
-        <MudTextField Label="Comment" @bind-Value="TmpProject.Comment" Required="false" Lines="3" Counter="200" Immediate="true" Variant="Variant.Outlined" class="pt-2" />
+        <MudTextField Label="Version" @bind-Value="_tmpProject.VersionName" Required="true" />
+        <MudTextField Label="Comment" @bind-Value="_tmpProject.Comment" Required="false" Lines="3" Counter="200" Immediate="true" Variant="Variant.Outlined" class="pt-2" />
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="OnCloseClicked">Close</MudButton>

@@ -1,4 +1,5 @@
 using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Projects;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -9,12 +10,12 @@ public partial class CreateReviewProjectDialog : ComponentBase
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     [Parameter] public ProjectMetaDto Project { get; set; } = null!;
 
-    private ProjectMetaDto TmpProject = null!;
+    private ProjectMetaDto _tmpProject = null!;
 
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        TmpProject = Project with { };
+        _tmpProject = Project with { };
     }
 
     private void OnCloseClicked()
@@ -24,6 +25,11 @@ public partial class CreateReviewProjectDialog : ComponentBase
 
     private void OnCreateClicked()
     {
-        MudDialog.Close(DialogResult.Ok(TmpProject));
+        MudDialog.Close(DialogResult.Ok(new ProjectStateChangeDto
+        {
+            State = ProjectState.Review,
+            VersionName = _tmpProject.VersionName,
+            Comment = _tmpProject.Comment
+        }));
     }
 }

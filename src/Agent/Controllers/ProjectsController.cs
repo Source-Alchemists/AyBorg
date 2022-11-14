@@ -37,16 +37,16 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async IAsyncEnumerable<ProjectMetaDto> GetAsync()
     {
-        foreach (var metaGroup in (await _projectManagementService.GetAllMetasAsync()).Where(x => x.ServiceUniqueName == _serviceUniqueName).GroupBy(p => p.Id))
+        foreach (IGrouping<Guid, SDK.Data.DAL.ProjectMetaRecord> metaGroup in (await _projectManagementService.GetAllMetasAsync()).Where(x => x.ServiceUniqueName == _serviceUniqueName).GroupBy(p => p.Id))
         {
-            var activeMeta = metaGroup.FirstOrDefault(g => g.IsActive);
+            SDK.Data.DAL.ProjectMetaRecord? activeMeta = metaGroup.FirstOrDefault(g => g.IsActive);
             if (activeMeta != null)
             {
                 yield return _storageToDtoMapper.Map(activeMeta);
             }
             else
             {
-                var meta = metaGroup.OrderByDescending(x => x.UpdatedDate).First();
+                SDK.Data.DAL.ProjectMetaRecord meta = metaGroup.OrderByDescending(x => x.UpdatedDate).First();
                 yield return _storageToDtoMapper.Map(meta);
             }
         }
@@ -57,15 +57,15 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult<ProjectMetaDto>> GetActiveAsync()
     {
-        var metas = await _projectManagementService.GetAllMetasAsync();
-        var activeProjectMeta = metas.FirstOrDefault(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
+        IEnumerable<SDK.Data.DAL.ProjectMetaRecord> metas = await _projectManagementService.GetAllMetasAsync();
+        SDK.Data.DAL.ProjectMetaRecord? activeProjectMeta = metas.FirstOrDefault(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
         if (activeProjectMeta == null)
         {
             _logger.LogWarning("No active project found.");
             return NotFound();
         }
 
-        var projectMetaDto = _storageToDtoMapper.Map(activeProjectMeta);
+        ProjectMetaDto projectMetaDto = _storageToDtoMapper.Map(activeProjectMeta);
         return Ok(projectMetaDto);
     }
 
@@ -73,7 +73,7 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async ValueTask<ActionResult<ProjectMetaDto>> CreateAsync(string name)
     {
-        var record = await _projectManagementService.CreateAsync(name);
+        SDK.Data.DAL.ProjectRecord record = await _projectManagementService.CreateAsync(name);
         return Ok(_storageToDtoMapper.Map(record.Meta));
     }
 
@@ -82,7 +82,7 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult> DeleteAsync(Guid id)
     {
-        var result = await _projectManagementService.TryDeleteAsync(id);
+        ProjectManagementResult result = await _projectManagementService.TryDeleteAsync(id);
         return result.IsSuccessful ? Ok() : NotFound(result.Message);
     }
 
@@ -91,16 +91,16 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult> ActivateAsync(Guid dbId, bool isActive)
     {
-        var result = await _projectManagementService.TryActivateAsync(dbId, isActive);
+        ProjectManagementResult result = await _projectManagementService.TryActivateAsync(dbId, isActive);
         return result.IsSuccessful ? Ok() : NotFound(result.Message);
     }
 
-    [HttpPut("{id}/state/{state}")]
+    [HttpPut("{dbId}/state")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
-    public async ValueTask<ActionResult> ChangeStateAsync(Guid id, ProjectState state)
+    public async ValueTask<ActionResult> ChangeStateAsync(Guid dbId, ProjectStateChangeDto stateChange)
     {
-        var result = await _projectManagementService.TryChangeStateAsync(id, state);
+        ProjectManagementResult result = await _projectManagementService.TrySaveNewVersionAsync(dbId, stateChange.State, stateChange.VersionName!, stateChange.Comment!);
         return result.IsSuccessful ? Ok() : Conflict(result.Message);
     }
 
@@ -116,7 +116,7 @@ public sealed class ProjectsController : ControllerBase
             return Conflict($"Project {id} is not active.");
         }
 
-        var result = await _projectManagementService.TrySaveActiveAsync();
+        ProjectManagementResult result = await _projectManagementService.TrySaveActiveAsync();
         return result.IsSuccessful ? Ok() : Conflict(result.Message);
     }
 

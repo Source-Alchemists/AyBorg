@@ -31,9 +31,9 @@ public partial class Projects : ComponentBase
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            var services = await RegistryService.ReceiveAllAvailableServicesAsync();
+            IEnumerable<RegistryEntryDto> services = await RegistryService.ReceiveAllAvailableServicesAsync();
             _baseUrl = RegistryService.GetUrl(services, ServiceId);
-            var service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
+            RegistryEntryDto? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
             if (_baseUrl == string.Empty || service == null)
             {
                 _hasServiceError = true;
@@ -49,7 +49,7 @@ public partial class Projects : ComponentBase
 
     private async Task ReceiveProjectsAsync()
     {
-        var allProjectMetas = await ProjectManagementService.GetMetasAsync(_baseUrl);
+        IEnumerable<ProjectMetaDto> allProjectMetas = await ProjectManagementService.GetMetasAsync(_baseUrl);
         _readyProjects = allProjectMetas.Where(p => p.State == ProjectState.Ready);
         _reviewProjects = allProjectMetas.Where(p => p.State == ProjectState.Review);
         _draftProjects = allProjectMetas.Where(p => p.State == ProjectState.Draft);
@@ -71,8 +71,8 @@ public partial class Projects : ComponentBase
         {
             { "ContentText", $"Are you sure you want to delete project '{projectDto.Name}'?" }
         };
-        var dialog = DialogService.Show<ConfirmDialog>("Delete project", parameters, options);
-        var result = await dialog.Result;
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete project", parameters, options);
+        DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
             if (await ProjectManagementService.TryDeleteAsync(_baseUrl, projectDto))
@@ -89,33 +89,34 @@ public partial class Projects : ComponentBase
         {
             { "Project", projectDto }
         };
-        var dialog = DialogService.Show<CreateReviewProjectDialog>($"Create review for {projectDto.Name}", parameters, options);
-        var result = await dialog.Result;
+        IDialogReference dialog = DialogService.Show<CreateReviewProjectDialog>($"Create review for {projectDto.Name}", parameters, options);
+        DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
-            // if (await ProjectManagementService.TrySaveAsReviewAsync(_baseUrl, projectDto))
-            // {
-            //     await ReceiveProjectsAsync();
-            // }
+            ProjectStateChangeDto stateChange = (ProjectStateChangeDto)result.Data;
+            if (await ProjectManagementService.TrySaveNewVersionAsync(_baseUrl, projectDto.DbId, stateChange))
+            {
+                await ReceiveProjectsAsync();
+            }
         }
     }
 
     private async void OnSaveAsReadyClicked(ProjectMetaDto projectDto)
     {
-        var options = new DialogOptions();
-        var parameters = new DialogParameters
-        {
-            { "ContentText", $"Are you sure you want to save project '{projectDto.Name}' as ready?" }
-        };
-        var dialog = DialogService.Show<ConfirmDialog>("Save project as ready", parameters, options);
-        var result = await dialog.Result;
-        if (!result.Cancelled)
-        {
-            if (await ProjectManagementService.TrySaveAsReadyAsync(_baseUrl, projectDto))
-            {
-                await ReceiveProjectsAsync();
-            }
-        }
+        // var options = new DialogOptions();
+        // var parameters = new DialogParameters
+        // {
+        //     { "ContentText", $"Are you sure you want to save project '{projectDto.Name}' as ready?" }
+        // };
+        // IDialogReference dialog = DialogService.Show<ConfirmDialog>("Save project as ready", parameters, options);
+        // DialogResult result = await dialog.Result;
+        // if (!result.Cancelled)
+        // {
+        //     if (await ProjectManagementService.TrySaveNewVersionAsync(_baseUrl, projectDto))
+        //     {
+        //         await ReceiveProjectsAsync();
+        //     }
+        // }
     }
 
     private async Task OnNewProjectClicked()
@@ -125,8 +126,8 @@ public partial class Projects : ComponentBase
         {
             { "BaseUrl", _baseUrl }
         };
-        var dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
-        var result = await dialog.Result;
+        IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
+        DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
             await ReceiveProjectsAsync();

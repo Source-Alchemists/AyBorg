@@ -46,9 +46,10 @@ public interface IProjectManagementService
     /// Sets the project to ready state.
     /// </summary>
     /// <param name="baseUrl">The base URL.</param>
-    /// <param name="projectMeta">The project meta.</param>
+    /// <param name="dbId">The database identifier.</param>
+    /// <param name="projectStateChange">State of the project.</param>
     /// <returns></returns>
-    Task<bool> TrySaveAsReadyAsync(string baseUrl, ProjectMetaDto projectMeta);
+    Task<bool> TrySaveNewVersionAsync(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange);
 
     /// <summary>
     /// Save the project.
