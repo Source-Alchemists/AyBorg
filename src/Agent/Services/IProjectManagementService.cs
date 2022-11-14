@@ -58,5 +58,5 @@ public interface IProjectManagementService
     /// <summary>
     /// Save the project as new version.
     /// </summary>
-    ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, string newVersionName, ProjectState projectState);
+    ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, string newVersionName, ProjectState projectState, string comment);
 }

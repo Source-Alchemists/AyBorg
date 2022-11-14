@@ -62,7 +62,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <returns></returns>
     public async ValueTask<ProjectRecord> CreateAsync(string name)
     {
-        using var context = await _projectContextFactory.CreateDbContextAsync();
+        using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
         var emptyProjectRecord = new ProjectRecord
         {
             Meta = new ProjectMetaRecord
@@ -76,7 +76,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
         };
 
-        var result = await context.AyBorgProjects!.AddAsync(emptyProjectRecord);
+        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<ProjectRecord> result = await context.AyBorgProjects!.AddAsync(emptyProjectRecord);
         await context.SaveChangesAsync();
         _logger.LogTrace("Created new project [{result.Entity.Meta.Name} | {result.Entity.DbId}].", result.Entity.Meta.Name, result.Entity.DbId);
         if (!context.AyBorgProjects.Any(p => p.Meta.IsActive && p.Meta.ServiceUniqueName == _serviceUniqueName))
@@ -98,14 +98,14 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <returns></returns>
     public async ValueTask<ProjectManagementResult> TryDeleteAsync(Guid projectId)
     {
-        using var context = await _projectContextFactory.CreateDbContextAsync();
-        var metas = await context.AyBorgProjectMetas!.Where(pm => pm.Id.Equals(projectId)).ToListAsync();
+        using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
+        List<ProjectMetaRecord> metas = await context.AyBorgProjectMetas!.Where(pm => pm.Id.Equals(projectId)).ToListAsync();
         if (!metas.Any())
         {
             return new ProjectManagementResult(false, "Project not found.");
         }
 
-        var activeProjectMeta = metas.FirstOrDefault(pm => pm.IsActive);
+        ProjectMetaRecord? activeProjectMeta = metas.FirstOrDefault(pm => pm.IsActive);
         if (activeProjectMeta != null && _engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(activeProjectMeta.Id))
         {
             // Need to deactivate the project.
@@ -116,7 +116,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
         }
 
-        var projects = await context.AyBorgProjects!.Where(p => p.Meta.Id.Equals(projectId)).ToListAsync();
+        List<ProjectRecord> projects = await context.AyBorgProjects!.Where(p => p.Meta.Id.Equals(projectId)).ToListAsync();
         context.AyBorgProjects!.RemoveRange(projects);
         context.AyBorgProjectMetas!.RemoveRange(metas);
         await context.SaveChangesAsync();
@@ -133,8 +133,8 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <returns></returns>
     public async ValueTask<ProjectManagementResult> TryActivateAsync(Guid projectMetaDbId, bool isActive)
     {
-        using var context = await _projectContextFactory.CreateDbContextAsync();
-        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectMetaDbId);
+        using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
+        ProjectMetaRecord? orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectMetaDbId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project found to activate.");
@@ -147,7 +147,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "Project is not owned by this service.");
         }
 
-        var lastActiveMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(x => x.IsActive && x.ServiceUniqueName == _serviceUniqueName);
+        ProjectMetaRecord? lastActiveMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(x => x.IsActive && x.ServiceUniqueName == _serviceUniqueName);
         if (lastActiveMetaRecord == null)
         {
             _logger.LogTrace("No active project.");
@@ -168,9 +168,9 @@ internal sealed class ProjectManagementService : IProjectManagementService
         if (isActive)
         {
             IQueryable<ProjectRecord> queryProject = CreateFullProjectQuery(context);
-            var orgProjectRecord = await queryProject.FirstAsync(x => x.Meta.DbId.Equals(projectMetaDbId));
+            ProjectRecord orgProjectRecord = await queryProject.FirstAsync(x => x.Meta.DbId.Equals(projectMetaDbId));
             _logger.LogTrace("Loading project [{orgProjectRecord.Meta.Name}] with step count [{orgProjectRecord.Steps.Count}].", orgProjectRecord.Meta.Name, orgProjectRecord.Steps.Count);
-            var project = await _runtimeConverterService.ConvertAsync(orgProjectRecord);
+            Project project = await _runtimeConverterService.ConvertAsync(orgProjectRecord);
             if (!await _engineHost.TryActivateProjectAsync(project))
             {
                 _logger.LogWarning("Could not activate project [{projectMetaDbId}].", projectMetaDbId);
@@ -200,8 +200,8 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <returns></returns>
     public async ValueTask<ProjectManagementResult> TryChangeStateAsync(Guid projectId, ProjectState state)
     {
-        using var context = await _projectContextFactory.CreateDbContextAsync();
-        var orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectId);
+        using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
+        ProjectMetaRecord? orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project for state change found.");
@@ -238,7 +238,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// </summary>
     public async ValueTask<IEnumerable<ProjectMetaRecord>> GetAllMetasAsync()
     {
-        using var context = await _projectContextFactory.CreateDbContextAsync();
+        using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
         return await context.AyBorgProjectMetas!.ToListAsync();
     }
 
@@ -248,23 +248,23 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <returns></returns>
     public async ValueTask<ProjectManagementResult> TryLoadActiveAsync()
     {
-        using var context = await _projectContextFactory.CreateDbContextAsync();
-        var projectMetas = await context.AyBorgProjectMetas!.Where(p => p.IsActive).ToListAsync();
+        using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
+        List<ProjectMetaRecord> projectMetas = await context.AyBorgProjectMetas!.Where(p => p.IsActive).ToListAsync();
         projectMetas = projectMetas.Where(p => p.ServiceUniqueName.Equals(_serviceUniqueName, StringComparison.InvariantCulture)).ToList();
-        if(projectMetas.Count > 1)
+        if (projectMetas.Count > 1)
         {
             _logger.LogWarning("More than one active project found.");
             return new ProjectManagementResult(false, "More than one active project found.");
         }
 
-        var projectMetaRecord = projectMetas.FirstOrDefault();
+        ProjectMetaRecord? projectMetaRecord = projectMetas.FirstOrDefault();
         if (projectMetaRecord == null)
         {
             _logger.LogTrace("No active project found.");
             return new ProjectManagementResult(false, "No active project found");
         }
 
-        var result = (await TryActivateAsync(projectMetaRecord.DbId, true)).IsSuccessful;
+        bool result = (await TryActivateAsync(projectMetaRecord.DbId, true)).IsSuccessful;
         if (!result)
         {
             _logger.LogWarning("Could not activate project.");
@@ -287,15 +287,15 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "No active project.");
         }
 
-        using var context = await _projectContextFactory.CreateDbContextAsync();
-        var previousProjectMetaRecord = await context.AyBorgProjectMetas!.Where(p => p.Id.Equals(_engineHost.ActiveProject.Meta.Id)).FirstOrDefaultAsync(p => p.IsActive);
+        using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
+        ProjectMetaRecord? previousProjectMetaRecord = await context.AyBorgProjectMetas!.Where(p => p.Id.Equals(_engineHost.ActiveProject.Meta.Id)).FirstOrDefaultAsync(p => p.IsActive);
         if (previousProjectMetaRecord == null)
         {
             _logger.LogWarning($"No project found to save.");
             return new ProjectManagementResult(false, "No project found to save.");
         }
 
-        var projectRecord = _runtimeToStorageMapper.Map(_engineHost.ActiveProject);
+        ProjectRecord projectRecord = _runtimeToStorageMapper.Map(_engineHost.ActiveProject);
         projectRecord.Meta = previousProjectMetaRecord with { DbId = Guid.Empty, UpdatedDate = DateTime.UtcNow };
 
         try
@@ -315,10 +315,10 @@ internal sealed class ProjectManagementService : IProjectManagementService
         return new ProjectManagementResult(true, null, projectRecord.Meta.DbId);
     }
 
-    public async ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, string newVersionName, ProjectState projectState)
+    public async ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, string newVersionName, ProjectState projectState, string comment)
     {
-        using var context = await _projectContextFactory.CreateDbContextAsync();
-        var previousProjectMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(p => p.DbId.Equals(projectMetaDbId));
+        using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
+        ProjectMetaRecord? previousProjectMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(p => p.DbId.Equals(projectMetaDbId));
         if (previousProjectMetaRecord == null)
         {
             _logger.LogWarning($"No project found to save.");
@@ -337,7 +337,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return await TrySaveDraftToReviewAsync(previousProjectMetaRecord, newVersionName, context);
         }
 
-        var previousProjectRecord = await context.AyBorgProjects!.Include(x => x.Steps)
+        ProjectRecord? previousProjectRecord = await context.AyBorgProjects!.Include(x => x.Steps)
                                                             .ThenInclude(x => x.Ports)
                                                             .Include(x => x.Links)
                                                             .AsSplitQuery()
@@ -349,22 +349,23 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "No database project found to save.");
         }
 
-        var projectMetaRecord = previousProjectMetaRecord with
+        ProjectMetaRecord projectMetaRecord = previousProjectMetaRecord with
         {
             DbId = Guid.Empty,
             State = projectState,
             VersionName = newVersionName,
             VersionIteration = previousProjectMetaRecord.VersionIteration + 1,
+            Comment = comment,
             UpdatedDate = DateTime.UtcNow,
         };
 
-        var projectRecord = previousProjectRecord with { DbId = Guid.Empty, Meta = projectMetaRecord };
+        ProjectRecord projectRecord = previousProjectRecord with { DbId = Guid.Empty, Meta = projectMetaRecord };
 
         // Reset database id so a new record will be created.
         projectRecord.Steps.ForEach(s => s.DbId = Guid.Empty);
         projectRecord.Links.ForEach(l => l.DbId = Guid.Empty);
 
-        var result = await context.AyBorgProjects!.AddAsync(projectRecord);
+        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<ProjectRecord> result = await context.AyBorgProjects!.AddAsync(projectRecord);
         await context.SaveChangesAsync();
         _logger.LogTrace("Project [{projectRecord.Meta.Name}] saved with id [{projectRecord.Meta.DbId}].", projectRecord.Meta.Name, projectRecord.Meta.DbId);
         return new ProjectManagementResult(true, null, projectRecord.Meta.DbId);
@@ -374,14 +375,14 @@ internal sealed class ProjectManagementService : IProjectManagementService
     {
         try
         {
-            var previousVersionIteration = projectMetaRecord.VersionIteration;
+            long previousVersionIteration = projectMetaRecord.VersionIteration;
             projectMetaRecord.State = ProjectState.Review;
             projectMetaRecord.VersionName = versionName;
             projectMetaRecord.VersionIteration++;
             projectMetaRecord.UpdatedDate = DateTime.UtcNow;
 
             // Remove all drafts from the history.
-            var metaQuery = context.AyBorgProjectMetas!.Where(pm => pm.Id.Equals(projectMetaRecord.Id)
+            IQueryable<ProjectMetaRecord> metaQuery = context.AyBorgProjectMetas!.Where(pm => pm.Id.Equals(projectMetaRecord.Id)
                                                                 && pm.State == ProjectState.Draft
                                                                 && pm.VersionIteration.Equals(previousVersionIteration)
                                                                 && pm.DbId != projectMetaRecord.DbId);
@@ -400,7 +401,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
     private void UpdateStepRecordsByDatabaseContext(ProjectRecord projectRecord, ProjectRecord databaseProjectRecord)
     {
-        foreach (var step in projectRecord.Steps)
+        foreach (StepRecord step in projectRecord.Steps)
         {
             if (!databaseProjectRecord.Steps.Any(x => x.Id.Equals(step.Id)))
             {
@@ -415,7 +416,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
     private void UpdateLinkRecordsByDatabaseContext(ProjectRecord projectRecord, ProjectRecord databaseProjectRecord)
     {
-        foreach (var link in projectRecord.Links)
+        foreach (LinkRecord link in projectRecord.Links)
         {
             if (!databaseProjectRecord.Links.Any(x => x.Id.Equals(link.Id)))
             {
