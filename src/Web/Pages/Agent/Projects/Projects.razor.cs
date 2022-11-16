@@ -135,21 +135,6 @@ public partial class Projects : ComponentBase
 
     private async void OnSaveAsReadyClicked(ProjectMetaDto projectDto)
     {
-        // var options = new DialogOptions();
-        // var parameters = new DialogParameters
-        // {
-        //     { "ContentText", $"Are you sure you want to save project '{projectDto.Name}' as ready?" }
-        // };
-        // IDialogReference dialog = DialogService.Show<ConfirmDialog>("Save project as ready", parameters, options);
-        // DialogResult result = await dialog.Result;
-        // if (!result.Cancelled)
-        // {
-        //     if (await ProjectManagementService.TrySaveNewVersionAsync(_baseUrl, projectDto))
-        //     {
-        //         await ReceiveProjectsAsync();
-        //     }
-        // }
-
         DialogParameters parameters = new()
         {
             { "Project", projectDto }
@@ -158,7 +143,17 @@ public partial class Projects : ComponentBase
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
-            await ReceiveProjectsAsync();
+            var resultProjectMetaDto = (ProjectMetaDto)result.Data;
+            if (await ProjectManagementService.TryApproveAsnyc(_baseUrl, projectDto.DbId, new ProjectStateChangeDto
+            {
+                State = ProjectState.Draft,
+                VersionName = projectDto.VersionName,
+                Comment = resultProjectMetaDto.Comment,
+                UserName = resultProjectMetaDto.ApprovedBy
+            }))
+            {
+                await ReceiveProjectsAsync();
+            }
         }
     }
 

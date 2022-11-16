@@ -287,20 +287,25 @@ internal sealed class ProjectManagementService : IProjectManagementService
         // Moving from draft to review state.
         if (previousProjectMetaRecord.State == ProjectState.Draft)
         {
-            return await TrySaveDraftToReviewAsync(previousProjectMetaRecord, newVersionName, context);
+            return await TrySaveDraftToReviewAsync(previousProjectMetaRecord, newVersionName, comment, context);
         }
 
-        ProjectRecord? previousProjectRecord = await context.AyBorgProjects!.Include(x => x.Steps)
-                                                            .ThenInclude(x => x.Ports)
-                                                            .Include(x => x.Links)
-                                                            .AsSplitQuery()
-                                                            .FirstOrDefaultAsync(p => p.Meta.DbId.Equals(projectMetaDbId));
-
-        if (previousProjectRecord == null)
+        if (previousProjectMetaRecord.State == ProjectState.Review && projectState == ProjectState.Draft)
         {
-            _logger.LogWarning($"No database project found to save.");
-            return new ProjectManagementResult(false, "No database project found to save.");
+            previousProjectMetaRecord.State = projectState;
+            previousProjectMetaRecord.Comment = comment;
+            await context.SaveChangesAsync();
+            return new ProjectManagementResult(true, null, previousProjectMetaRecord.DbId);
         }
+
+        if (projectState == ProjectState.Ready && string.IsNullOrEmpty(approver))
+        {
+            _logger.LogWarning("Approver is required.");
+            return new ProjectManagementResult(false, "Approver is required.");
+        }
+
+        IQueryable<ProjectRecord> queryProject = CreateFullProjectQuery(context);
+        ProjectRecord previousProjectRecord = await queryProject.FirstAsync(x => x.Meta.DbId.Equals(projectMetaDbId));
 
         ProjectMetaRecord projectMetaRecord = previousProjectMetaRecord with
         {
@@ -313,24 +318,48 @@ internal sealed class ProjectManagementService : IProjectManagementService
             ApprovedBy = approver
         };
 
-        ProjectRecord projectRecord = previousProjectRecord with { DbId = Guid.Empty, Meta = projectMetaRecord };
+        ProjectRecord projectRecord = previousProjectRecord with {
+            DbId = Guid.Empty,
+            Meta = projectMetaRecord,
+            Steps = new(),
+            Links = new()
+            };
 
-        // Reset database id so a new record will be created.
-        projectRecord.Steps.ForEach(s => s.DbId = Guid.Empty);
-        projectRecord.Links.ForEach(l => l.DbId = Guid.Empty);
 
-        Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<ProjectRecord> result = await context.AyBorgProjects!.AddAsync(projectRecord);
-        await context.SaveChangesAsync();
-        _logger.LogTrace("Project [{projectRecord.Meta.Name}] saved with id [{projectRecord.Meta.DbId}].", projectRecord.Meta.Name, projectRecord.Meta.DbId);
-        return new ProjectManagementResult(true, null, projectRecord.Meta.DbId);
+        projectRecord.Steps.Clear();
+        projectRecord.Links.Clear();
+        foreach(StepRecord s in previousProjectRecord.Steps)
+        {
+            StepRecord ns = s with { DbId = Guid.Empty, ProjectRecord = projectRecord, ProjectRecordId = projectRecord.DbId };
+            projectRecord.Steps.Add(ns);
+        }
+
+        foreach(LinkRecord l in previousProjectRecord.Links)
+        {
+            LinkRecord nl = l with { DbId = Guid.Empty, ProjectRecord = projectRecord, ProjectRecordId = projectRecord.DbId };
+            projectRecord.Links.Add(nl);
+        }
+
+        try
+        {
+            Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<ProjectRecord> result = await context.AyBorgProjects!.AddAsync(projectRecord);
+            await context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Could not save project.");
+        }
+        _logger.LogTrace("Project [{projectRecord.Meta.Name}] saved with id [{projectRecord.Meta.DbId}].", projectMetaRecord.Name, projectMetaRecord.DbId);
+        return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
     }
 
-    private async ValueTask<ProjectManagementResult> TrySaveDraftToReviewAsync(ProjectMetaRecord projectMetaRecord, string versionName, ProjectContext context)
+    private async ValueTask<ProjectManagementResult> TrySaveDraftToReviewAsync(ProjectMetaRecord projectMetaRecord, string versionName, string comment, ProjectContext context)
     {
         try
         {
             long previousVersionIteration = projectMetaRecord.VersionIteration;
             projectMetaRecord.State = ProjectState.Review;
+            projectMetaRecord.Comment = comment;
             projectMetaRecord.VersionName = versionName;
             projectMetaRecord.VersionIteration++;
             projectMetaRecord.UpdatedDate = DateTime.UtcNow;
@@ -351,36 +380,6 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
 
         return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
-    }
-
-    private void UpdateStepRecordsByDatabaseContext(ProjectRecord projectRecord, ProjectRecord databaseProjectRecord)
-    {
-        foreach (StepRecord step in projectRecord.Steps)
-        {
-            if (!databaseProjectRecord.Steps.Any(x => x.Id.Equals(step.Id)))
-            {
-                _logger.LogTrace("Adding step [{step.Id}] to project [{projectRecord.Meta.Name}] with id [{projectRecord.DbId}].", step.Id, projectRecord.Meta.Name, projectRecord.DbId);
-            }
-            else
-            {
-                step.DbId = databaseProjectRecord.Steps.First(x => x.Id.Equals(step.Id)).DbId;
-            }
-        }
-    }
-
-    private void UpdateLinkRecordsByDatabaseContext(ProjectRecord projectRecord, ProjectRecord databaseProjectRecord)
-    {
-        foreach (LinkRecord link in projectRecord.Links)
-        {
-            if (!databaseProjectRecord.Links.Any(x => x.Id.Equals(link.Id)))
-            {
-                _logger.LogTrace("Adding link [{link.Id}] to project [{projectRecord.Meta.Name}] with id [{projectRecord.DbId}].", link.Id, projectRecord.Meta.Name, projectRecord.DbId);
-            }
-            else
-            {
-                link.DbId = databaseProjectRecord.Links.First(x => x.Id.Equals(link.Id)).DbId;
-            }
-        }
     }
 
     private static IQueryable<ProjectRecord> CreateFullProjectQuery(ProjectContext context)

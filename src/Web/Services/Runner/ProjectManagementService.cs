@@ -159,6 +159,30 @@ public class ProjectManagementService : IProjectManagementService
     }
 
     /// <summary>
+    /// Sets the project to ready state.
+    /// </summary>
+    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="dbId">The database identifier.</param>
+    /// <param name="projectStateChange">State of the project.</param>
+    /// <returns></returns>
+    public async Task<bool> TryApproveAsnyc(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{dbId}/approve")
+        {
+            Content = new StringContent(JsonSerializer.Serialize(projectStateChange), Encoding.UTF8, "application/json")
+        };
+        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("Could not approve project '{dbId}' [Code: {response.StatusCode}]!", dbId, response.StatusCode);
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
     /// Save project asynchronous.
     /// </summary>
     /// <param name="baseUrl">The base URL.</param>

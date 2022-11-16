@@ -52,6 +52,15 @@ public interface IProjectManagementService
     Task<bool> TrySaveNewVersionAsync(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange);
 
     /// <summary>
+    /// Sets the project to ready state.
+    /// </summary>
+    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="dbId">The database identifier.</param>
+    /// <param name="projectStateChange">State of the project.</param>
+    /// <returns></returns>
+    Task<bool> TryApproveAsnyc(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange);
+
+    /// <summary>
     /// Save the project.
     /// </summary>
     /// <param name="baseUrl">The base URL.</param>

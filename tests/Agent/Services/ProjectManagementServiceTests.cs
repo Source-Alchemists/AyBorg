@@ -181,11 +181,11 @@ public sealed class ProjectManagementServiceTests : IDisposable
     }
 
     [Theory]
-    [InlineData(ProjectState.Draft, true, ProjectState.Review, "test_1.2.3")]
-    [InlineData(ProjectState.Draft, false, ProjectState.Review, "test_1.2.3")]
-    [InlineData(ProjectState.Review, true, ProjectState.Ready, "test_1.2.3")]
-    [InlineData(ProjectState.Review, false, ProjectState.Ready, "test_1.2.3")]
-    public async Task TestSaveNewVersionOfProject(ProjectState projectState,
+    [InlineData(ProjectState.Draft, null, true, ProjectState.Review, "test_1.2.3")]
+    [InlineData(ProjectState.Draft, null, false, ProjectState.Review, "test_1.2.3")]
+    [InlineData(ProjectState.Review, "auditor", true, ProjectState.Ready, "test_1.2.3")]
+    [InlineData(ProjectState.Review, "auditor", false, ProjectState.Ready, "test_1.2.3")]
+    public async Task TestSaveNewVersionOfProject(ProjectState projectState, string auditor,
                                                     bool expectedActive, ProjectState expectedProjectState, string expectedVersioName)
     {
         // Arrange
@@ -203,7 +203,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
                                                     runtimeConverterServiceMock.Object);
 
         // Act
-        ProjectManagementResult result = await service.TrySaveNewVersionAsync(initialDbProject.Meta.DbId, expectedProjectState, expectedVersioName, string.Empty);
+        ProjectManagementResult result = await service.TrySaveNewVersionAsync(initialDbProject.Meta.DbId, expectedProjectState, expectedVersioName, string.Empty, auditor);
 
         // Assert
         Assert.True(result.IsSuccessful);

@@ -103,6 +103,15 @@ public sealed class ProjectsController : ControllerBase
         return result.IsSuccessful ? Ok() : Conflict(result.Message);
     }
 
+    [HttpPut("{dbId}/approve")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status409Conflict)]
+    public async ValueTask<ActionResult> ApproveAsync(Guid dbId, ProjectStateChangeDto stateChange)
+    {
+        ProjectManagementResult result = await _projectManagementService.TrySaveNewVersionAsync(dbId, SDK.Projects.ProjectState.Ready, stateChange.VersionName!, stateChange.Comment!, stateChange.UserName);
+        return result.IsSuccessful ? Ok() : Conflict(result.Message);
+    }
+
     [HttpPut("{id}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]

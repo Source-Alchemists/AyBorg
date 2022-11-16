@@ -1,5 +1,6 @@
 <MudDialog>
     <DialogContent>
+        <MudTextField Label="Comment" @bind-Value="_tmpProjectMeta.Comment" Required="false" Lines="3" Counter="200" Immediate="true" Variant="Variant.Outlined" class="pt-2" />
         <MudAlert Severity="Severity.Info">
             Please confirm the approval with your password.
         </MudAlert>
