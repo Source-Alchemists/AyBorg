@@ -25,23 +25,27 @@
             }
             else
             {
-                <MudButton class="mb-4" Variant="Variant.Text" Color="Color.Primary" 
+                <MudButton class="mb-4" Variant="Variant.Text" Color="Color.Primary"
                     @onclick="(args) => OnActivateClicked(args, context)">Activate</MudButton>
             }
 
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
                 @if (@context.State == ProjectState.Draft) {
-                    <MudMenuItem Icon="@Icons.Filled.Circle" IconColor="Color.Info" @onclick="(args) => OnSaveAsReview(args, context)">
+                    <MudMenuItem Icon="@Icons.Filled.SafetyCheck" IconColor="Color.Info" @onclick="(args) => OnSaveAsReview(args, context)">
                             Create review
                     </MudMenuItem>
                 }
                 @if (@context.State == ProjectState.Review) {
-                    <MudMenuItem Icon="@Icons.Filled.Circle" IconColor="Color.Info" @onclick="(args) => OnSaveAsReady(args, context)">
-                            Open review
+                    <MudMenuItem Icon="@Icons.Filled.Cancel" IconColor="Color.Secondary" @onclick="(args) => OnAbandonClicked(args, context)">
+                            Abandon
+                    </MudMenuItem>
+                    <MudMenuItem Icon="@Icons.Filled.GppGood" IconColor="Color.Tertiary" @onclick="(args) => OnSaveAsReady(args, context)">
+                            Approve
                     </MudMenuItem>
                 }
+                <MudDivider />
                 <MudMenuItem Icon="@Icons.Filled.DeleteForever" IconColor="Color.Error" @onclick="(args) => OnDeleteClicked(args, context)">
-                    Delete        
+                    Delete
                 </MudMenuItem>
             </MudMenu>
         </MudTd>
@@ -62,28 +66,36 @@
     public EventCallback<ProjectMetaDto> OnProjectDeleteClicked { get; set; }
 
     [Parameter]
-    public EventCallback<ProjectMetaDto> OnProjectSaveAsReview { get; set; }
+    public EventCallback<ProjectMetaDto> OnProjectSaveAsReviewClicked { get; set; }
 
     [Parameter]
-    public EventCallback<ProjectMetaDto> OnProjectSaveAsReady { get; set; }
+    public EventCallback<ProjectMetaDto> OnProjectSaveAsReadyClicked { get; set; }
+
+    [Parameter]
+    public EventCallback<ProjectMetaDto> OnProjectAbandonClicked { get; set; }
 
     private async Task OnActivateClicked(EventArgs args, ProjectMetaDto projectDto)
     {
         await OnProjectActivateClicked.InvokeAsync(projectDto);
     }
 
-    private async Task OnDeleteClicked(EventArgs args, ProjectMetaDto projectDto) 
+    private async Task OnDeleteClicked(EventArgs args, ProjectMetaDto projectDto)
     {
         await OnProjectDeleteClicked.InvokeAsync(projectDto);
     }
 
     private async Task OnSaveAsReview(EventArgs args, ProjectMetaDto projectDto)
     {
-        await OnProjectSaveAsReview.InvokeAsync(projectDto);
+        await OnProjectSaveAsReviewClicked.InvokeAsync(projectDto);
     }
 
     private async Task OnSaveAsReady(EventArgs args, ProjectMetaDto projectDto)
     {
-        await OnProjectSaveAsReady.InvokeAsync(projectDto);
+        await OnProjectSaveAsReadyClicked.InvokeAsync(projectDto);
+    }
+
+    private async Task OnAbandonClicked(EventArgs args, ProjectMetaDto projectDto)
+    {
+        await OnProjectAbandonClicked.InvokeAsync(projectDto);
     }
 }

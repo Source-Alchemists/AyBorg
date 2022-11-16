@@ -325,12 +325,6 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "No project found to save.");
         }
 
-        if (previousProjectMetaRecord.VersionName.Equals(newVersionName, StringComparison.InvariantCulture))
-        {
-            _logger.LogWarning("Version name [{versionName}] is already used.", newVersionName);
-            return new ProjectManagementResult(false, "Version name is already used.");
-        }
-
         // Moving from draft to review state.
         if (previousProjectMetaRecord.State == ProjectState.Draft)
         {

@@ -15,7 +15,7 @@ public partial class CreateReviewProjectDialog : ComponentBase
     protected override void OnInitialized()
     {
         base.OnInitialized();
-        _tmpProject = Project with { };
+        _tmpProject = Project with {  Comment = string.Empty };
     }
 
     private void OnCloseClicked()

@@ -10,7 +10,7 @@
         <MudCard>
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Medium" Color="Color.Warning" />
+                    <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Large" Color="Color.Secondary" />
                 </CardHeaderAvatar>
                 <CardHeaderContent>
 				    <MudText Typo="Typo.h6">Draft</MudText>
@@ -20,11 +20,11 @@
                 </CardHeaderActions>
 			</MudCardHeader>
             <MudCardContent>
-                <ProjectsTable 
-                    Projects="@_draftProjects" 
-                    OnProjectActivateClicked="@OnActivateProjectClicked" 
+                <ProjectsTable
+                    Projects="@_draftProjects"
+                    OnProjectActivateClicked="@OnActivateProjectClicked"
                     OnProjectDeleteClicked="@OnProjectDeleteClicked"
-                    OnProjectSaveAsReview="@OnSaveAsReviewClicked" />
+                    OnProjectSaveAsReviewClicked="@OnSaveAsReviewClicked" />
             </MudCardContent>
         </MudCard>
     </MudItem>
@@ -34,18 +34,19 @@
             <MudCard>
                 <MudCardHeader>
                     <CardHeaderAvatar>
-                        <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Medium" Color="Color.Info" />
+                        <MudIcon Icon="@Icons.Filled.SafetyCheck" Size="Size.Large" Color="Color.Warning" />
                     </CardHeaderAvatar>
                     <CardHeaderContent>
                         <MudText Typo="Typo.h6">Review</MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
-                    <ProjectsTable 
-                        Projects="@_reviewProjects" 
-                        OnProjectActivateClicked="@OnActivateProjectClicked" 
+                    <ProjectsTable
+                        Projects="@_reviewProjects"
+                        OnProjectActivateClicked="@OnActivateProjectClicked"
                         OnProjectDeleteClicked="@OnProjectDeleteClicked"
-                        OnProjectSaveAsReady="@OnSaveAsReadyClicked" />
+                        OnProjectSaveAsReadyClicked="@OnSaveAsReadyClicked"
+                        OnProjectAbandonClicked="@OnAbandonReviewClicked" />
                 </MudCardContent>
             </MudCard>
         </MudItem>
@@ -56,16 +57,16 @@
             <MudCard>
                 <MudCardHeader>
                     <CardHeaderAvatar>
-                        <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Medium" Color="Color.Info" />
+                        <MudIcon Icon="@Icons.Filled.GppGood" Size="Size.Large" Color="Color.Tertiary" />
                     </CardHeaderAvatar>
                     <CardHeaderContent>
                         <MudText Typo="Typo.h6">Ready</MudText>
                     </CardHeaderContent>
                 </MudCardHeader>
                 <MudCardContent>
-                    <ProjectsTable 
-                        Projects="@_readyProjects" 
-                        OnProjectActivateClicked="@OnActivateProjectClicked" 
+                    <ProjectsTable
+                        Projects="@_readyProjects"
+                        OnProjectActivateClicked="@OnActivateProjectClicked"
                         OnProjectDeleteClicked="@OnProjectDeleteClicked" />
                 </MudCardContent>
             </MudCard>

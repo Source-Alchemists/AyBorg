@@ -25,6 +25,7 @@ public partial class Projects : ComponentBase
     [Inject] IProjectManagementService ProjectManagementService { get; set; } = null!;
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] IStateService StateService { get; set; } = null!;
+    [Inject] ISnackbar Snackbar { get; set; } = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -97,6 +98,37 @@ public partial class Projects : ComponentBase
             if (await ProjectManagementService.TrySaveNewVersionAsync(_baseUrl, projectDto.DbId, stateChange))
             {
                 await ReceiveProjectsAsync();
+            }
+            else
+            {
+                Snackbar.Add("Failed to save new version", Severity.Error);
+            }
+        }
+    }
+
+    private async void OnAbandonReviewClicked(ProjectMetaDto projectDto)
+    {
+        var options = new DialogOptions();
+        var parameters = new DialogParameters
+        {
+            { "ContentText", $"Are you sure you want to abandon review for project '{projectDto.Name}'?" }
+        };
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Abandon review", parameters, options);
+        DialogResult result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            if (await ProjectManagementService.TrySaveNewVersionAsync(_baseUrl, projectDto.DbId, new ProjectStateChangeDto
+            {
+                State = ProjectState.Draft,
+                VersionName = projectDto.VersionName,
+                Comment = "Abandoned review"
+            }))
+            {
+                await ReceiveProjectsAsync();
+            }
+            else
+            {
+                Snackbar.Add("Failed to abandon review", Severity.Error);
             }
         }
     }
