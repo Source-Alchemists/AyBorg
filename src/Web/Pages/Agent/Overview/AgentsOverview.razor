@@ -1,6 +1,6 @@
 @page "/agents/overview"
 @using SDK.Authorization
-@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, , {Roles.Reviewer}")]
 
 <PageTitle>AyBorg - Agents</PageTitle>
 

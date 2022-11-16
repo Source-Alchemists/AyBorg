@@ -192,47 +192,6 @@ internal sealed class ProjectManagementService : IProjectManagementService
         return new ProjectManagementResult(true, null, orgMetaRecord.DbId);
     }
 
-    // /// <summary>
-    // /// Change project state asynchronous.
-    // /// </summary>
-    // /// <param name="projectId">The project identifier.</param>
-    // /// <param name="state">The state.</param>
-    // /// <returns></returns>
-    // public async ValueTask<ProjectManagementResult> TryChangeStateAsync(Guid projectId, ProjectState state)
-    // {
-    //     using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
-    //     ProjectMetaRecord? orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectId);
-    //     if (orgMetaRecord == null)
-    //     {
-    //         _logger.LogWarning($"No project for state change found.");
-    //         return new ProjectManagementResult(false, "No project for state change found.");
-    //     }
-
-    //     if (orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
-    //     {
-    //         _logger.LogWarning("Project [{orgMetaRecord.Name}] is not owned by this service.", orgMetaRecord.Name);
-    //         return new ProjectManagementResult(false, "Project is not owned by this service.");
-    //     }
-
-    //     if (orgMetaRecord.State == state)
-    //     {
-    //         _logger.LogWarning("Project is already in state [{state}].", state);
-    //         return new ProjectManagementResult(false, "Project is already in state.");
-    //     }
-
-    //     if (orgMetaRecord.State == ProjectState.Ready)
-    //     {
-    //         _logger.LogWarning("Project is already in state [{state}]. Cannot change state from [{orgMetaRecord.State}] to [{state}].", state, orgMetaRecord.State, state);
-    //         return new ProjectManagementResult(false, "Project is already in state.");
-    //     }
-
-    //     orgMetaRecord.State = state;
-    //     orgMetaRecord.UpdatedDate = DateTime.UtcNow;
-    //     _logger.LogTrace("Project [{orgMetaRecord.DbId}] set state to [{state}].", orgMetaRecord.DbId, state);
-    //     await context.SaveChangesAsync();
-    //     return new ProjectManagementResult(true, null, orgMetaRecord.DbId);
-    // }
-
     /// <summary>
     /// Gets all project metas asynchronous.
     /// </summary>
@@ -315,7 +274,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         return new ProjectManagementResult(true, null, projectRecord.Meta.DbId);
     }
 
-    public async ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, ProjectState projectState, string newVersionName, string comment)
+    public async ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, ProjectState projectState, string newVersionName, string comment, string? approver = null)
     {
         using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
         ProjectMetaRecord? previousProjectMetaRecord = await context.AyBorgProjectMetas!.FirstOrDefaultAsync(p => p.DbId.Equals(projectMetaDbId));
@@ -351,6 +310,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             VersionIteration = previousProjectMetaRecord.VersionIteration + 1,
             Comment = comment,
             UpdatedDate = DateTime.UtcNow,
+            ApprovedBy = approver
         };
 
         ProjectRecord projectRecord = previousProjectRecord with { DbId = Guid.Empty, Meta = projectMetaRecord };

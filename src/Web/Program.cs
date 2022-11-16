@@ -52,6 +52,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole(Roles.Administrator));
     options.AddPolicy("RequireEngineerRole", policy => policy.RequireRole(Roles.Engineer));
     options.AddPolicy("RequireAuditorRole", policy => policy.RequireRole(Roles.Auditor));
+    options.AddPolicy("RequireReviewerRole", policy => policy.RequireRole(Roles.Reviewer));
 });
 
 builder.Services.AddRazorPages();

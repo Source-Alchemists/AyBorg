@@ -10,7 +10,7 @@ namespace AyBorg.Agent.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer })]
+[JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer, Roles.Reviewer })]
 public sealed class ProjectsController : ControllerBase
 {
     private readonly ILogger<ProjectsController> _logger;

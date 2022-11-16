@@ -39,9 +39,13 @@
                     <MudMenuItem Icon="@Icons.Filled.Cancel" IconColor="Color.Secondary" @onclick="(args) => OnAbandonClicked(args, context)">
                             Abandon
                     </MudMenuItem>
-                    <MudMenuItem Icon="@Icons.Filled.GppGood" IconColor="Color.Tertiary" @onclick="(args) => OnSaveAsReady(args, context)">
-                            Approve
-                    </MudMenuItem>
+                    <AuthorizeView Roles="Administrator, Reviewer" Context="other">
+                        <Authorized>
+                            <MudMenuItem Icon="@Icons.Filled.GppGood" IconColor="Color.Tertiary" @onclick="(args) => OnSaveAsReady(args, context)">
+                                    Approve
+                            </MudMenuItem>
+                        </Authorized>
+                    </AuthorizeView>
                 }
                 <MudDivider />
                 <MudMenuItem Icon="@Icons.Filled.DeleteForever" IconColor="Color.Error" @onclick="(args) => OnDeleteClicked(args, context)">

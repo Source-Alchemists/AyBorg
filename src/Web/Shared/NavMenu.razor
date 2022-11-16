@@ -3,7 +3,7 @@
     Dashboard
 </MudNavLink> *@
 
-<AuthorizeView Roles="Administrator, Engineer">
+<AuthorizeView Roles="Administrator, Engineer, Reviewer">
     <Authorized>
         <MudNavGroup Title="Agents" Icon="@Icons.Filled.Workspaces" Expanded="true">
             <MudNavLink Href="agents/overview"  Match="NavLinkMatch.All">

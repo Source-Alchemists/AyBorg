@@ -1,6 +1,6 @@
 @page "/agents/projects/{serviceId}"
 @using SDK.Authorization
-@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 
 <PageTitle>AyBorg - Projects</PageTitle>
 

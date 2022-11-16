@@ -1,5 +1,5 @@
 ﻿@page "/agents/editor/{serviceId}"
-@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 @using AyBorg.Web.Pages.Agent.Shared
 @using SDK.Authorization
 
