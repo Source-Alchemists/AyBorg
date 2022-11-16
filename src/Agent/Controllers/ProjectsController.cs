@@ -2,7 +2,6 @@ using AyBorg.Agent.Services;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Data.DTOs;
 using AyBorg.SDK.Data.Mapper;
-using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.AspNetCore.Mvc;
 

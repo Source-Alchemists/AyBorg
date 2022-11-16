@@ -20,7 +20,7 @@ public sealed class StorageController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async ValueTask<ActionResult<string[]>> GetDirectories(string path)
     {
-        var directories = _storageService.GetDirectories(path);
+        IEnumerable<string> directories = _storageService.GetDirectories(path);
         return await ValueTask.FromResult(Ok(directories));
     }
 }

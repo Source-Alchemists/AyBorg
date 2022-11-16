@@ -32,12 +32,12 @@ public sealed class PluginsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async ValueTask<ActionResult<IEnumerable<StepDto>>> GetStepsAsync()
     {
-        var plugins = _pluginsService.Steps;
+        IEnumerable<SDK.Common.IStepProxy> plugins = _pluginsService.Steps;
         var pluginDtos = new List<StepDto>();
 
-        foreach (var p in plugins)
+        foreach (SDK.Common.IStepProxy p in plugins)
         {
-            var dto = _dtoMapper.Map(p);
+            StepDto dto = _dtoMapper.Map(p);
             pluginDtos.Add(dto);
         }
 

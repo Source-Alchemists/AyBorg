@@ -1,0 +1,18 @@
+<MudDialog>
+    <DialogContent>
+        <MudAlert Severity="Severity.Info">
+            Please confirm the approval with your password.
+        </MudAlert>
+        <MudForm @ref="_form" @bind-Errors="@_errors">
+            <MudTextField T="string" Label="Password" InputType="InputType.Password"  @bind-value="_password" Required="true" />
+        </MudForm>
+        @foreach (var error in _errors)
+        {
+            <MudText Color="Color.Error">@error</MudText>
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="@OnCloseClicked">Close</MudButton>
+        <MudButton Color="Color.Primary" OnClick="@OnValidSubmit" StartIcon="@Icons.Filled.GppGood">Approve</MudButton>
+    </DialogActions>
+</MudDialog>

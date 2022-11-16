@@ -38,9 +38,9 @@ public sealed class FlowController : ControllerBase
     public async IAsyncEnumerable<StepDto> GetStepsAsync()
     {
         await ValueTask.CompletedTask;
-        foreach (var s in _flowService.GetSteps())
+        foreach (SDK.Common.IStepProxy s in _flowService.GetSteps())
         {
-            var dto = _dtoMapper.Map(s);
+            StepDto dto = _dtoMapper.Map(s);
             yield return dto;
         }
     }
@@ -50,13 +50,13 @@ public sealed class FlowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult<StepDto>> AddStepAsync(Guid stepId, int x, int y)
     {
-        var stepProxy = await _flowService.AddStepAsync(stepId, x, y);
+        SDK.Common.IStepProxy stepProxy = await _flowService.AddStepAsync(stepId, x, y);
         if (stepProxy == null)
         {
             return NotFound();
         }
 
-        var result = _dtoMapper.Map(stepProxy);
+        StepDto result = _dtoMapper.Map(stepProxy);
         return Ok(result);
     }
 
@@ -91,9 +91,9 @@ public sealed class FlowController : ControllerBase
     public async IAsyncEnumerable<LinkDto> GetLinksAsync()
     {
         await ValueTask.CompletedTask;
-        foreach (var l in _flowService.GetLinks())
+        foreach (SDK.Common.Ports.PortLink l in _flowService.GetLinks())
         {
-            var dto = _dtoMapper.Map(l);
+            LinkDto dto = _dtoMapper.Map(l);
             yield return dto;
         }
     }
@@ -103,7 +103,7 @@ public sealed class FlowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status409Conflict)]
     public async ValueTask<ActionResult<LinkDto>> LinkPortsAsync(Guid sourcePortId, Guid targetPortId)
     {
-        var result = await _flowService.LinkPortsAsync(sourcePortId, targetPortId);
+        SDK.Common.Ports.PortLink result = await _flowService.LinkPortsAsync(sourcePortId, targetPortId);
         if (result == null)
         {
             return Conflict();
@@ -129,7 +129,7 @@ public sealed class FlowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async ValueTask<ActionResult<PortDto>> GetPortAsync(Guid portId)
     {
-        var port = await _flowService.GetPortAsync(portId);
+        SDK.Common.Ports.IPort port = await _flowService.GetPortAsync(portId);
         if (port == null)
         {
             return NoContent();
@@ -143,7 +143,7 @@ public sealed class FlowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async ValueTask<ActionResult<PortDto>> GetPortFromIterationAsync(Guid portId, Guid iterationId)
     {
-        var port = await _flowService.GetPortAsync(portId);
+        SDK.Common.Ports.IPort port = await _flowService.GetPortAsync(portId);
         if (port == null)
         {
             return NoContent();
@@ -176,13 +176,13 @@ public sealed class FlowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async ValueTask<ActionResult<long>> GetStepExecutionTimeAsync(Guid stepId, Guid iterationId)
     {
-        var step = _flowService.GetSteps().FirstOrDefault(s => s.Id == stepId);
+        SDK.Common.IStepProxy? step = _flowService.GetSteps().FirstOrDefault(s => s.Id == stepId);
         if (step == null)
         {
             return NoContent();
         }
 
-        var entry = _cacheService.GetOrCreateStepExecutionTimeEntry(iterationId, step);
+        long entry = _cacheService.GetOrCreateStepExecutionTimeEntry(iterationId, step);
         return await ValueTask.FromResult(Ok(entry));
     }
 }

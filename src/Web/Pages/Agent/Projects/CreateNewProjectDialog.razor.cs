@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Components;
-using MudBlazor;
 using AyBorg.SDK.Data.DTOs;
 using AyBorg.Web.Services.Agent;
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace AyBorg.Web.Pages.Agent.Projects;
 
@@ -26,13 +26,13 @@ public partial class CreateNewProjectDialog : ComponentBase
     private async void OnValidSubmit()
     {
         var validationResults = new List<ValidationResult>();
-        if(!Validator.TryValidateObject(_newProject, new ValidationContext(_newProject), validationResults, true))
+        if (!Validator.TryValidateObject(_newProject, new ValidationContext(_newProject), validationResults, true))
         {
             validationResults.ForEach(r => _errors.Add(r.ErrorMessage!));
             return;
         }
 
-        var createdProject = await ProjectManagementService.CreateAsync(BaseUrl, _newProject.Name);
+        ProjectMetaDto createdProject = await ProjectManagementService.CreateAsync(BaseUrl, _newProject.Name);
         if (createdProject != null)
         {
             MudDialog.Close(DialogResult.Ok(createdProject));

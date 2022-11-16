@@ -44,7 +44,7 @@ public partial class EditAccountDialog : ComponentBase
         await _form.Validate();
         if (!_errors.Any())
         {
-            var user = await UserManager.FindByIdAsync(User.Id);
+            IdentityUser? user = await UserManager.FindByIdAsync(User.Id);
             if(user == null)
             {
                 Logger.LogWarning("User not found");
@@ -52,18 +52,18 @@ public partial class EditAccountDialog : ComponentBase
             }
 
             user.Email = _userEmail;
-            var result = await UserManager.UpdateAsync(user);
+            IdentityResult result = await UserManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
                 _errors = result.Errors.Select(e => e.Description).ToArray();
                 return;
             }
 
-            foreach (var role in _roles)
+            foreach (Role role in _roles)
             {
                 if (role.Checked && !await UserManager.IsInRoleAsync(user, role.IdentityRole.Name!))
                 {
-                    var roleResult = await UserManager.AddToRoleAsync(user, role.IdentityRole.Name!);
+                    IdentityResult roleResult = await UserManager.AddToRoleAsync(user, role.IdentityRole.Name!);
                     if (!roleResult.Succeeded)
                     {
                         _errors = roleResult.Errors.Select(e => e.Description).ToArray();
@@ -72,7 +72,7 @@ public partial class EditAccountDialog : ComponentBase
                 }
                 else if (!role.Checked && await UserManager.IsInRoleAsync(user, role.IdentityRole.Name!))
                 {
-                    var roleResult = await UserManager.RemoveFromRoleAsync(user, role.IdentityRole.Name!);
+                    IdentityResult roleResult = await UserManager.RemoveFromRoleAsync(user, role.IdentityRole.Name!);
                     if (!roleResult.Succeeded)
                     {
                         _errors = roleResult.Errors.Select(e => e.Description).ToArray();
@@ -82,7 +82,7 @@ public partial class EditAccountDialog : ComponentBase
 
                 _success = true;
             }
-            
+
             MudDialog.Close(DialogResult.Ok(true));
         }
     }

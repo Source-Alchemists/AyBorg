@@ -149,6 +149,17 @@ public partial class Projects : ComponentBase
         //         await ReceiveProjectsAsync();
         //     }
         // }
+
+        DialogParameters parameters = new()
+        {
+            { "Project", projectDto }
+        };
+        IDialogReference dialog = DialogService.Show<ConfirmProjectApproveDialog>($"Approve project {projectDto.Name}", parameters, new DialogOptions());
+        DialogResult result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            await ReceiveProjectsAsync();
+        }
     }
 
     private async Task OnNewProjectClicked()

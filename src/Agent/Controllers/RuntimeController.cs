@@ -26,7 +26,7 @@ public sealed class RuntimeController : ControllerBase
     [AllowAnonymous]
     public async ValueTask<ActionResult<EngineMeta>> GetStatusAsync()
     {
-        var status = await _engineHost.GetEngineStatusAsync();
+        EngineMeta status = await _engineHost.GetEngineStatusAsync();
         if (status == null)
         {
             _logger.LogWarning("No engine status found.");
@@ -41,7 +41,7 @@ public sealed class RuntimeController : ControllerBase
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     public async ValueTask<ActionResult<EngineMeta>> StartRunAsync(EngineExecutionType executionType)
     {
-        var status = await _engineHost.StartRunAsync(executionType);
+        EngineMeta status = await _engineHost.StartRunAsync(executionType);
         if (status != null)
         {
             return Ok(status);
@@ -56,7 +56,7 @@ public sealed class RuntimeController : ControllerBase
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     public async ValueTask<ActionResult<EngineMeta>> StopRunAsync()
     {
-        var status = await _engineHost.StopRunAsync();
+        EngineMeta status = await _engineHost.StopRunAsync();
         if (status != null)
         {
             return Ok(status);
@@ -71,7 +71,7 @@ public sealed class RuntimeController : ControllerBase
     [ProducesResponseType(StatusCodes.Status304NotModified)]
     public async ValueTask<ActionResult<EngineMeta>> AbortRunAsync()
     {
-        var status = await _engineHost.AbortRunAsync();
+        EngineMeta status = await _engineHost.AbortRunAsync();
         if (status != null)
         {
             return Ok(status);
