@@ -4,11 +4,11 @@ First off, thank you for considering contributing to AyBorg. We want to keep it 
 
 ### Where do I go from here?
 
-If you've noticed a bug or have a feature request, [make one][new issue]! It's generally best if you get confirmation of your bug or approval for your feature request this way before starting to code.
+If you've noticed a bug or have a feature request, [make one](https://github.com/Source-Alchemists/AyBorg/issues/new)! It's generally best if you get confirmation of your bug or approval for your feature request this way before starting to code.
 
 ### Fork & create a branch
 
-If this is something you think you can fix, then [fork AyBorg] and create a branch with a descriptive name.
+If this is something you think you can fix, then [fork AyBorg](https://github.com/Source-Alchemists/AyBorg/fork) and create a branch with a descriptive name.
 
 A good branch name would be (where issue #777 is the ticket you're working on):
 
@@ -18,7 +18,7 @@ git checkout -b 777-fix-ean-encoding
 
 ### Get the style right
 
-We provding a [`.editorconfig`][editorconfig] file to help you with the style of the project. Most editors support EditorConfig, but you may need to [install a plugin][editorconfig plugins].
+We provding a [`.editorconfig`](https://editorconfig.org/) file to help you with the style of the project. Most editors support EditorConfig, but you may need to install a plugin.
 
 ### Make a Pull Request
 
@@ -38,7 +38,7 @@ git rebase main
 git push --set-upstream origin 777-fix-ean-encoding
 ```
 
-Finally, go to the [AyBorg repo] and [make a Pull Request][new pull request].
+Finally, go to the [AyBorg repo] and make a Pull Request.
 
 ### Keep your Pull Request updated
 
