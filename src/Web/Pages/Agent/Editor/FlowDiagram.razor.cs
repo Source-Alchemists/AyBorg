@@ -73,12 +73,12 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
             _suspendDiagramRefresh = false;
 
             await ConnectHubEventsAsync();
+            double zoom = await StateService.AutomationFlowState.UpdateZoomAsync();
+            _diagram.SetZoom(zoom);
+            (double offsetX, double offsetY) = await StateService.AutomationFlowState.UpdateOffsetAsync();
+            _diagram.SetPan(offsetX, offsetY);
             await CreateFlow();
             _diagram.Refresh();
-            var zoom = await StateService.AutomationFlowState.UpdateZoomAsync();
-            _diagram.SetZoom(zoom);
-            var pan = await StateService.AutomationFlowState.UpdateOffsetAsync();
-            _diagram.SetPan(pan.offsetX, pan.offsetY);
         }
     }
 
@@ -112,20 +112,20 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
             Logger.LogTrace("LinkChanged event received from server. Link: {link}, Removed: {removed}", linkDto, removed);
             if (removed)
             {
-                var linkModel = FindLinkModel(linkDto);
+                BaseLinkModel linkModel = FindLinkModel(linkDto);
                 if (linkModel != null)
                 {
                     _diagram.Links.Remove(linkModel);
                 }
 
-                var tn = _diagram.Nodes.Cast<FlowNode>().FirstOrDefault(n => n.Step.Ports?.Any(p => p.Id == linkDto.TargetId) != false);
+                FlowNode? tn = _diagram.Nodes.Cast<FlowNode>().FirstOrDefault(n => n.Step.Ports?.Any(p => p.Id == linkDto.TargetId) != false);
                 if (tn == null) return;
-                var tp = tn.Ports.Cast<FlowPort>().First(p => p.Port.Id.Equals(linkDto.TargetId));
+                FlowPort tp = tn.Ports.Cast<FlowPort>().First(p => p.Port.Id.Equals(linkDto.TargetId));
                 await tp.UpdateAsync();
             }
             else
             {
-                var link = FindLinkModel(linkDto);
+                BaseLinkModel link = FindLinkModel(linkDto);
 
                 if (link != null)
                 {
@@ -144,7 +144,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
     private BaseLinkModel FindLinkModel(LinkDto linkDto)
     {
-        foreach (var li in _diagram.Links)
+        foreach (BaseLinkModel li in _diagram.Links)
         {
             if (li.SourcePort is FlowPort sp && sp.Port.Id.Equals(linkDto.SourceId) && li.TargetPort is FlowPort tp && tp.Port.Id.Equals(linkDto.TargetId))
             {
@@ -167,16 +167,16 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     {
         try
         {
-            var steps = await FlowService.GetStepsAsync(StateService.AgentState.BaseUrl);
+            IEnumerable<StepDto> steps = await FlowService.GetStepsAsync(StateService.AgentState.BaseUrl);
             // First create all nodes
-            foreach (var step in steps)
+            foreach (StepDto step in steps)
             {
                 _diagram.Nodes.Add(CreateNode(step));
             }
             // Next create all links
-            var links = await FlowService.GetLinksAsync(StateService.AgentState.BaseUrl);
+            IEnumerable<LinkDto> links = await FlowService.GetLinksAsync(StateService.AgentState.BaseUrl);
             var linkHashes = new HashSet<LinkDto>();
-            foreach (var link in links)
+            foreach (LinkDto link in links)
             {
                 if (linkHashes.Contains(link))
                 {
@@ -195,14 +195,14 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
     private LinkModel CreateLinkModel(LinkDto link)
     {
-        var targetNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.TargetId) != false);
-        var sourceNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.SourceId) != false);
+        NodeModel? targetNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.TargetId) != false);
+        NodeModel? sourceNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.SourceId) != false);
         if (targetNode == null || sourceNode == null)
         {
             throw new Exception("Could not find source or target node");
         }
-        var targetPort = targetNode.Ports.FirstOrDefault(p => ((FlowPort)p).Port.Id == link.TargetId);
-        var sourcePort = sourceNode.Ports.FirstOrDefault(p => ((FlowPort)p).Port.Id == link.SourceId);
+        PortModel? targetPort = targetNode.Ports.FirstOrDefault(p => ((FlowPort)p).Port.Id == link.TargetId);
+        PortModel? sourcePort = sourceNode.Ports.FirstOrDefault(p => ((FlowPort)p).Port.Id == link.SourceId);
         if (targetPort == null || sourcePort == null)
         {
             throw new Exception("Could not find source or target port");
@@ -242,7 +242,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
             return;
         }
 
-        var result = await FlowService.TryAddLinkAsync(StateService.AgentState.BaseUrl, sourcePort.Port.Id, targetPort.Port.Id);
+        bool result = await FlowService.TryAddLinkAsync(StateService.AgentState.BaseUrl, sourcePort.Port.Id, targetPort.Port.Id);
         if (!result)
         {
             Logger.LogWarning("Failed to add link from {Id} to {Id}", sourcePort.Port.Id, targetPort.Port.Id);
@@ -261,13 +261,13 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     private async Task OnDrop(DragEventArgs args)
     {
         if (_diagram == null) return;
-        var step = DragDropStateHandler.DraggedStep;
+        StepDto? step = DragDropStateHandler.DraggedStep;
         if (step == null) return;
-        var relativePosition = _diagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
+        Blazor.Diagrams.Core.Geometry.Point relativePosition = _diagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
         step.X = (int)relativePosition.X;
         step.Y = (int)relativePosition.Y;
 
-        var receivedStep = await FlowService.AddStepAsync(StateService.AgentState.BaseUrl, step.Id, step.X, step.Y);
+        StepDto receivedStep = await FlowService.AddStepAsync(StateService.AgentState.BaseUrl, step.Id, step.X, step.Y);
         if (receivedStep != null)
         {
             _diagram.Nodes.Add(CreateNode(receivedStep));
@@ -283,10 +283,10 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     {
         if (_suspendDiagramRefresh) return;
         if (link.TargetPort == null || link.SourcePort == null) return; // Nothing to do.
-        var links = await FlowService.GetLinksAsync(StateService.AgentState.BaseUrl);
+        IEnumerable<LinkDto> links = await FlowService.GetLinksAsync(StateService.AgentState.BaseUrl);
         var sp = (FlowPort)link.SourcePort;
         var tp = (FlowPort)link.TargetPort;
-        var orgLink = links.FirstOrDefault(l => l.SourceId == sp.Port.Id && l.TargetId == tp.Port.Id);
+        LinkDto? orgLink = links.FirstOrDefault(l => l.SourceId == sp.Port.Id && l.TargetId == tp.Port.Id);
         if (orgLink == null) return; // Nothing to do. Already removed.
         if (!await FlowService.TryRemoveLinkAsync(StateService.AgentState.BaseUrl, orgLink.Id))
         {
@@ -321,7 +321,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     private async void ShouldDeleteNodeAsync()
     {
         var selectedNodes = _diagram.Nodes.Where(n => n.Selected).ToList();
-        foreach (var node in selectedNodes)
+        foreach (NodeModel? node in selectedNodes)
         {
             await ShowDeleteConfirmDialogAsync(node.Title);
             OnNodeRemoved(node);
@@ -336,8 +336,8 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         {
             { "ContentText", $"Are you sure you want to delete '{targetName}'?" }
         };
-        var dialog = DialogService.Show<ConfirmDialog>("Confirm deletion", dialogParameters, new DialogOptions());
-        var result = await dialog.Result;
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Confirm deletion", dialogParameters, new DialogOptions());
+        DialogResult result = await dialog.Result;
         return !result.Cancelled;
     }
 
