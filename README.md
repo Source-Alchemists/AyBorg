@@ -62,7 +62,6 @@ The default appsettings give you a good starting point and will also work locall
 
 > :warning: **The default password should be changed immediately!**
 
-
 ## Want to contribute?
 
 We are happy to accept contributions from the community. Please read our [contributing guidelines](CONTRIBUTING.md) for more information.
