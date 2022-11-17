@@ -330,7 +330,12 @@ internal sealed class ProjectManagementService : IProjectManagementService
         projectRecord.Links.Clear();
         foreach(StepRecord s in previousProjectRecord.Steps)
         {
-            StepRecord ns = s with { DbId = Guid.Empty, ProjectRecord = projectRecord, ProjectRecordId = projectRecord.DbId };
+            StepRecord ns = s with { DbId = Guid.Empty, ProjectRecord = projectRecord, ProjectRecordId = projectRecord.DbId, Ports = new() };
+            foreach(PortRecord p in s.Ports)
+            {
+                PortRecord np = p with { DbId = Guid.Empty, StepRecord = ns, StepRecordId = Guid.Empty };
+                ns.Ports.Add(np);
+            }
             projectRecord.Steps.Add(ns);
         }
 
