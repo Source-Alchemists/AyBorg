@@ -38,7 +38,7 @@ git rebase main
 git push --set-upstream origin 777-fix-ean-encoding
 ```
 
-Finally, go to the [AyBorg repo] and make a Pull Request.
+Finally, go to the [AyBorg repo](https://github.com/Source-Alchemists/AyBorg) and make a Pull Request.
 
 ### Keep your Pull Request updated
 
