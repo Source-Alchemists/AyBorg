@@ -1,8 +1,8 @@
-using Autodroid.SDK.ImageProcessing;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Common;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.ImageProcessing;
 
-namespace Autodroid.Plugins.Base;
+namespace AyBorg.Plugins.Base;
 
 public sealed class ImageMirror : IStepBody, IDisposable
 {
@@ -27,15 +27,15 @@ public sealed class ImageMirror : IStepBody, IDisposable
         };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _outputImage.Value?.Dispose();
-        
+
         if (_mirrorHorizontal.Value == false && _mirrorVertical.Value == false)
         {
             // No mirror, just copy the input to the output
             _outputImage.Value = new Image(_inputImage.Value);
-            return Task.FromResult(true);
+            return ValueTask.FromResult(true);
         }
 
         var mirrorMode = MirrorMode.Horizontal;
@@ -50,7 +50,7 @@ public sealed class ImageMirror : IStepBody, IDisposable
 
         _outputImage.Value = new Image(_inputImage.Value.Mirror(mirrorMode));
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     public void Dispose()

@@ -1,9 +1,8 @@
 using System.Text;
 using System.Text.Json;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.Projects;
+using AyBorg.SDK.Data.DTOs;
 
-namespace Autodroid.Web.Services.Agent;
+namespace AyBorg.Web.Services.Agent;
 
 public class ProjectManagementService : IProjectManagementService
 {
@@ -17,8 +16,8 @@ public class ProjectManagementService : IProjectManagementService
     /// <param name="logger">The logger.</param>
     /// <param name="httpClient">The HTTP client.</param>
     /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
-    public ProjectManagementService(ILogger<ProjectManagementService> logger, 
-                                    HttpClient httpClient, 
+    public ProjectManagementService(ILogger<ProjectManagementService> logger,
+                                    HttpClient httpClient,
                                     IAuthorizationHeaderUtilService authorizationHeaderUtilService)
     {
         _logger = logger;
@@ -35,8 +34,8 @@ public class ProjectManagementService : IProjectManagementService
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/projects");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        var result = await response.Content.ReadFromJsonAsync<IEnumerable<ProjectMetaDto>>();
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        IEnumerable<ProjectMetaDto>? result = await response.Content.ReadFromJsonAsync<IEnumerable<ProjectMetaDto>>();
         if (result != null)
         {
             return result;
@@ -56,8 +55,8 @@ public class ProjectManagementService : IProjectManagementService
         {
             var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/projects/active");
             request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-            var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-            var result = await response.Content.ReadFromJsonAsync<ProjectMetaDto>();
+            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+            ProjectMetaDto? result = await response.Content.ReadFromJsonAsync<ProjectMetaDto>();
             return result!;
         }
         catch (Exception ex)
@@ -78,7 +77,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/projects?name={projectName}");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
 
         if (!response.IsSuccessStatusCode)
         {
@@ -86,11 +85,11 @@ public class ProjectManagementService : IProjectManagementService
             return null!;
         }
 
-        using var stream = response.Content.ReadAsStream();
+        using Stream stream = response.Content.ReadAsStream();
         var streamReader = new StreamReader(stream, Encoding.UTF8);
-        var postJson = await streamReader.ReadToEndAsync();
+        string postJson = await streamReader.ReadToEndAsync();
 
-        var projectMetaDto = JsonSerializer.Deserialize<ProjectMetaDto>(postJson);
+        ProjectMetaDto? projectMetaDto = JsonSerializer.Deserialize<ProjectMetaDto>(postJson);
         if (projectMetaDto == null) throw new JsonException();
         return projectMetaDto;
     }
@@ -105,7 +104,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         var request = new HttpRequestMessage(HttpMethod.Delete, $"{baseUrl}/projects?id={projectMeta.Id}");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogWarning("Could not delete project '{projectMeta.Name}' [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
@@ -123,9 +122,9 @@ public class ProjectManagementService : IProjectManagementService
     /// <returns></returns>
     public async Task<bool> TryActivateAsync(string baseUrl, ProjectMetaDto projectMeta)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.Id}/active/true");
+        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.DbId}/active/true");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogWarning("Could not set project '{projectMeta.Name}' to active [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
@@ -139,16 +138,44 @@ public class ProjectManagementService : IProjectManagementService
     /// Save project as ready asynchronous.
     /// </summary>
     /// <param name="baseUrl">The base URL.</param>
-    /// <param name="projectMeta">The project meta info.</param>
+    /// <param name="dbId">The database identifier.</param>
+    /// <param name="projectStateChange">State of the project.</param>
     /// <returns></returns>
-    public async Task<bool> TrySaveAsReadyAsync(string baseUrl, ProjectMetaDto projectMeta)
+    public async Task<bool> TrySaveNewVersionAsync(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.Id}/state/{ProjectState.Ready}");
+        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{dbId}/state")
+        {
+            Content = new StringContent(JsonSerializer.Serialize(projectStateChange), Encoding.UTF8, "application/json")
+        };
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (!response.IsSuccessStatusCode)
         {
-            _logger.LogWarning("Could not set project '{projectMeta.Name}' to ready [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
+            _logger.LogWarning("Could not save project '{dbId}' as new version [Code: {response.StatusCode}]!", dbId, response.StatusCode);
+            return false;
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// Sets the project to ready state.
+    /// </summary>
+    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="dbId">The database identifier.</param>
+    /// <param name="projectStateChange">State of the project.</param>
+    /// <returns></returns>
+    public async Task<bool> TryApproveAsnyc(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{dbId}/approve")
+        {
+            Content = new StringContent(JsonSerializer.Serialize(projectStateChange), Encoding.UTF8, "application/json")
+        };
+        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("Could not approve project '{dbId}' [Code: {response.StatusCode}]!", dbId, response.StatusCode);
             return false;
         }
 
@@ -164,7 +191,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.Id}");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (!response.IsSuccessStatusCode)
         {
             _logger.LogWarning("Could not save project '{projectMeta.Name}' [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);

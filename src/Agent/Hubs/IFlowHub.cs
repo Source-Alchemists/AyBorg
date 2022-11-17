@@ -1,6 +1,6 @@
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Agent.Hubs;
+namespace AyBorg.Agent.Hubs;
 
 public interface  IFlowHub
 {
@@ -9,5 +9,5 @@ public interface  IFlowHub
      /// </summary>
      /// <param name="link">The link.</param>
      /// <param name="remove">if set to <c>true</c> [remove].</param>
-     Task SendLinkChangedAsync(PortLink link, bool remove = false);
+     ValueTask SendLinkChangedAsync(PortLink link, bool remove = false);
 }

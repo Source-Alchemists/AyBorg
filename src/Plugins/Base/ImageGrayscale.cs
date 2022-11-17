@@ -1,8 +1,8 @@
-using Autodroid.SDK.ImageProcessing;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Common;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.ImageProcessing;
 
-namespace Autodroid.Plugins.Base;
+namespace AyBorg.Plugins.Base;
 
 public sealed class ImageGrayscale : IStepBody, IDisposable
 {
@@ -23,11 +23,11 @@ public sealed class ImageGrayscale : IStepBody, IDisposable
         };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _grayscaleImagePort.Value?.Dispose();
         _grayscaleImagePort.Value = _imagePort.Value.ToGrayscale();
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     public void Dispose()

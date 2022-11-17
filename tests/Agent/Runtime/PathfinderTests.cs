@@ -1,8 +1,8 @@
-using Autodroid.Agent.Runtime;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.Agent.Runtime;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Agent.Tests.Runtime;
+namespace AyBorg.Agent.Tests.Runtime;
 
 #nullable disable
 
@@ -196,10 +196,7 @@ public class PathfinderTests
         {
             var stepMock = MockHelper.CreateStepProxyMock($"Step {index}", numberOfInputPorts, numberOfOutputPorts);
             var step = stepMock.Object;
-            if (startStep == null)
-            {
-                startStep = step;
-            }
+            startStep ??= step;
 
             endStep = step;
 

@@ -1,7 +1,7 @@
 using System.Text.Json.Serialization;
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.SDK.Data.DTOs;
 
-namespace Autodroid.Web.Shared.Models;
+namespace AyBorg.Web.Shared.Models;
 
 public record UiAgentState
 {
@@ -17,7 +17,7 @@ public record UiAgentState
     {
     }
 
-    public UiAgentState(ServiceRegistryEntryDto entry)
+    public UiAgentState(RegistryEntryDto entry)
     {
         Name = entry.Name;
         UniqueName = entry.UniqueName;

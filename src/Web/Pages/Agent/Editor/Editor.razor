@@ -1,88 +1,64 @@
 ﻿@page "/agents/editor/{serviceId}"
-@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
-@using Autodroid.Web.Pages.Agent.Shared
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
+@using AyBorg.Web.Pages.Agent.Shared
 @using SDK.Authorization
 
-<PageTitle>Autodroid - Editor</PageTitle>
+<PageTitle>AyBorg - Editor</PageTitle>
 
-<MudGrid hidden="@(_projectMeta?.IsActive != false)">	
+<MudGrid hidden="@(_projectMeta?.IsActive != false)">
 	<MudItem xs="12">
 		<MudCard>
 			<MudCardHeader>
-					<CardHeaderAvatar>
-						<MudIcon Icon="@Icons.Filled.Info" Size="Size.Large" />
-					</CardHeaderAvatar>
-					<CardHeaderContent>
-						<MudText Typo="Typo.h6">No active project!</MudText>
-					</CardHeaderContent>
-				</MudCardHeader>
+				<CardHeaderAvatar>
+					<MudIcon Icon="@Icons.Filled.Info" Size="Size.Large" />
+				</CardHeaderAvatar>
+				<CardHeaderContent>
+					<MudText Typo="Typo.h6">No active project!</MudText>
+				</CardHeaderContent>
+			</MudCardHeader>
 			<MudCardContent>
 				<MudText Typo="Typo.body2">Please create a new project or activate an existing one.</MudText>
 			</MudCardContent>
 		</MudCard>
 	</MudItem>
 </MudGrid>
-<Autodroid.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
-@if(_projectMeta?.IsActive != false)
+<AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
+@if (_projectMeta?.IsActive != false)
 {
-<MudToolBar Class="px-0" hidden="@(_projectMeta == null)">
+	<MudToolBar Class="px-0" hidden="@(_projectMeta == null)">
 	<MudText Typo="Typo.h5">@_projectMeta?.Name</MudText>
 	<MudSpacer />
-	@if(!_areSubComponentsHidden)
-	{
-		<RuntimeToolbar ServiceUniqueName="@_serviceUniqueName" BaseUrl="@_baseUrl" />
-	}
-	<MudSpacer />
-	<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@OnProjectSaveClicked" Style="width: 200px">
-		@if (_isProjectSaving)
-        {
-            <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true"/>
-        }
-		else
+	@if (!_areSubComponentsHidden)
 		{
-			<MudIcon Icon="@Icons.Filled.SaveAlt" />
-			<MudText Class="pl-2">Save as draft</MudText>
+			<RuntimeToolbar ServiceUniqueName="@_serviceUniqueName" BaseUrl="@_baseUrl" />
 		}
-	</MudButton>
-</MudToolBar>
-<MudGrid Class="editor-container" hidden="@(_projectMeta == null)">	
-	<MudHidden Breakpoint="Breakpoint.Sm" Invert="false">
-		<MudItem md="5" lg="4" xl="2">
-			<MudCard Style="height: 100%">
-				<MudCardHeader>
-					<CardHeaderAvatar>
-						<MudIcon Icon="@Icons.Filled.Apps" />
-					</CardHeaderAvatar>
-					<CardHeaderContent>
-						<MudText Typo="Typo.h6">Steps</MudText>
-					</CardHeaderContent>
-				</MudCardHeader>
-				<MudCardContent class="pt-0 mt-0">
-					@if(!_areSubComponentsHidden)
-					{
-						<StepsSelection ServiceId="@ServiceId" />			
-					}
-				</MudCardContent>
-			</MudCard>
-		</MudItem>
-	</MudHidden>
-	<MudItem xs="12" md="7" lg="8" xl="10" class="mud-width-full">
-		<MudCard class="mud-height-full mud-width-full">
-			<MudCardHeader>
-				<CardHeaderAvatar>
-					<MudIcon Icon="@Icons.Filled.Hub" />
-				</CardHeaderAvatar>
-				<CardHeaderContent>
-					<MudText Typo="Typo.h6">Automation</MudText>
-				</CardHeaderContent>
-			</MudCardHeader>
-			<MudCardContent Style="height: calc(100% - 60px)" class="pt-0 mt-0">
-				@if(!_areSubComponentsHidden)
+		<MudSpacer />
+		<MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@OnProjectSaveClicked" Style="width: 200px">
+			@if (_isProjectSaving)
+			{
+				<MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
+			}
+			else
+			{
+				<MudIcon Icon="@Icons.Filled.SaveAlt" />
+				<MudText Class="pl-2">Save as draft</MudText>
+			}
+		</MudButton>
+	</MudToolBar>
+	<MudGrid Class="editor-container" hidden="@(_projectMeta == null)">
+		<MudHidden Breakpoint="Breakpoint.Sm" Invert="false">
+			<MudItem md="5" lg="3" xl="2">
+				@if (!_areSubComponentsHidden)
 				{
-					<FlowDiagram />
+					<StepsSelection ServiceId="@ServiceId" />
 				}
-			</MudCardContent>
-		</MudCard>
-	</MudItem>
-</MudGrid>
+			</MudItem>
+		</MudHidden>
+		<MudItem xs="12" md="7" lg="9" xl="10" class="mud-width-full">
+			@if (!_areSubComponentsHidden)
+			{
+				<FlowDiagram />
+			}
+		</MudItem>
+	</MudGrid>
 }

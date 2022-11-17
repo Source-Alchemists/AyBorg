@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.JSInterop;
 using MudBlazor;
 
-namespace Autodroid.Web.Pages.Admin.Shared.Modals;
+namespace AyBorg.Web.Pages.Admin.Shared.Modals;
 
 public partial class CreateAccountDialog : ComponentBase
 {
@@ -50,7 +50,7 @@ public partial class CreateAccountDialog : ComponentBase
             {
                 foreach(var role in _roles.Where(r => r.Checked))
                 {
-                    var roleResult = await UserManager.AddToRoleAsync(user, role.IdentityRole.Name);
+                    var roleResult = await UserManager.AddToRoleAsync(user, role.IdentityRole.Name!);
                     if(!roleResult.Succeeded)
                     {
                         _serviceErrors = roleResult.Errors.Select(e => e.Description).ToArray();

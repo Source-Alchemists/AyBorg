@@ -2,9 +2,9 @@
 @attribute [Authorize(Roles = Roles.Administrator)]
 @using SDK.Authorization
 @using SDK.Data.DTOs
-@inject Autodroid.Web.Services.IRegistryService registryService
+@inject AyBorg.Web.Services.IRegistryService registryService
 
-<PageTitle>Autodroid - Admin/Services</PageTitle>
+<PageTitle>AyBorg - Admin/Services</PageTitle>
 
 @if (serviceEntries == null)
 {
@@ -50,7 +50,7 @@ else
 }
 
 @code  {
-        private IEnumerable<ServiceRegistryEntryDto>? serviceEntries;
+        private IEnumerable<RegistryEntryDto>? serviceEntries;
         private bool isRefreshing = false;
 
         protected override async Task OnInitializedAsync()

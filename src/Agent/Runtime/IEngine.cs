@@ -1,6 +1,6 @@
-using Autodroid.SDK.System.Runtime;
+using AyBorg.SDK.System.Runtime;
 
-namespace Autodroid.Agent.Runtime;
+namespace AyBorg.Agent.Runtime;
 
 internal interface IEngine : IDisposable
 {
@@ -33,17 +33,17 @@ internal interface IEngine : IDisposable
     /// Starts the engine.
     /// </summary>
     /// <returns></returns>
-    Task<bool> TryStartAsync();
+    ValueTask<bool> TryStartAsync();
 
     /// <summary>
     /// Stops the engine.
     /// </summary>
     /// <returns></returns>
-    Task<bool> TryStopAsync();
+    ValueTask<bool> TryStopAsync();
 
     /// <summary>
     /// Aborts the engine.
     /// </summary>
     /// <returns></returns>
-    Task<bool> TryAbortAsync();
+    ValueTask<bool> TryAbortAsync();
 }

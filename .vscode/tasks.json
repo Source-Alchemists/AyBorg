@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/src/Web/Autodroid.Web.csproj",
+                "${workspaceFolder}/src/Web/AyBorg.Web.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/src/Web/Autodroid.Web.csproj",
+                "${workspaceFolder}/src/Web/AyBorg.Web.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/src/Web/Autodroid.Web.csproj"
+                "${workspaceFolder}/src/Web/AyBorg.Web.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

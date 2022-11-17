@@ -1,8 +1,9 @@
-using Autodroid.Web.Services;
+using AyBorg.Web.Services;
+using AyBorg.Web.Services.AppState;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
-namespace Autodroid.Web.Shared.Modals;
+namespace AyBorg.Web.Shared.Modals;
 
 public partial class DirectoryBrowser : ComponentBase
 {
@@ -10,7 +11,7 @@ public partial class DirectoryBrowser : ComponentBase
     [Inject] protected IStorageService StorageService { get; set; } = null!;
     [Inject] protected IStateService StateService { get; set; } = null!;
     [Parameter] public string? RootPath { get; set; }
-    
+
     private readonly HashSet<DirectoryItem> _items = new();
     private DirectoryItem? _selectedItem;
 

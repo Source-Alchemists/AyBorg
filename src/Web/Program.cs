@@ -1,17 +1,19 @@
+using AyBorg.Database.Data;
+using AyBorg.SDK.Authorization;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.System.Configuration;
+using AyBorg.Web;
+using AyBorg.Web.Areas.Identity;
+using AyBorg.Web.Services;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Services.AppState;
+using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
-using Blazored.LocalStorage;
-using Autodroid.Web.Areas.Identity;
-using Autodroid.Web.Services.Agent;
-using Autodroid.Web.Services;
-using Autodroid.Database.Data;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Data.Mapper;
-using Autodroid.Web;
-using Autodroid.SDK.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,9 +24,9 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.SqlLite")),
-        "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection"),
-                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.SqlLite")),
+        "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
+                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );
@@ -32,9 +34,10 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Add authentication services.
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => {
-        options.SignIn.RequireConfirmedAccount = false;
-    })
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+{
+    options.SignIn.RequireConfirmedAccount = false;
+})
     .AddRoles<IdentityRole>()
     .AddRoleManager<RoleManager<IdentityRole>>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
@@ -44,10 +47,12 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.LogoutPath = "/Identity/Account/Logout";
     options.AccessDeniedPath = "/Identity/Account/AccessDenied";
 });
-builder.Services.AddAuthorization(options => {
+builder.Services.AddAuthorization(options =>
+{
     options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole(Roles.Administrator));
     options.AddPolicy("RequireEngineerRole", policy => policy.RequireRole(Roles.Engineer));
     options.AddPolicy("RequireAuditorRole", policy => policy.RequireRole(Roles.Auditor));
+    options.AddPolicy("RequireReviewerRole", policy => policy.RequireRole(Roles.Reviewer));
 });
 
 builder.Services.AddRazorPages();
@@ -59,15 +64,16 @@ builder.Services.AddMudServices(config =>
 });
 builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddHttpClient("Autodroid.Web.RegistryService");
-builder.Services.AddHttpClient("Autodroid.Web.Services.RegistryService>");
+builder.Services.AddHttpClient("AyBorg.Web.RegistryService");
+builder.Services.AddHttpClient("AyBorg.Web.Services.RegistryService>");
 builder.Services.AddHttpClient<ProjectManagementService>();
 builder.Services.AddHttpClient<PluginsService>();
 builder.Services.AddHttpClient<IFlowService, FlowService>();
 builder.Services.AddHttpClient<IRuntimeService>();
 
-builder.Services.AddHostedService<Autodroid.SDK.System.Services.RegistryService>();
+builder.Services.AddHostedService<AyBorg.SDK.System.Services.RegistryService>();
 
+builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
 builder.Services.AddSingleton<IAgentCacheService, AgentCacheService>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
@@ -115,8 +121,7 @@ app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbCont
 
 // Initialize identity
 var scopedServiceProvider = app.Services.CreateScope().ServiceProvider;
-IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).Wait();
-
-app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().Wait();
+await IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).AsTask();
+await app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().AsTask()!;
 
 app.Run();

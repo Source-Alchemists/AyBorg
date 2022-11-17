@@ -1,6 +1,6 @@
-﻿using Autodroid.SDK.Data.DTOs;
+﻿using AyBorg.SDK.Data.DTOs;
 
-namespace Autodroid.Web.Services.Agent;
+namespace AyBorg.Web.Services.Agent;
 
 public class PluginsService
 {

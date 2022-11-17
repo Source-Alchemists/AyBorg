@@ -1,7 +1,7 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 public interface IFlowService
 {
@@ -23,14 +23,14 @@ public interface IFlowService
     /// <param name="x">The x.</param>
     /// <param name="y">The y.</param>
     /// <returns>The new created step proxy.</returns>
-    Task<IStepProxy> AddStepAsync(Guid stepId, int x, int y);
+    ValueTask<IStepProxy> AddStepAsync(Guid stepId, int x, int y);
 
     /// <summary>
     /// Removes the step.
     /// </summary>
     /// <param name="stepId">The step identifier.</param>
     /// <returns></returns>
-    Task<bool> TryRemoveStepAsync(Guid stepId);
+    ValueTask<bool> TryRemoveStepAsync(Guid stepId);
 
     /// <summary>
     /// Moves the step.
@@ -39,7 +39,7 @@ public interface IFlowService
     /// <param name="x">The x.</param>
     /// <param name="y">The y.</param>
     /// <returns></returns>
-    Task<bool> TryMoveStepAsync(Guid stepId, int x, int y);
+    ValueTask<bool> TryMoveStepAsync(Guid stepId, int x, int y);
 
     /// <summary>
     /// Link ports together.
@@ -47,21 +47,21 @@ public interface IFlowService
     /// <param name="sourcePortId">The source port identifier.</param>
     /// <param name="targetPortId">The target port identifier.</param>
     /// <returns></returns>
-    Task<PortLink> LinkPortsAsync(Guid sourcePortId, Guid targetPortId);
+    ValueTask<PortLink> LinkPortsAsync(Guid sourcePortId, Guid targetPortId);
 
     /// <summary>
     /// Unlink ports.
     /// </summary>
     /// <param name="linkId">The link identifier.</param>
     /// <returns></returns>
-    Task<bool> TryUnlinkPortsAsync(Guid linkId);
+    ValueTask<bool> TryUnlinkPortsAsync(Guid linkId);
 
     /// <summary>
     /// Gets the port.
     /// </summary>
     /// <param name="portId">The port identifier.</param>
     /// <returns></returns>
-    Task<IPort> GetPortAsync(Guid portId);
+    ValueTask<IPort> GetPortAsync(Guid portId);
 
     /// <summary>
     /// Updates the port value.
@@ -69,5 +69,5 @@ public interface IFlowService
     /// <param name="portId">The port identifier.</param>
     /// <param name="value">The value.</param>
     /// <returns></returns>
-    Task<bool> TryUpdatePortValueAsync(Guid portId, object value);
+    ValueTask<bool> TryUpdatePortValueAsync(Guid portId, object value);
 }

@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Agent;
+namespace AyBorg.Agent;
 
 public sealed class StepProxy : IStepProxy
 {
@@ -97,7 +97,7 @@ public sealed class StepProxy : IStepProxy
     /// <param name="iterationId">The iteration identifier.</param>
     /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns></returns>
-    public async Task<bool> TryRunAsync(Guid iterationId, CancellationToken cancellationToken)
+    public async ValueTask<bool> TryRunAsync(Guid iterationId, CancellationToken cancellationToken)
     {
         if (IterationId == iterationId)
         {
@@ -127,7 +127,7 @@ public sealed class StepProxy : IStepProxy
     /// <summary>
     /// Initializes the step.
     /// </summary>
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         if (StepBody is IInitializable initializable)
         {

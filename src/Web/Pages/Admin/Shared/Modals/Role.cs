@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Autodroid.Web.Pages.Admin.Shared.Modals;
+namespace AyBorg.Web.Pages.Admin.Shared.Modals;
 internal record Role
 {
     public readonly IdentityRole IdentityRole;

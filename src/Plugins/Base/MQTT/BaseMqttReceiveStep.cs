@@ -1,10 +1,10 @@
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Communication.MQTT;
 
-namespace Autodroid.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.Base.MQTT;
 
 public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
 {
@@ -19,25 +19,25 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
         _ports.Add(_timeoutMsPort);
     }
 
-    public async Task OnInitializeAsync()
+    public async ValueTask OnInitializeAsync()
     {
         await SubcripeAsync();
     }
 
-    public override async Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public override async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _hasNewMessage = false;
 
         await SubcripeAsync();
 
         int count = 0;
-        while(!_hasNewMessage && !cancellationToken.IsCancellationRequested)
+        while (!_hasNewMessage && !cancellationToken.IsCancellationRequested)
         {
             // Dont add the cancellation token here, because we want to wait for the timeout
             // Else the MQTT client will be disposed
             await Task.Delay(1);
             count++;
-            if(count > _timeoutMsPort.Value && _timeoutMsPort.Value != -1)
+            if (count > _timeoutMsPort.Value && _timeoutMsPort.Value != -1)
             {
                 _logger.LogWarning("Timeout while waiting for message");
                 return false;
@@ -47,9 +47,9 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
         return true;
     }
 
-    protected virtual async Task SubcripeAsync()
+    protected virtual async ValueTask SubcripeAsync()
     {
-        if(_subscription != null && _lastTopic != _topicPort.Value)
+        if (_subscription != null && _lastTopic != _topicPort.Value)
         {
             _logger.LogTrace("Unsubscribing from topic {topic}", _lastTopic);
             _subscription.MessageReceived -= OnMessageReceived;

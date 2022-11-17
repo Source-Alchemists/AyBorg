@@ -1,4 +1,4 @@
-namespace Autodroid.Plugins.Base.Numeric;
+namespace AyBorg.Plugins.Base.Numeric;
 
 public enum MathFunctions
 {

@@ -1,12 +1,12 @@
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Caching;
 using Microsoft.Extensions.Caching.Memory;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.Data.Mapper;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Projects;
-using Autodroid.SDK.System.Caching;
-using Autodroid.SDK.Common;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 internal sealed class CacheService : ICacheService
 {
@@ -65,11 +65,18 @@ internal sealed class CacheService : ICacheService
     public PortDto GetOrCreatePortEntry(Guid iterationId, IPort port)
     {
         var key = new PortCacheKey(iterationId, port.Id);
-        return _cache.GetOrCreate<PortDto>(key, entry =>
+        var result = _cache.GetOrCreate(key, entry =>
         {
             entry.SetOptions(_cacheEntryOptions);
             return _mapper.Map(port);
         });
+
+        if (result == null)
+        {
+            _logger.LogWarning("No port entry found or created for iteration {IterationId} and port {PortId}.", iterationId, port.Id);
+            throw new InvalidOperationException($"No port entry found or created for iteration {iterationId} and port {port.Id}.");
+        }
+        return result;
     }
 
     /// <summary>

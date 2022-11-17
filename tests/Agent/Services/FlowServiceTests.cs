@@ -1,12 +1,12 @@
-using Autodroid.Agent.Hubs;
-using Autodroid.Agent.Services;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Projects;
+using AyBorg.Agent.Hubs;
+using AyBorg.Agent.Services;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Projects;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace Autodroid.Agent.Tests.Services;
+namespace AyBorg.Agent.Tests.Services;
 
 public class FlowServiceTests
 {

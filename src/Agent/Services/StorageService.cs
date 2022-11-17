@@ -1,6 +1,6 @@
-using Autodroid.SDK.Common;
+using AyBorg.SDK.Common;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 internal sealed class StorageService : IStorageService
 {

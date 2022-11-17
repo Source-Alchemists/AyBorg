@@ -1,9 +1,9 @@
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Communication.MQTT;
 
-namespace Autodroid.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.Base.MQTT;
 
 public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
 {
@@ -12,7 +12,7 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
     protected readonly BooleanPort _retainPort = new("Retain", PortDirection.Input, false);
     protected readonly BooleanPort _parallelPort = new("Parallel", PortDirection.Input, false);
     private bool disposedValue;
-    
+
 
     public BaseMqttSendStep(ILogger logger, IMqttClientProvider mqttClientProvider)
         : base(logger, mqttClientProvider)
@@ -23,13 +23,13 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
         _ports.Add(_parallelPort);
     }
 
-    public override async Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public override async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         if (_parallelPort.Value)
         {
             if (_parallelTask != null)
             {
-                await _parallelTask; 
+                await _parallelTask;
                 _parallelTask.Dispose();
             }
             _parallelTask = Task.Run(async () => await Send(cancellationToken));
@@ -49,7 +49,7 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
         return true;
     }
 
-    protected abstract Task<bool> Send(CancellationToken cancellationToken);
+    protected abstract ValueTask<bool> Send(CancellationToken cancellationToken);
 
     protected virtual void Dispose(bool disposing)
     {
@@ -57,7 +57,7 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
         {
             if (disposing)
             {
-                if(_parallelTask != null)
+                if (_parallelTask != null)
                 {
                     _parallelTask.Wait(1000); // Wait for 1 second
                     _parallelTask.Dispose();

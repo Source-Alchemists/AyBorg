@@ -1,9 +1,9 @@
-using Autodroid.SDK.ImageProcessing;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.ImageProcessing;
 using Microsoft.Extensions.Logging;
-using Autodroid.SDK.Common;
 
-namespace Autodroid.Plugins.Base;
+namespace AyBorg.Plugins.Base;
 
 public sealed class ImageLoad : IStepBody, IDisposable
 {
@@ -33,18 +33,17 @@ public sealed class ImageLoad : IStepBody, IDisposable
         };
     }
 
-    public async Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _imagePort.Value?.Dispose();
-        if (_preloadTask == null)
-            _preloadTask = PreloadImage();
+        _preloadTask ??= PreloadImage();
         var result = await _preloadTask;
         _imagePort.Value = result.Value;
         _filePathPort.Value = result.Key;
         _preloadTask.Dispose();
         _preloadTask = PreloadImage();
 
-        return await Task.FromResult(true);
+        return await ValueTask.FromResult(true);
     }
 
     private Task<KeyValuePair<string, Image>> PreloadImage()

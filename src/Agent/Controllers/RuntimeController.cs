@@ -1,14 +1,14 @@
-using Autodroid.Agent.Services;
-using Autodroid.SDK.Authorization;
-using Autodroid.SDK.System.Runtime;
+using AyBorg.Agent.Services;
+using AyBorg.SDK.Authorization;
+using AyBorg.SDK.System.Runtime;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Autodroid.Agent.Controllers;
+namespace AyBorg.Agent.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer })]
+[JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer, Roles.Reviewer })]
 public sealed class RuntimeController : ControllerBase
 {
     private readonly ILogger<RuntimeController> _logger;
@@ -24,10 +24,10 @@ public sealed class RuntimeController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [AllowAnonymous]
-    public async Task<ActionResult<EngineMeta>> GetStatusAsync()
+    public async ValueTask<ActionResult<EngineMeta>> GetStatusAsync()
     {
-        var status = await _engineHost.GetEngineStatusAsync();
-        if(status == null)
+        EngineMeta status = await _engineHost.GetEngineStatusAsync();
+        if (status == null)
         {
             _logger.LogWarning("No engine status found.");
             return NoContent();
@@ -39,10 +39,10 @@ public sealed class RuntimeController : ControllerBase
     [HttpPost("start/{executionType}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
-    public async Task<ActionResult<EngineMeta>> StartRunAsync(EngineExecutionType executionType)
+    public async ValueTask<ActionResult<EngineMeta>> StartRunAsync(EngineExecutionType executionType)
     {
-        var status = await _engineHost.StartRunAsync(executionType);
-        if(status != null)
+        EngineMeta status = await _engineHost.StartRunAsync(executionType);
+        if (status != null)
         {
             return Ok(status);
         }
@@ -54,9 +54,9 @@ public sealed class RuntimeController : ControllerBase
     [HttpPost("stop")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
-    public async Task<ActionResult<EngineMeta>> StopRunAsync()
+    public async ValueTask<ActionResult<EngineMeta>> StopRunAsync()
     {
-        var status = await _engineHost.StopRunAsync();
+        EngineMeta status = await _engineHost.StopRunAsync();
         if (status != null)
         {
             return Ok(status);
@@ -69,9 +69,9 @@ public sealed class RuntimeController : ControllerBase
     [HttpPost("abort")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
-    public async Task<ActionResult<EngineMeta>> AbortRunAsync()
+    public async ValueTask<ActionResult<EngineMeta>> AbortRunAsync()
     {
-        var status = await _engineHost.AbortRunAsync();
+        EngineMeta status = await _engineHost.AbortRunAsync();
         if (status != null)
         {
             return Ok(status);

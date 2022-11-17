@@ -1,10 +1,10 @@
-using Autodroid.SDK.ImageProcessing;
-using Autodroid.SDK.ImageProcessing.Shapes;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.ImageProcessing;
+using AyBorg.SDK.ImageProcessing.Shapes;
 using Microsoft.Extensions.Logging;
-using Autodroid.SDK.Common;
 
-namespace Autodroid.Plugins.Base;
+namespace AyBorg.Plugins.Base;
 
 public sealed class ImageCrop : IStepBody, IDisposable
 {
@@ -29,17 +29,17 @@ public sealed class ImageCrop : IStepBody, IDisposable
         };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _outputImagePort.Value?.Dispose();
-        if(_cropRectanglePort.Value.Width <= 0 || _cropRectanglePort.Value.Height <= 0)
+        if (_cropRectanglePort.Value.Width <= 0 || _cropRectanglePort.Value.Height <= 0)
         {
             _logger.LogWarning("Invalid crop region.");
-            return Task.FromResult(false);
+            return ValueTask.FromResult(false);
         }
-        
+
         _outputImagePort.Value = _inputImagePort.Value.Crop(_cropRectanglePort.Value);
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 
     private void Dispose(bool disposing)

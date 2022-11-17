@@ -1,16 +1,16 @@
 @page "/agents/projects/{serviceId}"
 @using SDK.Authorization
-@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 
-<PageTitle>Autodroid - Projects</PageTitle>
+<PageTitle>AyBorg - Projects</PageTitle>
 
-<Autodroid.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
+<AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
 <MudGrid class="pt-6">
     <MudItem xs="12">
         <MudCard>
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Medium" Color="Color.Warning" />
+                    <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Large" Color="Color.Secondary" />
                 </CardHeaderAvatar>
                 <CardHeaderContent>
 				    <MudText Typo="Typo.h6">Draft</MudText>
@@ -20,30 +20,56 @@
                 </CardHeaderActions>
 			</MudCardHeader>
             <MudCardContent>
-                <ProjectsTable 
-                    Projects="@_draftProjects" 
-                    OnProjectActivateClicked="@OnActivateProjectClicked" 
+                <ProjectsTable
+                    Projects="@_draftProjects"
+                    OnProjectActivateClicked="@OnActivateProjectClicked"
                     OnProjectDeleteClicked="@OnProjectDeleteClicked"
-                    OnProjectSaveAsReady="@OnSaveAsReadyClicked" />
+                    OnProjectSaveAsReviewClicked="@OnSaveAsReviewClicked" />
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem xs="12">
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderAvatar>
-                    <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Medium" Color="Color.Info" />
-                </CardHeaderAvatar>
-                <CardHeaderContent>
-				    <MudText Typo="Typo.h6">Ready</MudText>
-                </CardHeaderContent>
-			</MudCardHeader>
-            <MudCardContent>
-                <ProjectsTable 
-                    Projects="@_readyProjects" 
-                    OnProjectActivateClicked="@OnActivateProjectClicked" 
-                    OnProjectDeleteClicked="@OnProjectDeleteClicked" />
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
+    @if(_reviewProjects.Any())
+    {
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudIcon Icon="@Icons.Filled.SafetyCheck" Size="Size.Large" Color="Color.Warning" />
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Review</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <ProjectsTable
+                        Projects="@_reviewProjects"
+                        OnProjectActivateClicked="@OnActivateProjectClicked"
+                        OnProjectDeleteClicked="@OnProjectDeleteClicked"
+                        OnProjectSaveAsReadyClicked="@OnSaveAsReadyClicked"
+                        OnProjectAbandonClicked="@OnAbandonReviewClicked" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
+    @if(_readyProjects.Any())
+    {
+        <MudItem xs="12">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderAvatar>
+                        <MudIcon Icon="@Icons.Filled.GppGood" Size="Size.Large" Color="Color.Tertiary" />
+                    </CardHeaderAvatar>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Ready</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <ProjectsTable
+                        Projects="@_readyProjects"
+                        OnProjectActivateClicked="@OnActivateProjectClicked"
+                        OnProjectDeleteClicked="@OnProjectDeleteClicked" />
+                </MudCardContent>
+            </MudCard>
+        </MudItem>
+    }
 </MudGrid>

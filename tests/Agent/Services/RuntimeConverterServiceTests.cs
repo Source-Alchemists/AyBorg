@@ -1,16 +1,16 @@
 using System.Globalization;
-using Autodroid.Agent.Services;
-using Autodroid.Agent.Tests.Dummies;
-using Autodroid.SDK.Data.DAL;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.Agent.Services;
+using AyBorg.Agent.Tests.Dummies;
+using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Common.Ports;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Autodroid.SDK.Projects;
-using Autodroid.SDK.Common;
+using AyBorg.SDK.Projects;
+using AyBorg.SDK.Common;
 
 #nullable disable
 
-namespace Autodroid.Agent.Tests.Services;
+namespace AyBorg.Agent.Tests.Services;
 
 public class RuntimeConverterServiceTests
 {
@@ -50,7 +50,7 @@ public class RuntimeConverterServiceTests
         {
             Id = Guid.NewGuid(),
             Name = "Test step",
-            MetaInfo = new PluginMetaInfo
+            MetaInfo = new PluginMetaInfoRecord
             {
                 TypeName = nameof(DummyStep)
             },

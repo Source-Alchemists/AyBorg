@@ -1,11 +1,11 @@
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.ImageProcessing;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using MQTTnet;
-using Autodroid.SDK.ImageProcessing;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Communication.MQTT;
 
-namespace Autodroid.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.Base.MQTT;
 
 public sealed class MqttImageReceive : BaseMqttReceiveStep
 {
@@ -14,7 +14,7 @@ public sealed class MqttImageReceive : BaseMqttReceiveStep
 
     public override string DefaultName => "MQTT.Image.Receive";
 
-    public  MqttImageReceive(ILogger<MqttImageReceive> logger, IMqttClientProvider mqttClientProvider)
+    public MqttImageReceive(ILogger<MqttImageReceive> logger, IMqttClientProvider mqttClientProvider)
         : base(logger, mqttClientProvider)
     {
         _ports.Add(_imagePort);
@@ -22,7 +22,7 @@ public sealed class MqttImageReceive : BaseMqttReceiveStep
 
     protected override void OnMessageReceived(MqttApplicationMessage message)
     {
-        if(message.Payload == null)
+        if (message.Payload == null)
         {
             _logger.LogWarning("Received message with null payload");
             return;

@@ -1,13 +1,14 @@
+using AyBorg.Agent.Hubs;
+using AyBorg.Agent.Services;
+using AyBorg.Database.Data;
+using AyBorg.SDK.Authorization;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.System.Configuration;
+using AyBorg.SDK.System.Services;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
-using Autodroid.Agent.Hubs;
-using Autodroid.Agent.Services;
-using Autodroid.SDK.Data.Mapper;
-using Autodroid.Database.Data;
-using Autodroid.SDK.Authorization;
-using Autodroid.SDK.System.Services;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Communication.MQTT;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,9 +19,9 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.SqlLite")),
-        "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection"),
-                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.SqlLite")),
+        "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
+                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );
@@ -35,7 +36,8 @@ builder.Services.AddHostedService<RegistryService>();
 
 builder.Services.AddMemoryCache();
 
-builder.Services.AddSingleton<IEnvironment, Autodroid.SDK.Common.Environment>();
+builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
+builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
 builder.Services.AddSingleton<IRuntimeConverterService, RuntimeConverterService>();
@@ -79,7 +81,7 @@ app.MapHub<FlowHubContext>("/hubs/flow");
 app.Services.GetService<IDbContextFactory<ProjectContext>>()!.CreateDbContext().Database.Migrate();
 
 app.Services.GetService<IPluginsService>()?.Load();
-app.Services.GetService<IProjectManagementService>()?.TryLoadActiveProjectAsync().Wait();
-app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().Wait();
+await app.Services.GetService<IProjectManagementService>()?.TryLoadActiveAsync().AsTask()!;
+await app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().AsTask()!;
 
 app.Run();

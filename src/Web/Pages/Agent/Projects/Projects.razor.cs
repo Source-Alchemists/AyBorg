@@ -1,19 +1,21 @@
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Projects;
+using AyBorg.Web.Services;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Shared.Modals;
+using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.Web.Services;
-using Autodroid.Web.Services.Agent;
-using Autodroid.Web.Shared.Modals;
 using MudBlazor;
-using Autodroid.Web.Shared.Models;
-using Autodroid.SDK.Projects;
 
-namespace Autodroid.Web.Pages.Agent.Projects;
+namespace AyBorg.Web.Pages.Agent.Projects;
 
 public partial class Projects : ComponentBase
 {
     private string _baseUrl = string.Empty;
     private bool _hasServiceError = false;
     private IEnumerable<ProjectMetaDto> _readyProjects = new List<ProjectMetaDto>();
+    private IEnumerable<ProjectMetaDto> _reviewProjects = new List<ProjectMetaDto>();
     private IEnumerable<ProjectMetaDto> _draftProjects = new List<ProjectMetaDto>();
 
     [Parameter]
@@ -23,23 +25,23 @@ public partial class Projects : ComponentBase
     [Inject] IProjectManagementService ProjectManagementService { get; set; } = null!;
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] IStateService StateService { get; set; } = null!;
+    [Inject] ISnackbar Snackbar { get; set; } = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            var services = await RegistryService.ReceiveAllAvailableServicesAsync();
+            IEnumerable<RegistryEntryDto> services = await RegistryService.ReceiveAllAvailableServicesAsync();
             _baseUrl = RegistryService.GetUrl(services, ServiceId);
-            var service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
+            RegistryEntryDto? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
             if (_baseUrl == string.Empty || service == null)
             {
                 _hasServiceError = true;
                 return;
             }
 
-            StateService.AgentState = new UiAgentState(service);
-            await StateService.RefreshAsync();
+            await StateService.SetAgentStateAsync(new UiAgentState(service));
 
             await ReceiveProjectsAsync();
             await InvokeAsync(StateHasChanged);
@@ -48,8 +50,9 @@ public partial class Projects : ComponentBase
 
     private async Task ReceiveProjectsAsync()
     {
-        var allProjectMetas = await ProjectManagementService.GetMetasAsync(_baseUrl);
+        IEnumerable<ProjectMetaDto> allProjectMetas = await ProjectManagementService.GetMetasAsync(_baseUrl);
         _readyProjects = allProjectMetas.Where(p => p.State == ProjectState.Ready);
+        _reviewProjects = allProjectMetas.Where(p => p.State == ProjectState.Review);
         _draftProjects = allProjectMetas.Where(p => p.State == ProjectState.Draft);
         await InvokeAsync(StateHasChanged);
     }
@@ -69,9 +72,9 @@ public partial class Projects : ComponentBase
         {
             { "ContentText", $"Are you sure you want to delete project '{projectDto.Name}'?" }
         };
-        var dialog = DialogService.Show<ConfirmDialog>("Delete project", parameters, options);
-        var result = await dialog.Result;
-        if(!result.Cancelled)
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete project", parameters, options);
+        DialogResult result = await dialog.Result;
+        if (!result.Cancelled)
         {
             if (await ProjectManagementService.TryDeleteAsync(_baseUrl, projectDto))
             {
@@ -80,18 +83,74 @@ public partial class Projects : ComponentBase
         }
     }
 
-    private async void OnSaveAsReadyClicked(ProjectMetaDto projectDto)
+    private async void OnSaveAsReviewClicked(ProjectMetaDto projectDto)
     {
         var options = new DialogOptions();
         var parameters = new DialogParameters
         {
-            { "ContentText", $"Are you sure you want to save project '{projectDto.Name}' as ready?" }
+            { "Project", projectDto }
         };
-        var dialog = DialogService.Show<ConfirmDialog>("Save project as ready", parameters, options);
-        var result = await dialog.Result;
-        if(!result.Cancelled)
+        IDialogReference dialog = DialogService.Show<CreateReviewProjectDialog>($"Create review for {projectDto.Name}", parameters, options);
+        DialogResult result = await dialog.Result;
+        if (!result.Cancelled)
         {
-            if (await ProjectManagementService.TrySaveAsReadyAsync(_baseUrl, projectDto))
+            ProjectStateChangeDto stateChange = (ProjectStateChangeDto)result.Data;
+            if (await ProjectManagementService.TrySaveNewVersionAsync(_baseUrl, projectDto.DbId, stateChange))
+            {
+                await ReceiveProjectsAsync();
+            }
+            else
+            {
+                Snackbar.Add("Failed to save new version", Severity.Error);
+            }
+        }
+    }
+
+    private async void OnAbandonReviewClicked(ProjectMetaDto projectDto)
+    {
+        var options = new DialogOptions();
+        var parameters = new DialogParameters
+        {
+            { "ContentText", $"Are you sure you want to abandon review for project '{projectDto.Name}'?" }
+        };
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Abandon review", parameters, options);
+        DialogResult result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            if (await ProjectManagementService.TrySaveNewVersionAsync(_baseUrl, projectDto.DbId, new ProjectStateChangeDto
+            {
+                State = ProjectState.Draft,
+                VersionName = projectDto.VersionName,
+                Comment = "Abandoned review"
+            }))
+            {
+                await ReceiveProjectsAsync();
+            }
+            else
+            {
+                Snackbar.Add("Failed to abandon review", Severity.Error);
+            }
+        }
+    }
+
+    private async void OnSaveAsReadyClicked(ProjectMetaDto projectDto)
+    {
+        DialogParameters parameters = new()
+        {
+            { "Project", projectDto }
+        };
+        IDialogReference dialog = DialogService.Show<ConfirmProjectApproveDialog>($"Approve project {projectDto.Name}", parameters, new DialogOptions());
+        DialogResult result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            var resultProjectMetaDto = (ProjectMetaDto)result.Data;
+            if (await ProjectManagementService.TryApproveAsnyc(_baseUrl, projectDto.DbId, new ProjectStateChangeDto
+            {
+                State = ProjectState.Draft,
+                VersionName = projectDto.VersionName,
+                Comment = resultProjectMetaDto.Comment,
+                UserName = resultProjectMetaDto.ApprovedBy
+            }))
             {
                 await ReceiveProjectsAsync();
             }
@@ -105,9 +164,9 @@ public partial class Projects : ComponentBase
         {
             { "BaseUrl", _baseUrl }
         };
-        var dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
-        var result = await dialog.Result;
-        if(!result.Cancelled)
+        IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
+        DialogResult result = await dialog.Result;
+        if (!result.Cancelled)
         {
             await ReceiveProjectsAsync();
         }

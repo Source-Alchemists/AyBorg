@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Autodroid.Agent.Runtime;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Projects;
-using Autodroid.SDK.System.Runtime;
+using AyBorg.Agent.Runtime;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Runtime;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 internal sealed class EngineHost : IEngineHost
 {
@@ -22,8 +22,8 @@ internal sealed class EngineHost : IEngineHost
     /// <param name="logger">The logger.</param>
     /// <param name="engineFactory">The engine factory.</param>
     /// <param name="mqttClientProvider">The MQTT client provider.</param>
-    public EngineHost(ILogger<EngineHost> logger, 
-                        IEngineFactory engineFactory, 
+    public EngineHost(ILogger<EngineHost> logger,
+                        IEngineFactory engineFactory,
                         IMqttClientProvider mqttClientProvider,
                         ICacheService cacheService)
     {
@@ -42,45 +42,44 @@ internal sealed class EngineHost : IEngineHost
     /// Tries to activate the specified project.
     /// </summary>
     /// <param name="project">The project.</param>
-    public async Task<bool> TryActivateProjectAsync(Project project)
+    public async ValueTask<bool> TryActivateProjectAsync(Project project)
     {
         ActiveProject = project;
-        await Task.CompletedTask;
-        return true;
+        return await ValueTask.FromResult(true);
     }
 
     /// <summary>
     /// Tries to deactivate the project.
     /// </summary>
     /// <returns></returns>
-    public async Task<bool> TryDeactivateProjectAsync()
+    public async ValueTask<bool> TryDeactivateProjectAsync()
     {
-        if(ActiveProject is null)
+        if (ActiveProject is null)
         {
             _logger.LogTrace("No active project to deactivate.");
             return true;
         }
 
-        if(_engine != null)
+        if (_engine != null)
         {
             _engine.Dispose();
             _engine = null;
         }
 
-        foreach(var step in ActiveProject.Steps)
+        foreach (var step in ActiveProject.Steps)
         {
             step.Dispose();
         }
-        
+
         ActiveProject = null;
-        return await Task.FromResult(true);
+        return await ValueTask.FromResult(true);
     }
 
     /// <summary>
     /// Gets the engine status asynchronous.
     /// </summary>
     /// <returns></returns>
-    public async Task<EngineMeta> GetEngineStatusAsync()
+    public async ValueTask<EngineMeta> GetEngineStatusAsync()
     {
         if (_engine == null)
         {
@@ -88,7 +87,7 @@ internal sealed class EngineHost : IEngineHost
             return null!;
         }
 
-        if(_engineMeta == null)
+        if (_engineMeta == null)
         {
             _logger.LogWarning("Engine meta is null.");
             return null!;
@@ -97,7 +96,7 @@ internal sealed class EngineHost : IEngineHost
         _engineMeta.State = _engine.State;
 
         _logger.LogTrace("Engine status: {_engine.State}, {_engine.ExecutionType}", _engine.State, _engine.ExecutionType);
-        return await Task.FromResult(_engineMeta);
+        return await ValueTask.FromResult(_engineMeta);
     }
 
     /// <summary>
@@ -105,7 +104,7 @@ internal sealed class EngineHost : IEngineHost
     /// </summary>
     /// <param name="executionType">The execution type.</param>
     /// <returns>Engine meta informations.</returns>
-    public async Task<EngineMeta> StartRunAsync(EngineExecutionType executionType)
+    public async ValueTask<EngineMeta> StartRunAsync(EngineExecutionType executionType)
     {
         if (ActiveProject == null)
         {
@@ -148,7 +147,7 @@ internal sealed class EngineHost : IEngineHost
     /// Stops the engine.
     /// </summary>
     /// <returns>Engine meta informations.</returns>
-    public async Task<EngineMeta> StopRunAsync()
+    public async ValueTask<EngineMeta> StopRunAsync()
     {
         if (_engine == null)
         {
@@ -162,7 +161,7 @@ internal sealed class EngineHost : IEngineHost
             return null!;
         }
 
-        if(_engineMeta == null)
+        if (_engineMeta == null)
         {
             _logger.LogWarning("Engine meta is null.");
             return null!;
@@ -183,7 +182,7 @@ internal sealed class EngineHost : IEngineHost
     /// Aborts the engine.
     /// </summary>
     /// <returns>Engine meta informations.</returns>
-    public async Task<EngineMeta> AbortRunAsync()
+    public async ValueTask<EngineMeta> AbortRunAsync()
     {
         if (_engine == null)
         {
@@ -197,7 +196,7 @@ internal sealed class EngineHost : IEngineHost
             return null!;
         }
 
-        if(_engineMeta == null)
+        if (_engineMeta == null)
         {
             _logger.LogWarning("Engine meta is null.");
             return null!;
@@ -224,7 +223,7 @@ internal sealed class EngineHost : IEngineHost
 
     private void Dispose(bool isDisposing)
     {
-        if(isDisposing && !_isDisposed)
+        if (isDisposing && !_isDisposed)
         {
             DisposeEngine();
             _isDisposed = true;
@@ -233,11 +232,11 @@ internal sealed class EngineHost : IEngineHost
 
     private async void EngineStateChanged(object? sender, EngineState state)
     {
-        if(_engineMeta == null)
+        if (_engineMeta == null)
         {
             _logger.LogWarning("Engine meta is null.");
             return;
-        }	
+        }
 
         _engineMeta.State = state;
 
@@ -266,12 +265,12 @@ internal sealed class EngineHost : IEngineHost
             _logger.LogTrace($"Engine is done. Removing engine.");
         }
 
-        await _mqttClientProvider.PublishAsync($"Autodroid/agents/{_mqttClientProvider.ServiceUniqueName}/engine/status", JsonSerializer.Serialize(_engineMeta), new MqttPublishOptions());
+        await _mqttClientProvider.PublishAsync($"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/status", JsonSerializer.Serialize(_engineMeta), new MqttPublishOptions());
     }
 
     private void DisposeEngine()
     {
-        if(_engine == null) return;
+        if (_engine == null) return;
         _engine.StateChanged -= EngineStateChanged;
         _engine.IterationFinished -= EngineIterationFinished;
         _engine.Dispose();
@@ -280,13 +279,13 @@ internal sealed class EngineHost : IEngineHost
 
     private async void EngineIterationFinished(object? sender, IterationFinishedEventArgs e)
     {
-        if(ActiveProject == null)
+        if (ActiveProject == null)
         {
             _logger.LogWarning("No active project.");
             return;
         }
-        
+
         _cacheService.CreateCache(e.IterationId, ActiveProject);
-        await Task.CompletedTask;
+        await ValueTask.CompletedTask;
     }
 }

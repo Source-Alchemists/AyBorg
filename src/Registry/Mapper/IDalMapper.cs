@@ -1,10 +1,10 @@
-using Autodroid.SDK.Data.DAL;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.ServiceRegistry.Models;
+using AyBorg.Registry.Models;
+using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Data.DTOs;
 
-namespace Autodroid.ServiceRegistry.Mapper;
+namespace AyBorg.Registry.Mapper;
 
-public interface IDalMapper 
+public interface IDalMapper
 {
     /// <summary>
     /// Maps the specified service entry.
@@ -21,6 +21,6 @@ public interface IDalMapper
     /// <summary>
     /// Maps the specified service registry entry dto.
     /// </summary>
-    /// <param name="serviceRegistryEntryDto">The service registry entry dto.</param>
-    ServiceEntry Map(ServiceRegistryEntryDto serviceEntryDto);
+    /// <param name="RegistryEntryDto">The service registry entry dto.</param>
+    ServiceEntry Map(RegistryEntryDto serviceEntryDto);
 }

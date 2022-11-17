@@ -1,8 +1,8 @@
 @page "/agents/overview"
 @using SDK.Authorization
-@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, , {Roles.Reviewer}")]
 
-<PageTitle>Autodroid - Agents</PageTitle>
+<PageTitle>AyBorg - Agents</PageTitle>
 
 <MudGrid class="pt-6">
     <MudItem xs="4">

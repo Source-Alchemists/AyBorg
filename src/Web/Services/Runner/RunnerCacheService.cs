@@ -1,8 +1,8 @@
-using Autodroid.SDK.System.Caching;
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.SDK.System.Caching;
+using AyBorg.SDK.Data.DTOs;
 using Microsoft.Extensions.Caching.Memory;
 
-namespace Autodroid.Web.Services.Agent;
+namespace AyBorg.Web.Services.Agent;
 
 public class AgentCacheService : IAgentCacheService
 {
@@ -37,7 +37,7 @@ public class AgentCacheService : IAgentCacheService
     public async Task<PortDto> GetOrCreatePortEntryAsync(string baseUrl, Guid portId, Guid iterationId)
     {
         var key = new PortCacheKey(iterationId, portId);
-        return await _cache.GetOrCreateAsync<PortDto>(key, async entry => 
+        var result = await _cache.GetOrCreateAsync(key, async entry => 
         {
             entry.SetOptions(_cacheEntryOptions);
             var response = await _httpClient.GetFromJsonAsync<PortDto>($"{baseUrl}/flow/ports/{portId}/{iterationId}");
@@ -48,6 +48,13 @@ public class AgentCacheService : IAgentCacheService
             }
             return response;
         });
+
+        if(result == null)
+        {
+            _logger.LogWarning("Could not get port {portId} for iteration {iterationId} from {baseUrl}", portId, iterationId, baseUrl);
+            throw new Exception($"Could not get port {portId} for iteration {iterationId} from {baseUrl}");
+        }
         
+        return result;
     }
 }

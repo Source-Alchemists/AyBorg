@@ -1,6 +1,6 @@
 using System.Net.Http.Headers;
 
-namespace Autodroid.Web.Services;
+namespace AyBorg.Web.Services;
 
 public interface IAuthorizationHeaderUtilService
 {

@@ -1,7 +1,7 @@
-using Autodroid.Web.Services;
+using AyBorg.Web.Services.AppState;
 using Microsoft.AspNetCore.Components;
 
-namespace Autodroid.Web.Shared;
+namespace AyBorg.Web.Shared;
 
 public partial class NavMenu : ComponentBase
 {
@@ -12,7 +12,7 @@ public partial class NavMenu : ComponentBase
         if (firstRender)
         {
             StateService.OnUpdate += OnUpdate;
-            await StateService.UpdateFromLocalstorageAsync();
+            await StateService.UpdateAgentStateFromLocalstorageAsync();
         }
     }
 

@@ -1,6 +1,6 @@
 [submodule "src/SDK"]
 	path = src/SDK
-	url = git@github.com:Source-Alchemists/Autodroid.SDK.git
+	url = git@github.com:Source-Alchemists/AyBorg.SDK.git
 [submodule "src/Blazor.Diagrams"]
 	path = src/Blazor.Diagrams
 	url = git@github.com:Source-Alchemists/Blazor.Diagrams.git

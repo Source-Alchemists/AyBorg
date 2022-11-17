@@ -1,10 +1,11 @@
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Services;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.Web.Services;
-using Autodroid.Web.Services.Agent;
-using Autodroid.Web.Shared.Models;
 
-namespace Autodroid.Web.Pages.Agent.Editor;
+namespace AyBorg.Web.Pages.Agent.Editor;
 
 public partial class Editor : ComponentBase
 {
@@ -22,7 +23,7 @@ public partial class Editor : ComponentBase
     [Parameter]
     public string ServiceId { get; set; } = string.Empty;
 
-    [Inject] Autodroid.Web.Services.IRegistryService? RegistryService { get; set; }
+    [Inject] IRegistryService? RegistryService { get; set; }
     [Inject] IProjectManagementService? ProjectManagementService { get; set; }
     [Inject] IStateService StateService { get; set; } = null!;
 
@@ -50,8 +51,7 @@ public partial class Editor : ComponentBase
                 return;
             }
 
-            StateService.AgentState = new UiAgentState(service);
-            await StateService.RefreshAsync();
+            await StateService.SetAgentStateAsync(new UiAgentState(service));
 
             _projectMeta = await ProjectManagementService!.GetActiveMetaAsync(_baseUrl);
 

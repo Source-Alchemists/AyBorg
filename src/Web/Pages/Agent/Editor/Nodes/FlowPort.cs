@@ -1,15 +1,15 @@
+using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Services.AppState;
 using Blazor.Diagrams.Core.Models;
 using MQTTnet;
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.Web.Services.Agent;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.Web.Services;
-using System.Globalization;
 
-namespace Autodroid.Web.Pages.Agent.Editor.Nodes;
+namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
 public class FlowPort : PortModel, IDisposable
 {
@@ -17,7 +17,7 @@ public class FlowPort : PortModel, IDisposable
     private readonly IStateService _stateService;
     private readonly IMqttClientProvider _mqttClientProvider;
     private readonly StepDto _step;
-    private Autodroid.SDK.Communication.MQTT.MqttSubscription? _subscription;
+    private MqttSubscription? _subscription;
     private bool disposedValue;
 
     /// <summary>
@@ -54,8 +54,8 @@ public class FlowPort : PortModel, IDisposable
     /// <param name="flowService">The flow service.</param>
     /// <param name="mqttClientProvider">The MQTT client provider.</param>
     /// <param name="stateService">The state service.</param>
-    public FlowPort(FlowNode node, PortDto port, StepDto parent, 
-                IFlowService flowService, IMqttClientProvider mqttClientProvider, 
+    public FlowPort(FlowNode node, PortDto port, StepDto parent,
+                IFlowService flowService, IMqttClientProvider mqttClientProvider,
                 IStateService stateService) : base(node, port.Direction == PortDirection.Input ? PortAlignment.Left : PortAlignment.Right)
     {
         Port = port;
@@ -94,7 +94,7 @@ public class FlowPort : PortModel, IDisposable
 
     private async void MqttSubscribe()
     {
-        _subscription = await _mqttClientProvider.SubscribeAsync($"Autodroid/agents/{_stateService.AgentState.UniqueName}/engine/steps/{_step.Id}/ports/{Port.Id}/#");
+        _subscription = await _mqttClientProvider.SubscribeAsync($"AyBorg/agents/{_stateService.AgentState.UniqueName}/engine/steps/{_step.Id}/ports/{Port.Id}/#");
         _subscription.MessageReceived += MqttMessageReceived;
     }
 
@@ -142,13 +142,13 @@ public class FlowPort : PortModel, IDisposable
         {
             if (disposing)
             {
-                if(_subscription != null)
+                if (_subscription != null)
                 {
                     _subscription.MessageReceived -= MqttMessageReceived;
                     _mqttClientProvider.UnsubscribeAsync(_subscription);
                 }
             }
-            
+
             disposedValue = true;
         }
     }

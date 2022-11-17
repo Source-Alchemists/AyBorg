@@ -1,8 +1,8 @@
-using Autodroid.SDK.Data.DAL;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Projects;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Projects;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 public interface IRuntimeConverterService
 {
@@ -11,7 +11,7 @@ public interface IRuntimeConverterService
     /// </summary>
     /// <param name="projectRecord">The project.</param>
     /// <returns></returns>
-    Task<Project> ConvertAsync(ProjectRecord projectRecord);
+    ValueTask<Project> ConvertAsync(ProjectRecord projectRecord);
 
     /// <summary>
     /// Updates the port value.
@@ -19,5 +19,5 @@ public interface IRuntimeConverterService
     /// <param name="port">The port.</param>
     /// <param name="value">The value.</param>
     /// <returns></returns>
-    Task<bool> TryUpdatePortValueAsync(IPort port, object value);
+    ValueTask<bool> TryUpdatePortValueAsync(IPort port, object value);
 }

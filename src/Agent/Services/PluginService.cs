@@ -1,8 +1,8 @@
-﻿using Autodroid.SDK.Common;
-using Autodroid.SDK.Data.DAL;
-using System.Reflection;
+﻿using System.Reflection;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Data.DAL;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 internal sealed class PluginsService : IPluginsService
 {
     private readonly ILogger<PluginsService> _logger;
@@ -39,7 +39,14 @@ internal sealed class PluginsService : IPluginsService
         _stepPlugins.Clear();
         try
         {
-            var pluginsDir = Path.GetFullPath(_configuration.GetValue<string>("Autodroid:Plugins:Folder"));
+            var configFolder = _configuration.GetValue<string>("AyBorg:Plugins:Folder");
+            if (configFolder == null)
+            {
+                _logger.LogWarning("No plugin folder specified in configuration. (Hint: AyBorg:Plugins:Folder)");
+                return;
+            }
+
+            var pluginsDir = Path.GetFullPath(configFolder);
 
             _logger.LogTrace("Loading plugins in '{pluginsDir}' ...", pluginsDir);
 
@@ -116,5 +123,5 @@ internal sealed class PluginsService : IPluginsService
         return false;
     }
 
-    private static bool IsSameType(Type type, PluginMetaInfo metaInfo) => type.Name == metaInfo.TypeName && type.Assembly.GetName().Name == metaInfo.AssemblyName;
+    private static bool IsSameType(Type type, PluginMetaInfoRecord metaInfo) => type.Name == metaInfo.TypeName && type.Assembly.GetName().Name == metaInfo.AssemblyName;
 }

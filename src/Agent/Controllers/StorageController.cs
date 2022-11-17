@@ -1,28 +1,26 @@
-using Autodroid.Agent.Services;
-using Autodroid.SDK.Authorization;
+using AyBorg.Agent.Services;
+using AyBorg.SDK.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Autodroid.Agent.Controllers;
+namespace AyBorg.Agent.Controllers;
 
 [ApiController]
 [Route("[controller]")]
-[JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer })]
+[JwtAuthorize(Roles = new[] { Roles.Administrator, Roles.Engineer, Roles.Reviewer })]
 public sealed class StorageController : ControllerBase
 {
-    private readonly ILogger<StorageController> _logger;
     private readonly IStorageService _storageService;
 
-    public StorageController(ILogger<StorageController> logger, IStorageService storageService)
+    public StorageController(IStorageService storageService)
     {
-        _logger = logger;
         _storageService = storageService;
     }
 
     [HttpGet("directories")]
     [ProducesResponseType(StatusCodes.Status200OK)]
-    public async Task<ActionResult<string[]>> GetDirectories(string path)
+    public async ValueTask<ActionResult<string[]>> GetDirectories(string path)
     {
-        var directories = _storageService.GetDirectories(path);
-        return await Task.FromResult(Ok(directories));
+        IEnumerable<string> directories = _storageService.GetDirectories(path);
+        return await ValueTask.FromResult(Ok(directories));
     }
 }

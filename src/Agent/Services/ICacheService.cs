@@ -1,9 +1,9 @@
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.Projects;
-using Autodroid.SDK.Common;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Projects;
 
-namespace Autodroid.Agent.Services;
+namespace AyBorg.Agent.Services;
 
 public interface ICacheService
 {

@@ -1,4 +1,4 @@
-using Autodroid.SDK.Data.DTOs;
+using AyBorg.SDK.Data.DTOs;
 
 /// <summary>
 /// Work around class, because DataTransfer is not supported in Blazor.

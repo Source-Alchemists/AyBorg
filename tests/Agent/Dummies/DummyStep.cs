@@ -1,12 +1,12 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Agent.Tests.Dummies;
+namespace AyBorg.Agent.Tests.Dummies;
 
 /// <summary>
 /// We need a "real" step instead of a mock to test the valid behaviour.
 /// </summary>
-/// <seealso cref="Autodroid.SDK.IStepBody" />
+/// <seealso cref="AyBorg.SDK.IStepBody" />
 public class DummyStep : IStepBody
 {
     public DummyStep()
@@ -21,7 +21,7 @@ public class DummyStep : IStepBody
 
     public string DefaultName =>  "Dummy";
     public IEnumerable<IPort> Ports { get; }
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         throw new NotImplementedException();
     }

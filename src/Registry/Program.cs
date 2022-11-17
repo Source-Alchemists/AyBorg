@@ -1,7 +1,8 @@
-using Autodroid.Database.Data;
-using Autodroid.SDK.Data.Mapper;
-using Autodroid.ServiceRegistry.Mapper;
-using Autodroid.ServiceRegistry.Services;
+using AyBorg.Database.Data;
+using AyBorg.Registry.Mapper;
+using AyBorg.Registry.Services;
+using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,9 +14,9 @@ builder.Services.AddDbContextFactory<RegistryContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.SqlLite")),
-        "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection"),
-                        x => x.MigrationsAssembly("Autodroid.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.SqlLite")),
+        "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
+                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );
@@ -25,6 +26,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+builder.Services.AddSingleton<IRegistryConfiguration, RegistryConfiguration>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IDalMapper, DalMapper>();
 builder.Services.AddSingleton<IKeeperService, KeeperService>();

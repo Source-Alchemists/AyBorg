@@ -1,7 +1,7 @@
-using Autodroid.SDK.Data.DTOs;
-using Autodroid.SDK.System.Runtime;
+using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.System.Runtime;
 
-namespace Autodroid.Web.Shared.Models;
+namespace AyBorg.Web.Shared.Models;
 
 public record AgentServiceEntry
 {
@@ -11,9 +11,9 @@ public record AgentServiceEntry
     public string ActiveProjectName { get; init; } = string.Empty;
     public EngineMeta Status { get; init; } = new EngineMeta();
 
-    public AgentServiceEntry(ServiceRegistryEntryDto dto)
+    public AgentServiceEntry(RegistryEntryDto dto)
     {
-        Name = dto.Name.Replace("Autodroid.", string.Empty);
+        Name = dto.Name.Replace("AyBorg.", string.Empty);
         EditorLink = $"agents/editor/{dto.Id}";
         ProjectsLink = $"agents/projects/{dto.Id}";
     }

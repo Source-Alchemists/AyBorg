@@ -1,7 +1,7 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Plugins.Base.Numeric;
+namespace AyBorg.Plugins.Base.Numeric;
 
 public sealed class NumberMathFunction : IStepBody
 {
@@ -17,9 +17,9 @@ public sealed class NumberMathFunction : IStepBody
         Ports = new IPort[] { _functionPort, _valueAPort, _valueBPort, _resultPort };
     }
 
-    public Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
-        switch(_functionPort.Value)
+        switch (_functionPort.Value)
         {
             case MathFunctions.Add:
                 _resultPort.Value = _valueAPort.Value + _valueBPort.Value;
@@ -35,6 +35,6 @@ public sealed class NumberMathFunction : IStepBody
                 break;
         }
 
-        return Task.FromResult(true);
+        return ValueTask.FromResult(true);
     }
 }

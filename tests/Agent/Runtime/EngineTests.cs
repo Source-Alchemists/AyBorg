@@ -1,13 +1,13 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Autodroid.Agent.Runtime;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.System.Runtime;
-using Autodroid.SDK.Communication.MQTT;
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Projects;
+using AyBorg.Agent.Runtime;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.System.Runtime;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Projects;
 
-namespace Autodroid.Agent.Tests.Runtime;
+namespace AyBorg.Agent.Tests.Runtime;
 
 public class EngineTests
 {

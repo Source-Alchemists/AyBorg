@@ -1,9 +1,9 @@
-using Autodroid.SDK.Authorization;
+using AyBorg.SDK.Authorization;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
 using MudBlazor;
 
-namespace Autodroid.Web.Pages.Admin.Shared.Modals;
+namespace AyBorg.Web.Pages.Admin.Shared.Modals;
 
 public partial class EditAccountDialog : ComponentBase
 {
@@ -11,6 +11,7 @@ public partial class EditAccountDialog : ComponentBase
     [Parameter] public IdentityUser User { get; set; } = null!;
     [Inject] RoleManager<IdentityRole> RoleManager { get; set; } = null!;
     [Inject] UserManager<IdentityUser> UserManager { get; set; } = null!;
+    [Inject] ILogger<EditAccountDialog> Logger { get; set; } = null!;
 
     private readonly List<Role> _roles = new();
     private MudForm _form = null!;
@@ -25,7 +26,7 @@ public partial class EditAccountDialog : ComponentBase
         {
             var role = new Role(r)
             {
-                Checked = await UserManager.IsInRoleAsync(User, r.Name)
+                Checked = await UserManager.IsInRoleAsync(User, r.Name!)
             };
             if (r.Name == Roles.Administrator && User.UserName == "SystemAdmin")
             {
@@ -33,7 +34,7 @@ public partial class EditAccountDialog : ComponentBase
             }
             _roles.Add(role);
         });
-        _userEmail = User.Email;
+        _userEmail = User.Email ?? string.Empty;
     }
 
     private void OnCancelClicked() => MudDialog.Cancel();
@@ -43,29 +44,35 @@ public partial class EditAccountDialog : ComponentBase
         await _form.Validate();
         if (!_errors.Any())
         {
-            var user = await UserManager.FindByIdAsync(User.Id);
+            IdentityUser? user = await UserManager.FindByIdAsync(User.Id);
+            if(user == null)
+            {
+                Logger.LogWarning("User not found");
+                return;
+            }
+
             user.Email = _userEmail;
-            var result = await UserManager.UpdateAsync(user);
+            IdentityResult result = await UserManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
                 _errors = result.Errors.Select(e => e.Description).ToArray();
                 return;
             }
 
-            foreach (var role in _roles)
+            foreach (Role role in _roles)
             {
-                if (role.Checked && !await UserManager.IsInRoleAsync(user, role.IdentityRole.Name))
+                if (role.Checked && !await UserManager.IsInRoleAsync(user, role.IdentityRole.Name!))
                 {
-                    var roleResult = await UserManager.AddToRoleAsync(user, role.IdentityRole.Name);
+                    IdentityResult roleResult = await UserManager.AddToRoleAsync(user, role.IdentityRole.Name!);
                     if (!roleResult.Succeeded)
                     {
                         _errors = roleResult.Errors.Select(e => e.Description).ToArray();
                         return;
                     }
                 }
-                else if (!role.Checked && await UserManager.IsInRoleAsync(user, role.IdentityRole.Name))
+                else if (!role.Checked && await UserManager.IsInRoleAsync(user, role.IdentityRole.Name!))
                 {
-                    var roleResult = await UserManager.RemoveFromRoleAsync(user, role.IdentityRole.Name);
+                    IdentityResult roleResult = await UserManager.RemoveFromRoleAsync(user, role.IdentityRole.Name!);
                     if (!roleResult.Succeeded)
                     {
                         _errors = roleResult.Errors.Select(e => e.Description).ToArray();
@@ -75,7 +82,7 @@ public partial class EditAccountDialog : ComponentBase
 
                 _success = true;
             }
-            
+
             MudDialog.Close(DialogResult.Ok(true));
         }
     }

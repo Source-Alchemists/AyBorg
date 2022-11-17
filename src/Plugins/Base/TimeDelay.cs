@@ -1,7 +1,7 @@
-using Autodroid.SDK.Common;
-using Autodroid.SDK.Common.Ports;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 
-namespace Autodroid.Plugins.Base;
+namespace AyBorg.Plugins.Base;
 
 public sealed class TimeDelay : IStepBody
 {
@@ -22,7 +22,7 @@ public sealed class TimeDelay : IStepBody
     public IEnumerable<IPort> Ports { get; }
 
     /// <inheritdoc />
-    public async Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         try
         {

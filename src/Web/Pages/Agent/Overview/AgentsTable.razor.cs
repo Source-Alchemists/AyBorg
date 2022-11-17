@@ -1,7 +1,7 @@
-using Autodroid.Web.Shared.Models;
+using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
 
-namespace Autodroid.Web.Pages.Agent.Overview;
+namespace AyBorg.Web.Pages.Agent.Overview;
 
 
 public partial class AgentsTable : ComponentBase

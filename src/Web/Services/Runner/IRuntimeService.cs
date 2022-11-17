@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.SignalR.Client;
-using Autodroid.SDK.System.Runtime;
+using AyBorg.SDK.System.Runtime;
 
 
-namespace Autodroid.Web.Services.Agent;
+namespace AyBorg.Web.Services.Agent;
 
 public interface IRuntimeService
 {

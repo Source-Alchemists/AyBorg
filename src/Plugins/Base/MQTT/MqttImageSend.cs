@@ -1,10 +1,10 @@
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.ImageProcessing.Encoding;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
-using Autodroid.SDK.Common.Ports;
-using Autodroid.SDK.ImageProcessing.Encoding;
-using Autodroid.SDK.Communication.MQTT;
 
-namespace Autodroid.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.Base.MQTT;
 
 public sealed class MqttImageSend : BaseMqttSendStep
 {
@@ -22,7 +22,7 @@ public sealed class MqttImageSend : BaseMqttSendStep
         _ports.Insert(2, _qualityPort);
     }
 
-    protected override async Task<bool> Send(CancellationToken cancellationToken)
+    protected override async ValueTask<bool> Send(CancellationToken cancellationToken)
     {
         try
         {
