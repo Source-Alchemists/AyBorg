@@ -11,6 +11,7 @@ public partial class Editor : ComponentBase
 {
     private string _baseUrl = string.Empty;
     private string _serviceUniqueName = string.Empty;
+    private string _serviceName = string.Empty;
     private bool _hasServiceError = false;
     private ProjectMetaDto? _projectMeta;
     private bool _isProjectSaving = false;
@@ -33,9 +34,9 @@ public partial class Editor : ComponentBase
         if (firstRender)
         {
             _areSubComponentsHidden = true;
-            var services = await RegistryService!.ReceiveAllAvailableServicesAsync();
+            IEnumerable<RegistryEntryDto> services = await RegistryService!.ReceiveAllAvailableServicesAsync();
 
-            var service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
+            RegistryEntryDto? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
             if (service == null)
             {
                 _hasServiceError = true;
@@ -43,6 +44,7 @@ public partial class Editor : ComponentBase
             }
 
             _serviceUniqueName = service.UniqueName;
+            _serviceName = service.Name;
 
             _baseUrl = RegistryService.GetUrl(services, ServiceId);
             if (_baseUrl == string.Empty)

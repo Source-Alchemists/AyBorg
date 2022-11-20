@@ -32,11 +32,6 @@ internal static class RandomPasswordGenerator
 
     public static string Generate()
     {
-        if (Length < MinLowercases + MinUppercases + MinDigits + MinSpecials)
-        {
-            throw new ArgumentException("Minimum requirements exceed password length.");
-        }
-
         ResetOutstandings();
 
         var password = new StringBuilder();

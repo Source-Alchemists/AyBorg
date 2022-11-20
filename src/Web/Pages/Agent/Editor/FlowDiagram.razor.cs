@@ -27,6 +27,8 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     [Inject] ISnackbar Snackbar { get; set; } = null!;
     [Inject] IDialogService DialogService { get; set; } = null!;
 
+    [Parameter] public bool Disabled { get; set; } = false;
+
     public FlowDiagram()
     {
         var options = new DiagramOptions
@@ -78,6 +80,15 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
             (double offsetX, double offsetY) = await StateService.AutomationFlowState.UpdateOffsetAsync();
             _diagram.SetPan(offsetX, offsetY);
             await CreateFlow();
+            if (Disabled)
+            {
+                _diagram.Locked = true;
+                _diagram.Nodes.Removed -= OnNodeRemoved;
+                _diagram.Links.Added -= OnLinkAdded;
+                _diagram.Links.Removed -= OnLinkRemovedAsync;
+                _diagram.ZoomChanged -= OnZoomChanged;
+                _diagram.PanChanged -= OnPanChanged;
+            }
             _diagram.Refresh();
         }
     }
@@ -157,7 +168,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
     private FlowNode CreateNode(StepDto step)
     {
-        var node = new FlowNode(FlowService, MqttClientProvider, StateService, step);
+        var node = new FlowNode(FlowService, MqttClientProvider, StateService, step, Disabled);
         node.Moving += async (n) => await OnNodeMovingAsync(n);
         node.OnDelete += ShouldDeleteNodeAsync;
         return node;
@@ -207,7 +218,10 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         {
             throw new Exception("Could not find source or target port");
         }
-        var linkModel = new LinkModel(link.Id.ToString(), sourcePort, targetPort);
+        var linkModel = new LinkModel(link.Id.ToString(), sourcePort, targetPort)
+        {
+            Locked = Disabled
+        };
         return linkModel;
     }
 

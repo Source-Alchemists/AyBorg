@@ -13,6 +13,7 @@ namespace AyBorg.Web.Pages.Agent.Projects;
 public partial class Projects : ComponentBase
 {
     private string _baseUrl = string.Empty;
+    private string _serviceName = string.Empty;
     private bool _hasServiceError = false;
     private IEnumerable<ProjectMetaDto> _readyProjects = new List<ProjectMetaDto>();
     private IEnumerable<ProjectMetaDto> _reviewProjects = new List<ProjectMetaDto>();
@@ -40,6 +41,8 @@ public partial class Projects : ComponentBase
                 _hasServiceError = true;
                 return;
             }
+
+            _serviceName = service.Name;
 
             await StateService.SetAgentStateAsync(new UiAgentState(service));
 

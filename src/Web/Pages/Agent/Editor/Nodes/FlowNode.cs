@@ -32,18 +32,19 @@ public class FlowNode : NodeModel, IDisposable
     /// <param name="mqttClientProvider">The MQTT client provider.</param>
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="step">The step.</param>
-    public FlowNode(IFlowService flowService, IMqttClientProvider mqttClientProvider, IStateService stateService, StepDto step) : base(new Point(step.X, step.Y))
+    public FlowNode(IFlowService flowService, IMqttClientProvider mqttClientProvider, IStateService stateService, StepDto step, bool locked = false) : base(new Point(step.X, step.Y))
     {
         _flowService = flowService;
         _mqttClientProvider = mqttClientProvider;
         _stateService = stateService;
         Title = step.Name;
         Step = step;
+        Locked = locked;
 
         if (step.Ports == null) return;
         foreach (PortDto port in step.Ports)
         {
-            AddPort(new FlowPort(this, port, step, _flowService, _mqttClientProvider, _stateService));
+            _ = AddPort(new FlowPort(this, port, step, _flowService, _mqttClientProvider, _stateService) { Locked = locked });
         }
 
         MqttSubscribe();
