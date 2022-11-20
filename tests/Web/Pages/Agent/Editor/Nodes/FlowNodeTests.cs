@@ -1,13 +1,14 @@
 using System.Text;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Models;
 using Moq;
 using MQTTnet;
 
-namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
+namespace AyBorg.Web.Tests.Pages.Agent.Editor.Nodes;
 
 public class FlowNodeTests
 {
