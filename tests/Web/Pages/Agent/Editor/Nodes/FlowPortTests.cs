@@ -85,7 +85,7 @@ public class FlowPortTests
                 }
                 if(topic.EndsWith("data"))
                 {
-                    Assert.Equal(image.Base64, ((ImageDto)flowPort.Port.Value!).Base64);
+                    Assert.Equal(image!.Base64, ((ImageDto)flowPort.Port.Value!).Base64);
                 }
                 break;
         }
