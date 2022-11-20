@@ -35,7 +35,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
         _dalMapper = dalMapper;
         _registryContextFactory = registryContextFactory;
 
-        var serverUrl = configuration.GetValue<string>("Kestrel:Endpoints:Https:Url");
+        string? serverUrl = configuration.GetValue<string>("Kestrel:Endpoints:Https:Url");
         if (serverUrl == null || serverUrl.Equals(string.Empty))
         {
             serverUrl = configuration.GetValue<string>("Kestrel:Endpoints:Http:Url");
@@ -64,7 +64,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// </summary>
     public void Dispose()
     {
-        Dispose(disposing: true);
+        Dispose(disposing: true).GetAwaiter().GetResult();
         GC.SuppressFinalize(this);
     }
 
@@ -76,7 +76,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     public async ValueTask<IEnumerable<RegistryEntryDto>> FindRegistryEntriesAsync(string name)
     {
 
-        var result = _registryEntries.Where(x => x.Name.Equals(name));
+        IEnumerable<RegistryEntryDto> result = _registryEntries.Where(x => x.Name.Equals(name));
         if (_selfServiceEntry.Name.Equals(name))
         {
             result = result.Append(_selfServiceEntry);
@@ -109,7 +109,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// <returns></returns>
     public async ValueTask<RegistryEntryDto?> GetRegistryEntryAsync(Guid serviceId)
     {
-        var result = _registryEntries.FirstOrDefault(x => x.Id == serviceId);
+        RegistryEntryDto? result = _registryEntries.FirstOrDefault(x => x.Id == serviceId);
         return await ValueTask.FromResult(result);
     }
 
@@ -121,15 +121,15 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// <exception cref="InvalidOperationException">Thrown if the same service instance is added multiple times.</exception>
     public async Task<Guid> RegisterAsync(RegistryEntryDto RegistryEntry)
     {
-        var matchingService = FindAvailableService(RegistryEntry);
+        ServiceEntry? matchingService = FindAvailableService(RegistryEntry);
 
         if (matchingService != null)
         {
             throw new InvalidOperationException($"Adding the same service instance multiple times is not allowed ({RegistryEntry.Name} | {RegistryEntry.Url})!");
         }
 
-        using var context = await _registryContextFactory.CreateDbContextAsync();
-        var knownService = await context.ServiceEntries!.FirstOrDefaultAsync(x => x.UniqueName == RegistryEntry.UniqueName && x.Type == RegistryEntry.Type);
+        using RegistryContext context = await _registryContextFactory.CreateDbContextAsync();
+        SDK.Data.DAL.ServiceEntryRecord? knownService = await context.ServiceEntries!.FirstOrDefaultAsync(x => x.UniqueName == RegistryEntry.UniqueName && x.Type == RegistryEntry.Type);
         ServiceEntry serviceEntry;
         if (knownService != null)
         {
@@ -168,7 +168,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// <exception cref="KeyNotFoundException">Thrown if the specified service is not found.</exception>
     public async Task UnregisterAsync(Guid serviceId)
     {
-        var matchingService = FindAvailableService(serviceId);
+        ServiceEntry? matchingService = FindAvailableService(serviceId);
 
         if (matchingService == null)
         {
@@ -187,7 +187,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// <returns>Task.</returns>
     public async ValueTask UpdateTimestamp(RegistryEntryDto RegistryEntry)
     {
-        var matchingService = FindAvailableService(RegistryEntry);
+        ServiceEntry? matchingService = FindAvailableService(RegistryEntry);
 
         if (matchingService == null)
         {
@@ -198,7 +198,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
 
         await ValueTask.CompletedTask;
     }
-    private async void Dispose(bool disposing)
+    private async Task Dispose(bool disposing)
     {
         if (!_isDisposed)
         {
@@ -225,7 +225,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
         ServiceEntry? removedEntry = null;
         while (_availableServices.AsEnumerable().Any())
         {
-            var lastEntry = _availableServices.Take();
+            ServiceEntry lastEntry = _availableServices.Take();
             if (!lastEntry.Id.Equals(serviceId))
             {
                 tmpCollection.Add(lastEntry);
@@ -236,7 +236,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
             }
         }
 
-        foreach (var tmpItem in tmpCollection)
+        foreach (ServiceEntry tmpItem in tmpCollection)
         {
             _availableServices.Add(tmpItem);
         }
@@ -252,40 +252,37 @@ public sealed class KeeperService : IKeeperService, IDisposable
         var tmpCollection = new List<RegistryEntryDto>();
         while (_registryEntries.AsEnumerable().Any())
         {
-            var lastEntry = _registryEntries.Take();
+            RegistryEntryDto lastEntry = _registryEntries.Take();
             if (!(lastEntry.Url.Equals(serviceEntry.Url)))
             {
                 tmpCollection.Add(lastEntry);
             }
         }
 
-        foreach (var tmpItem in tmpCollection)
+        foreach (RegistryEntryDto tmpItem in tmpCollection)
         {
             _registryEntries.Add(tmpItem);
         }
     }
 
-    private Task StartHeartbeatsValidation()
-    {
-        return Task.Factory.StartNew(async () =>
-        {
-            while (!_isHeartbeatTaskTerminated)
-            {
-                foreach (var serviceItem in _availableServices.AsEnumerable())
-                {
-                    var utcNow = DateTime.UtcNow;
-                    var utcHeartbeat = serviceItem.LastConnectionTime.AddMilliseconds(HeartbeatValidationTimeoutMs);
-                    if ((utcHeartbeat - utcNow).TotalMilliseconds < 0)
-                    {
-                        _logger.LogWarning("Service '{serviceItem.Name}' with id '{serviceItem.Id}' time out and will be removed!", serviceItem.Name, serviceItem.Id);
-                        RemoveService(serviceItem.Id);
-                        _logger.LogInformation("Service '{serviceItem.Name}' (Url: '{serviceItem.Url}') removed!", serviceItem.Name, serviceItem.Url);
-                    }
-                }
+    private Task StartHeartbeatsValidation() => Task.Factory.StartNew(async () =>
+                                                     {
+                                                         while (!_isHeartbeatTaskTerminated)
+                                                         {
+                                                             foreach (ServiceEntry? serviceItem in _availableServices.AsEnumerable())
+                                                             {
+                                                                 DateTime utcNow = DateTime.UtcNow;
+                                                                 DateTime utcHeartbeat = serviceItem.LastConnectionTime.AddMilliseconds(HeartbeatValidationTimeoutMs);
+                                                                 if ((utcHeartbeat - utcNow).TotalMilliseconds < 0)
+                                                                 {
+                                                                     _logger.LogWarning("Service '{serviceItem.Name}' with id '{serviceItem.Id}' time out and will be removed!", serviceItem.Name, serviceItem.Id);
+                                                                     RemoveService(serviceItem.Id);
+                                                                     _logger.LogInformation("Service '{serviceItem.Name}' (Url: '{serviceItem.Url}') removed!", serviceItem.Name, serviceItem.Url);
+                                                                 }
+                                                             }
 
-                await Task.Delay(HeartbeatPollingTimeMs);
-            }
+                                                             await Task.Delay(HeartbeatPollingTimeMs);
+                                                         }
 
-        }, TaskCreationOptions.LongRunning);
-    }
+                                                     }, TaskCreationOptions.LongRunning);
 }

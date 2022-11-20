@@ -1,3 +1,4 @@
+using AyBorg.Web.Pages.Admin.Shared;
 using AyBorg.Web.Pages.Admin.Shared.Modals;
 using AyBorg.Web.Shared.Modals;
 using Microsoft.AspNetCore.Components;
@@ -25,8 +26,8 @@ public partial class UserManagement : ComponentBase
     {
         var dialogOptions = new DialogOptions();
         var dialogParameters = new DialogParameters();
-        var dialog = DialogService.Show<CreateAccountDialog>("Add Account", dialogParameters, dialogOptions);
-        var result = await dialog.Result;
+        IDialogReference dialog = DialogService.Show<CreateAccountDialog>("Add Account", dialogParameters, dialogOptions);
+        DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
             _users = UserManager.Users.ToList();
@@ -41,8 +42,8 @@ public partial class UserManagement : ComponentBase
         {
             { "User", listUser }
         };
-        var dialog = DialogService.Show<EditAccountDialog>("Edit Account", dialogParameters, dialogOptions);
-        var result = await dialog.Result;
+        IDialogReference dialog = DialogService.Show<EditAccountDialog>("Edit Account", dialogParameters, dialogOptions);
+        DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
             _users = UserManager.Users.ToList();
@@ -52,9 +53,9 @@ public partial class UserManagement : ComponentBase
 
     private async void OnLockAccountClicked(IdentityUser listUser)
     {
-        var user = await FindActualUserAsync(listUser);
-        var dialog = DialogService.Show<ConfirmDialog>("Lock Account", new DialogParameters { { "ContentText", $"Are you sure you want to lock '{user.UserName}'?" } });
-        var result = await dialog.Result;
+        IdentityUser user = await FindActualUserAsync(listUser);
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Lock Account", new DialogParameters { { "ContentText", $"Are you sure you want to lock '{user.UserName}'?" } });
+        DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
             user.LockoutEnd = DateTime.Now.AddYears(1000);
@@ -66,9 +67,9 @@ public partial class UserManagement : ComponentBase
 
     private async void OnUnlockAccountClicked(IdentityUser listUser)
     {
-        var user = await FindActualUserAsync(listUser);
-        var dialog = DialogService.Show<ConfirmDialog>("Unlock Account", new DialogParameters { { "ContentText", $"Are you sure you want to unlock '{user.UserName}'?" } });
-        var result = await dialog.Result;
+        IdentityUser user = await FindActualUserAsync(listUser);
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Unlock Account", new DialogParameters { { "ContentText", $"Are you sure you want to unlock '{user.UserName}'?" } });
+        DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
             user.LockoutEnd = null;
@@ -81,13 +82,13 @@ public partial class UserManagement : ComponentBase
 
     private async void OnResetPasswordClicked(IdentityUser listUser)
     {
-        var user = await FindActualUserAsync(listUser);
-        var dialog = DialogService.Show<ConfirmDialog>("Reset Password", new DialogParameters { { "ContentText", $"Are you sure you want to reset the password for '{user.UserName}'?" } });
-        var result = await dialog.Result;
+        IdentityUser user = await FindActualUserAsync(listUser);
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Reset Password", new DialogParameters { { "ContentText", $"Are you sure you want to reset the password for '{user.UserName}'?" } });
+        DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
-            var newPassword = RandomPasswordGenerator.Generate();
-            var pwResult = await UserManager.RemovePasswordAsync(user);
+            string newPassword = RandomPasswordGenerator.Generate();
+            IdentityResult pwResult = await UserManager.RemovePasswordAsync(user);
             if (!pwResult.Succeeded)
             {
                 Snackbar.Add(pwResult.Errors.First().Description, Severity.Error);
@@ -100,7 +101,7 @@ public partial class UserManagement : ComponentBase
                 return;
             }
 
-            dialog = DialogService.Show<DisplayGeneratedPasswordDialog>("New Password", new DialogParameters { { "Password", newPassword } }, 
+            dialog = DialogService.Show<DisplayGeneratedPasswordDialog>("New Password", new DialogParameters { { "Password", newPassword } },
                                         new DialogOptions { CloseButton = true, CloseOnEscapeKey = false, DisableBackdropClick = true });
             await dialog.Result;
 
@@ -112,14 +113,14 @@ public partial class UserManagement : ComponentBase
     private async Task<IdentityUser> FindActualUserAsync(IdentityUser user)
     {
         // This method is needed because the user could be changed in the background or from a other admin page.
-        var identity = await UserManager.FindByIdAsync(user.Id);
+        IdentityUser? identity = await UserManager.FindByIdAsync(user.Id);
         if (identity == null)
         {
             Logger.LogWarning("User with id '{Id}' not found.", user.Id);
             Snackbar.Add("User not found.", Severity.Error);
             return null!;
         }
-        
+
         return identity;
     }
 }

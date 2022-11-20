@@ -15,7 +15,7 @@ public class FlowNode : NodeModel, IDisposable
     private readonly IStateService _stateService;
     private readonly IMqttClientProvider _mqttClientProvider;
     private MqttSubscription? _subscription;
-    private bool disposedValue;
+    private bool _disposedValue;
 
     public StepDto Step { get; private set; }
 
@@ -41,7 +41,7 @@ public class FlowNode : NodeModel, IDisposable
         Step = step;
 
         if (step.Ports == null) return;
-        foreach (var port in step.Ports)
+        foreach (PortDto port in step.Ports)
         {
             AddPort(new FlowPort(this, port, step, _flowService, _mqttClientProvider, _stateService));
         }
@@ -61,26 +61,26 @@ public class FlowNode : NodeModel, IDisposable
         StepChanged?.Invoke();
     }
 
-    protected virtual void Dispose(bool disposing)
+    protected virtual async Task Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
                 if (_subscription != null)
                 {
                     _subscription.MessageReceived -= MqttMessageReceived;
-                    _mqttClientProvider.UnsubscribeAsync(_subscription);
+                    await _mqttClientProvider.UnsubscribeAsync(_subscription);
                 }
             }
 
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 
     public void Dispose()
     {
-        Dispose(disposing: true);
+        Dispose(disposing: true).GetAwaiter().GetResult();
         GC.SuppressFinalize(this);
     }
 

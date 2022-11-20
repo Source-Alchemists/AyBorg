@@ -18,7 +18,7 @@ public class FlowPort : PortModel, IDisposable
     private readonly IMqttClientProvider _mqttClientProvider;
     private readonly StepDto _step;
     private MqttSubscription? _subscription;
-    private bool disposedValue;
+    private bool _disposedValue;
 
     /// <summary>
     /// Gets the port name.
@@ -70,12 +70,12 @@ public class FlowPort : PortModel, IDisposable
         MqttSubscribe();
     }
 
-    /// <summary>	
+    /// <summary>
     /// Updates the port.
     /// </summary>
     public async Task UpdateAsync()
     {
-        var newPort = await _flowService.GetPortAsync(_stateService.AgentState.BaseUrl, Port.Id);
+        PortDto newPort = await _flowService.GetPortAsync(_stateService.AgentState.BaseUrl, Port.Id);
         if (newPort == null) return;
         Port = newPort;
         PortChanged?.Invoke();
@@ -100,7 +100,7 @@ public class FlowPort : PortModel, IDisposable
 
     private void MqttMessageReceived(MqttApplicationMessage e)
     {
-        var topic = e.Topic;
+        string topic = e.Topic;
         switch (Port.Brand)
         {
             case PortBrand.String:
@@ -136,26 +136,26 @@ public class FlowPort : PortModel, IDisposable
         PortChanged?.Invoke();
     }
 
-    protected virtual void Dispose(bool disposing)
+    protected virtual async Task Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
                 if (_subscription != null)
                 {
                     _subscription.MessageReceived -= MqttMessageReceived;
-                    _mqttClientProvider.UnsubscribeAsync(_subscription);
+                    await _mqttClientProvider.UnsubscribeAsync(_subscription);
                 }
             }
 
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 
     public void Dispose()
     {
-        Dispose(disposing: true);
+        Dispose(disposing: true).GetAwaiter().GetResult();
         GC.SuppressFinalize(this);
     }
 }

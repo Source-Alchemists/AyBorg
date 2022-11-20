@@ -1,24 +1,26 @@
 using System.Security.Cryptography;
 using System.Text;
 
+namespace AyBorg.Web.Pages.Admin.Shared;
+
 internal static class RandomPasswordGenerator
 {
-        private enum CharType
-        {
-            Lowercase,
-            Uppercase,
-            Digit,
-            Special
-        }
+    private enum CharType
+    {
+        Lowercase,
+        Uppercase,
+        Digit,
+        Special
+    }
 
-        public static int Length { get; } = 12;
-        public static int MinLowercases { get; } = 1;
-        public static int MinUppercases { get; } = 1;
-        public static int MinDigits { get; } = 1;
-        public static int MinSpecials { get; } = 1;
+    public static int Length { get; } = 12;
+    public static int MinLowercases { get; } = 1;
+    public static int MinUppercases { get; } = 1;
+    public static int MinDigits { get; } = 1;
+    public static int MinSpecials { get; } = 1;
 
 
-        private static readonly Dictionary<CharType, string> _chars = new()
+    private static readonly Dictionary<CharType, string> s_chars = new()
         {
             { CharType.Lowercase, "abcdefghijklmnopqrstuvwxyz" },
             { CharType.Uppercase, "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
@@ -26,68 +28,68 @@ internal static class RandomPasswordGenerator
             { CharType.Special, "!@#$%^&*()-_=+{}[]?<>.," }
         };
 
-        private static readonly Dictionary<CharType, int> _outstandingChars = new();
+    private static readonly Dictionary<CharType, int> s_outstandingChars = new();
 
-        public static string Generate()
+    public static string Generate()
+    {
+        if (Length < MinLowercases + MinUppercases + MinDigits + MinSpecials)
         {
-            if (Length < MinLowercases + MinUppercases + MinDigits + MinSpecials)
-            {
-                throw new ArgumentException("Minimum requirements exceed password length.");
-            }
-
-            ResetOutstandings();
-
-            var password = new StringBuilder();
-
-            for (int i = 0; i < Length; i++)
-            {
-                if (_outstandingChars.Sum(x => x.Value) == Length - i)
-                {
-                    var outstanding = _outstandingChars.Where(x => x.Value > 0).Select(x => x.Key).ToArray();
-                    password.Append(DrawChar(outstanding));
-                }
-                else
-                {
-                    password.Append(DrawChar());
-                }
-            }
-
-            return password.ToString();
+            throw new ArgumentException("Minimum requirements exceed password length.");
         }
 
-        private static void ResetOutstandings()
+        ResetOutstandings();
+
+        var password = new StringBuilder();
+
+        for (int i = 0; i < Length; i++)
         {
-            _outstandingChars[CharType.Lowercase] = MinLowercases;
-            _outstandingChars[CharType.Uppercase] = MinUppercases;
-            _outstandingChars[CharType.Digit] = MinDigits;
-            _outstandingChars[CharType.Special] = MinSpecials;
+            if (s_outstandingChars.Sum(x => x.Value) == Length - i)
+            {
+                CharType[] outstanding = s_outstandingChars.Where(x => x.Value > 0).Select(x => x.Key).ToArray();
+                password.Append(DrawChar(outstanding));
+            }
+            else
+            {
+                password.Append(DrawChar());
+            }
         }
 
-        private static char DrawChar(params CharType[] types)
+        return password.ToString();
+    }
+
+    private static void ResetOutstandings()
+    {
+        s_outstandingChars[CharType.Lowercase] = MinLowercases;
+        s_outstandingChars[CharType.Uppercase] = MinUppercases;
+        s_outstandingChars[CharType.Digit] = MinDigits;
+        s_outstandingChars[CharType.Special] = MinSpecials;
+    }
+
+    private static char DrawChar(params CharType[] types)
+    {
+        IEnumerable<KeyValuePair<CharType, string>> filteredChars = types.Length == 0 ? s_chars : s_chars.Where(x => types.Contains(x.Key));
+        int length = filteredChars.Sum(x => x.Value.Length);
+        int index = RandomNumberGenerator.GetInt32(length);
+        int offset = 0;
+
+        foreach (KeyValuePair<CharType, string> item in filteredChars)
         {
-            var filteredChars = types.Length == 0 ? _chars : _chars.Where(x => types.Contains(x.Key));
-            int length = filteredChars.Sum(x => x.Value.Length);
-            int index = RandomNumberGenerator.GetInt32(length);
-            int offset = 0;
-
-            foreach (var item in filteredChars)
+            if (index < offset + item.Value.Length)
             {
-                if (index < offset + item.Value.Length)
-                {
-                    DecreaseOustanding(item.Key);
-                    return item.Value[index - offset];
-                }
-                offset += item.Value.Length;
+                DecreaseOustanding(item.Key);
+                return item.Value[index - offset];
             }
-
-            return new char();
+            offset += item.Value.Length;
         }
 
-        private static void DecreaseOustanding(CharType type)
+        return new char();
+    }
+
+    private static void DecreaseOustanding(CharType type)
+    {
+        if (s_outstandingChars[type] > 0)
         {
-            if (_outstandingChars[type] > 0)
-            {
-                _outstandingChars[type]--;
-            }
+            s_outstandingChars[type]--;
         }
     }
+}
