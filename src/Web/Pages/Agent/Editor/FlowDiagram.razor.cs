@@ -337,8 +337,10 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         var selectedNodes = _diagram.Nodes.Where(n => n.Selected).ToList();
         foreach (NodeModel? node in selectedNodes)
         {
-            await ShowDeleteConfirmDialogAsync(node.Title);
-            OnNodeRemoved(node);
+            if(await ShowDeleteConfirmDialogAsync(node.Title))
+            {
+                OnNodeRemoved(node);
+            }
         }
     }
 

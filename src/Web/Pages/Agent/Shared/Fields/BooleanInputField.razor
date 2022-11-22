@@ -6,7 +6,7 @@
             <MudText Class="pt-1">@Port.Name</MudText>
         </MudItem>
         <MudItem xs="4">
-            <MudSwitch T="bool" Checked="@_value" CheckedChanged="OnCheckChanged" Disabled="Port!.IsLinkConvertable" Color="Color.Info" Class="p-0 m-0" />
+            <MudSwitch T="bool" Checked="@_value" CheckedChanged="OnCheckChanged" Disabled="@(Port!.IsLinkConvertable || Disabled)" Color="Color.Info" Class="p-0 m-0" />
         </MudItem>
     </MudGrid>
 </div>

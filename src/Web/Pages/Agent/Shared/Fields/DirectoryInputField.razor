@@ -1,3 +1,3 @@
 @inherits BaseInputField
 
-<EditFieldButton Label="@Port.Name" Value="@Port.Value" IsLinkConvertable="@Port.IsLinkConvertable" Clicked="@OnEditFieldClicked" />
+<EditFieldButton Label="@Port.Name" Value="@Port.Value" Disabled="@(Port.IsLinkConvertable || Disabled)" Clicked="@OnEditFieldClicked" />

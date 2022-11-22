@@ -1,5 +1,5 @@
-using AyBorg.SDK.Data.DTOs;
 using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Data.DTOs;
 using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
@@ -12,16 +12,13 @@ public partial class BaseInputField : ComponentBase
     [EditorRequired]
     public PortDto Port { get; set; } = null!;
 
-    [Parameter]
-    public RenderFragment ChildContent { get; set; } = null!;
+    [Parameter] public bool Disabled { get; set; }
 
-    [Parameter]
-    public bool IsEditFieldVisible { get; set; } = false;
+    [Parameter] public RenderFragment ChildContent { get; set; } = null!;
 
-    [Parameter]
-    public EventCallback<ValueChangedEventArgs> ValueChanged { get; set; }
+    [Parameter] public bool IsEditFieldVisible { get; set; } = false;
 
-    protected bool IsDisabled => Port.IsConnected;
+    [Parameter] public EventCallback<ValueChangedEventArgs> ValueChanged { get; set; }
 
     protected override Task OnInitializedAsync()
     {

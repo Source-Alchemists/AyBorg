@@ -1,7 +1,7 @@
-using Blazor.Diagrams.Core.Models;
-using Microsoft.AspNetCore.Components;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.Web.Pages.Agent.Shared.Fields;
+using Blazor.Diagrams.Core.Models;
+using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
@@ -17,7 +17,7 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
     public ValueTask DisposeAsync()
     {
         Node.StepChanged -= OnChangedAsync;
-        foreach(var ip in _inputPorts.Cast<FlowPort>())
+        foreach (FlowPort ip in _inputPorts.Cast<FlowPort>())
         {
             ip.PortChanged -= OnChangedAsync;
             ip.Dispose();
@@ -32,7 +32,7 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
         _outputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Right); // Right for output
 
         Node.StepChanged += OnChangedAsync;
-        foreach (var ip in _inputPorts.Cast<FlowPort>())
+        foreach (FlowPort ip in _inputPorts.Cast<FlowPort>())
         {
             ip.PortChanged += OnChangedAsync;
         }
@@ -45,17 +45,17 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
         await InvokeAsync(StateHasChanged);
     }
 
-     private async Task OnPortValueChangedAsync(ValueChangedEventArgs e)
-     {
-        var port = Node.Ports.Cast<FlowPort>().First(p => p.Port.Id == e.Port.Id);
+    private async Task OnPortValueChangedAsync(ValueChangedEventArgs e)
+    {
+        FlowPort port = Node.Ports.Cast<FlowPort>().First(p => p.Port.Id == e.Port.Id);
         port.Port.Value = e.Value;
         await port.SendValueAsync();
-     }
+    }
 
-     private static string GetPortClass(PortModel port)
-     {
+    private static string GetPortClass(PortModel port)
+    {
         var fp = (FlowPort)port;
-        var directionClass = fp.Direction == PortDirection.Input ? " input" : " output";
+        string directionClass = fp.Direction == PortDirection.Input ? " input" : " output";
         string typeClass = string.Empty;
         switch (fp.Brand)
         {
@@ -71,12 +71,12 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
                 typeClass = "shape";
                 break;
         }
-        ;
+       ;
         return $"flow {directionClass} {typeClass}";
-     }
+    }
 
-     private void OnRemoveNode()
-     {
+    private void OnRemoveNode()
+    {
         Node.Delete();
     }
 }
