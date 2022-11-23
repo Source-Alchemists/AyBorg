@@ -1,3 +1,4 @@
+using AyBorg.Agent.Guards;
 using AyBorg.Agent.Hubs;
 using AyBorg.Agent.Services;
 using AyBorg.Database.Data;
@@ -10,10 +11,10 @@ using AyBorg.SDK.System.Services;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
+string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
 
 builder.Services.AddDbContextFactory<ProjectContext>(options =>
     _ = databaseProvider switch
@@ -61,7 +62,7 @@ builder.Services.AddResponseCompression(opts =>
         new[] { "application/octet-stream" });
 });
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -73,6 +74,7 @@ if (app.Environment.IsDevelopment())
 app.UseAuthorization();
 
 app.UseJwtMiddleware();
+app.UseProjectStateGuardMiddleware();
 
 app.MapControllers();
 app.MapHub<FlowHubContext>("/hubs/flow");
