@@ -1,7 +1,9 @@
 # Custom steps (plugins)
 
 ## StepBody
+
 The step body is all what a developer need to write to have a fully executable plugin/step.
+
 ```c#
 public sealed class TimeDelay : IStepBody
 {
@@ -14,16 +16,16 @@ public sealed class TimeDelay : IStepBody
     {
         Ports = new List<IPort> { _milliseconds };
     }
-    
+
     /// Ports provided.
     public IEnumerable<IPort> Ports { get; }
 
     /// The method that runs the step.
-    public async Task<bool> TryRunAsync(CancellationToken cancellationToken)
+    public async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         try
         {
-            var targetDelay = System.Convert.ToInt32(_milliseconds.Value);
+            int targetDelay = System.Convert.ToInt32(_milliseconds.Value);
             await Task.Delay(targetDelay, cancellationToken);
         }
         catch (TaskCanceledException)
@@ -35,9 +37,11 @@ public sealed class TimeDelay : IStepBody
     }
 }
 ```
+
 The resulting step would look like this:
 
 ![Time.Delay Screenshot](../../img/TimeDelayStep.png)
 
 ## Ports
+
 Go to [ports](../../ports.md).
