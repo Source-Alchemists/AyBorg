@@ -47,6 +47,7 @@ public class ProjectStateGuardMiddlewareTests
     [InlineData("DELETE", "/flow", ProjectState.Ready)]
     public async Task Test_InvokeAsync(string method, string path, ProjectState projectState)
     {
+        // Arrange
         var context = new DefaultHttpContext();
         context.Request.Method = method;
         context.Request.Path = path;
@@ -61,8 +62,10 @@ public class ProjectStateGuardMiddlewareTests
             }
         });
 
+        // Act
         await _middleware.InvokeAsync(context);
 
+        // Assert
         if(method != "GET" && path.StartsWith("/flow") && projectState != ProjectState.Draft)
         {
             _nextMock.Verify(next => next(context), Times.Never);
