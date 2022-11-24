@@ -43,6 +43,11 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
                 Id = projectRecord.Meta.Id,
                 Name = projectRecord.Meta.Name,
             },
+            Settings = new ProjectSettings
+            {
+                IsResultCommunicationForced = projectRecord.Settings.IsForceResultCommunicationEnabled,
+                IsWebUiCommunicationForced = projectRecord.Settings.IsForceWebUiCommunicationEnabled
+            },
             // First, we need to convert all the steps
             Steps = await ConvertStepsAsync(projectRecord.Steps)
         };

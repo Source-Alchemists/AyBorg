@@ -7,6 +7,7 @@ using AyBorg.SDK.Common;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
+using AyBorg.SDK.System.Runtime;
 using AyBorg.SDK.System.Services;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +50,7 @@ builder.Services.AddSingleton<IEngineFactory, EngineFactory>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddSingleton<IFlowHub, FlowHub>();
 builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
+builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
 
 builder.Services.AddScoped<IJwtConsumerService, JwtConsumerService>();
 builder.Services.AddScoped<IFlowService, FlowService>();

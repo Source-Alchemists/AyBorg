@@ -12,6 +12,7 @@ internal sealed class EngineHost : IEngineHost
     private readonly IEngineFactory _engineFactory;
     private readonly IMqttClientProvider _mqttClientProvider;
     private readonly ICacheService _cacheService;
+    private readonly CommunicationStateProvider _communicationStateProvider;
     private IEngine? _engine;
     private EngineMeta? _engineMeta;
     private bool _isDisposed = false;
@@ -25,12 +26,14 @@ internal sealed class EngineHost : IEngineHost
     public EngineHost(ILogger<EngineHost> logger,
                         IEngineFactory engineFactory,
                         IMqttClientProvider mqttClientProvider,
-                        ICacheService cacheService)
+                        ICacheService cacheService,
+                        ICommunicationStateProvider communicationStateProvider)
     {
         _logger = logger;
         _engineFactory = engineFactory;
         _mqttClientProvider = mqttClientProvider;
         _cacheService = cacheService;
+        _communicationStateProvider = (CommunicationStateProvider)communicationStateProvider;
     }
 
     /// <summary>
@@ -66,7 +69,7 @@ internal sealed class EngineHost : IEngineHost
             _engine = null;
         }
 
-        foreach (var step in ActiveProject.Steps)
+        foreach (SDK.Common.IStepProxy step in ActiveProject.Steps)
         {
             step.Dispose();
         }
@@ -124,6 +127,8 @@ internal sealed class EngineHost : IEngineHost
         // Dispose previous engine.
         DisposeEngine();
 
+        _communicationStateProvider.Update(ActiveProject);
+
         _engine = _engineFactory.CreateEngine(ActiveProject, executionType);
         _engineMeta = new EngineMeta
         {
@@ -133,7 +138,7 @@ internal sealed class EngineHost : IEngineHost
         };
         _engine.StateChanged += EngineStateChanged;
         _engine.IterationFinished += EngineIterationFinished;
-        var startResult = await _engine.TryStartAsync();
+        bool startResult = await _engine.TryStartAsync();
         if (!startResult)
         {
             _logger.LogWarning("Engine start failed.");
@@ -167,7 +172,7 @@ internal sealed class EngineHost : IEngineHost
             return null!;
         }
 
-        var stopResult = await _engine.TryStopAsync();
+        bool stopResult = await _engine.TryStopAsync();
         if (!stopResult)
         {
             _logger.LogWarning("Engine stop failed.");
@@ -202,7 +207,7 @@ internal sealed class EngineHost : IEngineHost
             return null!;
         }
 
-        var abortResult = await _engine.TryAbortAsync();
+        bool abortResult = await _engine.TryAbortAsync();
         if (!abortResult)
         {
             _logger.LogWarning("Engine abort failed.");

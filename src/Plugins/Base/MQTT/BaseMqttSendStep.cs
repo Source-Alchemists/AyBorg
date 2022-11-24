@@ -1,5 +1,6 @@
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.System.Runtime;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
 
@@ -7,16 +8,18 @@ namespace AyBorg.Plugins.Base.MQTT;
 
 public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
 {
+    private readonly ICommunicationStateProvider _communicationStateProvider;
     private Task _parallelTask = null!;
     protected readonly EnumPort _qosPort = new("QoS", PortDirection.Input, MqttQualityOfServiceLevel.AtMostOnce);
     protected readonly BooleanPort _retainPort = new("Retain", PortDirection.Input, false);
     protected readonly BooleanPort _parallelPort = new("Parallel", PortDirection.Input, false);
-    private bool disposedValue;
+    private bool _disposedValue;
 
 
-    public BaseMqttSendStep(ILogger logger, IMqttClientProvider mqttClientProvider)
+    public BaseMqttSendStep(ILogger logger, IMqttClientProvider mqttClientProvider, ICommunicationStateProvider communicationStateProvider)
         : base(logger, mqttClientProvider)
     {
+        _communicationStateProvider = communicationStateProvider;
         _ports.Add(_topicPort);
         _ports.Add(_qosPort);
         _ports.Add(_retainPort);
@@ -25,6 +28,8 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
 
     public override async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
+        if(!_communicationStateProvider.IsResultCommunicationEnabled) return true;
+
         if (_parallelPort.Value)
         {
             if (_parallelTask != null)
@@ -53,7 +58,7 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
@@ -63,7 +68,7 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
                     _parallelTask.Dispose();
                 }
             }
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 

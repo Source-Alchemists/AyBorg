@@ -1,6 +1,7 @@
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.ImageProcessing.Encoding;
+using AyBorg.SDK.System.Runtime;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
 
@@ -14,8 +15,8 @@ public sealed class MqttImageSend : BaseMqttSendStep
 
     public override string DefaultName => "MQTT.Image.Send";
 
-    public MqttImageSend(ILogger<MqttImageSend> logger, IMqttClientProvider mqttClientProvider)
-        : base(logger, mqttClientProvider)
+    public MqttImageSend(ILogger<MqttImageSend> logger, IMqttClientProvider mqttClientProvider, ICommunicationStateProvider communicationState)
+        : base(logger, mqttClientProvider, communicationState)
     {
         _ports.Insert(0, _imagePort);
         _ports.Insert(1, _encodingPort);

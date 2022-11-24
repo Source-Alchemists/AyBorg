@@ -2,6 +2,7 @@
 using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Services;
+
 public interface IProjectManagementService
 {
     /// <summary>
@@ -30,14 +31,6 @@ public interface IProjectManagementService
     /// <param name="projectId">The project id.</param>
     /// <returns></returns>
     ValueTask<ProjectManagementResult> TryDeleteAsync(Guid projectId);
-
-    // /// <summary>
-    // /// Change project state asynchronous.
-    // /// </summary>
-    // /// <param name="projectId">The project identifier.</param>
-    // /// <param name="state">The state.</param>
-    // /// <returns></returns>
-    // ValueTask<ProjectManagementResult> TryChangeStateAsync(Guid projectId, ProjectState state);
 
     /// <summary>
     /// Gets all project metas asynchronous.

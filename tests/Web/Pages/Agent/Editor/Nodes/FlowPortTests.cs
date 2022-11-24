@@ -3,8 +3,6 @@ using System.Text.Json;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.DTOs;
-using AyBorg.SDK.ImageProcessing;
-using AyBorg.SDK.ImageProcessing.Encoding;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
