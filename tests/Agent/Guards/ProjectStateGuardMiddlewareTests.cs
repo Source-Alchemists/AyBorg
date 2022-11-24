@@ -69,10 +69,48 @@ public class ProjectStateGuardMiddlewareTests
         if(method != "GET" && path.StartsWith("/flow") && projectState != ProjectState.Draft)
         {
             _nextMock.Verify(next => next(context), Times.Never);
+            Assert.Equal(StatusCodes.Status403Forbidden, context.Response.StatusCode);
         }
         else
         {
             _nextMock.Verify(next => next(context), Times.Once);
         }
+    }
+
+    [Fact]
+    public async Task Test_InvokeAsync_NoActiveProject()
+    {
+        // Arrange
+        var context = new DefaultHttpContext();
+        context.Request.Method = "POST";
+        context.Request.Path = "/flow";
+
+        _projectManagementServiceMock.SetupGet(service => service.ActiveProjectId).Returns(Guid.Empty);
+
+        // Act
+        await _middleware.InvokeAsync(context);
+
+        // Assert
+        _nextMock.Verify(next => next(context), Times.Never);
+        Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Test_InvokeAsync_NoProjectMeta()
+    {
+        // Arrange
+        var context = new DefaultHttpContext();
+        context.Request.Method = "POST";
+        context.Request.Path = "/flow";
+
+        _projectManagementServiceMock.SetupGet(service => service.ActiveProjectId).Returns(Guid.NewGuid());
+        _projectManagementServiceMock.Setup(service => service.GetAllMetasAsync()).ReturnsAsync(new List<ProjectMetaRecord>());
+
+        // Act
+        await _middleware.InvokeAsync(context);
+
+        // Assert
+        _nextMock.Verify(next => next(context), Times.Never);
+        Assert.Equal(StatusCodes.Status400BadRequest, context.Response.StatusCode);
     }
 }
