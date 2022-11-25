@@ -141,7 +141,7 @@ public sealed class ProjectsController : ControllerBase
             return NotFound();
         }
 
-        return settings != null ? Ok(_storageToDtoMapper.Map(settings)) : NotFound();
+        return Ok(_storageToDtoMapper.Map(settings));
     }
 
 }

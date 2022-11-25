@@ -6,14 +6,11 @@ using MudBlazor;
 
 namespace AyBorg.Web.Shared;
 
-public partial class MainLayout : LayoutComponentBase, IDisposable
+public sealed partial class MainLayout : LayoutComponentBase, IDisposable
 {
-    [Inject]
-    protected NavigationManager NavigationManager { get; set; } = null!;
-    [Inject]
-    protected IJSRuntime JsRuntime { get; set; } = null!;
-    [Inject]
-    protected ILocalStorageService LocalStorageService { get; set; } = null!;
+    [Inject] NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] IJSRuntime JsRuntime { get; set; } = null!;
+    [Inject] ILocalStorageService LocalStorageService { get; set; } = null!;
     public string RouteName = string.Empty;
 
     private bool _isDarkMode = true;
