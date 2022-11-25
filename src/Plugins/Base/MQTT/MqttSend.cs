@@ -12,8 +12,8 @@ public sealed class MqttSend : BaseMqttSendStep, IStepBody
     private readonly StringPort _messagePort = new("Message", PortDirection.Input, string.Empty);
     public override string DefaultName => "MQTT.Send";
 
-    public MqttSend(ILogger<MqttSend> logger, IMqttClientProvider mqttClientProvider, ICommunicationStateProvider communicationState)
-        : base(logger, mqttClientProvider, communicationState)
+    public MqttSend(ILogger<MqttSend> logger, IMqttClientProvider mqttClientProvider, ICommunicationStateProvider communicationStateProvider)
+        : base(logger, mqttClientProvider, communicationStateProvider)
     {
         _ports.Insert(0, _messagePort);
     }

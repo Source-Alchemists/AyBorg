@@ -16,7 +16,7 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
     private bool _disposedValue;
 
 
-    public BaseMqttSendStep(ILogger logger, IMqttClientProvider mqttClientProvider, ICommunicationStateProvider communicationStateProvider)
+    protected BaseMqttSendStep(ILogger logger, IMqttClientProvider mqttClientProvider, ICommunicationStateProvider communicationStateProvider)
         : base(logger, mqttClientProvider)
     {
         _communicationStateProvider = communicationStateProvider;
