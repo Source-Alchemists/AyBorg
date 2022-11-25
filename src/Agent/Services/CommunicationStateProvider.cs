@@ -22,7 +22,7 @@ public sealed record CommunicationStateProvider : ICommunicationStateProvider
     public void Update(Project project)
     {
         IsResultCommunicationEnabled = project.Meta.State == ProjectState.Ready;
-        IsWebUiCommunicationEnabled = project.Meta.State != ProjectState.Draft;
+        IsWebUiCommunicationEnabled = project.Meta.State != ProjectState.Ready;
 
         if (project.Settings.IsResultCommunicationForced)
         {

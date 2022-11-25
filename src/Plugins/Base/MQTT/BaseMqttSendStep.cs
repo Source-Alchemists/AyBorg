@@ -28,7 +28,7 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
 
     public override async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
-        if(!_communicationStateProvider.IsResultCommunicationEnabled) return true;
+        if (!_communicationStateProvider.IsResultCommunicationEnabled) return true;
 
         if (_parallelPort.Value)
         {
