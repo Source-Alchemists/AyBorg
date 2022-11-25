@@ -23,7 +23,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.0" />
-    <PackageReference Include="MudBlazor" Version="6.0.18" />
+    <PackageReference Include="MudBlazor" Version="6.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
