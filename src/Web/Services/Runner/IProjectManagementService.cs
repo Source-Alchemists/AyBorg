@@ -9,14 +9,14 @@ public interface IProjectManagementService
     /// </summary>
     /// <param name="baseUrl">The base URL.</param>
     /// <returns></returns>
-    Task<IEnumerable<ProjectMetaDto>> GetMetasAsync(string baseUrl);
+    ValueTask<IEnumerable<ProjectMetaDto>> GetMetasAsync(string baseUrl);
 
     /// <summary>
     /// Receives active project meta asynchronous.
     /// </summary>
     /// <param name="baseUrl">The base URL.</param>
     /// <returns></returns>
-    Task<ProjectMetaDto> GetActiveMetaAsync(string baseUrl);
+    ValueTask<ProjectMetaDto> GetActiveMetaAsync(string baseUrl);
 
     /// <summary>
     /// Creates asynchronous.
@@ -24,7 +24,7 @@ public interface IProjectManagementService
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="projectName">Name of the project.</param>
     /// <returns></returns>
-    Task<ProjectMetaDto> CreateAsync(string baseUrl, string projectName);
+    ValueTask<ProjectMetaDto> CreateAsync(string baseUrl, string projectName);
 
     /// <summary>
     /// Deletes asynchronous.
@@ -32,7 +32,7 @@ public interface IProjectManagementService
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="projectMeta">The project meta.</param>
     /// <returns></returns>
-    Task<bool> TryDeleteAsync(string baseUrl, ProjectMetaDto projectMeta);
+    ValueTask<bool> TryDeleteAsync(string baseUrl, ProjectMetaDto projectMeta);
 
     /// <summary>
     /// Set the state of the project to active.
@@ -40,7 +40,7 @@ public interface IProjectManagementService
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="projectMeta">The project meta.</param>
     /// <returns></returns>
-    Task<bool> TryActivateAsync(string baseUrl, ProjectMetaDto projectMeta);
+    ValueTask<bool> TryActivateAsync(string baseUrl, ProjectMetaDto projectMeta);
 
     /// <summary>
     /// Sets the project to ready state.
@@ -49,7 +49,7 @@ public interface IProjectManagementService
     /// <param name="dbId">The database identifier.</param>
     /// <param name="projectStateChange">State of the project.</param>
     /// <returns></returns>
-    Task<bool> TrySaveNewVersionAsync(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange);
+    ValueTask<bool> TrySaveNewVersionAsync(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange);
 
     /// <summary>
     /// Sets the project to ready state.
@@ -58,7 +58,7 @@ public interface IProjectManagementService
     /// <param name="dbId">The database identifier.</param>
     /// <param name="projectStateChange">State of the project.</param>
     /// <returns></returns>
-    Task<bool> TryApproveAsnyc(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange);
+    ValueTask<bool> TryApproveAsnyc(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange);
 
     /// <summary>
     /// Save the project.
@@ -66,5 +66,13 @@ public interface IProjectManagementService
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="projectMeta">The project meta.</param>
     /// <returns></returns>
-    Task<bool> TrySaveAsync(string baseUrl, ProjectMetaDto projectMeta);
+    ValueTask<bool> TrySaveAsync(string baseUrl, ProjectMetaDto projectMeta);
+
+    /// <summary>
+    /// Gets the project settings asynchronous.
+    /// </summary>
+    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="projectMeta">The project meta info.</param>
+    /// <returns></returns>
+    ValueTask<ProjectSettingsDto> GetProjectSettingsAsync(string baseUrl, ProjectMetaDto projectMeta);
 }

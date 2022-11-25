@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using AyBorg.Agent.Hubs;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
@@ -71,7 +72,7 @@ internal sealed class FlowService : IFlowService
     /// <returns></returns>
     public async ValueTask<IStepProxy> AddStepAsync(Guid stepId, int x, int y)
     {
-        var pluginProxy = _pluginsService.Find(stepId);
+        IStepProxy pluginProxy = _pluginsService.Find(stepId);
         if (_runtimeHost.ActiveProject == null)
         {
             _logger.LogWarning("No active project found.");
@@ -84,7 +85,7 @@ internal sealed class FlowService : IFlowService
             return null!;
         }
 
-        var stepProxy = _pluginsService.CreateInstance(pluginProxy.StepBody);
+        IStepProxy stepProxy = _pluginsService.CreateInstance(pluginProxy.StepBody);
         stepProxy.X = x;
         stepProxy.Y = y;
 
@@ -105,8 +106,8 @@ internal sealed class FlowService : IFlowService
             return false;
         }
 
-        var project = _runtimeHost.ActiveProject;
-        var step = project.Steps.FirstOrDefault(s => s.Id == stepId);
+        SDK.Projects.Project project = _runtimeHost.ActiveProject;
+        IStepProxy? step = project.Steps.FirstOrDefault(s => s.Id == stepId);
         if (step == null)
         {
             _logger.LogWarning("Step with id '{stepId}' not found.", stepId);
@@ -116,7 +117,7 @@ internal sealed class FlowService : IFlowService
         project.Steps.Remove(step);
 
         var stepLinks = new List<PortLink>();
-        foreach (var link in step.Links)
+        foreach (PortLink link in step.Links)
         {
             stepLinks.Add(link);
             if (project.Links.Contains(link))
@@ -125,11 +126,11 @@ internal sealed class FlowService : IFlowService
             }
         }
 
-        foreach (var link in stepLinks)
+        foreach (PortLink link in stepLinks)
         {
-            foreach (var linkedStep in project.Steps.Where(s => s.Links.Contains(link)))
+            foreach (IStepProxy? linkedStep in project.Steps.Where(s => s.Links.Contains(link)))
             {
-                foreach (var linkedPort in linkedStep.Ports.Where(p => p.Id == link.SourceId || p.Id == link.TargetId))
+                foreach (IPort? linkedPort in linkedStep.Ports.Where(p => p.Id == link.SourceId || p.Id == link.TargetId))
                 {
                     linkedPort.Disconnect();
                 }
@@ -156,7 +157,7 @@ internal sealed class FlowService : IFlowService
             return false;
         }
 
-        var step = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Id == stepId);
+        IStepProxy? step = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Id == stepId);
         if (step == null)
         {
             _logger.LogWarning("Step with id '{stepId}' not found.", stepId);
@@ -186,10 +187,10 @@ internal sealed class FlowService : IFlowService
         IPort? targetPort = null;
         IStepProxy? sourceStep = null;
         IStepProxy? targetStep = null;
-        foreach (var step in _runtimeHost.ActiveProject.Steps)
+        foreach (IStepProxy step in _runtimeHost.ActiveProject.Steps)
         {
-            var sp = step.Ports.FirstOrDefault(p => p.Id == sourcePortId);
-            var tp = step.Ports.FirstOrDefault(p => p.Id == targetPortId);
+            IPort? sp = step.Ports.FirstOrDefault(p => p.Id == sourcePortId);
+            IPort? tp = step.Ports.FirstOrDefault(p => p.Id == targetPortId);
 
             if (sp != null)
             {
@@ -203,40 +204,26 @@ internal sealed class FlowService : IFlowService
             }
         }
 
-        if (sourcePort == null || targetPort == null)
+        if (!ValidatePortLinkResult(sourcePortId, targetPortId, sourcePort!, targetPort!))
         {
-            _logger.LogWarning("Ports with ids '{sourcePortId}' and/or '{targetPortId}' not found.", sourcePortId, targetPortId);
             return null!;
         }
 
-        if (sourceStep!.Id == targetStep!.Id)
+        if (!ValidateStepLinkResult(sourcePortId, targetPortId, sourceStep!, targetStep!))
         {
-            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are in the same step.", sourcePortId, targetPortId);
             return null!;
         }
 
-        if (sourcePort.Direction != PortDirection.Output || targetPort.Direction != PortDirection.Input)
-        {
-            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are not compatible.", sourcePortId, targetPortId);
-            return null!;
-        }
-
-        if (sourceStep.Links.Any(x => x.SourceId == sourcePortId && x.TargetId == targetPortId)
-            || targetStep.Links.Any(x => x.SourceId == sourcePortId && x.TargetId == targetPortId))
+        if (sourceStep!.Links.Any(x => x.SourceId == sourcePortId && x.TargetId == targetPortId)
+            || targetStep!.Links.Any(x => x.SourceId == sourcePortId && x.TargetId == targetPortId))
         {
             _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are already linked.", sourcePortId, targetPortId);
             return null!;
         }
 
-        if (!PortConverter.IsConvertable(sourcePort, targetPort))
-        {
-            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are not convertable.", sourcePortId, targetPortId);
-            return null!;
-        }
-
-        var link = new PortLink(sourcePort, targetPort);
-        targetPort.Connect(link);
-        sourcePort.Connect(link);
+        var link = new PortLink(sourcePort!, targetPort!);
+        targetPort!.Connect(link);
+        sourcePort!.Connect(link);
         sourceStep.Links.Add(link);
         targetStep.Links.Add(link);
         _runtimeHost.ActiveProject.Links.Add(link);
@@ -257,20 +244,20 @@ internal sealed class FlowService : IFlowService
             return false;
         }
 
-        var steps = _runtimeHost.ActiveProject.Steps.Where(s => s.Links.Any(l => l.Id == linkId));
+        IEnumerable<IStepProxy> steps = _runtimeHost.ActiveProject.Steps.Where(s => s.Links.Any(l => l.Id == linkId));
         if (!steps.Any())
         {
             _logger.LogTrace("Link with id '{linkId}' not found. Already removed.", linkId);
             return true;
         }
 
-        var link = steps.First().Links.First(l => l.Id == linkId);
-        var sourcePort = link.Source;
-        var targetPort = link.Target;
+        PortLink link = steps.First().Links.First(l => l.Id == linkId);
+        IPort sourcePort = link.Source;
+        IPort targetPort = link.Target;
         sourcePort.Disconnect();
         targetPort.Disconnect();
 
-        foreach (var step in steps)
+        foreach (IStepProxy? step in steps)
         {
             step.Links.Remove(link);
         }
@@ -293,7 +280,7 @@ internal sealed class FlowService : IFlowService
             return null!;
         }
 
-        var targetStep = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Ports.Any(p => p.Id == portId));
+        IStepProxy? targetStep = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Ports.Any(p => p.Id == portId));
         if (targetStep == null)
         {
             _logger.LogTrace("Port with id '{portId}' not found. Already removed.", portId);
@@ -317,14 +304,50 @@ internal sealed class FlowService : IFlowService
             return false;
         }
 
-        var targetStep = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Ports.Any(p => p.Id == portId));
+        IStepProxy? targetStep = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Ports.Any(p => p.Id == portId));
         if (targetStep == null)
         {
             _logger.LogWarning("Port with id '{portId}' not found.", portId);
             return false;
         }
 
-        var port = targetStep.Ports.First(p => p.Id == portId);
+        IPort port = targetStep.Ports.First(p => p.Id == portId);
         return await _runtimeConverterService.TryUpdatePortValueAsync(port, value);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool ValidatePortLinkResult(Guid sourcePortId, Guid targetPortId, IPort sourcePort, IPort targetPort)
+    {
+        if (sourcePort == null || targetPort == null)
+        {
+            _logger.LogWarning("Ports with ids '{sourcePortId}' and/or '{targetPortId}' not found.", sourcePortId, targetPortId);
+            return false;
+        }
+
+        if (sourcePort.Direction != PortDirection.Output || targetPort.Direction != PortDirection.Input)
+        {
+            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are not compatible.", sourcePortId, targetPortId);
+            return false;
+        }
+
+        if (!PortConverter.IsConvertable(sourcePort, targetPort))
+        {
+            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are not convertable.", sourcePortId, targetPortId);
+            return false;
+        }
+
+        return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private bool ValidateStepLinkResult(Guid sourcePortId, Guid targetPortId, IStepProxy sourceStep, IStepProxy targetStep)
+    {
+        if (sourceStep!.Id == targetStep!.Id)
+        {
+            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are in the same step.", sourcePortId, targetPortId);
+            return false;
+        }
+
+        return true;
     }
 }

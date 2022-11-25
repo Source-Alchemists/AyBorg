@@ -22,10 +22,10 @@ public class FlowHub : IFlowHub
     /// Sends the link changed.
     /// </summary>
     /// <param name="link">The link.</param>
-    /// <param name="removed">if set to <c>true</c> [remove].</param>
-    public async ValueTask SendLinkChangedAsync(PortLink link, bool removed)
+    /// <param name="remove = false">if set to <c>true</c> [remove].</param>
+    public async ValueTask SendLinkChangedAsync(PortLink link, bool remove = false)
     {
-        var dtoLink = _mapper.Map(link);
-        await _hubContext.Clients.All.SendAsync("LinkChanged", dtoLink, removed);
+        SDK.Data.DTOs.LinkDto dtoLink = _mapper.Map(link);
+        await _hubContext.Clients.All.SendAsync("LinkChanged", dtoLink, remove);
     }
 }

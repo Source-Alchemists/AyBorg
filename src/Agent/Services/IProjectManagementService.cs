@@ -13,10 +13,10 @@ public interface IProjectManagementService
     /// <summary>
     /// Activates asynchronous.
     /// </summary>
-    /// <param name="projectId">The project identifier.</param>
+    /// <param name="projectMetaId">The project identifier.</param>
     /// <param name="isActive">if set to <c>true</c> [is active].</param>
     /// <returns></returns>
-    ValueTask<ProjectManagementResult> TryActivateAsync(Guid projectId, bool isActive);
+    ValueTask<ProjectManagementResult> TryActivateAsync(Guid projectMetaId, bool isActive);
 
     /// <summary>
     /// Creates the asynchronous.
@@ -36,6 +36,11 @@ public interface IProjectManagementService
     /// Gets all project metas asynchronous.
     /// </summary>
     ValueTask<IEnumerable<ProjectMetaRecord>> GetAllMetasAsync();
+
+    /// <summary>
+    /// Gets the project settings asynchronous.
+    /// </summary>
+    ValueTask<ProjectSettingsRecord> GetSettingsAsync(Guid projectMetaDatabaseId);
 
     /// <summary>
     /// Load active project asynchronous.

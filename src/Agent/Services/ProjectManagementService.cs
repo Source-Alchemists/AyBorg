@@ -131,10 +131,10 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <param name="projectMetaId">The project identifier.</param>
     /// <param name="isActive">if set to <c>true</c> [is active].</param>
     /// <returns></returns>
-    public async ValueTask<ProjectManagementResult> TryActivateAsync(Guid projectMetaDbId, bool isActive)
+    public async ValueTask<ProjectManagementResult> TryActivateAsync(Guid projectMetaId, bool isActive)
     {
         using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
-        ProjectMetaRecord? orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectMetaDbId);
+        ProjectMetaRecord? orgMetaRecord = await context.AyBorgProjectMetas!.FindAsync(projectMetaId);
         if (orgMetaRecord == null)
         {
             _logger.LogWarning($"No project found to activate.");
@@ -168,12 +168,12 @@ internal sealed class ProjectManagementService : IProjectManagementService
         if (isActive)
         {
             IQueryable<ProjectRecord> queryProject = CreateFullProjectQuery(context);
-            ProjectRecord orgProjectRecord = await queryProject.FirstAsync(x => x.Meta.DbId.Equals(projectMetaDbId));
+            ProjectRecord orgProjectRecord = await queryProject.FirstAsync(x => x.Meta.DbId.Equals(projectMetaId));
             _logger.LogTrace("Loading project [{orgProjectRecord.Meta.Name}] with step count [{orgProjectRecord.Steps.Count}].", orgProjectRecord.Meta.Name, orgProjectRecord.Steps.Count);
             Project project = await _runtimeConverterService.ConvertAsync(orgProjectRecord);
             if (!await _engineHost.TryActivateProjectAsync(project))
             {
-                _logger.LogWarning("Could not activate project [{projectMetaDbId}].", projectMetaDbId);
+                _logger.LogWarning("Could not activate project [{projectMetaDbId}].", projectMetaId);
                 return new ProjectManagementResult(false, "Could not activate project.");
             }
         }
@@ -199,6 +199,22 @@ internal sealed class ProjectManagementService : IProjectManagementService
     {
         using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
         return await context.AyBorgProjectMetas!.ToListAsync();
+    }
+
+    /// <summary>
+    /// Gets the project settings asynchronous.
+    /// </summary>
+    public async ValueTask<ProjectSettingsRecord> GetSettingsAsync(Guid projectMetaDatabaseId)
+    {
+        using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
+        ProjectRecord? projectRecord = await context.AyBorgProjects!.Include(x => x.Settings).FirstOrDefaultAsync(x => x.Meta.DbId.Equals(projectMetaDatabaseId));
+        if (projectRecord == null)
+        {
+            _logger.LogWarning("No project found with id [{projectDatabaseId}].", projectMetaDatabaseId);
+            return null!;
+        }
+
+        return projectRecord.Settings;
     }
 
     /// <summary>

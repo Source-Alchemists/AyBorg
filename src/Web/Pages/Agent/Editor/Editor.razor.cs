@@ -1,9 +1,11 @@
 using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Pages.Agent.Shared;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace AyBorg.Web.Pages.Agent.Editor;
 
@@ -14,7 +16,7 @@ public partial class Editor : ComponentBase
     private string _serviceName = string.Empty;
     private bool _hasServiceError = false;
     private ProjectMetaDto? _projectMeta;
-    private bool _isProjectSaving = false;
+    private bool _isProjectServerWaiting = false;
 
     private bool _areSubComponentsHidden = true; // Workaround to update the flow with the correct Agent instance.
 
@@ -27,12 +29,14 @@ public partial class Editor : ComponentBase
     [Inject] IRegistryService? RegistryService { get; set; }
     [Inject] IProjectManagementService? ProjectManagementService { get; set; }
     [Inject] IStateService StateService { get; set; } = null!;
+    [Inject] IDialogService DialogService { get; set; } = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+            _isProjectServerWaiting = true;
             _areSubComponentsHidden = true;
             IEnumerable<RegistryEntryDto> services = await RegistryService!.ReceiveAllAvailableServicesAsync();
 
@@ -58,19 +62,26 @@ public partial class Editor : ComponentBase
             _projectMeta = await ProjectManagementService!.GetActiveMetaAsync(_baseUrl);
 
             _areSubComponentsHidden = false;
+            _isProjectServerWaiting = false;
             await InvokeAsync(StateHasChanged);
         }
     }
 
-    private async Task OnProjectSaveClicked()
+    private async void OnProjectSaveClicked()
     {
-        if (_projectMeta == null)
-        {
-            throw new InvalidOperationException("Project meta is null");
-        }
+        _isProjectServerWaiting = true;
+        await ProjectManagementService!.TrySaveAsync(_baseUrl, _projectMeta!);
+        _isProjectServerWaiting = false;
+        await InvokeAsync(StateHasChanged);
+    }
 
-        _isProjectSaving = true;
-        await ProjectManagementService!.TrySaveAsync(_baseUrl, _projectMeta);
-        _isProjectSaving = false;
+    private async void OnProjectSettingsClicked()
+    {
+        IDialogReference dialog = DialogService.Show<ProjectSettingsDialog>("Project settings", new DialogParameters { { "ProjectMeta", _projectMeta } });
+        DialogResult result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            await InvokeAsync(StateHasChanged);
+        }
     }
 }

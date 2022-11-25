@@ -1,5 +1,6 @@
 using AyBorg.Agent.Services;
 using AyBorg.SDK.Authorization;
+using AyBorg.SDK.Data.DAL;
 using AyBorg.SDK.Data.DTOs;
 using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
@@ -56,8 +57,8 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult<ProjectMetaDto>> GetActiveAsync()
     {
-        IEnumerable<SDK.Data.DAL.ProjectMetaRecord> metas = await _projectManagementService.GetAllMetasAsync();
-        SDK.Data.DAL.ProjectMetaRecord? activeProjectMeta = metas.FirstOrDefault(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
+        IEnumerable<ProjectMetaRecord> metas = await _projectManagementService.GetAllMetasAsync();
+        ProjectMetaRecord? activeProjectMeta = metas.FirstOrDefault(p => p.IsActive && p.ServiceUniqueName == _serviceUniqueName);
         if (activeProjectMeta == null)
         {
             _logger.LogWarning("No active project found.");
@@ -72,7 +73,7 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async ValueTask<ActionResult<ProjectMetaDto>> CreateAsync(string name)
     {
-        SDK.Data.DAL.ProjectRecord record = await _projectManagementService.CreateAsync(name);
+        ProjectRecord record = await _projectManagementService.CreateAsync(name);
         return Ok(_storageToDtoMapper.Map(record.Meta));
     }
 
@@ -126,6 +127,21 @@ public sealed class ProjectsController : ControllerBase
 
         ProjectManagementResult result = await _projectManagementService.TrySaveActiveAsync();
         return result.IsSuccessful ? Ok() : Conflict(result.Message);
+    }
+
+    [HttpGet("{dbId}/settings")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async ValueTask<ActionResult<ProjectSettingsDto>> GetSettingsAsync(Guid dbId)
+    {
+        ProjectSettingsRecord? settings = await _projectManagementService.GetSettingsAsync(dbId);
+        if (settings == null)
+        {
+            _logger.LogWarning("No settings found for project {dbId}.", dbId);
+            return NotFound();
+        }
+
+        return settings != null ? Ok(_storageToDtoMapper.Map(settings)) : NotFound();
     }
 
 }

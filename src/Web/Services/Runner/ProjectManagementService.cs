@@ -30,7 +30,7 @@ public class ProjectManagementService : IProjectManagementService
     /// </summary>
     /// <param name="baseUrl">The base URL.</param>
     /// <returns></returns>
-    public async Task<IEnumerable<ProjectMetaDto>> GetMetasAsync(string baseUrl)
+    public async ValueTask<IEnumerable<ProjectMetaDto>> GetMetasAsync(string baseUrl)
     {
         var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/projects");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
@@ -49,7 +49,7 @@ public class ProjectManagementService : IProjectManagementService
     /// </summary>
     /// <param name="baseUrl">The base URL.</param>
     /// <returns></returns>
-    public async Task<ProjectMetaDto> GetActiveMetaAsync(string baseUrl)
+    public async ValueTask<ProjectMetaDto> GetActiveMetaAsync(string baseUrl)
     {
         try
         {
@@ -73,7 +73,7 @@ public class ProjectManagementService : IProjectManagementService
     /// <param name="projectName">Name of the project.</param>
     /// <returns></returns>
     /// <exception cref="System.Text.Json.JsonException"></exception>
-    public async Task<ProjectMetaDto> CreateAsync(string baseUrl, string projectName)
+    public async ValueTask<ProjectMetaDto> CreateAsync(string baseUrl, string projectName)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/projects?name={projectName}");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
@@ -85,11 +85,7 @@ public class ProjectManagementService : IProjectManagementService
             return null!;
         }
 
-        using Stream stream = response.Content.ReadAsStream();
-        var streamReader = new StreamReader(stream, Encoding.UTF8);
-        string postJson = await streamReader.ReadToEndAsync();
-
-        ProjectMetaDto? projectMetaDto = JsonSerializer.Deserialize<ProjectMetaDto>(postJson);
+        ProjectMetaDto? projectMetaDto = await response.Content.ReadFromJsonAsync<ProjectMetaDto>();
         if (projectMetaDto == null) throw new JsonException();
         return projectMetaDto;
     }
@@ -100,7 +96,7 @@ public class ProjectManagementService : IProjectManagementService
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="projectMeta">The project meta info.</param>
     /// <returns></returns>
-    public async Task<bool> TryDeleteAsync(string baseUrl, ProjectMetaDto projectMeta)
+    public async ValueTask<bool> TryDeleteAsync(string baseUrl, ProjectMetaDto projectMeta)
     {
         var request = new HttpRequestMessage(HttpMethod.Delete, $"{baseUrl}/projects?id={projectMeta.Id}");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
@@ -120,7 +116,7 @@ public class ProjectManagementService : IProjectManagementService
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="projectMeta">The project meta info.</param>
     /// <returns></returns>
-    public async Task<bool> TryActivateAsync(string baseUrl, ProjectMetaDto projectMeta)
+    public async ValueTask<bool> TryActivateAsync(string baseUrl, ProjectMetaDto projectMeta)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.DbId}/active/true");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
@@ -141,7 +137,7 @@ public class ProjectManagementService : IProjectManagementService
     /// <param name="dbId">The database identifier.</param>
     /// <param name="projectStateChange">State of the project.</param>
     /// <returns></returns>
-    public async Task<bool> TrySaveNewVersionAsync(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange)
+    public async ValueTask<bool> TrySaveNewVersionAsync(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{dbId}/state")
         {
@@ -165,7 +161,7 @@ public class ProjectManagementService : IProjectManagementService
     /// <param name="dbId">The database identifier.</param>
     /// <param name="projectStateChange">State of the project.</param>
     /// <returns></returns>
-    public async Task<bool> TryApproveAsnyc(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange)
+    public async ValueTask<bool> TryApproveAsnyc(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{dbId}/approve")
         {
@@ -187,7 +183,7 @@ public class ProjectManagementService : IProjectManagementService
     /// </summary>
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="projectMeta">The project meta info.</param>
-    public async Task<bool> TrySaveAsync(string baseUrl, ProjectMetaDto projectMeta)
+    public async ValueTask<bool> TrySaveAsync(string baseUrl, ProjectMetaDto projectMeta)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.Id}");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
@@ -199,5 +195,27 @@ public class ProjectManagementService : IProjectManagementService
         }
 
         return true;
+    }
+
+    /// <summary>
+    /// Gets the project settings asynchronous.
+    /// </summary>
+    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="projectMeta">The project meta info.</param>
+    /// <returns></returns>
+    public async ValueTask<ProjectSettingsDto> GetProjectSettingsAsync(string baseUrl, ProjectMetaDto projectMeta)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/projects/{projectMeta.DbId}/settings");
+        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("Could not get project settings for '{projectMeta.Name}' [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
+            return null!;
+        }
+
+        ProjectSettingsDto? projectSettingsDto = await response.Content.ReadFromJsonAsync<ProjectSettingsDto>();
+        if (projectSettingsDto == null) throw new JsonException();
+        return projectSettingsDto;
     }
 }

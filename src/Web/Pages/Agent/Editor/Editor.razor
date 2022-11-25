@@ -12,7 +12,6 @@ else
 {
     <PageTitle>AyBorg - Editor (@_serviceName)</PageTitle>
 }
-
 <MudGrid hidden="@(_projectMeta?.IsActive != false)">
     <MudItem xs="12">
         <MudCard>
@@ -69,18 +68,18 @@ else
             <RuntimeToolbar ServiceUniqueName="@_serviceUniqueName" BaseUrl="@_baseUrl" />
         }
         <MudSpacer />
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@OnProjectSaveClicked" Style="width: 200px" Disabled=@(_projectMeta?.State != ProjectState.Draft)>
-            @if (_isProjectSaving)
-            {
-                <MudProgressCircular Class="ms-n1" Size="Size.Small" Indeterminate="true" />
-            }
-            else
-            {
-                <MudIcon Icon="@Icons.Filled.SaveAlt" />
-                <MudText Class="pl-2">Save as draft</MudText>
-            }
-        </MudButton>
+        <MudTooltip Text="Save as draft">
+            <MudIconButton Color="Color.Default" Icon="@Icons.Filled.SaveAlt" OnClick="@OnProjectSaveClicked" Disabled=@(_projectMeta?.State != ProjectState.Draft) />
+        </MudTooltip>
+        <MudTooltip Text="Settings">
+            <MudIconButton Icon="@Icons.Filled.Settings" OnClick="@OnProjectSettingsClicked" />
+        </MudTooltip>
     </MudToolBar>
+
+    <div style="height: 4px">
+        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isProjectServerWaiting)"/>
+    </div>
+
     <MudGrid Class="editor-container" hidden="@(_projectMeta == null)">
         @if (_projectMeta != null)
         {

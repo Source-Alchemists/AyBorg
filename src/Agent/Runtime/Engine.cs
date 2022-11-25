@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
@@ -9,7 +10,7 @@ namespace AyBorg.Agent.Runtime;
 /// <summary>
 /// Represents the engine.
 /// </summary>
-/// <remarks>To keep things simple, the engine is always running once and is not beeing reused. 
+/// <remarks>To keep things simple, the engine is always running once and is not beeing reused.
 /// Each single/continuous run will create a new engine, with a new ID starting from idle state.</remarks>
 internal sealed class Engine : IEngine
 {
@@ -66,7 +67,7 @@ internal sealed class Engine : IEngine
         _pathExecuterLogger = _loggerFactory.CreateLogger<PathExecuter>();
         ExecutionType = executionType;
 
-        foreach (var step in _project.Steps)
+        foreach (IStepProxy step in _project.Steps)
         {
             step.Completed += StepCompleted;
         }
@@ -91,7 +92,7 @@ internal sealed class Engine : IEngine
         StateChanged?.Invoke(this, State);
 
         var pathfinder = new Pathfinder();
-        var pathItems = await pathfinder.CreatePathAsync(_project.Steps, _project.Links);
+        IEnumerable<PathItem> pathItems = await pathfinder.CreatePathAsync(_project.Steps, _project.Links);
         _logger.LogTrace("Engine [{Id}] path created.", Id);
 
         _executionTask = Task.Factory.StartNew(async () => await ExecutePathAsync(pathItems, _stopTokenSource.Token, _abortTokenSource.Token), TaskCreationOptions.LongRunning);
@@ -168,7 +169,7 @@ internal sealed class Engine : IEngine
 
             _abortTokenSource.Dispose();
             _stopTokenSource.Dispose();
-            foreach (var step in _project.Steps)
+            foreach (IStepProxy step in _project.Steps)
             {
                 step.Completed -= StepCompleted;
             }
@@ -187,31 +188,7 @@ internal sealed class Engine : IEngine
             _iterationId = Guid.NewGuid();
             _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] started.", Id, _iterationId);
 
-            // Create a new executer for each path item.
-            foreach (var pathItem in pathItems)
-            {
-                // If the same step is used multiple times in the path, we only need to create one executer for it.
-                if (executers.Any(e => e.PathItem.Step.Id.Equals(pathItem.Step.Id)))
-                {
-                    continue;
-                }
-
-                executers.Add(new PathExecuter(_pathExecuterLogger, pathItem, _iterationId, abortToken));
-            }
-
-            // Wait till all path items are done with there work.
-            // Done could be completed successfully or failed.
-            while (!executers.All(e => e.Done))
-            {
-                foreach (var executer in executers.Where(e => e.State == PathExecutionState.Ready && e.State != PathExecutionState.Running))
-                {
-                    executingTasks.Add(executer.TryExecuteAsync());
-                }
-
-                // ToDo: Potentiall performance issue. Task delay could have a jitter of few milliseconds.
-                await Task.Delay(1);
-            }
-
+            await StartExecuteAllPathItemsAsync(executers, pathItems, executingTasks, abortToken);
             await WaitAndClearExecutors(executers, executingTasks);
 
             // All steps are executed and the iteration is finished.
@@ -244,7 +221,37 @@ internal sealed class Engine : IEngine
             State = EngineState.Finished;
             _logger.LogTrace("Engine [{Id}] single run finished.", Id);
         }
+
         StateChanged?.Invoke(this, State);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private async ValueTask StartExecuteAllPathItemsAsync(HashSet<PathExecuter> executers, IEnumerable<PathItem> pathItems, List<Task<bool>> executingTasks, CancellationToken abortToken)
+    {
+        // Create a new executer for each path item.
+        foreach (PathItem pathItem in pathItems)
+        {
+            // If the same step is used multiple times in the path, we only need to create one executer for it.
+            if (executers.Any(e => e.PathItem.Step.Id.Equals(pathItem.Step.Id)))
+            {
+                continue;
+            }
+
+            executers.Add(new PathExecuter(_pathExecuterLogger, pathItem, _iterationId, abortToken));
+        }
+
+        // Wait till all path items are done with there work.
+        // Done could be completed successfully or failed.
+        while (!executers.All(e => e.Done))
+        {
+            foreach (PathExecuter? executer in executers.Where(e => e.State == PathExecutionState.Ready && e.State != PathExecutionState.Running))
+            {
+                executingTasks.Add(executer.TryExecuteAsync());
+            }
+
+            // ToDo: Potentiall performance issue. Task delay could have a jitter of few milliseconds.
+            await Task.Delay(1, CancellationToken.None);
+        }
     }
 
     private async void StepCompleted(object? sender, bool success)
@@ -264,16 +271,16 @@ internal sealed class Engine : IEngine
     {
         await SendStepInputPortsAsync(stepProxy);
 
-        var baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/";
+        string baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/";
         await _mqttClientProvider.PublishAsync($"{baseTopic}executionTimeMs", stepProxy.ExecutionTimeMs.ToString(), new MqttPublishOptions());
     }
 
     private async ValueTask SendStepInputPortsAsync(IStepProxy stepProxy)
     {
-        var baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/ports/";
+        string baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/ports/";
 
-        var inputPorts = stepProxy.StepBody.Ports.Where(p => p.Direction == PortDirection.Input);
-        var token = CancellationToken.None;
+        IEnumerable<IPort> inputPorts = stepProxy.StepBody.Ports.Where(p => p.Direction == PortDirection.Input);
+        CancellationToken token = CancellationToken.None;
         await Parallel.ForEachAsync(inputPorts, async (port, token) =>
         {
             await _mqttClientProvider.PublishAsync($"{baseTopic}{port.Id}", port, new MqttPublishOptions { Resize = true });
@@ -283,13 +290,13 @@ internal sealed class Engine : IEngine
     private static async ValueTask WaitAndClearExecutors(HashSet<PathExecuter> executers, List<Task<bool>> executingTasks)
     {
         await Task.WhenAll(executingTasks);
-        foreach (var t in executingTasks)
+        foreach (Task<bool> t in executingTasks)
         {
             t.Dispose();
         }
 
         // Clear the executer list.
-        foreach (var executer in executers)
+        foreach (PathExecuter executer in executers)
         {
             executer.Dispose();
         }
