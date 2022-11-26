@@ -129,13 +129,13 @@ public sealed class FlowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async ValueTask<ActionResult<PortDto>> GetPortAsync(Guid portId)
     {
-        SDK.Common.Ports.IPort port = await _flowService.GetPortAsync(portId);
+        SDK.Common.Ports.IPort port = _flowService.GetPort(portId);
         if (port == null)
         {
             return NoContent();
         }
 
-        return Ok(_dtoMapper.Map(port));
+        return await ValueTask.FromResult(Ok(_dtoMapper.Map(port)));
     }
 
     [HttpGet("ports/{portId}/{iterationId}")]
@@ -143,13 +143,13 @@ public sealed class FlowController : ControllerBase
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     public async ValueTask<ActionResult<PortDto>> GetPortFromIterationAsync(Guid portId, Guid iterationId)
     {
-        SDK.Common.Ports.IPort port = await _flowService.GetPortAsync(portId);
+        SDK.Common.Ports.IPort port = _flowService.GetPort(portId);
         if (port == null)
         {
             return NoContent();
         }
 
-        return Ok(_cacheService.GetOrCreatePortEntry(iterationId, port));
+        return await ValueTask.FromResult(Ok(_cacheService.GetOrCreatePortEntry(iterationId, port)));
     }
 
     [HttpPut("ports")]

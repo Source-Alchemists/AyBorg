@@ -18,18 +18,18 @@ internal sealed class FlowService : IFlowService
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="pluginsService">The plugins service.</param>
-    /// <param name="runtimeHost">The runtime host.</param>
+    /// <param name="engineHost">The engine host.</param>
     /// <param name="flowHub">The flow hub.</param>
     /// <param name="runtimeConverterService">The runtime converter service.</param>
     public FlowService(ILogger<FlowService> logger,
                         IPluginsService pluginsService,
-                        IEngineHost runtimeHost,
+                        IEngineHost engineHost,
                         IFlowHub flowHub,
                         IRuntimeConverterService runtimeConverterService)
     {
         _logger = logger;
         _pluginsService = pluginsService;
-        _runtimeHost = runtimeHost;
+        _runtimeHost = engineHost;
         _flowHub = flowHub;
         _runtimeConverterService = runtimeConverterService;
     }
@@ -64,6 +64,29 @@ internal sealed class FlowService : IFlowService
     }
 
     /// <summary>
+    /// Gets the port.
+    /// </summary>
+    /// <param name="portId">The port identifier.</param>
+    /// <returns></returns>
+    public IPort GetPort(Guid portId)
+    {
+        if (_runtimeHost.ActiveProject == null)
+        {
+            _logger.LogWarning("No active project found.");
+            return null!;
+        }
+
+        IStepProxy? targetStep = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Ports.Any(p => p.Id == portId));
+        if (targetStep == null)
+        {
+            _logger.LogTrace("Port with id '{portId}' not found. Already removed.", portId);
+            return null!;
+        }
+
+        return targetStep.Ports.First(p => p.Id == portId);
+    }
+
+    /// <summary>
     /// Add step asynchronous.
     /// </summary>
     /// <param name="stepId">The step identifier.</param>
@@ -72,12 +95,13 @@ internal sealed class FlowService : IFlowService
     /// <returns></returns>
     public async ValueTask<IStepProxy> AddStepAsync(Guid stepId, int x, int y)
     {
-        IStepProxy pluginProxy = _pluginsService.Find(stepId);
         if (_runtimeHost.ActiveProject == null)
         {
             _logger.LogWarning("No active project found.");
             return null!;
         }
+
+        IStepProxy pluginProxy = _pluginsService.Find(stepId);
 
         if (pluginProxy == null)
         {
@@ -228,7 +252,7 @@ internal sealed class FlowService : IFlowService
         targetStep.Links.Add(link);
         _runtimeHost.ActiveProject.Links.Add(link);
         await _flowHub.SendLinkChangedAsync(link);
-        return await ValueTask.FromResult(link);
+        return link;
     }
 
     /// <summary>
@@ -264,30 +288,7 @@ internal sealed class FlowService : IFlowService
 
         _runtimeHost.ActiveProject.Links.Remove(link);
         await _flowHub.SendLinkChangedAsync(link, true);
-        return await ValueTask.FromResult(true);
-    }
-
-    /// <summary>
-    /// Gets the port.
-    /// </summary>
-    /// <param name="portId">The port identifier.</param>
-    /// <returns></returns>
-    public async ValueTask<IPort> GetPortAsync(Guid portId)
-    {
-        if (_runtimeHost.ActiveProject == null)
-        {
-            _logger.LogWarning("No active project found.");
-            return null!;
-        }
-
-        IStepProxy? targetStep = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Ports.Any(p => p.Id == portId));
-        if (targetStep == null)
-        {
-            _logger.LogTrace("Port with id '{portId}' not found. Already removed.", portId);
-            return null!;
-        }
-
-        return await ValueTask.FromResult(targetStep.Ports.First(p => p.Id == portId));
+        return true;
     }
 
     /// <summary>

@@ -17,6 +17,13 @@ public interface IFlowService
     IEnumerable<PortLink> GetLinks();
 
     /// <summary>
+    /// Gets the port.
+    /// </summary>
+    /// <param name="portId">The port identifier.</param>
+    /// <returns></returns>
+    IPort GetPort(Guid portId);
+
+    /// <summary>
     /// Adds the step.
     /// </summary>
     /// <param name="stepId">The step identifier.</param>
@@ -55,13 +62,6 @@ public interface IFlowService
     /// <param name="linkId">The link identifier.</param>
     /// <returns></returns>
     ValueTask<bool> TryUnlinkPortsAsync(Guid linkId);
-
-    /// <summary>
-    /// Gets the port.
-    /// </summary>
-    /// <param name="portId">The port identifier.</param>
-    /// <returns></returns>
-    ValueTask<IPort> GetPortAsync(Guid portId);
 
     /// <summary>
     /// Updates the port value.
