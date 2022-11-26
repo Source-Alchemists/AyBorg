@@ -1,6 +1,6 @@
 namespace AyBorg.Agent.Runtime;
 
-internal sealed class IterationFinishedEventArgs : EventArgs
+public sealed class IterationFinishedEventArgs : EventArgs
 {
     /// <summary>
     /// Gets the iteration identifier.

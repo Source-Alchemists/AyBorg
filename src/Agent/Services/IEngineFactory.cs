@@ -4,7 +4,7 @@ using AyBorg.SDK.System.Runtime;
 
 namespace AyBorg.Agent.Services;
 
-internal interface IEngineFactory
+public interface IEngineFactory
 {
     /// <summary>
     /// Creates the engine.

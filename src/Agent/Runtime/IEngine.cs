@@ -2,7 +2,7 @@ using AyBorg.SDK.System.Runtime;
 
 namespace AyBorg.Agent.Runtime;
 
-internal interface IEngine : IDisposable
+public interface IEngine : IDisposable
 {
     /// <summary>
     /// Called when the iteration is finished.
