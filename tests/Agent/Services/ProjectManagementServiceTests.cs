@@ -22,6 +22,11 @@ public sealed class ProjectManagementServiceTests : IDisposable
     private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
     private readonly DbContextOptions<ProjectContext> _contextOptions;
     private readonly IServiceConfiguration _serviceConfiguration;
+    private readonly Mock<IEngineHost> _mockEngineHost = new();
+    private readonly Mock<IRuntimeToStorageMapper> _mockRuntimeToStorageMapper = new();
+    private readonly Mock<IRuntimeConverterService> _mockRuntimeConverterService = new();
+    private readonly Mock<IDbContextFactory<ProjectContext>> _mockDbContextFactory;
+    private readonly ProjectManagementService _service;
     private bool _disposed = false;
 
     public ProjectManagementServiceTests()
@@ -43,27 +48,24 @@ public sealed class ProjectManagementServiceTests : IDisposable
             .AddInMemoryCollection(settings)
             .Build();
         _serviceConfiguration = new ServiceConfiguration(s_serviceLogger, configuration);
+
+        _mockDbContextFactory = CreateContextFactoryMock();
+        _service = new ProjectManagementService(s_projLogger,
+                                                    _serviceConfiguration,
+                                                    _mockDbContextFactory.Object,
+                                                    _mockEngineHost.Object,
+                                                    _mockRuntimeToStorageMapper.Object,
+                                                    _mockRuntimeConverterService.Object);
     }
 
     [Fact]
-    public async Task TestCreateFirstProject()
+    public async Task Test_CreateFirstProject()
     {
         // Arrange
-        var runtimeHostMock = new Mock<IEngineHost>();
-        var runtimeStorageMapperMock = new Mock<IRuntimeToStorageMapper>();
-        var runtimeConverterServiceMock = new Mock<IRuntimeConverterService>();
-
-        runtimeHostMock.Setup(x => x.TryActivateProjectAsync(It.IsAny<Project>())).ReturnsAsync(true);
-
-        var service = new ProjectManagementService(s_projLogger,
-                                                    _serviceConfiguration,
-                                                    CreateContextFactoryMock().Object,
-                                                    runtimeHostMock.Object,
-                                                    runtimeStorageMapperMock.Object,
-                                                    runtimeConverterServiceMock.Object);
+        _mockEngineHost.Setup(x => x.TryActivateProjectAsync(It.IsAny<Project>())).ReturnsAsync(true);
 
         // Act
-        ProjectRecord result = await service.CreateAsync("test");
+        ProjectRecord result = await _service.CreateAsync("test");
 
         // Assert
         Assert.NotNull(result);
@@ -76,18 +78,14 @@ public sealed class ProjectManagementServiceTests : IDisposable
     [InlineData(true, ProjectState.Draft)]
     [InlineData(false, ProjectState.Ready)]
     [InlineData(true, ProjectState.Ready)]
-    public async Task TestDeleteProject(bool isActive, ProjectState state)
+    public async Task Test_DeleteProject(bool isActive, ProjectState state)
     {
         // Arrange
-        var runtimeHostMock = new Mock<IEngineHost>();
-        var runtimeStorageMapperMock = new Mock<IRuntimeToStorageMapper>();
-        var runtimeConverterServiceMock = new Mock<IRuntimeConverterService>();
-
         ProjectRecord databaseProjectRecord = await CreateDatabaseProject("test", isActive, state);
 
         if (isActive)
         {
-            runtimeHostMock.Setup(x => x.ActiveProject).Returns(new Project
+            _mockEngineHost.Setup(x => x.ActiveProject).Returns(new Project
             {
                 Meta = new ProjectMeta
                 {
@@ -97,17 +95,10 @@ public sealed class ProjectManagementServiceTests : IDisposable
             });
         }
 
-        runtimeHostMock.Setup(x => x.TryDeactivateProjectAsync()).ReturnsAsync(true);
-
-        var service = new ProjectManagementService(s_projLogger,
-                                                    _serviceConfiguration,
-                                                    CreateContextFactoryMock().Object,
-                                                    runtimeHostMock.Object,
-                                                    runtimeStorageMapperMock.Object,
-                                                    runtimeConverterServiceMock.Object);
+        _mockEngineHost.Setup(x => x.TryDeactivateProjectAsync()).ReturnsAsync(true);
 
         // Act
-        ProjectManagementResult result = await service.TryDeleteAsync(databaseProjectRecord.Meta.Id);
+        ProjectManagementResult result = await _service.TryDeleteAsync(databaseProjectRecord.Meta.Id);
 
         // Assert
         Assert.True(result.IsSuccessful);
@@ -116,14 +107,18 @@ public sealed class ProjectManagementServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task TestSaveActiveProject()
+    public async Task Test_SaveActiveProject()
     {
         // Arrange
-        var runtimeHostMock = new Mock<IEngineHost>();
-        var runtimeConverterServiceMock = new Mock<IRuntimeConverterService>();
-        IDbContextFactory<ProjectContext> contextFactory = CreateContextFactoryMock().Object;
-
         ProjectRecord newDatabaseProjectRecord = await CreateDatabaseProject("test", true, ProjectState.Draft);
+        _mockRuntimeToStorageMapper.Setup(x => x.Map(It.IsAny<Project>())).Returns(newDatabaseProjectRecord with
+        {
+            DbId = Guid.Empty,
+            Settings = newDatabaseProjectRecord.Settings with
+            {
+                DbId = Guid.Empty
+            }
+        });
 
         StepProxy stepProxy1 = CreateStepProxy("Step 1");
         StepProxy stepProxy2 = CreateStepProxy("Step 2");
@@ -141,24 +136,17 @@ public sealed class ProjectManagementServiceTests : IDisposable
             }
         };
 
-        runtimeHostMock.Setup(x => x.ActiveProject).Returns(runtimeProject);
-
-        var service = new ProjectManagementService(s_projLogger,
-                                                    _serviceConfiguration,
-                                                    contextFactory,
-                                                    runtimeHostMock.Object,
-                                                    new RuntimeToStorageMapper(),
-                                                    runtimeConverterServiceMock.Object);
+        _mockEngineHost.Setup(x => x.ActiveProject).Returns(runtimeProject);
 
         // Act
-        ProjectManagementResult result = await service.TrySaveActiveAsync();
+        ProjectManagementResult result = await _service.TrySaveActiveAsync();
 
         // Assert
         Assert.True(result.IsSuccessful);
         Assert.Null(result.Message);
         Assert.NotEqual(Guid.Empty, result.ProjectMetaDbId);
         Assert.NotNull(result.ProjectMetaDbId);
-        using ProjectContext context = await contextFactory.CreateDbContextAsync();
+        using ProjectContext context = await _mockDbContextFactory.Object.CreateDbContextAsync();
         Assert.Equal(2, context.AyBorgProjectMetas.Count());
         Assert.Equal(2, context.AyBorgProjects.Count());
         ProjectMetaRecord resultProjectMetaRecord = context.AyBorgProjectMetas.Single(pm => pm.DbId.Equals(result.ProjectMetaDbId));
@@ -171,13 +159,6 @@ public sealed class ProjectManagementServiceTests : IDisposable
         Assert.False(previousProjectMetaRecord.IsActive);
         Assert.True(resultProjectRecord.Meta.IsActive);
         Assert.Equal(ProjectState.Draft, resultProjectRecord.Meta.State);
-        Assert.Equal(2, resultProjectRecord.Steps.Count);
-        Assert.Single(resultProjectRecord.Steps.Where(x => x.Name.Equals(stepProxy1.Name)));
-        Assert.Single(resultProjectRecord.Steps.Where(x => x.Name.Equals(stepProxy2.Name)));
-        StepRecord resultStep1 = resultProjectRecord.Steps.Single(x => x.Name.Equals(stepProxy1.Name));
-        AssertStepProxy(stepProxy1, resultStep1);
-        StepRecord resultStep2 = resultProjectRecord.Steps.Single(x => x.Name.Equals(stepProxy2.Name));
-        AssertStepProxy(stepProxy2, resultStep2);
     }
 
     [Theory]
@@ -185,32 +166,21 @@ public sealed class ProjectManagementServiceTests : IDisposable
     [InlineData(ProjectState.Draft, null, false, ProjectState.Review, "test_1.2.3")]
     [InlineData(ProjectState.Review, "auditor", true, ProjectState.Ready, "test_1.2.3")]
     [InlineData(ProjectState.Review, "auditor", false, ProjectState.Ready, "test_1.2.3")]
-    public async Task TestSaveNewVersionOfProject(ProjectState projectState, string auditor,
+    public async Task Test_SaveNewVersionOfProject(ProjectState projectState, string auditor,
                                                     bool expectedActive, ProjectState expectedProjectState, string expectedVersioName)
     {
         // Arrange
-        var runtimeHostMock = new Mock<IEngineHost>();
-        var runtimeConverterServiceMock = new Mock<IRuntimeConverterService>();
-        IDbContextFactory<ProjectContext> contextFactory = CreateContextFactoryMock().Object;
-
         ProjectRecord initialDbProject = await CreateDatabaseProject("test", expectedActive, projectState);
 
-        var service = new ProjectManagementService(s_projLogger,
-                                                    _serviceConfiguration,
-                                                    contextFactory,
-                                                    runtimeHostMock.Object,
-                                                    new RuntimeToStorageMapper(),
-                                                    runtimeConverterServiceMock.Object);
-
         // Act
-        ProjectManagementResult result = await service.TrySaveNewVersionAsync(initialDbProject.Meta.DbId, expectedProjectState, expectedVersioName, string.Empty, auditor);
+        ProjectManagementResult result = await _service.TrySaveNewVersionAsync(initialDbProject.Meta.DbId, expectedProjectState, expectedVersioName, string.Empty, auditor);
 
         // Assert
         Assert.True(result.IsSuccessful);
         Assert.Null(result.Message);
         Assert.NotEqual(Guid.Empty, result.ProjectMetaDbId);
         Assert.NotNull(result.ProjectMetaDbId);
-        using ProjectContext context = await contextFactory.CreateDbContextAsync();
+        using ProjectContext context = await _mockDbContextFactory.Object.CreateDbContextAsync();
         if (projectState == ProjectState.Draft)
         {
             Assert.Single(context.AyBorgProjectMetas.Where(x => x.DbId.Equals(initialDbProject.Meta.DbId)));
@@ -222,6 +192,40 @@ public sealed class ProjectManagementServiceTests : IDisposable
         Assert.Equal(initialDbProject.Meta.VersionIteration + 1, resultProjectMeta.VersionIteration);
         Assert.Equal(expectedVersioName, resultProjectMeta.VersionName);
         Assert.Equal(expectedProjectState, resultProjectMeta.State);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public async Task Test_GetSettingsAsync(bool projectAvailable)
+    {
+        // Arrange
+        Guid projectMetaDbId = Guid.NewGuid();
+        if (projectAvailable)
+        {
+            ProjectContext context = _mockDbContextFactory.Object.CreateDbContext();
+            ProjectRecord projectRecord = new()
+            {
+                Meta = new ProjectMetaRecord(),
+                Settings = new ProjectSettingsRecord()
+            };
+            context.AyBorgProjects.Add(projectRecord);
+            await context.SaveChangesAsync();
+            projectMetaDbId = projectRecord.Meta.DbId;
+        }
+
+        // Act
+        ProjectSettingsRecord result = await _service.GetSettingsAsync(projectMetaDbId);
+
+        // Assert
+        if (projectAvailable)
+        {
+            Assert.NotNull(result);
+        }
+        else
+        {
+            Assert.Null(result);
+        }
     }
 
     public void Dispose()
@@ -239,7 +243,7 @@ public sealed class ProjectManagementServiceTests : IDisposable
         }
     }
 
-    private async Task<ProjectRecord> CreateDatabaseProject(string name, bool isActive, ProjectState state)
+    private async ValueTask<ProjectRecord> CreateDatabaseProject(string name, bool isActive, ProjectState state)
     {
         using var context = new ProjectContext(_contextOptions);
         var project = new ProjectRecord
@@ -250,7 +254,8 @@ public sealed class ProjectManagementServiceTests : IDisposable
                 Name = name,
                 IsActive = isActive,
                 State = state
-            }
+            },
+            Settings = new ProjectSettingsRecord { DbId = Guid.Empty }
         };
         context.AyBorgProjects.Add(project);
         context.AyBorgProjectMetas.Add(project.Meta);
@@ -286,40 +291,6 @@ public sealed class ProjectManagementServiceTests : IDisposable
                                 .ThenInclude(x => x.MetaInfo)
                                 .Include(x => x.Steps)
                                 .ThenInclude(x => x.Ports);
-    }
-
-    private static void AssertStepProxy(IStepProxy expected, StepRecord actual)
-    {
-        Assert.NotEqual(Guid.Empty, actual.DbId);
-        Assert.Equal(expected.Id, actual.Id);
-        Assert.Equal(expected.Name, actual.Name);
-        Assert.Equal(expected.X, actual.X);
-        Assert.Equal(expected.Y, actual.Y);
-        Assert.Equal(expected.Ports.Count(), actual.Ports.Count);
-
-        foreach (IPort expectedPort in expected.Ports)
-        {
-            PortRecord actualPort = actual.Ports.Single(x => x.Id.Equals(expectedPort.Id));
-            Assert.Equal(expectedPort.Name, actualPort.Name);
-            Assert.Equal(expectedPort.Direction, actualPort.Direction);
-            Assert.Equal(expectedPort.Brand, actualPort.Brand);
-
-            switch (expectedPort.Brand)
-            {
-                case PortBrand.String:
-                    if (expectedPort is StringPort stringPort)
-                    {
-                        Assert.Equal(stringPort.Value, actualPort.Value);
-                    }
-                    break;
-                case PortBrand.Numeric:
-                    if (expectedPort is NumericPort numericPort)
-                    {
-                        Assert.Equal(numericPort.Value.ToString(), actualPort.Value);
-                    }
-                    break;
-            }
-        }
     }
 
     private Mock<IDbContextFactory<ProjectContext>> CreateContextFactoryMock()
