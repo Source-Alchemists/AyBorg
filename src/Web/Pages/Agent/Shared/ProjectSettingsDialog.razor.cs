@@ -24,7 +24,7 @@ public sealed partial class ProjectSettingsDialog : ComponentBase
         _projectSettings = await ProjectManagementService.GetProjectSettingsAsync(StateService.AgentState.BaseUrl, ProjectMeta);
     }
 
-    private async void ChangeResultCommunicationClicked()
+    private async Task ChangeResultCommunicationClicked()
     {
         IDialogReference dialog = DialogService.Show<ConfirmDialog>("Change result communication",
                                             new DialogParameters {
@@ -39,7 +39,7 @@ public sealed partial class ProjectSettingsDialog : ComponentBase
         }
     }
 
-    private async void ChangeUiCommunicationClicked()
+    private async Task ChangeUiCommunicationClicked()
     {
         IDialogReference dialog = DialogService.Show<ConfirmDialog>("Change UI communication",
                                             new DialogParameters {
