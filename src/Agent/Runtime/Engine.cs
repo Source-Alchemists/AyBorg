@@ -269,6 +269,8 @@ internal sealed class Engine : IEngine
 
     private async ValueTask SendStepInfoAsync(IStepProxy stepProxy)
     {
+        if(_project.Meta.State != ProjectState.Ready && _project.Settings.IsForceWebUiCommunicationEnabled) return;
+        if(_project.Meta.State == ProjectState.Ready && !_project.Settings.IsForceWebUiCommunicationEnabled) return;
         await SendStepInputPortsAsync(stepProxy);
 
         string baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/";

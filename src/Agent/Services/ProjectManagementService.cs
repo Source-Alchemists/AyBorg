@@ -351,7 +351,6 @@ internal sealed class ProjectManagementService : IProjectManagementService
             Links = new()
             };
 
-
         projectRecord.Steps.Clear();
         projectRecord.Links.Clear();
         foreach(StepRecord s in previousProjectRecord.Steps)

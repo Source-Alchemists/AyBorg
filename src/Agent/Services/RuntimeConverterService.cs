@@ -42,6 +42,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
             {
                 Id = projectRecord.Meta.Id,
                 Name = projectRecord.Meta.Name,
+                State = projectRecord.Meta.State,
             },
             Settings = new ProjectSettings
             {
@@ -128,7 +129,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
     private static bool UpdateEnumPortValue(EnumPort port, object value)
     {
-        var record = JsonSerializer.Deserialize<EnumRecord>(value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+        EnumRecord record = JsonSerializer.Deserialize<EnumRecord>(value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
         port.Value = (Enum)Enum.Parse(port.Value.GetType(), record.Name);
 
         return true;
@@ -146,7 +147,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         {
             PropertyNameCaseInsensitive = true
         };
-        var record = JsonSerializer.Deserialize<RectangleRecord>(value.ToString()!, options);
+        RectangleRecord? record = JsonSerializer.Deserialize<RectangleRecord>(value.ToString()!, options);
         if (record == null)
         {
             return false;
@@ -159,9 +160,9 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
     private async ValueTask<ICollection<IStepProxy>> ConvertStepsAsync(ICollection<StepRecord> stepRecords)
     {
         var steps = new List<IStepProxy>();
-        foreach (var stepRecord in stepRecords)
+        foreach (StepRecord stepRecord in stepRecords)
         {
-            var step = await ConvertStepAsync(stepRecord);
+            IStepProxy step = await ConvertStepAsync(stepRecord);
             steps.Add(step);
         }
 
@@ -170,7 +171,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
     private async ValueTask<IStepProxy> ConvertStepAsync(StepRecord stepRecord)
     {
-        var proxyInstance = _pluginsService.Find(stepRecord);
+        IStepProxy proxyInstance = _pluginsService.Find(stepRecord);
         if (proxyInstance == null) throw new KeyNotFoundException(nameof(stepRecord.MetaInfo.TypeName));
 
         if (ActivatorUtilities.CreateInstance(_serviceProvider, proxyInstance.StepBody.GetType()) is IStepBody stepBody)
@@ -192,7 +193,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
     private void ConvertLinks(ProjectRecord projectRecord, Project project)
     {
         var linkRecordHashes = new HashSet<LinkRecord>();
-        foreach (var linkRecord in projectRecord.Links)
+        foreach (LinkRecord linkRecord in projectRecord.Links)
         {
             if (linkRecordHashes.Contains(linkRecord))
             {
@@ -202,10 +203,10 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
             linkRecordHashes.Add(linkRecord);
             try
             {
-                var sourceStep = project.Steps.First(s => s.Ports.Any(p => p.Id == linkRecord.SourceId));
-                var targetStep = project.Steps.First(s => s.Ports.Any(p => p.Id == linkRecord.TargetId));
-                var sourcePort = sourceStep.Ports.First(p => p.Id == linkRecord.SourceId);
-                var targetPort = targetStep.Ports.First(p => p.Id == linkRecord.TargetId);
+                IStepProxy sourceStep = project.Steps.First(s => s.Ports.Any(p => p.Id == linkRecord.SourceId));
+                IStepProxy targetStep = project.Steps.First(s => s.Ports.Any(p => p.Id == linkRecord.TargetId));
+                IPort sourcePort = sourceStep.Ports.First(p => p.Id == linkRecord.SourceId);
+                IPort targetPort = targetStep.Ports.First(p => p.Id == linkRecord.TargetId);
                 var link = new PortLink(linkRecord.Id, sourcePort, targetPort);
                 sourcePort.Connect(link);
                 targetPort.Connect(link);
@@ -222,9 +223,9 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
     private async ValueTask ChangePortsValues(IEnumerable<IPort> ports, IEnumerable<PortRecord> portRecords)
     {
-        foreach (var port in ports)
+        foreach (IPort port in ports)
         {
-            var portRecord = portRecords.FirstOrDefault(x => x.Name == port.Name && x.Direction == port.Direction);
+            PortRecord? portRecord = portRecords.FirstOrDefault(x => x.Name == port.Name && x.Direction == port.Direction);
             if (portRecord == null)
             {
                 _logger.LogWarning("Port record {port.Name} not found! Will use default value.", port.Name);

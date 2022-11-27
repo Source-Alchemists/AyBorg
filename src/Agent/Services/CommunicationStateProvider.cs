@@ -26,12 +26,12 @@ public sealed record CommunicationStateProvider : ICommunicationStateProvider
 
         if (project.Settings.IsForceResultCommunicationEnabled)
         {
-            IsResultCommunicationEnabled = true;
+            IsResultCommunicationEnabled = !IsResultCommunicationEnabled;
         }
 
         if (project.Settings.IsForceWebUiCommunicationEnabled)
         {
-            IsWebUiCommunicationEnabled = true;
+            IsWebUiCommunicationEnabled = !IsWebUiCommunicationEnabled;
         }
     }
 }
