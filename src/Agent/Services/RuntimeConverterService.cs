@@ -45,8 +45,8 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
             },
             Settings = new ProjectSettings
             {
-                IsResultCommunicationForced = projectRecord.Settings.IsForceResultCommunicationEnabled,
-                IsWebUiCommunicationForced = projectRecord.Settings.IsForceWebUiCommunicationEnabled
+                IsForceResultCommunicationEnabled = projectRecord.Settings.IsForceResultCommunicationEnabled,
+                IsForceWebUiCommunicationEnabled = projectRecord.Settings.IsForceWebUiCommunicationEnabled
             },
             // First, we need to convert all the steps
             Steps = await ConvertStepsAsync(projectRecord.Steps)

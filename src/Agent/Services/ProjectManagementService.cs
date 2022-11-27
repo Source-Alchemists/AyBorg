@@ -272,11 +272,13 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
         ProjectRecord projectRecord = _runtimeToStorageMapper.Map(_engineHost.ActiveProject);
         projectRecord.Meta = previousProjectMetaRecord with { DbId = Guid.Empty, UpdatedDate = DateTime.UtcNow };
+        projectRecord.Settings.DbId = Guid.Empty;
 
         try
         {
             await context.AyBorgProjects!.AddAsync(projectRecord);
             await context.AyBorgProjectMetas!.AddAsync(projectRecord.Meta);
+            await context.AyBorgProjectSettings!.AddAsync(projectRecord.Settings);
             previousProjectMetaRecord.IsActive = false;
             await context.SaveChangesAsync();
             _engineHost.ActiveProject.Meta.Id = projectRecord.Meta.Id;
@@ -334,9 +336,17 @@ internal sealed class ProjectManagementService : IProjectManagementService
             ApprovedBy = approver
         };
 
+        ProjectSettingsRecord projectSettingsRecord = previousProjectRecord.Settings with
+        {
+            DbId = Guid.Empty,
+            IsForceResultCommunicationEnabled = false,
+            IsForceWebUiCommunicationEnabled = false
+        };
+
         ProjectRecord projectRecord = previousProjectRecord with {
             DbId = Guid.Empty,
             Meta = projectMetaRecord,
+            Settings = projectSettingsRecord,
             Steps = new(),
             Links = new()
             };
@@ -365,6 +375,11 @@ internal sealed class ProjectManagementService : IProjectManagementService
         {
             Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<ProjectRecord> result = await context.AyBorgProjects!.AddAsync(projectRecord);
             await context.SaveChangesAsync();
+            if(_engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(previousProjectMetaRecord.Id))
+            {
+                _engineHost.ActiveProject.Settings.IsForceResultCommunicationEnabled = false;
+                _engineHost.ActiveProject.Settings.IsForceWebUiCommunicationEnabled = false;
+            }
         }
         catch (Exception ex)
         {
@@ -406,6 +421,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     private static IQueryable<ProjectRecord> CreateFullProjectQuery(ProjectContext context)
     {
         return context.AyBorgProjects!.Include(x => x.Meta)
+                                .Include(x => x.Settings)
                                 .Include(x => x.Steps)
                                 .ThenInclude(x => x.MetaInfo)
                                 .Include(x => x.Steps)

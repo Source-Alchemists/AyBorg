@@ -16,6 +16,7 @@ public sealed class ProjectsController : ControllerBase
     private readonly ILogger<ProjectsController> _logger;
     private readonly IProjectManagementService _projectManagementService;
     private readonly IDtoMapper _storageToDtoMapper;
+    private readonly IEngineHost _engineHost;
     private readonly string _serviceUniqueName;
 
     /// <summary>
@@ -25,11 +26,17 @@ public sealed class ProjectsController : ControllerBase
     /// <param name="serviceConfiguration">The service configuration.</param>
     /// <param name="projectManagementService">The project management service.</param>
     /// <param name="storageToDtoMapper">The storage to dto mapper.</param>
-    public ProjectsController(ILogger<ProjectsController> logger, IServiceConfiguration serviceConfiguration, IProjectManagementService projectManagementService, IDtoMapper storageToDtoMapper)
+    /// <param name="engineHost">The engine host.</param>
+    public ProjectsController(ILogger<ProjectsController> logger,
+                                IServiceConfiguration serviceConfiguration,
+                                IProjectManagementService projectManagementService,
+                                IDtoMapper storageToDtoMapper,
+                                IEngineHost engineHost)
     {
         _logger = logger;
         _projectManagementService = projectManagementService;
         _storageToDtoMapper = storageToDtoMapper;
+        _engineHost = engineHost;
         _serviceUniqueName = serviceConfiguration.UniqueName;
     }
 
@@ -37,7 +44,7 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async IAsyncEnumerable<ProjectMetaDto> GetAsync()
     {
-        foreach (IGrouping<Guid, SDK.Data.DAL.ProjectMetaRecord> metaGroup in (await _projectManagementService.GetAllMetasAsync()).Where(x => x.ServiceUniqueName == _serviceUniqueName).GroupBy(p => p.Id))
+        foreach (IGrouping<Guid, ProjectMetaRecord> metaGroup in (await _projectManagementService.GetAllMetasAsync()).Where(x => x.ServiceUniqueName == _serviceUniqueName).GroupBy(p => p.Id))
         {
             SDK.Data.DAL.ProjectMetaRecord? activeMeta = metaGroup.FirstOrDefault(g => g.IsActive);
             if (activeMeta != null)
@@ -134,6 +141,19 @@ public sealed class ProjectsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult<ProjectSettingsDto>> GetSettingsAsync(Guid dbId)
     {
+        IEnumerable<ProjectMetaRecord> projectMetas = await _projectManagementService.GetAllMetasAsync();
+        ProjectMetaRecord? projectMeta = projectMetas.FirstOrDefault(p => p.DbId == dbId);
+        if (projectMeta == null)
+        {
+            _logger.LogWarning("Project {dbId} not found.", dbId);
+            return NotFound();
+        }
+
+        if(_projectManagementService.ActiveProjectId == projectMeta.Id)
+        {
+            return Ok(_storageToDtoMapper.Map(_engineHost.ActiveProject!.Settings));
+        }
+
         ProjectSettingsRecord? settings = await _projectManagementService.GetSettingsAsync(dbId);
         if (settings == null)
         {
@@ -144,4 +164,26 @@ public sealed class ProjectsController : ControllerBase
         return Ok(_storageToDtoMapper.Map(settings));
     }
 
+    [HttpPut("{dbId}/settings/communication")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [JwtAuthorize(Roles = new[] { Roles.Administrator })]
+    public async ValueTask<ActionResult> SetCommunicationSettingsAsync(Guid dbId, ProjectSettingsDto projectSettings)
+    {
+        IEnumerable<ProjectMetaRecord> projectMetas = await _projectManagementService.GetAllMetasAsync();
+        ProjectMetaRecord? projectMeta = projectMetas.FirstOrDefault(p => p.DbId == dbId);
+        if (projectMeta == null)
+        {
+            _logger.LogWarning("No settings found for project {dbId}.", dbId);
+            return NotFound();
+        }
+
+        if (_projectManagementService.ActiveProjectId == projectMeta.Id)
+        {
+            _engineHost.ActiveProject!.Settings.IsForceResultCommunicationEnabled = projectSettings.IsForceResultCommunicationEnabled;
+            _engineHost.ActiveProject!.Settings.IsForceWebUiCommunicationEnabled = projectSettings.IsForceWebUiCommunicationEnabled;
+        }
+
+        return Ok();
+    }
 }

@@ -24,12 +24,12 @@ public sealed record CommunicationStateProvider : ICommunicationStateProvider
         IsResultCommunicationEnabled = project.Meta.State == ProjectState.Ready;
         IsWebUiCommunicationEnabled = project.Meta.State != ProjectState.Ready;
 
-        if (project.Settings.IsResultCommunicationForced)
+        if (project.Settings.IsForceResultCommunicationEnabled)
         {
             IsResultCommunicationEnabled = true;
         }
 
-        if (project.Settings.IsWebUiCommunicationForced)
+        if (project.Settings.IsForceWebUiCommunicationEnabled)
         {
             IsWebUiCommunicationEnabled = true;
         }

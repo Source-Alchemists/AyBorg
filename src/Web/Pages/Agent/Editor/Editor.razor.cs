@@ -77,7 +77,16 @@ public partial class Editor : ComponentBase
 
     private async void OnProjectSettingsClicked()
     {
-        IDialogReference dialog = DialogService.Show<ProjectSettingsDialog>("Project settings", new DialogParameters { { "ProjectMeta", _projectMeta } });
+        IDialogReference dialog = DialogService.Show<ProjectSettingsDialog>("Project settings",
+                                                                            new DialogParameters {
+                                                                                { "ProjectMeta", _projectMeta }
+                                                                            },
+                                                                            new DialogOptions
+                                                                            {
+                                                                                MaxWidth = MaxWidth.Medium,
+                                                                                FullWidth = true,
+                                                                                CloseButton = true
+                                                                            });
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {

@@ -18,8 +18,8 @@ public sealed class communicationStateProviderTest
         var communicationStateProvider = new CommunicationStateProvider();
         var project = new Project();
         project.Meta.State = projectState;
-        project.Settings.IsResultCommunicationForced = forceResult;
-        project.Settings.IsWebUiCommunicationForced = forceUi;
+        project.Settings.IsForceResultCommunicationEnabled = forceResult;
+        project.Settings.IsForceWebUiCommunicationEnabled = forceUi;
 
         // Act
         communicationStateProvider.Update(project);

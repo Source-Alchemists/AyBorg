@@ -75,4 +75,13 @@ public interface IProjectManagementService
     /// <param name="projectMeta">The project meta info.</param>
     /// <returns></returns>
     ValueTask<ProjectSettingsDto> GetProjectSettingsAsync(string baseUrl, ProjectMetaDto projectMeta);
+
+    /// <summary>
+    /// Updates the project communication settings asynchronous.
+    /// </summary>
+    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="projectMeta">The project meta info.</param>
+    /// <param name="projectSettings">The project settings.</param>
+    /// <returns></returns>
+    ValueTask<bool> TryUpdateProjectCommunicationSettingsAsync(string baseUrl, ProjectMetaDto projectMeta, ProjectSettingsDto projectSettings);
 }

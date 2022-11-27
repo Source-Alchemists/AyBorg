@@ -218,4 +218,28 @@ public class ProjectManagementService : IProjectManagementService
         if (projectSettingsDto == null) throw new JsonException();
         return projectSettingsDto;
     }
+
+    /// <summary>
+    /// Updates the project communication settings asynchronous.
+    /// </summary>
+    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="projectMeta">The project meta info.</param>
+    /// <param name="projectSettings">The project settings.</param>
+    /// <returns></returns>
+    public async ValueTask<bool> TryUpdateProjectCommunicationSettingsAsync(string baseUrl, ProjectMetaDto projectMeta, ProjectSettingsDto projectSettings)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.DbId}/settings/communication")
+        {
+            Content = new StringContent(JsonSerializer.Serialize(projectSettings), Encoding.UTF8, "application/json")
+        };
+        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        if (!response.IsSuccessStatusCode)
+        {
+            _logger.LogWarning("Could not update project communication settings for '{projectMeta.DbId}' [Code: {response.StatusCode}]!", projectMeta.DbId, response.StatusCode);
+            return false;
+        }
+
+        return true;
+    }
 }
