@@ -14,7 +14,7 @@ public sealed class ImageLoad : IStepBody, IDisposable
     private readonly StringPort _filePathPort = new("File path", PortDirection.Output, string.Empty);
     private readonly string[] _supportedFileTypes = new[] { ".jpg", ".jpeg", ".png", ".bmp" };
     private int _imageIndex = 0;
-    private bool disposedValue;
+    private bool _disposedValue;
     private Task<KeyValuePair<string, Image>>? _preloadTask;
 
     public string DefaultName => "Image.Load";
@@ -46,36 +46,33 @@ public sealed class ImageLoad : IStepBody, IDisposable
         return await ValueTask.FromResult(true);
     }
 
-    private Task<KeyValuePair<string, Image>> PreloadImage()
-    {
-        return Task.Factory.StartNew(() =>
-        {
-            var absolutPath = Path.GetFullPath($"{_environment.StorageLocation}{_folderPort.Value}");
-            var files = Directory.GetFiles(absolutPath);
-            var supportedFiles = files.Where(f => _supportedFileTypes.Contains(Path.GetExtension(f)));
-            var imageFileNames = supportedFiles.ToArray();
-            if (imageFileNames.Length == 0)
-            {
-                _logger.LogWarning("No images found in folder {folder}", _folderPort.Value);
-                return new KeyValuePair<string, Image>(string.Empty, null!);
-            }
+    private Task<KeyValuePair<string, Image>> PreloadImage() => Task.Factory.StartNew(() =>
+                                                                     {
+                                                                         string absolutPath = Path.GetFullPath($"{_environment.StorageLocation}{_folderPort.Value}");
+                                                                         string[] files = Directory.GetFiles(absolutPath);
+                                                                         IEnumerable<string> supportedFiles = files.Where(f => _supportedFileTypes.Contains(Path.GetExtension(f), StringComparer.OrdinalIgnoreCase));
+                                                                         string[] imageFileNames = supportedFiles.ToArray();
+                                                                         if (imageFileNames.Length == 0)
+                                                                         {
+                                                                             _logger.LogWarning("No images found in folder {folder}", _folderPort.Value);
+                                                                             return new KeyValuePair<string, Image>(string.Empty, null!);
+                                                                         }
 
-            if (_imageIndex >= imageFileNames.Length)
-            {
-                _imageIndex = 0;
-            }
-            var imageFileName = imageFileNames![_imageIndex];
-            var image = Image.Load(imageFileName);
-            imageFileName = imageFileName.Replace(_environment.StorageLocation, string.Empty);
-            imageFileName = imageFileName.Replace('\\', '/');
-            _imageIndex++;
-            return new KeyValuePair<string, Image>(imageFileName, image);
-        });
-    }
+                                                                         if (_imageIndex >= imageFileNames.Length)
+                                                                         {
+                                                                             _imageIndex = 0;
+                                                                         }
+                                                                         string imageFileName = imageFileNames![_imageIndex];
+                                                                         var image = Image.Load(imageFileName);
+                                                                         imageFileName = imageFileName.Replace(_environment.StorageLocation, string.Empty);
+                                                                         imageFileName = imageFileName.Replace('\\', '/');
+                                                                         _imageIndex++;
+                                                                         return new KeyValuePair<string, Image>(imageFileName, image);
+                                                                     });
 
     private void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
@@ -83,7 +80,7 @@ public sealed class ImageLoad : IStepBody, IDisposable
                 _preloadTask?.Wait();
                 _preloadTask?.Dispose();
             }
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 
