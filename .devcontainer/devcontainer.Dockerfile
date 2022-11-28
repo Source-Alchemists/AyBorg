@@ -2,6 +2,7 @@ FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy
 
 ########### START -- environment variables ###########
 ENV DOTNET_CLI_TELEMETRY_OPTOUT=1
+ENV XDG_CONFIG_HOME="/workspace/ApplicationData"
 ENV TZ=Europe/Berlin
 ########### END -- environment variables ###########
 
@@ -20,6 +21,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
     rm -rf /var/lib/apt/lists/*
+RUN mkdir -p $XDG_CONFIG_HOME
 ########### END -- install general utility ###########
 
 
