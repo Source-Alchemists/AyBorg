@@ -58,7 +58,8 @@ internal sealed class PluginsService : IPluginsService
                 if (Directory.EnumerateFiles(pd).Where(x => Path.GetFileName(x).Equals(dllName)).Count() == 1)
                 {
                     _logger.LogTrace("Detected directory '{pd}'.", pd);
-                    var assembly = Assembly.LoadFile($"{Path.Combine(pd, dllName)}");
+                    // use load from assembly to load other dependencies from same folder
+                    var assembly = Assembly.LoadFrom($"{Path.Combine(pd, dllName)}");
                     if (!TryLoadPlugins(assembly))
                     {
                         _logger.LogTrace("No plugins detected.");
