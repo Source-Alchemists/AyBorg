@@ -54,7 +54,7 @@ Because AyBorg is orchastrated into multipe microservices, you need to start eac
 In most cases the following setup makes sense:
 
 1. A MQTT broker (e.g. [Eclipse-Mosquitto](https://mosquitto.org))
-2. AyBorg.Registry
+2. AyBorg.Gateway
 3. AyBorg.Web
 4. One or more [AyBorg.Agent(s)](doc/agent/agent.md)
 

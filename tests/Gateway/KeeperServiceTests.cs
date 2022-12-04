@@ -1,6 +1,6 @@
 using AyBorg.Database.Data;
-using AyBorg.Registry.Mapper;
-using AyBorg.Registry.Services;
+using AyBorg.Gateway.Mapper;
+using AyBorg.Gateway.Services;
 using AyBorg.SDK.Data.DTOs;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace AyBorg.Registry.Tests;
+namespace AyBorg.Gateway.Tests;
 
 public sealed class KeeperServiceTests : IDisposable
 {

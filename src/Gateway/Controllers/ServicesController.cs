@@ -1,8 +1,8 @@
-using AyBorg.Registry.Services;
+using AyBorg.Gateway.Services;
 using AyBorg.SDK.Data.DTOs;
 using Microsoft.AspNetCore.Mvc;
 
-namespace AyBorg.Registry.Controllers;
+namespace AyBorg.Gateway.Controllers;
 
 [ApiController]
 [Route("[controller]")]
@@ -36,7 +36,7 @@ public class ServicesController : ControllerBase
     {
         try
         {
-            var id = await _keeperService.RegisterAsync(RegistryEntry);
+            Guid id = await _keeperService.RegisterAsync(RegistryEntry);
             _logger.LogInformation("Registered {Name} ({Url}) with id [{Id}].", RegistryEntry.Name, RegistryEntry.Url, id);
             return Ok(id);
         }
@@ -96,7 +96,7 @@ public class ServicesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     public async ValueTask<ActionResult<RegistryEntryDto[]>> GetByTypeNameAsync(string typeName)
     {
-        var services = await _keeperService.GetAllRegistryEntriesAsync();
+        IEnumerable<RegistryEntryDto> services = await _keeperService.GetAllRegistryEntriesAsync();
         return Ok(services.Where(s => s.Type == typeName));
     }
 
@@ -108,7 +108,7 @@ public class ServicesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async ValueTask<ActionResult<RegistryEntryDto>> GetAsync(Guid id)
     {
-        var result = await _keeperService.GetRegistryEntryAsync(id);
+        RegistryEntryDto? result = await _keeperService.GetRegistryEntryAsync(id);
         return result != null ? Ok(result) : NotFound();
     }
 

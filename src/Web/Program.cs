@@ -15,10 +15,10 @@ using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
+string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     _ = databaseProvider switch
@@ -64,8 +64,8 @@ builder.Services.AddMudServices(config =>
 });
 builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddHttpClient("AyBorg.Web.RegistryService");
-builder.Services.AddHttpClient("AyBorg.Web.Services.RegistryService>");
+builder.Services.AddHttpClient("AyBorg.Web.GatewayService");
+builder.Services.AddHttpClient("AyBorg.Web.Services.GatewayService>");
 builder.Services.AddHttpClient<ProjectManagementService>();
 builder.Services.AddHttpClient<PluginsService>();
 builder.Services.AddHttpClient<IFlowService, FlowService>();
@@ -89,7 +89,7 @@ builder.Services.AddScoped<IAgentOverviewService, AgentOverviewService>();
 builder.Services.AddScoped<IStorageService, StorageService>();
 builder.Services.AddScoped<IStateService, StateService>();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -120,7 +120,7 @@ app.MapFallbackToPage("/_Host");
 app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbContext().Database.Migrate();
 
 // Initialize identity
-var scopedServiceProvider = app.Services.CreateScope().ServiceProvider;
+IServiceProvider scopedServiceProvider = app.Services.CreateScope().ServiceProvider;
 await IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).AsTask();
 await app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().AsTask()!;
 

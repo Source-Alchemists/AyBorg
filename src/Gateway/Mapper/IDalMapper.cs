@@ -1,8 +1,8 @@
-using AyBorg.Registry.Models;
+using AyBorg.Gateway.Models;
 using AyBorg.SDK.Data.DAL;
 using AyBorg.SDK.Data.DTOs;
 
-namespace AyBorg.Registry.Mapper;
+namespace AyBorg.Gateway.Mapper;
 
 public interface IDalMapper
 {

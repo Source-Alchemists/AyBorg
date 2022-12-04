@@ -2,11 +2,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using AyBorg.Registry.Controllers;
-using AyBorg.Registry.Services;
+using AyBorg.Gateway.Controllers;
+using AyBorg.Gateway.Services;
 
 
-namespace AyBorg.Registry.Tests;
+namespace AyBorg.Gateway.Tests;
 
 public class ServiceControllerTests
 {
@@ -23,7 +23,7 @@ public class ServiceControllerTests
         var controller = new ServicesController(_logger, mockedService.Object);
 
         // Act
-        var actionResult = await controller.RegisterAsync(entry);
+        ActionResult<Guid> actionResult = await controller.RegisterAsync(entry);
         var result = actionResult.Result as OkObjectResult;
 
         // Assert
@@ -43,7 +43,7 @@ public class ServiceControllerTests
         var controller = new ServicesController(_logger, mockedService.Object);
 
         // Act
-        var actionResult = await controller.RegisterAsync(entry);
+        ActionResult<Guid> actionResult = await controller.RegisterAsync(entry);
         var result = actionResult.Result as StatusCodeResult;
 
         // Assert
@@ -61,7 +61,7 @@ public class ServiceControllerTests
         var controller = new ServicesController(_logger, mockedService.Object);
 
         // Act
-        var actionRresult = await controller.UnregisterAsync(Guid.NewGuid());
+        ActionResult actionRresult = await controller.UnregisterAsync(Guid.NewGuid());
         var result = actionRresult as StatusCodeResult;
 
         // Assert
@@ -79,7 +79,7 @@ public class ServiceControllerTests
         var controller = new ServicesController(_logger, mockedService.Object);
 
         // Act
-        var actionRresult = await controller.UnregisterAsync(Guid.NewGuid());
+        ActionResult actionRresult = await controller.UnregisterAsync(Guid.NewGuid());
         var result = actionRresult as StatusCodeResult;
 
         // Assert

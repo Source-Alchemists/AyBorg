@@ -1,6 +1,6 @@
 using AyBorg.SDK.Data.DAL;
 
-namespace AyBorg.Registry.Models;
+namespace AyBorg.Gateway.Models;
 
 /// <summary>
 /// Service entry.

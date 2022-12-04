@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Registry\AyBorg.Registry.csproj" />
+    <ProjectReference Include="..\..\src\Gateway\AyBorg.Gateway.csproj" />
     <ProjectReference Include="..\..\src\SDK\src\System\AyBorg.SDK.System.csproj" />
   </ItemGroup>
 

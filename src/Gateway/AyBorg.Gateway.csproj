@@ -8,11 +8,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <OutputPath>bin\debug\AyBorg.Registry</OutputPath>
+    <OutputPath>bin\debug\AyBorg.Gateway</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <OutputPath>bin\release\AyBorg.Registry</OutputPath>
+    <OutputPath>bin\release\AyBorg.Gateway</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'Registry' " />

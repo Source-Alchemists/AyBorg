@@ -1,9 +1,9 @@
-using AyBorg.Registry.Models;
+using AyBorg.Gateway.Models;
 using AyBorg.SDK.Data.DAL;
 using AyBorg.SDK.Data.DTOs;
 using AutoMapper;
 
-namespace AyBorg.Registry.Mapper;
+namespace AyBorg.Gateway.Mapper;
 
 public class DalMapper : IDalMapper
 {
@@ -33,7 +33,7 @@ public class DalMapper : IDalMapper
     /// <summary>
     /// Maps the specified service entry record.
     /// </summary>
-    /// <param name="serviceEntryRecord">The service entry record.</param>	
+    /// <param name="serviceEntryRecord">The service entry record.</param>
     public ServiceEntry Map(ServiceEntryRecord serviceEntryRecord) => _mapper.Map<ServiceEntry>(serviceEntryRecord);
 
     /// <summary>

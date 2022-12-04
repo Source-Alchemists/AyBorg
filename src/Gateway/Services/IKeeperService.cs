@@ -1,6 +1,6 @@
 using AyBorg.SDK.Data.DTOs;
 
-namespace AyBorg.Registry.Services;
+namespace AyBorg.Gateway.Services;
 
 public interface IKeeperService
 {

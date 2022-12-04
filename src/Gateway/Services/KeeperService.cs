@@ -1,12 +1,12 @@
 using System.Collections.Concurrent;
 using AyBorg.Database.Data;
-using AyBorg.Registry.Mapper;
-using AyBorg.Registry.Models;
+using AyBorg.Gateway.Mapper;
+using AyBorg.Gateway.Models;
 using AyBorg.SDK.Data.DTOs;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
 
-namespace AyBorg.Registry.Services;
+namespace AyBorg.Gateway.Services;
 
 public sealed class KeeperService : IKeeperService, IDisposable
 {

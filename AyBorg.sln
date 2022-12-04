@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{9E803E63-67E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Agent", "src\Agent\AyBorg.Agent.csproj", "{FF6E85B7-E0A3-438F-BA8D-47C0B88B8C07}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Registry", "src\Registry\AyBorg.Registry.csproj", "{4D05A562-E1AF-4B45-B35B-492ABF9808D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Gateway", "src\Gateway\AyBorg.Gateway.csproj", "{4D05A562-E1AF-4B45-B35B-492ABF9808D3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Web", "src\Web\AyBorg.Web.csproj", "{91BFA49C-70EB-4CE4-BCE0-36D281C9D54D}"
 EndProject
@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{BE2EA3AA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Agent.Tests", "tests\Agent\AyBorg.Agent.Tests.csproj", "{EAF49714-DC6E-463E-A8F2-1A0BD0DB828F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Registry.Tests", "tests\Registry\AyBorg.Registry.Tests.csproj", "{F69C1508-1BD5-4165-B34E-8546D9A3D42E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Gateway.Tests", "tests\Gateway\AyBorg.Gateway.Tests.csproj", "{F69C1508-1BD5-4165-B34E-8546D9A3D42E}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{2EB58A8D-7B3D-4310-A101-FB023071CD19}"
 EndProject

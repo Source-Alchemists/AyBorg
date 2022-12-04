@@ -7,7 +7,7 @@ public class RegistryService : IRegistryService
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<RegistryService> _logger;
-    
+
     /// <summary>Initializes a new instance of the <see cref="RegistryService" /> class.</summary>
     /// <param name="logger">The logger.</param>
     /// <param name="serviceConfiguration">The service configuration.</param>
@@ -28,7 +28,7 @@ public class RegistryService : IRegistryService
     public string GetUrl(IEnumerable<RegistryEntryDto> RegistryEntryDtos, string serviceId)
     {
         var id = Guid.Parse(serviceId);
-        var serviceDetails = RegistryEntryDtos.FirstOrDefault(x => x.Id.Equals(id));
+        RegistryEntryDto? serviceDetails = RegistryEntryDtos.FirstOrDefault(x => x.Id.Equals(id));
         if (serviceDetails == null) return string.Empty;
         return serviceDetails.Url;
     }
@@ -39,11 +39,11 @@ public class RegistryService : IRegistryService
     /// </returns>
     public async Task<IEnumerable<RegistryEntryDto>> ReceiveAllAvailableServicesAsync()
     {
-        var result = await _httpClient.GetFromJsonAsync<RegistryEntryDto[]>("/Services");
+        RegistryEntryDto[]? result = await _httpClient.GetFromJsonAsync<RegistryEntryDto[]>("/Services");
         if (result != null)
         {
             return result;
-        } 
+        }
 
         _logger.LogWarning("Failed to receive service registry entries!");
         return new List<RegistryEntryDto>();
@@ -56,11 +56,11 @@ public class RegistryService : IRegistryService
     /// <returns></returns>
     public async Task<IEnumerable<RegistryEntryDto>> ReceiveAllAvailableServicesAsync(string typeName)
     {
-        var result = await _httpClient.GetFromJsonAsync<RegistryEntryDto[]>($"/Services/type/{typeName}");
+        RegistryEntryDto[]? result = await _httpClient.GetFromJsonAsync<RegistryEntryDto[]>($"/Services/type/{typeName}");
         if (result != null)
         {
             return result;
-        } 
+        }
 
         _logger.LogWarning("Failed to receive service registry entries!");
         return new List<RegistryEntryDto>();

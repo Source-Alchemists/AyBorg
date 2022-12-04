@@ -1,14 +1,14 @@
 using AyBorg.Database.Data;
-using AyBorg.Registry.Mapper;
-using AyBorg.Registry.Services;
+using AyBorg.Gateway.Mapper;
+using AyBorg.Gateway.Services;
 using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
+string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
 
 builder.Services.AddDbContextFactory<RegistryContext>(options =>
     _ = databaseProvider switch
@@ -31,7 +31,7 @@ builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IDalMapper, DalMapper>();
 builder.Services.AddSingleton<IKeeperService, KeeperService>();
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
