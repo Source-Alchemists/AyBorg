@@ -28,7 +28,7 @@ public sealed class ProjectsController : ControllerBase
     /// <param name="storageToDtoMapper">The storage to dto mapper.</param>
     /// <param name="engineHost">The engine host.</param>
     public ProjectsController(ILogger<ProjectsController> logger,
-                                IServiceConfiguration serviceConfiguration,
+                                IGatewayConfiguration serviceConfiguration,
                                 IProjectManagementService projectManagementService,
                                 IDtoMapper storageToDtoMapper,
                                 IEngineHost engineHost)
@@ -46,7 +46,7 @@ public sealed class ProjectsController : ControllerBase
     {
         foreach (IGrouping<Guid, ProjectMetaRecord> metaGroup in (await _projectManagementService.GetAllMetasAsync()).Where(x => x.ServiceUniqueName == _serviceUniqueName).GroupBy(p => p.Id))
         {
-            SDK.Data.DAL.ProjectMetaRecord? activeMeta = metaGroup.FirstOrDefault(g => g.IsActive);
+            ProjectMetaRecord? activeMeta = metaGroup.FirstOrDefault(g => g.IsActive);
             if (activeMeta != null)
             {
                 yield return _storageToDtoMapper.Map(activeMeta);

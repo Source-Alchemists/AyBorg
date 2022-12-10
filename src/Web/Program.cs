@@ -73,7 +73,7 @@ builder.Services.AddHttpClient<IRuntimeService>();
 
 builder.Services.AddHostedService<AyBorg.SDK.System.Services.RegistryService>();
 
-builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
+builder.Services.AddSingleton<IGatewayConfiguration, GatewayConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
 builder.Services.AddSingleton<IAgentCacheService, AgentCacheService>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();

@@ -10,13 +10,13 @@ public class RegistryService : IRegistryService
 
     /// <summary>Initializes a new instance of the <see cref="RegistryService" /> class.</summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="serviceConfiguration">The service configuration.</param>
+    /// <param name="gatewayConfiguration">The service configuration.</param>
     /// <param name="httpClient">The HTTP client.</param>
-    public RegistryService(ILogger<RegistryService> logger, IServiceConfiguration serviceConfiguration, HttpClient httpClient)
+    public RegistryService(ILogger<RegistryService> logger, IGatewayConfiguration gatewayConfiguration, HttpClient httpClient)
     {
         _logger = logger;
         _httpClient = httpClient;
-        _httpClient.BaseAddress = new Uri(serviceConfiguration.RegistryUrl);
+        _httpClient.BaseAddress = new Uri(gatewayConfiguration.GatewayUrl);
     }
 
     /// <summary>

@@ -41,7 +41,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <param name="runtimeToStorageMapper">The runtime to storage mapper.</param>
     /// <param name="runtimeConverterService">The runtime converter service.</param>
     public ProjectManagementService(ILogger<ProjectManagementService> logger,
-                                    IServiceConfiguration serviceConfiguration,
+                                    IGatewayConfiguration serviceConfiguration,
                                     IDbContextFactory<ProjectContext> projectContextFactory,
                                     IEngineHost runtimeHost,
                                     IRuntimeToStorageMapper runtimeToStorageMapper,
