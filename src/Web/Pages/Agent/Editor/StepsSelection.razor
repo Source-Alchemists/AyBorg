@@ -1,3 +1,4 @@
+@using AyBorg.Web.Shared.Models
 @using SDK.Data.DTOs
 @inject AyBorg.Web.Services.IRegistryService registryService
 @inject AyBorg.Web.Services.Agent.PluginsService AgentPluginsService;
@@ -36,7 +37,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        var services = await registryService.ReceiveAllAvailableServicesAsync();
+        var services = await registryService.ReceiveServicesAsync();
         _baseUrl = registryService.GetUrl(services, ServiceId);
         if (_baseUrl == string.Empty)
         {

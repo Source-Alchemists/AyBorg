@@ -38,9 +38,9 @@ public partial class Editor : ComponentBase
         {
             _isProjectServerWaiting = true;
             _areSubComponentsHidden = true;
-            IEnumerable<RegistryEntryDto> services = await RegistryService!.ReceiveAllAvailableServicesAsync();
+            IEnumerable<ServiceInfoEntry> services = await RegistryService!.ReceiveServicesAsync();
 
-            RegistryEntryDto? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
+            ServiceInfoEntry? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
             if (service == null)
             {
                 _hasServiceError = true;

@@ -33,9 +33,9 @@ public partial class Projects : ComponentBase
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            IEnumerable<RegistryEntryDto> services = await RegistryService.ReceiveAllAvailableServicesAsync();
+            IEnumerable<ServiceInfoEntry> services = await RegistryService.ReceiveServicesAsync();
             _baseUrl = RegistryService.GetUrl(services, ServiceId);
-            RegistryEntryDto? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
+            ServiceInfoEntry? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
             if (_baseUrl == string.Empty || service == null)
             {
                 _hasServiceError = true;

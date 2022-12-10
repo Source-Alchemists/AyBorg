@@ -1,5 +1,4 @@
 using System.Text.Json.Serialization;
-using AyBorg.SDK.Data.DTOs;
 
 namespace AyBorg.Web.Shared.Models;
 
@@ -17,12 +16,12 @@ public record UiAgentState
     {
     }
 
-    public UiAgentState(RegistryEntryDto entry)
+    public UiAgentState(ServiceInfoEntry serviceInfoEntry)
     {
-        Name = entry.Name;
-        UniqueName = entry.UniqueName;
-        BaseUrl = entry.Url;
-        var agentEntry = new AgentServiceEntry(entry);
+        Name = serviceInfoEntry.Name;
+        UniqueName = serviceInfoEntry.UniqueName;
+        BaseUrl = serviceInfoEntry.Url;
+        var agentEntry = new AgentServiceEntry(serviceInfoEntry);
         EditorLink = agentEntry.EditorLink;
         ProjectsLink = agentEntry.ProjectsLink;
     }

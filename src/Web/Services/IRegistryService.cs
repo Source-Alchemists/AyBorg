@@ -1,4 +1,4 @@
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Shared.Models;
 
 namespace AyBorg.Web.Services;
 
@@ -7,21 +7,15 @@ public interface IRegistryService
     /// <summary>
     /// Gets the URL.
     /// </summary>
-    /// <param name="RegistryEntryDtos">The service registry entry dtos.</param>
+    /// <param name="serviceInfoEntry">The service registry entry dtos.</param>
     /// <param name="serviceId">The service identifier.</param>
     /// <returns></returns>
-    string GetUrl(IEnumerable<RegistryEntryDto> RegistryEntryDtos, string serviceId);
+    string GetUrl(IEnumerable<ServiceInfoEntry> serviceInfoEntry, string serviceId);
 
     /// <summary>Receives all available services asynchronous.</summary>
+    /// <param name="typeName">Name of the type.</param>
     /// <returns>
     ///  Service registry entries.
     ///  </returns>
-    Task<IEnumerable<RegistryEntryDto>> ReceiveAllAvailableServicesAsync();
-
-    /// <summary>
-    /// Receives all available services asynchronous.
-    /// </summary>
-    /// <param name="typeName">The name.</param>
-    /// <returns></returns>
-    Task<IEnumerable<RegistryEntryDto>> ReceiveAllAvailableServicesAsync(string typeName);
+    Task<IEnumerable<ServiceInfoEntry>> ReceiveServicesAsync(string typeName = "");
 }

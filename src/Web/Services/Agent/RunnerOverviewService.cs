@@ -9,7 +9,7 @@ public class AgentOverviewService : IAgentOverviewService
     private readonly IRuntimeService _runtimeService;
     private readonly IProjectManagementService _projectManagementService;
     private readonly List<AgentServiceEntry> _AgentServices = new();
-    
+
     private int _AgentsCount = 0;
     private int _activeAgentsCount = 0;
     private int _inactiveAgentsCount = 0;
@@ -29,7 +29,7 @@ public class AgentOverviewService : IAgentOverviewService
     public async Task UpdateAsync()
     {
         var tmpAgentList = new List<AgentServiceEntry>();
-        foreach (var Agent in await _registryService!.ReceiveAllAvailableServicesAsync("AyBorg.Agent"))
+        foreach (var Agent in await _registryService!.ReceiveServicesAsync("AyBorg.Agent"))
         {
             var baseUrl = Agent.Url;
             var projectMeta = await _projectManagementService!.GetActiveMetaAsync(baseUrl);
