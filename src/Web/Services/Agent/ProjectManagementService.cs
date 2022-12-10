@@ -1,245 +1,211 @@
-using System.Text;
-using System.Text.Json;
-using AyBorg.SDK.Data.DTOs;
+using Ayborg.Gateway.V1;
+using Grpc.Core;
 
 namespace AyBorg.Web.Services.Agent;
 
 public class ProjectManagementService : IProjectManagementService
 {
     private readonly ILogger<ProjectManagementService> _logger;
-    private readonly HttpClient _httpClient;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
+    private readonly AgentProjectManagement.AgentProjectManagementClient _agentProjectManagementClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectManagementService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="httpClient">The HTTP client.</param>
     /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
     public ProjectManagementService(ILogger<ProjectManagementService> logger,
-                                    HttpClient httpClient,
-                                    IAuthorizationHeaderUtilService authorizationHeaderUtilService)
+                                    IAuthorizationHeaderUtilService authorizationHeaderUtilService,
+                                    AgentProjectManagement.AgentProjectManagementClient agentProjectManagementClient)
     {
         _logger = logger;
-        _httpClient = httpClient;
         _authorizationHeaderUtilService = authorizationHeaderUtilService;
+        _agentProjectManagementClient = agentProjectManagementClient;
     }
 
     /// <summary>
     /// Receives asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="baseUrl">The agent unique name.</param>
     /// <returns></returns>
-    public async ValueTask<IEnumerable<ProjectMetaDto>> GetMetasAsync(string baseUrl)
+    public async ValueTask<IEnumerable<Shared.Models.Agent.ProjectMeta>> GetMetasAsync(string agentUniqueName)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/projects");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        IEnumerable<ProjectMetaDto>? result = await response.Content.ReadFromJsonAsync<IEnumerable<ProjectMetaDto>>();
-        if (result != null)
+        try
         {
+            GetProjectMetasResponse response = await _agentProjectManagementClient.GetProjectMetasAsync(new GetProjectMetasRequest
+            {
+                AgentUniqueName = agentUniqueName
+            });
+
+            var result = new List<Shared.Models.Agent.ProjectMeta>();
+
+            foreach (ProjectMeta? pm in response.ProjectMetas)
+            {
+                result.Add(new Shared.Models.Agent.ProjectMeta(pm));
+            }
+
             return result;
         }
-
-        return new List<ProjectMetaDto>();
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to get project metas");
+            return new List<Shared.Models.Agent.ProjectMeta>();
+        }
     }
 
     /// <summary>
     /// Receives active project meta asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="agentUniqueName">The agent unique name.</param>
     /// <returns></returns>
-    public async ValueTask<ProjectMetaDto> GetActiveMetaAsync(string baseUrl)
+    public async ValueTask<Shared.Models.Agent.ProjectMeta> GetActiveMetaAsync(string agentUniqueName)
     {
-        try
-        {
-            var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/projects/active");
-            request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-            HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-            ProjectMetaDto? result = await response.Content.ReadFromJsonAsync<ProjectMetaDto>();
-            return result!;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogTrace(ex, "Failed to get active project meta");
-            return null!;
-        }
+        IEnumerable<Shared.Models.Agent.ProjectMeta> projectMetas = await GetMetasAsync(agentUniqueName);
+        return projectMetas.FirstOrDefault(pm => pm.IsActive)!;
     }
 
     /// <summary>
     /// Creates asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="agentUniqueName">The agent unique name.</param>
     /// <param name="projectName">Name of the project.</param>
     /// <returns></returns>
     /// <exception cref="System.Text.Json.JsonException"></exception>
-    public async ValueTask<ProjectMetaDto> CreateAsync(string baseUrl, string projectName)
+    public async ValueTask<Shared.Models.Agent.ProjectMeta> CreateAsync(string agentUniqueName, string projectName)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/projects?name={projectName}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            _logger.LogWarning("Could not create project '{projectName}' [Code: {response.StatusCode}]!", projectName, response.StatusCode);
+            CreateProjectResponse response = await _agentProjectManagementClient.CreateProjetAsync(new CreateProjectRequest
+            {
+                AgentUniqueName = agentUniqueName,
+                ProjectName = projectName
+            });
+
+            return new Shared.Models.Agent.ProjectMeta(response.ProjectMeta);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to create project");
             return null!;
         }
-
-        ProjectMetaDto? projectMetaDto = await response.Content.ReadFromJsonAsync<ProjectMetaDto>();
-        if (projectMetaDto == null) throw new JsonException();
-        return projectMetaDto;
     }
 
     /// <summary>
     /// Deletes asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="agentUniqueName">The agent unique name.</param>
     /// <param name="projectMeta">The project meta info.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryDeleteAsync(string baseUrl, ProjectMetaDto projectMeta)
+    public async ValueTask<bool> TryDeleteAsync(string agentUniqueName, Shared.Models.Agent.ProjectMeta projectMeta)
     {
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"{baseUrl}/projects?id={projectMeta.Id}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            _logger.LogWarning("Could not delete project '{projectMeta.Name}' [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
+            _ = await _agentProjectManagementClient.DeleteProjectAsync(new DeleteProjectRequest
+            {
+                AgentUniqueName = agentUniqueName,
+                ProjectId = projectMeta.Id
+            });
+
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to delete project");
             return false;
         }
-
-        return true;
     }
 
     /// <summary>
     /// Activates the asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="agentUniqueName">The agent unique name.</param>
     /// <param name="projectMeta">The project meta info.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryActivateAsync(string baseUrl, ProjectMetaDto projectMeta)
+    public async ValueTask<bool> TryActivateAsync(string agentUniqueName, Shared.Models.Agent.ProjectMeta projectMeta)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.DbId}/active/true");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            _logger.LogWarning("Could not set project '{projectMeta.Name}' to active [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
+            _ = await _agentProjectManagementClient.ActivateProjectAsync(new ActivateProjectRequest
+            {
+                AgentUniqueName = agentUniqueName,
+                ProjectDbId = projectMeta.DbId
+            });
+
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to activate project");
             return false;
         }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Save project as ready asynchronous.
-    /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
-    /// <param name="dbId">The database identifier.</param>
-    /// <param name="projectStateChange">State of the project.</param>
-    /// <returns></returns>
-    public async ValueTask<bool> TrySaveNewVersionAsync(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange)
-    {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{dbId}/state")
-        {
-            Content = new StringContent(JsonSerializer.Serialize(projectStateChange), Encoding.UTF8, "application/json")
-        };
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        if (!response.IsSuccessStatusCode)
-        {
-            _logger.LogWarning("Could not save project '{dbId}' as new version [Code: {response.StatusCode}]!", dbId, response.StatusCode);
-            return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// Sets the project to ready state.
-    /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
-    /// <param name="dbId">The database identifier.</param>
-    /// <param name="projectStateChange">State of the project.</param>
-    /// <returns></returns>
-    public async ValueTask<bool> TryApproveAsnyc(string baseUrl, Guid dbId, ProjectStateChangeDto projectStateChange)
-    {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{dbId}/approve")
-        {
-            Content = new StringContent(JsonSerializer.Serialize(projectStateChange), Encoding.UTF8, "application/json")
-        };
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        if (!response.IsSuccessStatusCode)
-        {
-            _logger.LogWarning("Could not approve project '{dbId}' [Code: {response.StatusCode}]!", dbId, response.StatusCode);
-            return false;
-        }
-
-        return true;
     }
 
     /// <summary>
     /// Save project asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="agentUniqueName">The agent unique name.</param>
     /// <param name="projectMeta">The project meta info.</param>
-    public async ValueTask<bool> TrySaveAsync(string baseUrl, ProjectMetaDto projectMeta)
+    /// <param name="projectSaveInfo">The project save information.</param>
+    public async ValueTask<bool> TrySaveAsync(string agentUniqueName,
+                                                Shared.Models.Agent.ProjectMeta projectMeta,
+                                                Shared.Models.Agent.ProjectSaveInfo projectSaveInfo)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.Id}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            _logger.LogWarning("Could not save project '{projectMeta.Name}' [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
+            _ = await _agentProjectManagementClient.SaveProjectAsync(new SaveProjectRequest
+            {
+                AgentUniqueName = agentUniqueName,
+                ProjectDbId = projectMeta.DbId,
+                ProjectId = projectMeta.Id,
+                ProjectSaveInfo = CreateRpcProjectSaveInfo(projectSaveInfo)
+            });
+
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to save project");
             return false;
         }
-
-        return true;
     }
 
     /// <summary>
-    /// Gets the project settings asynchronous.
+    /// Sets the project to ready state.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
-    /// <param name="projectMeta">The project meta info.</param>
+    /// <param name="agentUniqueName">The agent unique name.</param>
+    /// <param name="dbId">The database identifier.</param>
+    /// <param name="projectSaveInfo">State of the project.</param>
     /// <returns></returns>
-    public async ValueTask<ProjectSettingsDto> GetProjectSettingsAsync(string baseUrl, ProjectMetaDto projectMeta)
+    public async ValueTask<bool> TryApproveAsync(string agentUniqueName,
+                                                    string dbId,
+                                                    Shared.Models.Agent.ProjectSaveInfo projectSaveInfo)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/projects/{projectMeta.DbId}/settings");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        if (!response.IsSuccessStatusCode)
+        try
         {
-            _logger.LogWarning("Could not get project settings for '{projectMeta.Name}' [Code: {response.StatusCode}]!", projectMeta.Name, response.StatusCode);
-            return null!;
+            _ = await _agentProjectManagementClient.ApproveProjectAsync(new ApproveProjectRequest
+            {
+                AgentUniqueName = agentUniqueName,
+                ProjectDbId = dbId,
+                ProjectSaveInfo = CreateRpcProjectSaveInfo(projectSaveInfo)
+            });
+
+            return true;
         }
-
-        ProjectSettingsDto? projectSettingsDto = await response.Content.ReadFromJsonAsync<ProjectSettingsDto>();
-        if (projectSettingsDto == null) throw new JsonException();
-        return projectSettingsDto;
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to approve project");
+            return false;
+        }
     }
 
-    /// <summary>
-    /// Updates the project communication settings asynchronous.
-    /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
-    /// <param name="projectMeta">The project meta info.</param>
-    /// <param name="projectSettings">The project settings.</param>
-    /// <returns></returns>
-    public async ValueTask<bool> TryUpdateProjectCommunicationSettingsAsync(string baseUrl, ProjectMetaDto projectMeta, ProjectSettingsDto projectSettings)
+    private static ProjectSaveInfo CreateRpcProjectSaveInfo(Shared.Models.Agent.ProjectSaveInfo projectSaveInfo)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/projects/{projectMeta.DbId}/settings/communication")
+        return new ProjectSaveInfo
         {
-            Content = new StringContent(JsonSerializer.Serialize(projectSettings), Encoding.UTF8, "application/json")
+            State = (int)projectSaveInfo.State,
+            VersionName = projectSaveInfo.VersionName,
+            Comment = projectSaveInfo.Comment,
+            UserName = projectSaveInfo.UserName
         };
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        if (!response.IsSuccessStatusCode)
-        {
-            _logger.LogWarning("Could not update project communication settings for '{projectMeta.DbId}' [Code: {response.StatusCode}]!", projectMeta.DbId, response.StatusCode);
-            return false;
-        }
-
-        return true;
     }
 }

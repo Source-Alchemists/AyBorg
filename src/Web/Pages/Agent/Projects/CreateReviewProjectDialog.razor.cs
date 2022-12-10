@@ -1,5 +1,5 @@
 using AyBorg.SDK.Data.DTOs;
-using AyBorg.SDK.Projects;
+using AyBorg.Web.Shared.Models.Agent;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -8,9 +8,9 @@ namespace AyBorg.Web.Pages.Agent.Projects;
 public partial class CreateReviewProjectDialog : ComponentBase
 {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
-    [Parameter] public ProjectMetaDto Project { get; set; } = null!;
+    [Parameter] public ProjectMeta Project { get; set; } = null!;
 
-    private ProjectMetaDto _tmpProject = null!;
+    private ProjectMeta _tmpProject = null!;
 
     protected override void OnInitialized()
     {
@@ -27,7 +27,7 @@ public partial class CreateReviewProjectDialog : ComponentBase
     {
         MudDialog.Close(DialogResult.Ok(new ProjectStateChangeDto
         {
-            State = ProjectState.Review,
+            State = SDK.Projects.ProjectState.Review,
             VersionName = _tmpProject.VersionName,
             Comment = _tmpProject.Comment
         }));

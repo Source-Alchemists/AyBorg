@@ -43,6 +43,7 @@ builder.Services.AddAuthorization();
 builder.Services.AddGrpc();
 
 builder.Services.AddSingleton<IGatewayConfiguration, GatewayConfiguration>();
+builder.Services.AddSingleton<IGrpcChannelService, GrpcChannelService>();
 builder.Services.AddSingleton<IKeeperService, KeeperService>();
 
 WebApplication app = builder.Build();

@@ -17,6 +17,8 @@
 
   <ItemGroup>
     <Protobuf Include="..\SDK\src\Communication\gRPC\Contracts\Gateway\registerV1.proto" GrpcServices="Server" />
+    <Protobuf Include="..\SDK\src\Communication\gRPC\Contracts\Gateway\agentProjectManagementV1.proto" GrpcServices="Both" />
+    <Protobuf Include="..\SDK\src\Communication\gRPC\Contracts\Gateway\agentProjectSettingsV1.proto" GrpcServices="Both" />
   </ItemGroup>
 
   <ItemGroup>

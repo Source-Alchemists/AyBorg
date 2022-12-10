@@ -1,7 +1,7 @@
-using AyBorg.SDK.Data.DTOs;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Modals;
+using AyBorg.Web.Shared.Models.Agent;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -9,19 +9,19 @@ namespace AyBorg.Web.Pages.Agent.Shared;
 
 public sealed partial class ProjectSettingsDialog : ComponentBase
 {
-    [Parameter] public ProjectMetaDto ProjectMeta { get; set; } = null!;
-    [Inject] IProjectManagementService ProjectManagementService { get; set; } = null!;
+    [Parameter] public ProjectMeta ProjectMeta { get; set; } = null!;
+    [Inject] IProjectSettingsService ProjectSettingsService { get; set; } = null!;
     [Inject] IStateService StateService { get; set; } = null!;
     [Inject] IDialogService DialogService { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
 
-    private ProjectSettingsDto _projectSettings = null!;
+    private ProjectSettings _projectSettings = null!;
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
 
-        _projectSettings = await ProjectManagementService.GetProjectSettingsAsync(StateService.AgentState.BaseUrl, ProjectMeta);
+        _projectSettings = await ProjectSettingsService.GetProjectSettingsAsync(StateService.AgentState.BaseUrl, ProjectMeta);
     }
 
     private async Task ChangeResultCommunicationClicked()
@@ -56,7 +56,7 @@ public sealed partial class ProjectSettingsDialog : ComponentBase
 
     private async ValueTask UpdateCommunicationSettings()
     {
-        bool apiResult = await ProjectManagementService.TryUpdateProjectCommunicationSettingsAsync(StateService.AgentState.BaseUrl, ProjectMeta, _projectSettings);
+        bool apiResult = await ProjectSettingsService.TryUpdateProjectCommunicationSettingsAsync(StateService.AgentState.BaseUrl, ProjectMeta, _projectSettings);
         if (apiResult)
         {
             Snackbar.Add("Result communication changed successfully.", Severity.Success);

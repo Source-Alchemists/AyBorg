@@ -14,6 +14,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     private readonly Task _heartbeatTask;
     private readonly ILogger<KeeperService> _logger;
     private readonly IDbContextFactory<RegistryContext> _registryContextFactory;
+    private readonly IGrpcChannelService _grpcChannelService;
     private readonly BlockingCollection<ServiceEntry> _registryEntries = new();
     private readonly ServiceEntry _selfServiceEntry;
     private bool _isDisposed = false;
@@ -24,14 +25,18 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// </summary>
     /// <param name="logger">Logger.</param>
     /// <param name="configuration">The configuration.</param>
+    /// <param name="gatewayConfiguration">The gateway configuration.</param>
     /// <param name="registryContextFactory">The registry context.</param>
+    /// <param name="grpcChannelService">The gRPC channel service.</param>
     public KeeperService(ILogger<KeeperService> logger,
                         IConfiguration configuration,
-                        IGatewayConfiguration registryConfiguration,
-                        IDbContextFactory<RegistryContext> registryContextFactory)
+                        IGatewayConfiguration gatewayConfiguration,
+                        IDbContextFactory<RegistryContext> registryContextFactory,
+                        IGrpcChannelService grpcChannelService)
     {
         _logger = logger;
         _registryContextFactory = registryContextFactory;
+        _grpcChannelService = grpcChannelService;
 
         string? serverUrl = configuration.GetValue<string>("AyBorg:Service:Url");
 
@@ -44,11 +49,11 @@ public sealed class KeeperService : IKeeperService, IDisposable
         _selfServiceEntry = new ServiceEntry
         {
             Id = Guid.NewGuid(),
-            Name = registryConfiguration.DisplayName,
-            UniqueName = registryConfiguration.UniqueName,
-            Type = registryConfiguration.TypeName,
+            Name = gatewayConfiguration.DisplayName,
+            UniqueName = gatewayConfiguration.UniqueName,
+            Type = gatewayConfiguration.TypeName,
             Url = serverUrl,
-            Version = registryConfiguration.Version
+            Version = gatewayConfiguration.Version
         };
         _heartbeatTask = StartHeartbeatsValidation();
     }
@@ -141,6 +146,11 @@ public sealed class KeeperService : IKeeperService, IDisposable
             }
             serviceEntry.Id = Guid.NewGuid();
             await context.ServiceEntries!.AddAsync(serviceEntry);
+        }
+
+        if(!_grpcChannelService.TryRegisterChannel(serviceEntry.UniqueName, serviceEntry.Url))
+        {
+            throw new InvalidOperationException($"Adding a service with unique name ({serviceEntry.UniqueName} is not allowed! A service with the name is already registered.");
         }
 
         await context.SaveChangesAsync();
@@ -244,7 +254,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
         while (_registryEntries.AsEnumerable().Any())
         {
             ServiceEntry lastEntry = _registryEntries.Take();
-            if (!(lastEntry.Url.Equals(serviceEntry.Url)))
+            if (!lastEntry.Url.Equals(serviceEntry.Url))
             {
                 tmpCollection.Add(lastEntry);
             }
@@ -254,6 +264,8 @@ public sealed class KeeperService : IKeeperService, IDisposable
         {
             _registryEntries.Add(tmpItem);
         }
+
+        _grpcChannelService.TryUnregisterChannel(serviceEntry.UniqueName);
     }
 
     private Task StartHeartbeatsValidation() => Task.Factory.StartNew(async () =>

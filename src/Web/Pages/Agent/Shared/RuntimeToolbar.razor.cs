@@ -1,10 +1,10 @@
 using System.Text;
 using System.Text.Json;
-using Microsoft.AspNetCore.Components;
-using MQTTnet;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.System.Runtime;
 using AyBorg.Web.Services.Agent;
+using Microsoft.AspNetCore.Components;
+using MQTTnet;
 
 
 namespace AyBorg.Web.Pages.Agent.Shared;
@@ -13,10 +13,6 @@ namespace AyBorg.Web.Pages.Agent.Shared;
 
 public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
 {
-    [Parameter]
-    [EditorRequired]
-    public string BaseUrl { get; set; }
-
     [Parameter]
     [EditorRequired]
     public string ServiceUniqueName { get; set; }
@@ -46,10 +42,9 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
 
     protected override async Task OnParametersSetAsync()
     {
-        if (string.IsNullOrEmpty(BaseUrl)) return;
         _status = await RuntimeService.GetStatusAsync();
         UpdateButtonsState();
-        if(_statusSubscription != null)
+        if (_statusSubscription != null)
         {
             _statusSubscription.MessageReceived -= OnMqttMessageReceived;
             await MqttClientProvider.UnsubscribeAsync(_statusSubscription);
@@ -67,11 +62,11 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
 
     private async void OnMqttMessageReceived(MqttApplicationMessage message)
     {
-        if(message.Payload is null) return;
-            var status = JsonSerializer.Deserialize<EngineMeta>(Encoding.UTF8.GetString(message.Payload));
-            _status = status;
-            UpdateButtonsState();
-            await InvokeAsync(StateHasChanged);
+        if (message.Payload is null) return;
+        EngineMeta status = JsonSerializer.Deserialize<EngineMeta>(Encoding.UTF8.GetString(message.Payload));
+        _status = status;
+        UpdateButtonsState();
+        await InvokeAsync(StateHasChanged);
     }
 
     private void UpdateButtonsState()

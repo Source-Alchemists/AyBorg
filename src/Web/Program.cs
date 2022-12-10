@@ -1,4 +1,3 @@
-using Ayborg.Gateway.V1;
 using AyBorg.Communication.gRPC.Registry;
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
@@ -7,6 +6,7 @@ using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.Web;
 using AyBorg.Web.Areas.Identity;
+using AyBorg.Web.BuilderTools;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
@@ -66,16 +66,11 @@ builder.Services.AddMudServices(config =>
 });
 builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddHttpClient<ProjectManagementService>();
 builder.Services.AddHttpClient<PluginsService>();
 builder.Services.AddHttpClient<IFlowService, FlowService>();
 builder.Services.AddHttpClient<IRuntimeService>();
 
-builder.Services.AddGrpcClient<Register.RegisterClient>(option =>
-{
-    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
-    option.Address = new Uri(gatewayUrl!);
-});
+GrpcClientRegisterTool.Register(builder);
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
 
@@ -88,6 +83,7 @@ builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 builder.Services.AddScoped<IAuthorizationHeaderUtilService, AuthorizationHeaderUtilService>();
 builder.Services.AddScoped<IJwtProviderService, JwtProviderService>();
 builder.Services.AddScoped<IProjectManagementService, ProjectManagementService>();
+builder.Services.AddScoped<IProjectSettingsService, ProjectSettingsService>();
 builder.Services.AddScoped<PluginsService>();
 builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IRuntimeService, RuntimeService>();
