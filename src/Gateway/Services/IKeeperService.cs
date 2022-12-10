@@ -27,9 +27,9 @@ public interface IKeeperService
     /// <summary>
     /// Register a new service.
     /// </summary>
-    /// <param name="RegistryEntry">Service registry entry.</param>
+    /// <param name="serviceEntry">Service registry entry.</param>
     /// <returns>Id for the new service.</returns>
-    Task<Guid> RegisterAsync(ServiceEntry RegistryEntry);
+    Task<Guid> RegisterAsync(ServiceEntry serviceEntry);
 
     /// <summary>
     /// Unregister a service
@@ -41,7 +41,7 @@ public interface IKeeperService
     /// Updates the service timestamp.
     /// If not updated frequencly, the service will be recognized as not available and be removed to available service collection.
     /// </summary>
-    /// <param name="RegistryEntry">The desired service.</param>
+    /// <param name="serviceEntry">The desired service.</param>
     /// <returns>ValueTask.</returns>
-    ValueTask UpdateTimestamp(ServiceEntry RegistryEntry);
+    ValueTask UpdateTimestamp(ServiceEntry serviceEntry);
 }

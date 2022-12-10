@@ -13,9 +13,9 @@ namespace AyBorg.Gateway.Tests;
 public sealed class KeeperServiceTests : IDisposable
 {
     private static readonly NullLogger<KeeperService> s_logger = new();
-    private readonly NullLogger<IRegistryConfiguration> _registryConfigurationLogger = new();
+    private readonly NullLogger<IGatewayConfiguration> _registryConfigurationLogger = new();
     private readonly IConfiguration _configuration;
-    private readonly IRegistryConfiguration _registryConfiguration;
+    private readonly IGatewayConfiguration _registryConfiguration;
     private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
     private readonly DbContextOptions<RegistryContext> _contextOptions;
     private readonly IDalMapper _dalMapper;
@@ -31,7 +31,7 @@ public sealed class KeeperServiceTests : IDisposable
                 new("Kestrel:Endpoints:Https:Url", "https://localhost:5001")
             }!).Build();
 
-        _registryConfiguration = new RegistryConfiguration(_registryConfigurationLogger, _configuration);
+        _registryConfiguration = new GatewayConfiguration(_registryConfigurationLogger, _configuration);
         _dalMapper = new DalMapper();
 
         _connection = new Microsoft.Data.Sqlite.SqliteConnection("Filename=:memory:");
@@ -57,7 +57,7 @@ public sealed class KeeperServiceTests : IDisposable
                 new("Kestrel:Endpoints:Http:Url", httpUrl),
                 new("Kestrel:Endpoints:Https:Url", httpsUrl)
             }!).Build();
-        var registryConfiguration = new RegistryConfiguration(_registryConfigurationLogger, configuration);
+        var registryConfiguration = new GatewayConfiguration(_registryConfigurationLogger, configuration);
 
         // Act
         KeeperService service;

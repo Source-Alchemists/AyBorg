@@ -42,7 +42,7 @@ builder.Services.AddDbContextFactory<RegistryContext>(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddGrpc();
 
-builder.Services.AddSingleton<IRegistryConfiguration, RegistryConfiguration>();
+builder.Services.AddSingleton<IGatewayConfiguration, GatewayConfiguration>();
 builder.Services.AddSingleton<IKeeperService, KeeperService>();
 
 WebApplication app = builder.Build();

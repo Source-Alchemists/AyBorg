@@ -1,8 +1,10 @@
+using Ayborg.Gateway.V1;
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
+using AyBorg.Shared.gRPC.Registry;
 using AyBorg.Web;
 using AyBorg.Web.Areas.Identity;
 using AyBorg.Web.Services;
@@ -64,16 +66,20 @@ builder.Services.AddMudServices(config =>
 });
 builder.Services.AddBlazoredLocalStorage();
 
-builder.Services.AddHttpClient("AyBorg.Web.GatewayService");
-builder.Services.AddHttpClient("AyBorg.Web.Services.GatewayService>");
 builder.Services.AddHttpClient<ProjectManagementService>();
 builder.Services.AddHttpClient<PluginsService>();
 builder.Services.AddHttpClient<IFlowService, FlowService>();
 builder.Services.AddHttpClient<IRuntimeService>();
 
-builder.Services.AddHostedService<AyBorg.SDK.System.Services.RegistryService>();
+builder.Services.AddGrpcClient<Register.RegisterClient>(option =>
+{
+    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
+    option.Address = new Uri(gatewayUrl!);
+});
 
-builder.Services.AddSingleton<IGatewayConfiguration, GatewayConfiguration>();
+builder.Services.AddHostedService<RegistryBackgroundService>();
+
+builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
 builder.Services.AddSingleton<IAgentCacheService, AgentCacheService>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();

@@ -27,21 +27,17 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// <param name="registryContextFactory">The registry context.</param>
     public KeeperService(ILogger<KeeperService> logger,
                         IConfiguration configuration,
-                        IRegistryConfiguration registryConfiguration,
+                        IGatewayConfiguration registryConfiguration,
                         IDbContextFactory<RegistryContext> registryContextFactory)
     {
         _logger = logger;
         _registryContextFactory = registryContextFactory;
 
-        string? serverUrl = configuration.GetValue<string>("Kestrel:Endpoints:Https:Url");
-        if (serverUrl == null || serverUrl.Equals(string.Empty))
-        {
-            serverUrl = configuration.GetValue<string>("Kestrel:Endpoints:Http:Url");
-        }
+        string? serverUrl = configuration.GetValue<string>("AyBorg:Service:Url");
 
         if (string.IsNullOrEmpty(serverUrl))
         {
-            _logger.LogError("Server url is not set in configuration. (Hint: Kestrel:Endpoints:Https:Url or Kestrel:Endpoints:Http:Url)");
+            _logger.LogError("Server url is not set in configuration. (Hint: AyBorg:Service:Url)");
             throw new InvalidOperationException("Server url is not set in configuration.");
         }
 
@@ -134,6 +130,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
             knownService.Url = serviceEntry.Url;
             knownService.Name = serviceEntry.Name;
             serviceEntry.LastConnectionTime = DateTime.UtcNow;
+            serviceEntry.Id = knownService.Id;
             _logger.LogTrace("Service {serviceEntry.Name} ({serviceEntry.Url}) is already registered and will be used with same id [{serviceEntry.Id}].", serviceEntry.Name, serviceEntry.Url, serviceEntry.Id);
         }
         else
@@ -147,7 +144,6 @@ public sealed class KeeperService : IKeeperService, IDisposable
         }
 
         await context.SaveChangesAsync();
-        serviceEntry.Id = serviceEntry.Id;
         _availableServices.Add(serviceEntry);
         _registryEntries.Add(serviceEntry);
 
@@ -177,15 +173,15 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// Updates the service timestamp.
     /// If not updated frequencly, the service will be recognized as not available and be removed to available service collection.
     /// </summary>
-    /// <param name="RegistryEntry">The desired service.</param>
+    /// <param name="serviceEntry">The desired service.</param>
     /// <returns>Task.</returns>
-    public async ValueTask UpdateTimestamp(ServiceEntry RegistryEntry)
+    public async ValueTask UpdateTimestamp(ServiceEntry serviceEntry)
     {
-        ServiceEntry? matchingService = FindAvailableService(RegistryEntry);
+        ServiceEntry? matchingService = FindAvailableService(serviceEntry);
 
         if (matchingService == null)
         {
-            throw new KeyNotFoundException($"Service with url '{RegistryEntry.Url}' not found!");
+            throw new KeyNotFoundException($"Service with url '{serviceEntry.Url}' not found!");
         }
 
         matchingService.LastConnectionTime = DateTime.UtcNow;
@@ -261,23 +257,23 @@ public sealed class KeeperService : IKeeperService, IDisposable
     }
 
     private Task StartHeartbeatsValidation() => Task.Factory.StartNew(async () =>
-                                                     {
-                                                         while (!_isHeartbeatTaskTerminated)
-                                                         {
-                                                             foreach (ServiceEntry? serviceItem in _availableServices.AsEnumerable())
-                                                             {
-                                                                 DateTime utcNow = DateTime.UtcNow;
-                                                                 DateTime utcHeartbeat = serviceItem.LastConnectionTime.AddMilliseconds(HeartbeatValidationTimeoutMs);
-                                                                 if ((utcHeartbeat - utcNow).TotalMilliseconds < 0)
-                                                                 {
-                                                                     _logger.LogWarning("Service '{serviceItem.Name}' with id '{serviceItem.Id}' time out and will be removed!", serviceItem.Name, serviceItem.Id);
-                                                                     RemoveService(serviceItem.Id);
-                                                                     _logger.LogInformation("Service '{serviceItem.Name}' (Url: '{serviceItem.Url}') removed!", serviceItem.Name, serviceItem.Url);
-                                                                 }
-                                                             }
+    {
+        while (!_isHeartbeatTaskTerminated)
+        {
+            foreach (ServiceEntry? serviceItem in _availableServices.AsEnumerable())
+            {
+                DateTime utcNow = DateTime.UtcNow;
+                DateTime utcHeartbeat = serviceItem.LastConnectionTime.AddMilliseconds(HeartbeatValidationTimeoutMs);
+                if ((utcHeartbeat - utcNow).TotalMilliseconds < 0)
+                {
+                    _logger.LogWarning("Service '{serviceItem.Name}' with id '{serviceItem.Id}' time out and will be removed!", serviceItem.Name, serviceItem.Id);
+                    RemoveService(serviceItem.Id);
+                    _logger.LogInformation("Service '{serviceItem.Name}' (Url: '{serviceItem.Url}') removed!", serviceItem.Name, serviceItem.Url);
+                }
+            }
 
-                                                             await Task.Delay(HeartbeatPollingTimeMs);
-                                                         }
+            await Task.Delay(HeartbeatPollingTimeMs);
+        }
 
-                                                     }, TaskCreationOptions.LongRunning);
+    }, TaskCreationOptions.LongRunning);
 }

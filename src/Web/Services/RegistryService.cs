@@ -12,7 +12,7 @@ public class RegistryService : IRegistryService
     /// <param name="logger">The logger.</param>
     /// <param name="gatewayConfiguration">The service configuration.</param>
     /// <param name="httpClient">The HTTP client.</param>
-    public RegistryService(ILogger<RegistryService> logger, IGatewayConfiguration gatewayConfiguration, HttpClient httpClient)
+    public RegistryService(ILogger<RegistryService> logger, IServiceConfiguration gatewayConfiguration, HttpClient httpClient)
     {
         _logger = logger;
         _httpClient = httpClient;

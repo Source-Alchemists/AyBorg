@@ -28,7 +28,7 @@ public sealed class ProjectsController : ControllerBase
     /// <param name="storageToDtoMapper">The storage to dto mapper.</param>
     /// <param name="engineHost">The engine host.</param>
     public ProjectsController(ILogger<ProjectsController> logger,
-                                IGatewayConfiguration serviceConfiguration,
+                                IServiceConfiguration serviceConfiguration,
                                 IProjectManagementService projectManagementService,
                                 IDtoMapper storageToDtoMapper,
                                 IEngineHost engineHost)
