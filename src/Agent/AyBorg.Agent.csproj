@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.0" />
+    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.50.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -33,6 +33,7 @@
     <ProjectReference Include="..\SDK\src\System\AyBorg.SDK.System.csproj" />
     <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
     <ProjectReference Include="..\SDK\src\Communication\MQTT\AyBorg.SDK.Communication.MQTT.csproj" />
+    <ProjectReference Include="..\SDK\src\Communication\gRPC\Client\AyBorg.Communication.gRPC.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

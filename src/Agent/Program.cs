@@ -1,6 +1,8 @@
+using Ayborg.Gateway.V1;
 using AyBorg.Agent.Guards;
 using AyBorg.Agent.Hubs;
 using AyBorg.Agent.Services;
+using AyBorg.Communication.gRPC.Registry;
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
@@ -8,7 +10,6 @@ using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
-using AyBorg.SDK.System.Services;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,8 +34,13 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddHttpClient<RegistryService>();
-builder.Services.AddHostedService<RegistryService>();
+builder.Services.AddGrpcClient<Register.RegisterClient>(option =>
+{
+    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
+    option.Address = new Uri(gatewayUrl!);
+});
+
+builder.Services.AddHostedService<RegistryBackgroundService>();
 
 builder.Services.AddMemoryCache();
 
