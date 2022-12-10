@@ -1,4 +1,4 @@
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.Gateway.Models;
 
 namespace AyBorg.Gateway.Services;
 
@@ -9,27 +9,27 @@ public interface IKeeperService
     /// </summary>
     /// <param name="name">The searched name.</param>
     /// <returns>Array of entries. Empty array if no entry match the name.</returns>
-    ValueTask<IEnumerable<RegistryEntryDto>> FindRegistryEntriesAsync(string name);
+    ValueTask<IEnumerable<ServiceEntry>> FindRegistryEntriesAsync(string name);
 
     /// <summary>
     /// Gets all service registry entries.
     /// </summary>
     /// <returns>All service registry entries.</returns>
-    ValueTask<IEnumerable<RegistryEntryDto>> GetAllRegistryEntriesAsync();
+    ValueTask<IEnumerable<ServiceEntry>> GetAllRegistryEntriesAsync();
 
     /// <summary>
     /// Gets the service registry entry asynchronous.
     /// </summary>
     /// <param name="serviceId">The service identifier.</param>
     /// <returns></returns>
-    ValueTask<RegistryEntryDto?> GetRegistryEntryAsync(Guid serviceId);
+    ValueTask<ServiceEntry?> GetRegistryEntryAsync(Guid serviceId);
 
     /// <summary>
     /// Register a new service.
     /// </summary>
     /// <param name="RegistryEntry">Service registry entry.</param>
     /// <returns>Id for the new service.</returns>
-    Task<Guid> RegisterAsync(RegistryEntryDto RegistryEntry);
+    Task<Guid> RegisterAsync(ServiceEntry RegistryEntry);
 
     /// <summary>
     /// Unregister a service
@@ -43,5 +43,5 @@ public interface IKeeperService
     /// </summary>
     /// <param name="RegistryEntry">The desired service.</param>
     /// <returns>ValueTask.</returns>
-    ValueTask UpdateTimestamp(RegistryEntryDto RegistryEntry);
+    ValueTask UpdateTimestamp(ServiceEntry RegistryEntry);
 }

@@ -1,11 +1,29 @@
 using AyBorg.Database.Data;
-using AyBorg.Gateway.Mapper;
 using AyBorg.Gateway.Services;
-using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    string? serviceUrl = builder.Configuration.GetValue("AyBorg:Service:Url", string.Empty);
+    if (string.IsNullOrEmpty(serviceUrl))
+    {
+        throw new Exception("Service url is not set");
+    }
+
+    bool useTls = serviceUrl.StartsWith("https");
+    if (useTls) return; // Nothing to configure as TLS is used by default.
+
+    string portStr = serviceUrl.Substring(serviceUrl.LastIndexOf(":")+1);
+    if (!int.TryParse(portStr, out int port))
+    {
+        throw new Exception("Invalid port");
+    }
+    options.ListenLocalhost(port, o => o.Protocols = HttpProtocols.Http2);
+});
 
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
@@ -21,28 +39,18 @@ builder.Services.AddDbContextFactory<RegistryContext>(options =>
     }
 );
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddAuthorization();
+builder.Services.AddGrpc();
 
 builder.Services.AddSingleton<IRegistryConfiguration, RegistryConfiguration>();
-builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
-builder.Services.AddSingleton<IDalMapper, DalMapper>();
 builder.Services.AddSingleton<IKeeperService, KeeperService>();
 
 WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapGrpcService<RegisterServiceV1>();
+app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists
 app.Services.GetService<IDbContextFactory<RegistryContext>>()!.CreateDbContext().Database.Migrate();
