@@ -39,7 +39,7 @@
     <ProjectReference Include="..\SDK\src\Data\Mapper\AyBorg.SDK.Data.Mapper.csproj" />
     <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
     <ProjectReference Include="..\SDK\src\Communication\MQTT\AyBorg.SDK.Communication.MQTT.csproj" />
-    <ProjectReference Include="..\Shared\gRPC\Client\AyBorg.Shared.gRPC.Client.csproj" />
+    <ProjectReference Include="..\SDK\src\Communication\gRPC\Client\AyBorg.Communication.gRPC.Client.csproj" />
   </ItemGroup>
 
 </Project>

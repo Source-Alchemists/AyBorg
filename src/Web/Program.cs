@@ -1,10 +1,10 @@
 using Ayborg.Gateway.V1;
+using AyBorg.Communication.gRPC.Registry;
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
-using AyBorg.Shared.gRPC.Registry;
 using AyBorg.Web;
 using AyBorg.Web.Areas.Identity;
 using AyBorg.Web.Services;
