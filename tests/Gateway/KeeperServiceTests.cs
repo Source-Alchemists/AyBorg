@@ -1,5 +1,5 @@
 using AyBorg.Database.Data;
-using AyBorg.Gateway.Mapper;
+using AyBorg.Gateway.Models;
 using AyBorg.Gateway.Services;
 using AyBorg.SDK.Data.DTOs;
 using AyBorg.SDK.System.Configuration;
@@ -18,7 +18,6 @@ public sealed class KeeperServiceTests : IDisposable
     private readonly IGatewayConfiguration _registryConfiguration;
     private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
     private readonly DbContextOptions<RegistryContext> _contextOptions;
-    private readonly IDalMapper _dalMapper;
     private bool _disposed = false;
 
     /// <summary>
@@ -28,11 +27,10 @@ public sealed class KeeperServiceTests : IDisposable
     {
         _configuration = new ConfigurationBuilder().AddInMemoryCollection(
             initialData: new List<KeyValuePair<string, string>> {
-                new("Kestrel:Endpoints:Https:Url", "https://localhost:5001")
+                new("AyBorg:Service:Url", "https://localhost:5001")
             }!).Build();
 
         _registryConfiguration = new GatewayConfiguration(_registryConfigurationLogger, _configuration);
-        _dalMapper = new DalMapper();
 
         _connection = new Microsoft.Data.Sqlite.SqliteConnection("Filename=:memory:");
         _connection.Open();
@@ -45,29 +43,28 @@ public sealed class KeeperServiceTests : IDisposable
     }
 
     [Theory]
-    [InlineData(null, null)]
-    [InlineData("", "")]
-    [InlineData("http://test.org", "")]
-    [InlineData("", "https://test.org")]
-    public void TestConfigurationServerUrl(string httpUrl, string httpsUrl)
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("http://test.org")]
+    [InlineData("https://test.org")]
+    public void TestConfigurationServerUrl(string url)
     {
         // Arrange
         IConfigurationRoot configuration = new ConfigurationBuilder().AddInMemoryCollection(
             initialData: new List<KeyValuePair<string, string>> {
-                new("Kestrel:Endpoints:Http:Url", httpUrl),
-                new("Kestrel:Endpoints:Https:Url", httpsUrl)
+                new("AyBorg:Service:Url", url)
             }!).Build();
         var registryConfiguration = new GatewayConfiguration(_registryConfigurationLogger, configuration);
 
         // Act
         KeeperService service;
-        if (string.IsNullOrEmpty(httpsUrl) && string.IsNullOrEmpty(httpUrl))
+        if (string.IsNullOrEmpty(url))
         {
-            Assert.Throws<InvalidOperationException>(() => service = new KeeperService(s_logger, configuration, registryConfiguration, _dalMapper, CreateContextFactoryMock().Object));
+            Assert.Throws<InvalidOperationException>(() => service = new KeeperService(s_logger, configuration, registryConfiguration, CreateContextFactoryMock().Object));
         }
         else
         {
-            service = new KeeperService(s_logger, configuration, registryConfiguration, _dalMapper, CreateContextFactoryMock().Object);
+            service = new KeeperService(s_logger, configuration, registryConfiguration, CreateContextFactoryMock().Object);
 
             // Assert
             Assert.NotNull(service);
@@ -78,8 +75,8 @@ public sealed class KeeperServiceTests : IDisposable
     public async Task TestRegisterAsync()
     {
         // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, _dalMapper, CreateContextFactoryMock().Object);
-        var entry = new RegistryEntryDto { Name = "Test", Url = "https://myservice:7777" };
+        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object);
+        var entry = new ServiceEntry { Name = "Test", Url = "https://myservice:7777" };
 
         // Act
         Guid result = await service.RegisterAsync(entry);
@@ -93,8 +90,8 @@ public sealed class KeeperServiceTests : IDisposable
     public async Task TestRegisterKnownServiceAgain()
     {
         // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, _dalMapper, CreateContextFactoryMock().Object);
-        var entry = new RegistryEntryDto { Name = "Test", Url = "https://myservice:7777" };
+        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object);
+        var entry = new ServiceEntry { Name = "Test", Url = "https://myservice:7777" };
 
         Guid expectedResult = await service.RegisterAsync(entry);
         await service.UnregisterAsync(expectedResult);
@@ -110,8 +107,8 @@ public sealed class KeeperServiceTests : IDisposable
     public async Task TestUnregisterAsync_success()
     {
         // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, _dalMapper, CreateContextFactoryMock().Object);
-        var entry = new RegistryEntryDto { Name = "Test", Url = "https://myservice:7777" };
+        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object);
+        var entry = new ServiceEntry { Name = "Test", Url = "https://myservice:7777" };
 
         // Act
         Guid result1 = await service.RegisterAsync(entry);
@@ -126,7 +123,7 @@ public sealed class KeeperServiceTests : IDisposable
     public async Task TestUnregisterAsync_unknownService()
     {
         // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, _dalMapper, CreateContextFactoryMock().Object);
+        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object);
 
         // Assert
         await Assert.ThrowsAsync<KeyNotFoundException>(() => service.UnregisterAsync(Guid.Empty));
@@ -136,14 +133,14 @@ public sealed class KeeperServiceTests : IDisposable
     public async Task TestGetAllServicRegistryEntriesAsync()
     {
         // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, _dalMapper, CreateContextFactoryMock().Object);
-        var entry1 = new RegistryEntryDto { Name = "Test", Url = "https://myservice:7777" };
-        var entry2 = new RegistryEntryDto { Name = "Test2", Url = "https://myservice2:7777" };
+        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object);
+        var entry1 = new ServiceEntry { Name = "Test", Url = "https://myservice:7777" };
+        var entry2 = new ServiceEntry { Name = "Test2", Url = "https://myservice2:7777" };
 
         // Act
         await service.RegisterAsync(entry1);
         await service.RegisterAsync(entry2);
-        IEnumerable<RegistryEntryDto> result = await service.GetAllRegistryEntriesAsync();
+        IEnumerable<ServiceEntry> result = await service.GetAllRegistryEntriesAsync();
 
         // Assert
         Assert.Equal(3, result.Count());
@@ -155,14 +152,14 @@ public sealed class KeeperServiceTests : IDisposable
     public async Task TestFindRegistryEntriesAsync()
     {
         // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, _dalMapper, CreateContextFactoryMock().Object);
-        var entry1 = new RegistryEntryDto { Name = "Test", Url = "https://myservice:7777" };
-        var entry2 = new RegistryEntryDto { Name = "Test2", Url = "https://myservice2:7777" };
+        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object);
+        var entry1 = new ServiceEntry { Name = "Test", Url = "https://myservice:7777" };
+        var entry2 = new ServiceEntry { Name = "Test2", Url = "https://myservice2:7777" };
 
         // Act
         await service.RegisterAsync(entry1);
         await service.RegisterAsync(entry2);
-        IEnumerable<RegistryEntryDto> result = await service.FindRegistryEntriesAsync("Test");
+        IEnumerable<ServiceEntry> result = await service.FindRegistryEntriesAsync("Test");
 
         // Assert
         Assert.Single(result);
