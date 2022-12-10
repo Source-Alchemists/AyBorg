@@ -26,8 +26,7 @@ public class RegistryService : IRegistryService
     /// <returns></returns>
     public string GetUrl(IEnumerable<ServiceInfoEntry> serviceInfoEntry, string serviceId)
     {
-        var id = Guid.Parse(serviceId);
-        ServiceInfoEntry? serviceDetails = serviceInfoEntry.FirstOrDefault(x => x.Id.Equals(id));
+        ServiceInfoEntry? serviceDetails = serviceInfoEntry.FirstOrDefault(x => x.Id.Equals(serviceId, StringComparison.InvariantCultureIgnoreCase));
         if (serviceDetails == null)
         {
             _logger.LogWarning("Service with id {serviceId} not found", serviceId);
