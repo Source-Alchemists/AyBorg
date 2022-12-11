@@ -1,5 +1,6 @@
 using Ayborg.Gateway.V1;
 using Grpc.Core;
+using Microsoft.AspNetCore.Components.Authorization;
 
 namespace AyBorg.Web.Services.Agent;
 
@@ -7,6 +8,7 @@ public class ProjectManagementService : IProjectManagementService
 {
     private readonly ILogger<ProjectManagementService> _logger;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
+    private readonly AuthenticationStateProvider _authenticationStateProvider;
     private readonly AgentProjectManagement.AgentProjectManagementClient _agentProjectManagementClient;
 
     /// <summary>
@@ -16,10 +18,12 @@ public class ProjectManagementService : IProjectManagementService
     /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
     public ProjectManagementService(ILogger<ProjectManagementService> logger,
                                     IAuthorizationHeaderUtilService authorizationHeaderUtilService,
+                                    AuthenticationStateProvider authenticationStateProvider,
                                     AgentProjectManagement.AgentProjectManagementClient agentProjectManagementClient)
     {
         _logger = logger;
         _authorizationHeaderUtilService = authorizationHeaderUtilService;
+        _authenticationStateProvider = authenticationStateProvider;
         _agentProjectManagementClient = agentProjectManagementClient;
     }
 
@@ -75,7 +79,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
-            CreateProjectResponse response = await _agentProjectManagementClient.CreateProjetAsync(new CreateProjectRequest
+            CreateProjectResponse response = await _agentProjectManagementClient.CreateProjectAsync(new CreateProjectRequest
             {
                 AgentUniqueName = agentUniqueName,
                 ProjectName = projectName
@@ -157,7 +161,7 @@ public class ProjectManagementService : IProjectManagementService
                 AgentUniqueName = agentUniqueName,
                 ProjectDbId = projectMeta.DbId,
                 ProjectId = projectMeta.Id,
-                ProjectSaveInfo = CreateRpcProjectSaveInfo(projectSaveInfo)
+                ProjectSaveInfo = await CreateRpcProjectSaveInfoAsync(projectSaveInfo)
             });
 
             return true;
@@ -186,7 +190,7 @@ public class ProjectManagementService : IProjectManagementService
             {
                 AgentUniqueName = agentUniqueName,
                 ProjectDbId = dbId,
-                ProjectSaveInfo = CreateRpcProjectSaveInfo(projectSaveInfo)
+                ProjectSaveInfo = await CreateRpcProjectSaveInfoAsync(projectSaveInfo)
             });
 
             return true;
@@ -198,14 +202,15 @@ public class ProjectManagementService : IProjectManagementService
         }
     }
 
-    private static ProjectSaveInfo CreateRpcProjectSaveInfo(Shared.Models.Agent.ProjectSaveInfo projectSaveInfo)
+    private async ValueTask<ProjectSaveInfo> CreateRpcProjectSaveInfoAsync(Shared.Models.Agent.ProjectSaveInfo projectSaveInfo)
     {
+        AuthenticationState authState = await _authenticationStateProvider.GetAuthenticationStateAsync();
         return new ProjectSaveInfo
         {
             State = (int)projectSaveInfo.State,
             VersionName = projectSaveInfo.VersionName,
             Comment = projectSaveInfo.Comment,
-            UserName = projectSaveInfo.UserName
+            UserName = authState.User.Identity!.Name
         };
     }
 }

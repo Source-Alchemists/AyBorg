@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
-    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.50.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.0" />
@@ -39,7 +38,7 @@
     <ProjectReference Include="..\SDK\src\Data\Mapper\AyBorg.SDK.Data.Mapper.csproj" />
     <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
     <ProjectReference Include="..\SDK\src\Communication\MQTT\AyBorg.SDK.Communication.MQTT.csproj" />
-    <ProjectReference Include="..\SDK\src\Communication\gRPC\Client\AyBorg.Communication.gRPC.Client.csproj" />
+    <ProjectReference Include="..\SDK\src\Communication\gRPC\AyBorg.SDK.Communication.gRPC.csproj" />
   </ItemGroup>
 
 </Project>

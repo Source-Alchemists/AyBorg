@@ -14,7 +14,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.Net.ClientFactory" Version="2.50.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -22,7 +21,6 @@
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -33,7 +31,7 @@
     <ProjectReference Include="..\SDK\src\System\AyBorg.SDK.System.csproj" />
     <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
     <ProjectReference Include="..\SDK\src\Communication\MQTT\AyBorg.SDK.Communication.MQTT.csproj" />
-    <ProjectReference Include="..\SDK\src\Communication\gRPC\Client\AyBorg.Communication.gRPC.Client.csproj" />
+    <ProjectReference Include="..\SDK\src\Communication\gRPC\AyBorg.SDK.Communication.gRPC.csproj" />
   </ItemGroup>
 
   <ItemGroup>

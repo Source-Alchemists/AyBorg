@@ -10,7 +10,7 @@ public partial class CreateNewProjectDialog : ComponentBase
 {
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
-    [Inject] ProjectManagementService ProjectManagementService { get; set; } = null!;
+    [Inject] IProjectManagementService ProjectManagementService { get; set; } = null!;
     [Parameter] public string ServiceUniqueName { get; set; } = string.Empty;
 
     private readonly ProjectMeta _newProject = new() { VersionName = "__DRAFT__" };

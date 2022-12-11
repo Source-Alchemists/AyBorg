@@ -1,4 +1,4 @@
-using AyBorg.Communication.gRPC.Registry;
+using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Communication.MQTT;

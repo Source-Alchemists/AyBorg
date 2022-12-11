@@ -121,7 +121,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         context.AyBorgProjectMetas!.RemoveRange(metas);
         await context.SaveChangesAsync();
 
-        _logger.LogTrace("Removed project  with id [{projectId}].", projectId);
+        _logger.LogInformation("Removed project with id [{projectId}].", projectId);
         return new ProjectManagementResult(true, null);
     }
 

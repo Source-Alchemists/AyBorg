@@ -164,7 +164,7 @@ public partial class Projects : ComponentBase
         var options = new DialogOptions();
         var parameters = new DialogParameters
         {
-            { "BaseUrl", _serviceUniqueName }
+            { "ServiceUniqueName", _serviceUniqueName }
         };
         IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
         DialogResult result = await dialog.Result;

@@ -1,5 +1,4 @@
 using System.Runtime.CompilerServices;
-using AyBorg.Agent.Hubs;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 
@@ -10,7 +9,6 @@ internal sealed class FlowService : IFlowService
     private readonly ILogger<FlowService> _logger;
     private readonly IPluginsService _pluginsService;
     private readonly IEngineHost _runtimeHost;
-    private readonly IFlowHub _flowHub;
     private readonly IRuntimeConverterService _runtimeConverterService;
 
     /// <summary>
@@ -19,18 +17,15 @@ internal sealed class FlowService : IFlowService
     /// <param name="logger">The logger.</param>
     /// <param name="pluginsService">The plugins service.</param>
     /// <param name="engineHost">The engine host.</param>
-    /// <param name="flowHub">The flow hub.</param>
     /// <param name="runtimeConverterService">The runtime converter service.</param>
     public FlowService(ILogger<FlowService> logger,
                         IPluginsService pluginsService,
                         IEngineHost engineHost,
-                        IFlowHub flowHub,
                         IRuntimeConverterService runtimeConverterService)
     {
         _logger = logger;
         _pluginsService = pluginsService;
         _runtimeHost = engineHost;
-        _flowHub = flowHub;
         _runtimeConverterService = runtimeConverterService;
     }
 
@@ -251,8 +246,7 @@ internal sealed class FlowService : IFlowService
         sourceStep.Links.Add(link);
         targetStep.Links.Add(link);
         _runtimeHost.ActiveProject.Links.Add(link);
-        await _flowHub.SendLinkChangedAsync(link);
-        return link;
+        return await ValueTask.FromResult(link);
     }
 
     /// <summary>
@@ -287,8 +281,7 @@ internal sealed class FlowService : IFlowService
         }
 
         _runtimeHost.ActiveProject.Links.Remove(link);
-        await _flowHub.SendLinkChangedAsync(link, true);
-        return true;
+        return await ValueTask.FromResult(true);
     }
 
     /// <summary>

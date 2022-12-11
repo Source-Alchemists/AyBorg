@@ -9,13 +9,11 @@ public sealed record ProjectMeta
     /// <summary>
     /// Gets or sets the database identifier.
     /// </summary>
-    [Required]
     public string DbId { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the identifier.
     /// </summary>
-    [Required]
     public string Id { get; set; } = string.Empty;
 
     /// <summary>

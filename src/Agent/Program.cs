@@ -1,8 +1,6 @@
-using Ayborg.Gateway.V1;
 using AyBorg.Agent.Guards;
-using AyBorg.Agent.Hubs;
 using AyBorg.Agent.Services;
-using AyBorg.Communication.gRPC.Registry;
+using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
@@ -10,8 +8,8 @@ using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
+using AyBorg.Agent.Services.gRPC;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -29,12 +27,10 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
     }
 );
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddAuthorization();
+builder.Services.AddGrpc();
 
-builder.Services.AddGrpcClient<Register.RegisterClient>(option =>
+builder.Services.AddGrpcClient<Ayborg.Gateway.V1.Register.RegisterClient>(option =>
 {
     string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
     option.Address = new Uri(gatewayUrl!);
@@ -54,7 +50,6 @@ builder.Services.AddSingleton<IProjectManagementService, ProjectManagementServic
 builder.Services.AddSingleton<IEngineHost, EngineHost>();
 builder.Services.AddSingleton<IEngineFactory, EngineFactory>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
-builder.Services.AddSingleton<IFlowHub, FlowHub>();
 builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
 
@@ -62,30 +57,15 @@ builder.Services.AddScoped<IJwtConsumerService, JwtConsumerService>();
 builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IStorageService, StorageService>();
 
-builder.Services.AddSignalR();
-
-builder.Services.AddResponseCompression(opts =>
-{
-    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-        new[] { "application/octet-stream" });
-});
-
 WebApplication app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
 app.UseAuthorization();
 
 app.UseJwtMiddleware();
 app.UseProjectStateGuardMiddleware();
 
-app.MapControllers();
-app.MapHub<FlowHubContext>("/hubs/flow");
+app.MapGrpcService<ProjectManagementServiceV1>();
+app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists
 app.Services.GetService<IDbContextFactory<ProjectContext>>()!.CreateDbContext().Database.Migrate();
