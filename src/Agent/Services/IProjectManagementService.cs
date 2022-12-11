@@ -38,11 +38,6 @@ public interface IProjectManagementService
     ValueTask<IEnumerable<ProjectMetaRecord>> GetAllMetasAsync();
 
     /// <summary>
-    /// Gets the project settings asynchronous.
-    /// </summary>
-    ValueTask<ProjectSettingsRecord> GetSettingsAsync(Guid projectMetaDatabaseId);
-
-    /// <summary>
     /// Load active project asynchronous.
     /// </summary>
     ValueTask<ProjectManagementResult> TryLoadActiveAsync();

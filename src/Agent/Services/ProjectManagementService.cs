@@ -202,22 +202,6 @@ internal sealed class ProjectManagementService : IProjectManagementService
     }
 
     /// <summary>
-    /// Gets the project settings asynchronous.
-    /// </summary>
-    public async ValueTask<ProjectSettingsRecord> GetSettingsAsync(Guid projectMetaDatabaseId)
-    {
-        using ProjectContext context = await _projectContextFactory.CreateDbContextAsync();
-        ProjectRecord? projectRecord = await context.AyBorgProjects!.Include(x => x.Settings).FirstOrDefaultAsync(x => x.Meta.DbId.Equals(projectMetaDatabaseId));
-        if (projectRecord == null)
-        {
-            _logger.LogWarning("No project found with id [{projectDatabaseId}].", projectMetaDatabaseId);
-            return null!;
-        }
-
-        return projectRecord.Settings;
-    }
-
-    /// <summary>
     /// Loads the active project asynchronous.
     /// </summary>
     /// <returns></returns>
