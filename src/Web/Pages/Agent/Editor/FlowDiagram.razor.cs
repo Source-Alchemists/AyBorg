@@ -1,4 +1,5 @@
 using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.Bindings;
 using AyBorg.SDK.Data.DTOs;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services.Agent;
@@ -74,7 +75,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
             _diagram.Links.Clear();
             _suspendDiagramRefresh = false;
 
-            await ConnectHubEventsAsync();
+            // await ConnectHubEventsAsync();
             double zoom = await StateService.AutomationFlowState.UpdateZoomAsync();
             _diagram.SetZoom(zoom);
             (double offsetX, double offsetY) = await StateService.AutomationFlowState.UpdateOffsetAsync();
@@ -109,12 +110,12 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         if (_flowHubConnection != null) await _flowHubConnection.DisposeAsync();
     }
 
-    private async Task ConnectHubEventsAsync()
-    {
-        _flowHubConnection = FlowService.CreateHubConnection(StateService.AgentState.BaseUrl);
-        ConnectLinkChangedHubEvent();
-        await _flowHubConnection.StartAsync();
-    }
+    // private async Task ConnectHubEventsAsync()
+    // {
+    //     _flowHubConnection = FlowService.CreateHubConnection(StateService.AgentState.BaseUrl);
+    //     ConnectLinkChangedHubEvent();
+    //     await _flowHubConnection.StartAsync();
+    // }
 
     private void ConnectLinkChangedHubEvent()
     {
@@ -275,7 +276,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     private async Task OnDrop(DragEventArgs args)
     {
         if (_diagram == null) return;
-        StepDto? step = DragDropStateHandler.DraggedStep;
+        Step? step = DragDropStateHandler.DraggedStep;
         if (step == null) return;
         Blazor.Diagrams.Core.Geometry.Point relativePosition = _diagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
         step.X = (int)relativePosition.X;

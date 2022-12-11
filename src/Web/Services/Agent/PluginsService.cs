@@ -1,41 +1,38 @@
-﻿using AyBorg.SDK.Data.DTOs;
+﻿using AyBorg.SDK.Communication.gRPC;
+using AyBorg.SDK.Data.Bindings;
 
 namespace AyBorg.Web.Services.Agent;
 
 public class PluginsService
 {
     private readonly ILogger<PluginsService> _logger;
-    private readonly HttpClient _httpClient;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
+    private Ayborg.Gateway.V1.AgentEditor.AgentEditorClient _agentEditorClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginsService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="httpClient">The HTTP client.</param>
     /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
-    public PluginsService(ILogger<PluginsService> logger, 
-                            HttpClient httpClient, 
-                            IAuthorizationHeaderUtilService authorizationHeaderUtilService)
+    public PluginsService(ILogger<PluginsService> logger,
+                            IAuthorizationHeaderUtilService authorizationHeaderUtilService,
+                            Ayborg.Gateway.V1.AgentEditor.AgentEditorClient agentEditorClient)
     {
         _logger = logger;
-        _httpClient = httpClient;
         _authorizationHeaderUtilService = authorizationHeaderUtilService;
+        _agentEditorClient = agentEditorClient;
     }
 
     /// <summary>
     /// Receive steps from the Agent, using a web service.
     /// </summary>
-    public async Task<IEnumerable<StepDto>> ReceiveStepsAsync(string baseUrl)
+    public async Task<IEnumerable<Step>> ReceiveStepsAsync(string agentUniqueName)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/plugins/steps");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        var steps = await response.Content.ReadFromJsonAsync<IEnumerable<StepDto>>();
-        if (steps == null)
+        Ayborg.Gateway.V1.GetAvailableStepsResponse response = await _agentEditorClient.GetAvailableStepsAsync(new Ayborg.Gateway.V1.GetAvailableStepsRequest { AgentUniqueName = agentUniqueName });
+        var steps = new List<Step>();
+        foreach (Ayborg.Gateway.V1.Step? s in response.Steps)
         {
-            _logger.LogWarning("No steps received from Agent.");
-            return new List<StepDto>();
+            steps.Add(RpcMapper.FromRpc(s));
         }
         return steps;
     }

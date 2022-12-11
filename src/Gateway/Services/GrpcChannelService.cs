@@ -1,4 +1,5 @@
 using System.Collections.Concurrent;
+using Grpc.Core;
 using Grpc.Net.Client;
 
 namespace AyBorg.Gateway.Services;
@@ -47,5 +48,24 @@ public sealed class GrpcChannelService : IGrpcChannelService
         }
 
         return _channels[uniqueServiceName];
+    }
+
+    public T CreateClient<T>(string uniqueServiceName)
+    {
+        if (string.IsNullOrEmpty(uniqueServiceName))
+        {
+            _logger.LogWarning("UniqueServiceName is null or empty");
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "UniqueServiceName is null or empty"));
+        }
+
+        try
+        {
+            GrpcChannel channel = GetChannel(uniqueServiceName);
+            return (T)Activator.CreateInstance(typeof(T), channel)!;
+        }
+        catch (KeyNotFoundException)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "Agent not found"));
+        }
     }
 }

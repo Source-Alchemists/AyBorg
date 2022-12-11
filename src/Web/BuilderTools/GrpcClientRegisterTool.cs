@@ -24,5 +24,10 @@ internal static class GrpcClientRegisterTool
         {
             option.Address = new Uri(gatewayUrl!);
         });
+
+        builder.Services.AddGrpcClient<AgentEditor.AgentEditorClient>(option =>
+        {
+            option.Address = new Uri(gatewayUrl!);
+        });
     }
 }

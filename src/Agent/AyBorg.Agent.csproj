@@ -27,7 +27,6 @@
     <ProjectReference Include="..\SDK\database\AyBorg.Database.Data\AyBorg.Database.Data.csproj" />
     <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.SqlLite\AyBorg.Database.Migrations.SqlLite.csproj" />
     <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.PostgreSql\AyBorg.Database.Migrations.PostgreSql.csproj" />
-    <ProjectReference Include="..\SDK\src\Common\AyBorg.SDK.Common.csproj" />
     <ProjectReference Include="..\SDK\src\System\AyBorg.SDK.System.csproj" />
     <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
     <ProjectReference Include="..\SDK\src\Communication\MQTT\AyBorg.SDK.Communication.MQTT.csproj" />

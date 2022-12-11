@@ -18,32 +18,13 @@ public sealed class ProjectSettingsPassthroughServiceV1 : AgentProjectSettings.A
 
     public override async Task<GetProjectSettingsResponse> GetProjectSettings(GetProjectSettingsRequest request, ServerCallContext context)
     {
-        AgentProjectSettings.AgentProjectSettingsClient client = CreateClient(request.AgentUniqueName);
+        AgentProjectSettings.AgentProjectSettingsClient client = _grpcChannelService.CreateClient<AgentProjectSettings.AgentProjectSettingsClient>(request.AgentUniqueName);
         return await client.GetProjectSettingsAsync(request);
     }
 
     public override async Task<Empty> UpdateProjectSettings(UpdateProjectSettingsRequest request, ServerCallContext context)
     {
-        AgentProjectSettings.AgentProjectSettingsClient client = CreateClient(request.AgentUniqueName);
+        AgentProjectSettings.AgentProjectSettingsClient client = _grpcChannelService.CreateClient<AgentProjectSettings.AgentProjectSettingsClient>(request.AgentUniqueName);
         return await client.UpdateProjectSettingsAsync(request);
-    }
-
-    private AgentProjectSettings.AgentProjectSettingsClient CreateClient(string agentUniqueName)
-    {
-        if (string.IsNullOrEmpty(agentUniqueName))
-        {
-            _logger.LogWarning("AgentUniqueName is null or empty");
-            throw new RpcException(new Status(StatusCode.InvalidArgument, "AgentUniqueName is null or empty"));
-        }
-
-        try
-        {
-            GrpcChannel channel = _grpcChannelService.GetChannel(agentUniqueName);
-            return new AgentProjectSettings.AgentProjectSettingsClient(channel);
-        }
-        catch (KeyNotFoundException)
-        {
-            throw new RpcException(new Status(StatusCode.NotFound, "Agent not found"));
-        }
     }
 }

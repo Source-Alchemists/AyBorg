@@ -7,4 +7,5 @@ public interface IGrpcChannelService
     bool TryRegisterChannel(string uniqueServiceName, string address);
     bool TryUnregisterChannel(string uniqueServiceName);
     GrpcChannel GetChannel(string uniqueServiceName);
+    T CreateClient<T>(string uniqueServiceName);
 }
