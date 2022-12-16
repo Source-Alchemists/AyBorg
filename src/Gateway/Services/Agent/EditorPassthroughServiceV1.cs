@@ -45,6 +45,12 @@ public sealed class EditorPassthroughServiceV1 : AgentEditor.AgentEditorBase
         return await client.AddFlowStepAsync(request);
     }
 
+    public override async Task<Empty> DeleteFlowStep(DeleteFlowStepRequest request, ServerCallContext context)
+    {
+        AgentEditor.AgentEditorClient client = _grpcChannelService.CreateClient<AgentEditor.AgentEditorClient>(request.AgentUniqueName);
+        return await client.DeleteFlowStepAsync(request);
+    }
+
     public override async Task<Empty> MoveFlowStep(MoveFlowStepRequest request, ServerCallContext context)
     {
         AgentEditor.AgentEditorClient client = _grpcChannelService.CreateClient<AgentEditor.AgentEditorClient>(request.AgentUniqueName);

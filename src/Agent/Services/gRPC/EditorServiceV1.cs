@@ -133,6 +133,24 @@ public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
         };
     }
 
+    public override async Task<Empty> DeleteFlowStep(DeleteFlowStepRequest request, ServerCallContext context)
+    {
+        if (!Guid.TryParse(request.StepId, out Guid stepId))
+        {
+            _logger.LogWarning("Invalid step id: {StepId}", request.StepId);
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
+        }
+
+        bool result = await _flowService.TryRemoveStepAsync(stepId);
+        if(!result)
+        {
+            _logger.LogWarning("Step not found: {StepId}", request.StepId);
+            throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
+        }
+
+        return new Empty();
+    }
+
     public override async Task<Empty> MoveFlowStep(MoveFlowStepRequest request, ServerCallContext context)
     {
         if (!Guid.TryParse(request.StepId, out Guid stepId))

@@ -31,34 +31,6 @@ public sealed class FlowController : ControllerBase
         _dtoMapper = dtoMapper;
     }
 
-    [HttpPost("steps/{stepId}/{x}/{y}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async ValueTask<ActionResult<StepDto>> AddStepAsync(Guid stepId, int x, int y)
-    {
-        SDK.Common.IStepProxy stepProxy = await _flowService.AddStepAsync(stepId, x, y);
-        if (stepProxy == null)
-        {
-            return NotFound();
-        }
-
-        StepDto result = _dtoMapper.Map(stepProxy);
-        return Ok(result);
-    }
-
-    [HttpDelete("steps/{stepId}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async ValueTask<ActionResult> DeleteStepAsync(Guid stepId)
-    {
-        if (await _flowService.TryRemoveStepAsync(stepId))
-        {
-            return Ok();
-        }
-
-        return NotFound();
-    }
-
     [HttpPost("links/{sourcePortId}/{targetPortId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]

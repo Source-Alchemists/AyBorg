@@ -88,15 +88,25 @@ public class FlowService : IFlowService
     /// <summary>
     /// Removes the step asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="baseUrl">The service unique name.</param>
     /// <param name="stepId">The step identifier.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryRemoveStepAsync(string baseUrl, Guid stepId)
+    public async ValueTask<bool> TryRemoveStepAsync(string serviceUniqueName, Guid stepId)
     {
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"{baseUrl}/flow/steps/{stepId}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            _ = await _agentEditorClient.DeleteFlowStepAsync(new Ayborg.Gateway.V1.DeleteFlowStepRequest
+            {
+                AgentUniqueName = serviceUniqueName,
+                StepId = stepId.ToString()
+            });
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error deleting step");
+            return false;
+        }
     }
 
     /// <summary>
