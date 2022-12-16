@@ -140,30 +140,52 @@ public class FlowService : IFlowService
     /// <summary>
     /// Add link between ports asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="baseUrl">The service unique name.</param>
     /// <param name="sourcePortId">The source port identifier.</param>
     /// <param name="targetPortId">The target port identifier.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryAddLinkAsync(string baseUrl, Guid sourcePortId, Guid targetPortId)
+    public async ValueTask<bool> TryAddLinkAsync(string serviceUniqueName, Guid sourcePortId, Guid targetPortId)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/flow/links/{sourcePortId}/{targetPortId}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            _ = await _agentEditorClient.LinkFlowPortsAsync(new Ayborg.Gateway.V1.LinkFlowPortsRequest
+            {
+                AgentUniqueName = serviceUniqueName,
+                SourceId = sourcePortId.ToString(),
+                TargetId = targetPortId.ToString()
+            });
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error linking ports");
+            return false;
+        }
     }
 
     /// <summary>
     /// Removes the link asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="baseUrl">The service unique name.</param>
     /// <param name="linkId">The link identifier.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryRemoveLinkAsync(string baseUrl, Guid linkId)
+    public async ValueTask<bool> TryRemoveLinkAsync(string serviceUniqueName, Guid linkId)
     {
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"{baseUrl}/flow/links/{linkId}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            _ = await _agentEditorClient.LinkFlowPortsAsync(new Ayborg.Gateway.V1.LinkFlowPortsRequest
+            {
+                AgentUniqueName = serviceUniqueName,
+                SourceId = linkId.ToString(),
+                TargetId = string.Empty
+            });
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error linking ports");
+            return false;
+        }
     }
 
     /// <summary>

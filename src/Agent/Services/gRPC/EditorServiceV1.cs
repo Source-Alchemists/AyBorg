@@ -141,8 +141,7 @@ public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
         }
 
-        bool result = await _flowService.TryRemoveStepAsync(stepId);
-        if(!result)
+        if (!await _flowService.TryRemoveStepAsync(stepId))
         {
             _logger.LogWarning("Step not found: {StepId}", request.StepId);
             throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
@@ -159,11 +158,42 @@ public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
         }
 
-        bool result = await _flowService.TryMoveStepAsync(stepId, request.X, request.Y);
-        if (!result)
+        if (!await _flowService.TryMoveStepAsync(stepId, request.X, request.Y))
         {
             _logger.LogWarning("Step not found: {StepId}", request.StepId);
             throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
+        }
+
+        return new Empty();
+    }
+
+    public override async Task<Empty> LinkFlowPorts(LinkFlowPortsRequest request, ServerCallContext context)
+    {
+        if (!Guid.TryParse(request.SourceId, out Guid sourceId))
+        {
+            _logger.LogWarning("Invalid source id: {SourceId}", request.SourceId);
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid source id"));
+        }
+
+        if (!string.IsNullOrEmpty(request.TargetId))
+        {
+            // Try to link
+            if (!Guid.TryParse(request.TargetId, out Guid targetId))
+            {
+                _logger.LogWarning("Invalid target id: {TargetId}", request.TargetId);
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid target id"));
+            }
+
+            _= await _flowService.LinkPortsAsync(sourceId, targetId);
+        }
+        else
+        {
+            // Try to unlink
+            if (!await _flowService.TryUnlinkPortsAsync(sourceId))
+            {
+                _logger.LogWarning("Source port not found: {SourceId}", request.SourceId);
+                throw new RpcException(new Status(StatusCode.NotFound, "Source port not found"));
+            }
         }
 
         return new Empty();
