@@ -198,4 +198,16 @@ public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
 
         return new Empty();
     }
+
+    public override async Task<Empty> UpdateFlowPort(UpdateFlowPortRequest request, ServerCallContext context)
+    {
+        SDK.Data.Bindings.Port port = RpcMapper.FromRpc(request.Port);
+        if(!await _flowService.TryUpdatePortValueAsync(port.Id, port.Value!))
+        {
+            _logger.LogWarning("Could not update port: {PortId}", port.Id);
+            throw new RpcException(new Status(StatusCode.Internal, "Could not update port"));
+        }
+
+        return new Empty();
+    }
 }

@@ -129,7 +129,28 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
     private static bool UpdateEnumPortValue(EnumPort port, object value)
     {
-        EnumRecord record = JsonSerializer.Deserialize<EnumRecord>(value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+        EnumRecord record;
+        if (value is Enum enumValue)
+        {
+            record = new EnumRecord
+            {
+                Name = enumValue.ToString(),
+                Names = Enum.GetNames(enumValue.GetType())
+            };
+        }
+        else if (value is SDK.Data.Bindings.Enum enumBinding)
+        {
+            record = new EnumRecord
+            {
+                Name = enumBinding.Name!,
+                Names = enumBinding.Names!
+            };
+        }
+        else
+        {
+            record = JsonSerializer.Deserialize<EnumRecord>(value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+        }
+
         port.Value = (Enum)Enum.Parse(port.Value.GetType(), record.Name);
 
         return true;

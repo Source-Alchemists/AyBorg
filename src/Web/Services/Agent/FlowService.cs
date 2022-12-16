@@ -216,17 +216,24 @@ public class FlowService : IFlowService
     /// <summary>
     /// Try to set the port value asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="baseUrl">The service unique name.</param>
     /// <param name="port">The port.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TrySetPortValueAsync(string baseUrl, Port port)
+    public async ValueTask<bool> TrySetPortValueAsync(string serviceUniqueName, Port port)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/flow/ports")
+        try
         {
-            Content = new StringContent(JsonConvert.SerializeObject(port), Encoding.UTF8, "application/json")
-        };
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
+            _ = await _agentEditorClient.UpdateFlowPortAsync(new Ayborg.Gateway.V1.UpdateFlowPortRequest
+            {
+                AgentUniqueName = serviceUniqueName,
+                Port = RpcMapper.ToRpc(port)
+            });
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error setting port value");
+            return false;
+        }
     }
 }
