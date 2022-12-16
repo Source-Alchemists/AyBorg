@@ -112,16 +112,39 @@ public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
         return await ValueTask.FromResult(result);
     }
 
+    public override async Task<AddFlowStepResponse> AddFlowStep(AddFlowStepRequest request, ServerCallContext context)
+    {
+        if (!Guid.TryParse(request.StepId, out Guid stepId))
+        {
+            _logger.LogWarning("Invalid step id: {StepId}", request.StepId);
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
+        }
+
+        SDK.Common.IStepProxy stepProxy = await _flowService.AddStepAsync(stepId, request.X, request.Y);
+        if (stepProxy == null)
+        {
+            _logger.LogWarning("Step not found: {StepId}", request.StepId);
+            throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
+        }
+
+        return new AddFlowStepResponse
+        {
+            Step = RpcMapper.ToRpc(RuntimeMapper.FromRuntime(stepProxy))
+        };
+    }
+
     public override async Task<Empty> MoveFlowStep(MoveFlowStepRequest request, ServerCallContext context)
     {
         if (!Guid.TryParse(request.StepId, out Guid stepId))
         {
+            _logger.LogWarning("Invalid step id: {StepId}", request.StepId);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
         }
 
         bool result = await _flowService.TryMoveStepAsync(stepId, request.X, request.Y);
         if (!result)
         {
+            _logger.LogWarning("Step not found: {StepId}", request.StepId);
             throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
         }
 
