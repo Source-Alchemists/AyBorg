@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Data.Bindings;
 using AyBorg.SDK.Data.DTOs;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
@@ -16,7 +17,7 @@ public class FlowPort : PortModel, IDisposable
     private readonly IFlowService _flowService;
     private readonly IStateService _stateService;
     private readonly IMqttClientProvider _mqttClientProvider;
-    private readonly StepDto _step;
+    private readonly Step _step;
     private MqttSubscription? _subscription;
     private bool _disposedValue;
 
@@ -38,7 +39,7 @@ public class FlowPort : PortModel, IDisposable
     /// <summary>
     /// Gets the port dto.
     /// </summary>
-    public PortDto Port { get; private set; }
+    public Port Port { get; private set; }
 
     /// <summary>
     /// Called when a link is added or removed.
@@ -54,7 +55,7 @@ public class FlowPort : PortModel, IDisposable
     /// <param name="flowService">The flow service.</param>
     /// <param name="mqttClientProvider">The MQTT client provider.</param>
     /// <param name="stateService">The state service.</param>
-    public FlowPort(FlowNode node, PortDto port, StepDto parent,
+    public FlowPort(FlowNode node, Port port, Step parent,
                 IFlowService flowService, IMqttClientProvider mqttClientProvider,
                 IStateService stateService) : base(node, port.Direction == PortDirection.Input ? PortAlignment.Left : PortAlignment.Right)
     {
@@ -75,7 +76,7 @@ public class FlowPort : PortModel, IDisposable
     /// </summary>
     public async Task UpdateAsync()
     {
-        PortDto newPort = await _flowService.GetPortAsync(_stateService.AgentState.BaseUrl, Port.Id);
+        Port newPort = await _flowService.GetPortAsync(_stateService.AgentState.UniqueName, Port.Id);
         if (newPort == null) return;
         Port = newPort;
         PortChanged?.Invoke();
@@ -86,7 +87,7 @@ public class FlowPort : PortModel, IDisposable
     /// </summary>
     public async Task SendValueAsync()
     {
-        if (!await _flowService.TrySetPortValueAsync(_stateService.AgentState.BaseUrl, Port))
+        if (!await _flowService.TrySetPortValueAsync(_stateService.AgentState.UniqueName, Port))
         {
             throw new Exception("Failed to set port value.");
         }

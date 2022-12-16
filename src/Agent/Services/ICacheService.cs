@@ -1,6 +1,6 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Data.Bindings;
 using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Services;
@@ -21,7 +21,7 @@ public interface ICacheService
     /// <param name="port">The port.</param>
     /// <returns></returns>
     /// <remarks>If the iteration does not exist, it will create a port entry from the last iteration.</remarks>
-    PortDto GetOrCreatePortEntry(Guid iterationId, IPort port);
+    Port GetOrCreatePortEntry(Guid iterationId, IPort port);
 
     /// <summary>
     /// Gets or creates the step cache entry for the specified iteration.

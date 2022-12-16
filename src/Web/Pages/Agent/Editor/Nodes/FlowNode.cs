@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Data.Bindings;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using Blazor.Diagrams.Core.Geometry;
@@ -17,7 +17,7 @@ public class FlowNode : NodeModel, IDisposable
     private MqttSubscription? _subscription;
     private bool _disposedValue;
 
-    public StepDto Step { get; private set; }
+    public Step Step { get; private set; }
 
     /// <summary>
     /// Called when a step is updated.
@@ -32,7 +32,7 @@ public class FlowNode : NodeModel, IDisposable
     /// <param name="mqttClientProvider">The MQTT client provider.</param>
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="step">The step.</param>
-    public FlowNode(IFlowService flowService, IMqttClientProvider mqttClientProvider, IStateService stateService, StepDto step, bool locked = false) : base(new Point(step.X, step.Y))
+    public FlowNode(IFlowService flowService, IMqttClientProvider mqttClientProvider, IStateService stateService, Step step, bool locked = false) : base(new Point(step.X, step.Y))
     {
         _flowService = flowService;
         _mqttClientProvider = mqttClientProvider;
@@ -42,7 +42,7 @@ public class FlowNode : NodeModel, IDisposable
         Locked = locked;
 
         if (step.Ports == null) return;
-        foreach (PortDto port in step.Ports)
+        foreach (Port port in step.Ports)
         {
             _ = AddPort(new FlowPort(this, port, step, _flowService, _mqttClientProvider, _stateService) { Locked = locked });
         }

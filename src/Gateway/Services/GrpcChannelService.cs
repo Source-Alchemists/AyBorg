@@ -65,7 +65,7 @@ public sealed class GrpcChannelService : IGrpcChannelService
         }
         catch (KeyNotFoundException)
         {
-            throw new RpcException(new Status(StatusCode.NotFound, "Agent not found"));
+            throw new RpcException(new Status(StatusCode.NotFound, $"Agent not found ({uniqueServiceName})"));
         }
     }
 }

@@ -1,12 +1,11 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Components.Web;
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Data.Bindings;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class RectangleInputField : BaseInputField
 {
-    private RectangleDto _value = new();
+    private Rectangle _value = new();
     private bool _isXEditing = false;
     private bool _isYEditing = false;
     private bool _isWidthEditing = false;
@@ -15,12 +14,11 @@ public partial class RectangleInputField : BaseInputField
     protected override Task OnParametersSetAsync()
     {
         if (Port.Value == null) return Task.CompletedTask;
-        if (Port.Value is RectangleDto value)
+        if (Port.Value is Rectangle value)
         {
             _value = value;
             return Task.CompletedTask;
         }
-        _value = JsonSerializer.Deserialize<RectangleDto>(Port.Value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
         Port.Value = _value;
         return base.OnParametersSetAsync();
     }

@@ -19,4 +19,22 @@ public sealed class EditorPassthroughServiceV1 : AgentEditor.AgentEditorBase
         AgentEditor.AgentEditorClient client = _grpcChannelService.CreateClient<AgentEditor.AgentEditorClient>(request.AgentUniqueName);
         return await client.GetAvailableStepsAsync(request);
     }
+
+    public override async Task<GetFlowStepsResponse> GetFlowSteps(GetFlowStepsRequest request, ServerCallContext context)
+    {
+        AgentEditor.AgentEditorClient client = _grpcChannelService.CreateClient<AgentEditor.AgentEditorClient>(request.AgentUniqueName);
+        return await client.GetFlowStepsAsync(request);
+    }
+
+    public override async Task<GetFlowLinksResponse> GetFlowLinks(GetFlowLinksRequest request, ServerCallContext context)
+    {
+        AgentEditor.AgentEditorClient client = _grpcChannelService.CreateClient<AgentEditor.AgentEditorClient>(request.AgentUniqueName);
+        return await client.GetFlowLinksAsync(request);
+    }
+
+    public override async Task<GetFlowPortsResponse> GetFlowPorts(GetFlowPortsRequest request, ServerCallContext context)
+    {
+        AgentEditor.AgentEditorClient client = _grpcChannelService.CreateClient<AgentEditor.AgentEditorClient>(request.AgentUniqueName);
+        return await client.GetFlowPortsAsync(request);
+    }
 }

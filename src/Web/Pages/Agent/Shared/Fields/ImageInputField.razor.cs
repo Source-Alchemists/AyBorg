@@ -37,7 +37,7 @@ public partial class ImageInputField : BaseInputField
                 _imageHeight = imageDto.Meta.Height;
                 SetImageUrl(imageDto);
             }
-            
+
         }
         base.OnParametersSet();
     }

@@ -76,7 +76,6 @@ builder.Services.AddHostedService<RegistryBackgroundService>();
 
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
-builder.Services.AddSingleton<IAgentCacheService, AgentCacheService>();
 builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 

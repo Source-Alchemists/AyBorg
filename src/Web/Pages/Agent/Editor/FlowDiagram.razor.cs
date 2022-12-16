@@ -1,6 +1,5 @@
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.Bindings;
-using AyBorg.SDK.Data.DTOs;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
@@ -119,7 +118,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
     private void ConnectLinkChangedHubEvent()
     {
-        _flowHubConnection.On<LinkDto, bool>("LinkChanged", async (linkDto, removed) =>
+        _flowHubConnection.On<Link, bool>("LinkChanged", async (linkDto, removed) =>
         {
             Logger.LogTrace("LinkChanged event received from server. Link: {link}, Removed: {removed}", linkDto, removed);
             if (removed)
@@ -154,7 +153,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         });
     }
 
-    private BaseLinkModel FindLinkModel(LinkDto linkDto)
+    private BaseLinkModel FindLinkModel(Link linkDto)
     {
         foreach (BaseLinkModel li in _diagram.Links)
         {
@@ -167,7 +166,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         return null!;
     }
 
-    private FlowNode CreateNode(StepDto step)
+    private FlowNode CreateNode(Step step)
     {
         var node = new FlowNode(FlowService, MqttClientProvider, StateService, step, Disabled);
         node.Moving += async (n) => await OnNodeMovingAsync(n);
@@ -179,16 +178,16 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     {
         try
         {
-            IEnumerable<StepDto> steps = await FlowService.GetStepsAsync(StateService.AgentState.BaseUrl);
+            IEnumerable<Step> steps = await FlowService.GetStepsAsync(StateService.AgentState.UniqueName);
             // First create all nodes
-            foreach (StepDto step in steps)
+            foreach (Step step in steps)
             {
                 _diagram.Nodes.Add(CreateNode(step));
             }
             // Next create all links
-            IEnumerable<LinkDto> links = await FlowService.GetLinksAsync(StateService.AgentState.BaseUrl);
-            var linkHashes = new HashSet<LinkDto>();
-            foreach (LinkDto link in links)
+            IEnumerable<Link> links = await FlowService.GetLinksAsync(StateService.AgentState.UniqueName);
+            var linkHashes = new HashSet<Link>();
+            foreach (Link link in links)
             {
                 if (linkHashes.Contains(link))
                 {
@@ -205,7 +204,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         }
     }
 
-    private LinkModel CreateLinkModel(LinkDto link)
+    private LinkModel CreateLinkModel(Link link)
     {
         NodeModel? targetNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.TargetId) != false);
         NodeModel? sourceNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.SourceId) != false);
@@ -282,7 +281,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         step.X = (int)relativePosition.X;
         step.Y = (int)relativePosition.Y;
 
-        StepDto receivedStep = await FlowService.AddStepAsync(StateService.AgentState.BaseUrl, step.Id, step.X, step.Y);
+        Step receivedStep = await FlowService.AddStepAsync(StateService.AgentState.BaseUrl, step.Id, step.X, step.Y);
         if (receivedStep != null)
         {
             _diagram.Nodes.Add(CreateNode(receivedStep));
@@ -298,10 +297,10 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     {
         if (_suspendDiagramRefresh) return;
         if (link.TargetPort == null || link.SourcePort == null) return; // Nothing to do.
-        IEnumerable<LinkDto> links = await FlowService.GetLinksAsync(StateService.AgentState.BaseUrl);
+        IEnumerable<Link> links = await FlowService.GetLinksAsync(StateService.AgentState.BaseUrl);
         var sp = (FlowPort)link.SourcePort;
         var tp = (FlowPort)link.TargetPort;
-        LinkDto? orgLink = links.FirstOrDefault(l => l.SourceId == sp.Port.Id && l.TargetId == tp.Port.Id);
+        Link? orgLink = links.FirstOrDefault(l => l.SourceId == sp.Port.Id && l.TargetId == tp.Port.Id);
         if (orgLink == null) return; // Nothing to do. Already removed.
         if (!await FlowService.TryRemoveLinkAsync(StateService.AgentState.BaseUrl, orgLink.Id))
         {

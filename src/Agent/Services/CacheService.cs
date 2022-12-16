@@ -1,8 +1,10 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Data.Bindings;
 using AyBorg.SDK.Data.DTOs;
 using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Agent;
 using AyBorg.SDK.System.Caching;
 using Microsoft.Extensions.Caching.Memory;
 
@@ -40,10 +42,10 @@ internal sealed class CacheService : ICacheService
     /// <param name="project">The project.</param>
     public void CreateCache(Guid iterationId, Project project)
     {
-        Parallel.ForEach(project.Steps, step =>
+        _ = Parallel.ForEach(project.Steps, step =>
         {
             CreateStepEntry(iterationId, step);
-            foreach (var port in step.Ports)
+            foreach (IPort port in step.Ports)
             {
                 // Only input ports that are connected to another port are cached.
                 // All other ports are not changing there displayed value at real time.
@@ -62,13 +64,13 @@ internal sealed class CacheService : ICacheService
     /// <param name="port">The port.</param>
     /// <returns></returns>
     /// <remarks>If the iteration does not exist, it will create a port entry from the last iteration.</remarks>
-    public PortDto GetOrCreatePortEntry(Guid iterationId, IPort port)
+    public Port GetOrCreatePortEntry(Guid iterationId, IPort port)
     {
         var key = new PortCacheKey(iterationId, port.Id);
-        var result = _cache.GetOrCreate(key, entry =>
+        Port? result = _cache.GetOrCreate(key, entry =>
         {
             entry.SetOptions(_cacheEntryOptions);
-            return _mapper.Map(port);
+            return RuntimeMapper.FromRuntime(port);
         });
 
         if (result == null)
@@ -99,7 +101,7 @@ internal sealed class CacheService : ICacheService
     private void CreatePortEntry(Guid iterationId, IPort port)
     {
         var key = new PortCacheKey(iterationId, port.Id);
-        var portDto = _mapper.Map(port);
+        PortDto portDto = _mapper.Map(port);
         _cache.Set<PortDto>(key, portDto, _cacheEntryOptions);
     }
 

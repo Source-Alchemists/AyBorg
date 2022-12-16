@@ -7,7 +7,7 @@ public class PluginsService
 {
     private readonly ILogger<PluginsService> _logger;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
-    private Ayborg.Gateway.V1.AgentEditor.AgentEditorClient _agentEditorClient;
+    private readonly Ayborg.Gateway.V1.AgentEditor.AgentEditorClient _agentEditorClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginsService"/> class.
