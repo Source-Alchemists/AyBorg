@@ -1,6 +1,7 @@
 using System.Text;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Data.Bindings;
+using Grpc.Core;
 using Newtonsoft.Json;
 
 namespace AyBorg.Web.Services.Agent;
@@ -34,7 +35,7 @@ public class FlowService : IFlowService
     /// </summary>
     /// <param name="serviceUniqueName">The service unique name.</param>
     /// <returns>The steps.</returns>
-    public async Task<IEnumerable<Step>> GetStepsAsync(string serviceUniqueName)
+    public async ValueTask<IEnumerable<Step>> GetStepsAsync(string serviceUniqueName)
     {
         Ayborg.Gateway.V1.GetFlowStepsResponse response = await _agentEditorClient.GetFlowStepsAsync(new Ayborg.Gateway.V1.GetFlowStepsRequest { AgentUniqueName = serviceUniqueName });
         var result = new List<Step>();
@@ -51,7 +52,7 @@ public class FlowService : IFlowService
     /// </summary>
     /// <param name="serviceUniqueName">The service unique name.</param>
     /// <returns>The links.</returns>
-    public async Task<IEnumerable<Link>> GetLinksAsync(string serviceUniqueName)
+    public async ValueTask<IEnumerable<Link>> GetLinksAsync(string serviceUniqueName)
     {
         Ayborg.Gateway.V1.GetFlowLinksResponse response = await _agentEditorClient.GetFlowLinksAsync(new Ayborg.Gateway.V1.GetFlowLinksRequest { AgentUniqueName = serviceUniqueName });
         var result = new List<Link>();
@@ -71,7 +72,7 @@ public class FlowService : IFlowService
     /// <param name="x">The x.</param>
     /// <param name="y">The y.</param>
     /// <returns></returns>
-    public async Task<Step> AddStepAsync(string serviceUniqueName, Guid stepId, int x, int y)
+    public async ValueTask<Step> AddStepAsync(string serviceUniqueName, Guid stepId, int x, int y)
     {
         Ayborg.Gateway.V1.AddFlowStepResponse response = await _agentEditorClient.AddFlowStepAsync(new Ayborg.Gateway.V1.AddFlowStepRequest
         {
@@ -90,7 +91,7 @@ public class FlowService : IFlowService
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="stepId">The step identifier.</param>
     /// <returns></returns>
-    public async Task<bool> TryRemoveStepAsync(string baseUrl, Guid stepId)
+    public async ValueTask<bool> TryRemoveStepAsync(string baseUrl, Guid stepId)
     {
         var request = new HttpRequestMessage(HttpMethod.Delete, $"{baseUrl}/flow/steps/{stepId}");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
@@ -101,17 +102,29 @@ public class FlowService : IFlowService
     /// <summary>
     /// Moves the step asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
+    /// <param name="serviceUniqueName">The service unique name.</param>
     /// <param name="stepId">The step identifier.</param>
     /// <param name="x">The x.</param>
     /// <param name="y">The y.</param>
     /// <returns></returns>
-    public async Task<bool> TryMoveStepAsync(string baseUrl, Guid stepId, int x, int y)
+    public async ValueTask<bool> TryMoveStepAsync(string serviceUniqueName, Guid stepId, int x, int y)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/flow/steps/{stepId}/{x}/{y}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        HttpResponseMessage response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            _ = await _agentEditorClient.MoveFlowStepAsync(new Ayborg.Gateway.V1.MoveFlowStepRequest
+            {
+                AgentUniqueName = serviceUniqueName,
+                StepId = stepId.ToString(),
+                X = x,
+                Y = y
+            });
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error moving step");
+            return false;
+        }
     }
 
     /// <summary>
@@ -121,7 +134,7 @@ public class FlowService : IFlowService
     /// <param name="sourcePortId">The source port identifier.</param>
     /// <param name="targetPortId">The target port identifier.</param>
     /// <returns></returns>
-    public async Task<bool> TryAddLinkAsync(string baseUrl, Guid sourcePortId, Guid targetPortId)
+    public async ValueTask<bool> TryAddLinkAsync(string baseUrl, Guid sourcePortId, Guid targetPortId)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/flow/links/{sourcePortId}/{targetPortId}");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
@@ -135,7 +148,7 @@ public class FlowService : IFlowService
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="linkId">The link identifier.</param>
     /// <returns></returns>
-    public async Task<bool> TryRemoveLinkAsync(string baseUrl, Guid linkId)
+    public async ValueTask<bool> TryRemoveLinkAsync(string baseUrl, Guid linkId)
     {
         var request = new HttpRequestMessage(HttpMethod.Delete, $"{baseUrl}/flow/links/{linkId}");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
@@ -150,7 +163,7 @@ public class FlowService : IFlowService
     /// <param name="portId">The port identifier.</param>
     /// <param name="iterationId">The iteration identifier.</param>
     /// <returns></returns>
-    public async Task<Port> GetPortAsync(string serviceUniqueName, Guid portId, Guid? iterationId = null)
+    public async ValueTask<Port> GetPortAsync(string serviceUniqueName, Guid portId, Guid? iterationId = null)
     {
         var request = new Ayborg.Gateway.V1.GetFlowPortsRequest
         {
@@ -174,7 +187,7 @@ public class FlowService : IFlowService
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="port">The port.</param>
     /// <returns></returns>
-    public async Task<bool> TrySetPortValueAsync(string baseUrl, Port port)
+    public async ValueTask<bool> TrySetPortValueAsync(string baseUrl, Port port)
     {
         var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/flow/ports")
         {

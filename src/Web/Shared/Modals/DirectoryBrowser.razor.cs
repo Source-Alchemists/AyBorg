@@ -20,9 +20,9 @@ public partial class DirectoryBrowser : ComponentBase
         await base.OnParametersSetAsync();
         _items.Clear();
         _selectedItem = null;
-        foreach (var dir in await StorageService!.GetDirectoriesAsync(StateService.AgentState.BaseUrl, "/"))
+        foreach (string dir in await StorageService!.GetDirectoriesAsync(StateService.AgentState.UniqueName, "/"))
         {
-            var item = await CreateDirectoryItemAsync(dir);
+            DirectoryItem item = await CreateDirectoryItemAsync(dir);
             _items.Add(item);
         }
 
@@ -31,14 +31,14 @@ public partial class DirectoryBrowser : ComponentBase
 
     private async Task<DirectoryItem> CreateDirectoryItemAsync(string dir)
     {
-        var name = Path.GetFileName(dir);
+        string name = Path.GetFileName(dir);
         var childs = new List<DirectoryItem>();
         if (dir != "/")
         {
-            var subDirs = await StorageService!.GetDirectoriesAsync(StateService.AgentState.BaseUrl, dir);
-            foreach (var subDir in subDirs)
+            IEnumerable<string> subDirs = await StorageService!.GetDirectoriesAsync(StateService.AgentState.UniqueName, dir);
+            foreach (string subDir in subDirs)
             {
-                var subItem = await CreateDirectoryItemAsync(subDir);
+                DirectoryItem subItem = await CreateDirectoryItemAsync(subDir);
                 childs.Add(subItem);
             }
         }

@@ -36,7 +36,7 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status.</returns>
     public async Task<EngineMeta> GetStatusAsync()
     {
-        return await GetStatusAsync(_stateService.AgentState.BaseUrl);
+        return await GetStatusAsync(_stateService.AgentState.UniqueName);
     }
 
     /// <summary>
@@ -46,14 +46,15 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status.</returns>
     public async Task<EngineMeta> GetStatusAsync(string baseUrl)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/runtime/status");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
-        if (response.StatusCode != HttpStatusCode.OK)
-        {
-            return null!;
-        }
-        var status = await response.Content.ReadFromJsonAsync<EngineMeta>();
+        // var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/runtime/status");
+        // request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
+        // HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        // if (response.StatusCode != HttpStatusCode.OK)
+        // {
+        //     return null!;
+        // }
+        // EngineMeta? status = await response.Content.ReadFromJsonAsync<EngineMeta>();
+        EngineMeta? status = new EngineMeta();
         return status!;
     }
 
@@ -64,15 +65,15 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status</returns>
     public async Task<EngineMeta> StartRunAsync(EngineExecutionType executionType)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{_stateService.AgentState.BaseUrl}/runtime/start/{executionType}");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{_stateService.AgentState.UniqueName}/runtime/start/{executionType}");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (response.StatusCode != HttpStatusCode.OK)
         {
             _logger.LogWarning("No status received from Agent. Indicating that the Agent is not started.");
             return null!;
         }
-        var status = await response.Content.ReadFromJsonAsync<EngineMeta>();
+        EngineMeta? status = await response.Content.ReadFromJsonAsync<EngineMeta>();
         return status!;
     }
 
@@ -82,16 +83,16 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status</returns>
     public async Task<EngineMeta> StopRunAsync()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{_stateService.AgentState.BaseUrl}/runtime/stop");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{_stateService.AgentState.UniqueName}/runtime/stop");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (response.StatusCode != HttpStatusCode.OK)
         {
             _logger.LogWarning("No status received from Agent. Indicating that the Agent is not started.");
             return null!;
         }
 
-        var status = await response.Content.ReadFromJsonAsync<EngineMeta>();
+        EngineMeta? status = await response.Content.ReadFromJsonAsync<EngineMeta>();
         return status!;
     }
 
@@ -101,16 +102,16 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status</returns>
     public async Task<EngineMeta> AbortRunAsync()
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{_stateService.AgentState.BaseUrl}/runtime/abort");
+        var request = new HttpRequestMessage(HttpMethod.Post, $"{_stateService.AgentState.UniqueName}/runtime/abort");
         request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
+        HttpResponseMessage response = await _httpClient.SendAsync(request, HttpCompletionOption.ResponseContentRead);
         if (response.StatusCode != HttpStatusCode.OK)
         {
             _logger.LogWarning("No status received from Agent. Indicating that the Agent is not in a abortable state.");
             return null!;
         }
 
-        var status = await response.Content.ReadFromJsonAsync<EngineMeta>();
+        EngineMeta? status = await response.Content.ReadFromJsonAsync<EngineMeta>();
         return status!;
     }
 
@@ -120,8 +121,8 @@ public class RuntimeService : IRuntimeService
     /// <returns>The hub connection.</returns>
     public HubConnection CreateHubConnection()
     {
-        var hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{_stateService.AgentState.BaseUrl}/hubs/runtime")
+        HubConnection hubConnection = new HubConnectionBuilder()
+            .WithUrl($"{_stateService.AgentState.UniqueName}/hubs/runtime")
             .Build();
         return hubConnection;
     }

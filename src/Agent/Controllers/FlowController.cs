@@ -59,19 +59,6 @@ public sealed class FlowController : ControllerBase
         return NotFound();
     }
 
-    [HttpPut("steps/{stepId}/{x}/{y}")]
-    [ProducesResponseType(StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async ValueTask<ActionResult> MoveStepAsync(Guid stepId, int x, int y)
-    {
-        if (await _flowService.TryMoveStepAsync(stepId, x, y))
-        {
-            return Ok();
-        }
-
-        return NotFound();
-    }
-
     [HttpPost("links/{sourcePortId}/{targetPortId}")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]

@@ -256,7 +256,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
             return;
         }
 
-        bool result = await FlowService.TryAddLinkAsync(StateService.AgentState.BaseUrl, sourcePort.Port.Id, targetPort.Port.Id);
+        bool result = await FlowService.TryAddLinkAsync(StateService.AgentState.UniqueName, sourcePort.Port.Id, targetPort.Port.Id);
         if (!result)
         {
             Logger.LogWarning("Failed to add link from {Id} to {Id}", sourcePort.Port.Id, targetPort.Port.Id);
@@ -281,7 +281,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         step.X = (int)relativePosition.X;
         step.Y = (int)relativePosition.Y;
 
-        Step receivedStep = await FlowService.AddStepAsync(StateService.AgentState.BaseUrl, step.Id, step.X, step.Y);
+        Step receivedStep = await FlowService.AddStepAsync(StateService.AgentState.UniqueName, step.Id, step.X, step.Y);
         if (receivedStep != null)
         {
             _diagram.Nodes.Add(CreateNode(receivedStep));
@@ -297,12 +297,12 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     {
         if (_suspendDiagramRefresh) return;
         if (link.TargetPort == null || link.SourcePort == null) return; // Nothing to do.
-        IEnumerable<Link> links = await FlowService.GetLinksAsync(StateService.AgentState.BaseUrl);
+        IEnumerable<Link> links = await FlowService.GetLinksAsync(StateService.AgentState.UniqueName);
         var sp = (FlowPort)link.SourcePort;
         var tp = (FlowPort)link.TargetPort;
         Link? orgLink = links.FirstOrDefault(l => l.SourceId == sp.Port.Id && l.TargetId == tp.Port.Id);
         if (orgLink == null) return; // Nothing to do. Already removed.
-        if (!await FlowService.TryRemoveLinkAsync(StateService.AgentState.BaseUrl, orgLink.Id))
+        if (!await FlowService.TryRemoveLinkAsync(StateService.AgentState.UniqueName, orgLink.Id))
         {
             _diagram.Links.Add(link);
             return;
@@ -316,7 +316,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         if (_suspendDiagramRefresh) return;
         if (node is FlowNode flowNode)
         {
-            if (await FlowService.TryRemoveStepAsync(StateService.AgentState.BaseUrl, flowNode.Step.Id))
+            if (await FlowService.TryRemoveStepAsync(StateService.AgentState.UniqueName, flowNode.Step.Id))
             {
                 _diagram.Nodes.Remove(node);
             }
@@ -328,7 +328,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         if (_suspendDiagramRefresh) return;
         if (node is FlowNode flowNode)
         {
-            await FlowService.TryMoveStepAsync(StateService.AgentState.BaseUrl, flowNode.Step.Id, (int)flowNode.Position.X, (int)flowNode.Position.Y);
+            await FlowService.TryMoveStepAsync(StateService.AgentState.UniqueName, flowNode.Step.Id, (int)flowNode.Position.X, (int)flowNode.Position.Y);
         }
     }
 

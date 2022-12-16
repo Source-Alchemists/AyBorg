@@ -1,4 +1,5 @@
 using Ayborg.Gateway.V1;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
 namespace AyBorg.Gateway.Services.Agent;
@@ -36,5 +37,17 @@ public sealed class EditorPassthroughServiceV1 : AgentEditor.AgentEditorBase
     {
         AgentEditor.AgentEditorClient client = _grpcChannelService.CreateClient<AgentEditor.AgentEditorClient>(request.AgentUniqueName);
         return await client.GetFlowPortsAsync(request);
+    }
+
+    public override async Task<AddFlowStepResponse> AddFlowStep(AddFlowStepRequest request, ServerCallContext context)
+    {
+        AgentEditor.AgentEditorClient client = _grpcChannelService.CreateClient<AgentEditor.AgentEditorClient>(request.AgentUniqueName);
+        return await client.AddFlowStepAsync(request);
+    }
+
+    public override async Task<Empty> MoveFlowStep(MoveFlowStepRequest request, ServerCallContext context)
+    {
+        AgentEditor.AgentEditorClient client = _grpcChannelService.CreateClient<AgentEditor.AgentEditorClient>(request.AgentUniqueName);
+        return await client.MoveFlowStepAsync(request);
     }
 }

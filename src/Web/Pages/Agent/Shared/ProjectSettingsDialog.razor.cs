@@ -21,7 +21,7 @@ public sealed partial class ProjectSettingsDialog : ComponentBase
     {
         await base.OnParametersSetAsync();
 
-        _projectSettings = await ProjectSettingsService.GetProjectSettingsAsync(StateService.AgentState.BaseUrl, ProjectMeta);
+        _projectSettings = await ProjectSettingsService.GetProjectSettingsAsync(StateService.AgentState.UniqueName, ProjectMeta);
     }
 
     private async Task ChangeResultCommunicationClicked()
@@ -56,7 +56,7 @@ public sealed partial class ProjectSettingsDialog : ComponentBase
 
     private async ValueTask UpdateCommunicationSettings()
     {
-        bool apiResult = await ProjectSettingsService.TryUpdateProjectCommunicationSettingsAsync(StateService.AgentState.BaseUrl, ProjectMeta, _projectSettings);
+        bool apiResult = await ProjectSettingsService.TryUpdateProjectCommunicationSettingsAsync(StateService.AgentState.UniqueName, ProjectMeta, _projectSettings);
         if (apiResult)
         {
             Snackbar.Add("Result communication changed successfully.", Severity.Success);

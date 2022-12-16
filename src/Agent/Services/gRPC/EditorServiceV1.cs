@@ -1,6 +1,7 @@
 using Ayborg.Gateway.V1;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.System.Agent;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
 namespace AyBorg.Agent.Services.gRPC;
@@ -109,5 +110,21 @@ public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
         var result = new GetFlowPortsResponse();
         result.Ports.Add(resultPorts);
         return await ValueTask.FromResult(result);
+    }
+
+    public override async Task<Empty> MoveFlowStep(MoveFlowStepRequest request, ServerCallContext context)
+    {
+        if (!Guid.TryParse(request.StepId, out Guid stepId))
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
+        }
+
+        bool result = await _flowService.TryMoveStepAsync(stepId, request.X, request.Y);
+        if (!result)
+        {
+            throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
+        }
+
+        return new Empty();
     }
 }
