@@ -1,15 +1,12 @@
-using System.Text;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Data.Bindings;
 using Grpc.Core;
-using Newtonsoft.Json;
 
 namespace AyBorg.Web.Services.Agent;
 
 public class FlowService : IFlowService
 {
     private readonly ILogger<FlowService> _logger;
-    private readonly HttpClient _httpClient;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
     private readonly Ayborg.Gateway.V1.AgentEditor.AgentEditorClient _agentEditorClient;
 
@@ -27,7 +24,6 @@ public class FlowService : IFlowService
         _logger = logger;
         _authorizationHeaderUtilService = authorizationHeaderUtilService;
         _agentEditorClient = agentEditorClient;
-        _httpClient = httpClient;
     }
 
     /// <summary>
