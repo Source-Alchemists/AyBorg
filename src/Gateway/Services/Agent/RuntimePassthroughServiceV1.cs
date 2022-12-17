@@ -1,4 +1,4 @@
-using Ayborg.Gateway.V1;
+using Ayborg.Gateway.Agent.V1;
 using Grpc.Core;
 
 namespace AyBorg.Gateway.Services.Agent;

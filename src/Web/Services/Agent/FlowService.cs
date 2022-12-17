@@ -10,7 +10,7 @@ public class FlowService : IFlowService
     private readonly ILogger<FlowService> _logger;
     private readonly IStateService _stateService;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
-    private readonly Ayborg.Gateway.V1.AgentEditor.AgentEditorClient _agentEditorClient;
+    private readonly Ayborg.Gateway.Agent.V1.AgentEditor.AgentEditorClient _agentEditorClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FlowService"/> class.
@@ -21,7 +21,7 @@ public class FlowService : IFlowService
     public FlowService(ILogger<FlowService> logger,
                         IStateService stateService,
                         IAuthorizationHeaderUtilService authorizationHeaderUtilService,
-                        Ayborg.Gateway.V1.AgentEditor.AgentEditorClient agentEditorClient)
+                        Ayborg.Gateway.Agent.V1.AgentEditor.AgentEditorClient agentEditorClient)
     {
         _logger = logger;
         _stateService = stateService;
@@ -35,12 +35,12 @@ public class FlowService : IFlowService
     /// <returns>The steps.</returns>
     public async ValueTask<IEnumerable<Step>> GetStepsAsync()
     {
-        Ayborg.Gateway.V1.GetFlowStepsResponse response = await _agentEditorClient.GetFlowStepsAsync(new Ayborg.Gateway.V1.GetFlowStepsRequest
+        Ayborg.Gateway.Agent.V1.GetFlowStepsResponse response = await _agentEditorClient.GetFlowStepsAsync(new Ayborg.Gateway.Agent.V1.GetFlowStepsRequest
         {
             AgentUniqueName = _stateService.AgentState.UniqueName
         });
         var result = new List<Step>();
-        foreach (Ayborg.Gateway.V1.Step? s in response.Steps)
+        foreach (Ayborg.Gateway.Agent.V1.Step? s in response.Steps)
         {
             result.Add(RpcMapper.FromRpc(s));
         }
@@ -54,12 +54,12 @@ public class FlowService : IFlowService
     /// <returns>The links.</returns>
     public async ValueTask<IEnumerable<Link>> GetLinksAsync()
     {
-        Ayborg.Gateway.V1.GetFlowLinksResponse response = await _agentEditorClient.GetFlowLinksAsync(new Ayborg.Gateway.V1.GetFlowLinksRequest
+        Ayborg.Gateway.Agent.V1.GetFlowLinksResponse response = await _agentEditorClient.GetFlowLinksAsync(new Ayborg.Gateway.Agent.V1.GetFlowLinksRequest
         {
             AgentUniqueName = _stateService.AgentState.UniqueName
         });
         var result = new List<Link>();
-        foreach (Ayborg.Gateway.V1.Link? l in response.Links)
+        foreach (Ayborg.Gateway.Agent.V1.Link? l in response.Links)
         {
             result.Add(RpcMapper.FromRpc(l));
         }
@@ -76,7 +76,7 @@ public class FlowService : IFlowService
     /// <returns></returns>
     public async ValueTask<Step> AddStepAsync(Guid stepId, int x, int y)
     {
-        Ayborg.Gateway.V1.AddFlowStepResponse response = await _agentEditorClient.AddFlowStepAsync(new Ayborg.Gateway.V1.AddFlowStepRequest
+        Ayborg.Gateway.Agent.V1.AddFlowStepResponse response = await _agentEditorClient.AddFlowStepAsync(new Ayborg.Gateway.Agent.V1.AddFlowStepRequest
         {
             AgentUniqueName = _stateService.AgentState.UniqueName,
             StepId = stepId.ToString(),
@@ -96,7 +96,7 @@ public class FlowService : IFlowService
     {
         try
         {
-            _ = await _agentEditorClient.DeleteFlowStepAsync(new Ayborg.Gateway.V1.DeleteFlowStepRequest
+            _ = await _agentEditorClient.DeleteFlowStepAsync(new Ayborg.Gateway.Agent.V1.DeleteFlowStepRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 StepId = stepId.ToString()
@@ -121,7 +121,7 @@ public class FlowService : IFlowService
     {
         try
         {
-            _ = await _agentEditorClient.MoveFlowStepAsync(new Ayborg.Gateway.V1.MoveFlowStepRequest
+            _ = await _agentEditorClient.MoveFlowStepAsync(new Ayborg.Gateway.Agent.V1.MoveFlowStepRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 StepId = stepId.ToString(),
@@ -147,7 +147,7 @@ public class FlowService : IFlowService
     {
         try
         {
-            _ = await _agentEditorClient.LinkFlowPortsAsync(new Ayborg.Gateway.V1.LinkFlowPortsRequest
+            _ = await _agentEditorClient.LinkFlowPortsAsync(new Ayborg.Gateway.Agent.V1.LinkFlowPortsRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 SourceId = sourcePortId.ToString(),
@@ -171,7 +171,7 @@ public class FlowService : IFlowService
     {
         try
         {
-            _ = await _agentEditorClient.LinkFlowPortsAsync(new Ayborg.Gateway.V1.LinkFlowPortsRequest
+            _ = await _agentEditorClient.LinkFlowPortsAsync(new Ayborg.Gateway.Agent.V1.LinkFlowPortsRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 SourceId = linkId.ToString(),
@@ -194,14 +194,14 @@ public class FlowService : IFlowService
     /// <returns></returns>
     public async ValueTask<Port> GetPortAsync(Guid portId, Guid? iterationId = null)
     {
-        var request = new Ayborg.Gateway.V1.GetFlowPortsRequest
+        var request = new Ayborg.Gateway.Agent.V1.GetFlowPortsRequest
         {
             AgentUniqueName = _stateService.AgentState.UniqueName,
             IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
         };
         request.PortIds.Add(portId.ToString());
-        Ayborg.Gateway.V1.GetFlowPortsResponse response = await _agentEditorClient.GetFlowPortsAsync(request);
-        Ayborg.Gateway.V1.Port? resultPort = response.Ports.FirstOrDefault();
+        Ayborg.Gateway.Agent.V1.GetFlowPortsResponse response = await _agentEditorClient.GetFlowPortsAsync(request);
+        Ayborg.Gateway.Agent.V1.Port? resultPort = response.Ports.FirstOrDefault();
         if (resultPort == null)
         {
             _logger.LogWarning("Could not find port with id {PortId} in iteration {IterationId}", portId, iterationId);
@@ -219,7 +219,7 @@ public class FlowService : IFlowService
     {
         try
         {
-            _ = await _agentEditorClient.UpdateFlowPortAsync(new Ayborg.Gateway.V1.UpdateFlowPortRequest
+            _ = await _agentEditorClient.UpdateFlowPortAsync(new Ayborg.Gateway.Agent.V1.UpdateFlowPortRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 Port = RpcMapper.ToRpc(port)

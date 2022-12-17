@@ -7,7 +7,7 @@ public class PluginsService
 {
     private readonly ILogger<PluginsService> _logger;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
-    private readonly Ayborg.Gateway.V1.AgentEditor.AgentEditorClient _agentEditorClient;
+    private readonly Ayborg.Gateway.Agent.V1.AgentEditor.AgentEditorClient _agentEditorClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginsService"/> class.
@@ -16,7 +16,7 @@ public class PluginsService
     /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
     public PluginsService(ILogger<PluginsService> logger,
                             IAuthorizationHeaderUtilService authorizationHeaderUtilService,
-                            Ayborg.Gateway.V1.AgentEditor.AgentEditorClient agentEditorClient)
+                            Ayborg.Gateway.Agent.V1.AgentEditor.AgentEditorClient agentEditorClient)
     {
         _logger = logger;
         _authorizationHeaderUtilService = authorizationHeaderUtilService;
@@ -28,9 +28,9 @@ public class PluginsService
     /// </summary>
     public async Task<IEnumerable<Step>> ReceiveStepsAsync(string agentUniqueName)
     {
-        Ayborg.Gateway.V1.GetAvailableStepsResponse response = await _agentEditorClient.GetAvailableStepsAsync(new Ayborg.Gateway.V1.GetAvailableStepsRequest { AgentUniqueName = agentUniqueName });
+        Ayborg.Gateway.Agent.V1.GetAvailableStepsResponse response = await _agentEditorClient.GetAvailableStepsAsync(new Ayborg.Gateway.Agent.V1.GetAvailableStepsRequest { AgentUniqueName = agentUniqueName });
         var steps = new List<Step>();
-        foreach (Ayborg.Gateway.V1.Step? s in response.Steps)
+        foreach (Ayborg.Gateway.Agent.V1.Step? s in response.Steps)
         {
             steps.Add(RpcMapper.FromRpc(s));
         }

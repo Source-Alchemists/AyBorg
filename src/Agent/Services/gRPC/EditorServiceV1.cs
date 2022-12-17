@@ -1,4 +1,4 @@
-using Ayborg.Gateway.V1;
+using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.System.Agent;
 using Google.Protobuf.WellKnownTypes;

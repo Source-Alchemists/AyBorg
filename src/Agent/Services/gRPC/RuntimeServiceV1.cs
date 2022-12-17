@@ -1,5 +1,5 @@
 using System.Runtime.CompilerServices;
-using Ayborg.Gateway.V1;
+using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.System.Runtime;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;

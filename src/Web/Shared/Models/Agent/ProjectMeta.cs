@@ -64,7 +64,7 @@ public sealed record ProjectMeta
 
     public ProjectMeta() { }
 
-    public ProjectMeta(Ayborg.Gateway.V1.ProjectMeta projectMeta)
+    public ProjectMeta(Ayborg.Gateway.Agent.V1.ProjectMeta projectMeta)
     {
         DbId = projectMeta.DbId;
         Id = projectMeta.Id;

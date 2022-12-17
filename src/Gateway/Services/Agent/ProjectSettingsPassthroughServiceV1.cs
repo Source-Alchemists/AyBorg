@@ -1,7 +1,6 @@
-using Ayborg.Gateway.V1;
+using Ayborg.Gateway.Agent.V1;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using Grpc.Net.Client;
 
 namespace AyBorg.Gateway.Services.Agent;
 
