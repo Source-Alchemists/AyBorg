@@ -1,8 +1,6 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Data.Bindings;
-using AyBorg.SDK.Data.DTOs;
-using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Agent;
 using AyBorg.SDK.System.Caching;
@@ -13,7 +11,6 @@ namespace AyBorg.Agent.Services;
 internal sealed class CacheService : ICacheService
 {
     private readonly ILogger<CacheService> _logger;
-    private readonly IDtoMapper _mapper;
     private readonly IMemoryCache _cache;
     private readonly MemoryCacheEntryOptions _cacheEntryOptions;
 
@@ -23,10 +20,9 @@ internal sealed class CacheService : ICacheService
     /// <param name="logger">The logger.</param>
     /// <param name="mapper">The mapper.</param>
     /// <param name="memoryCache">The cache.</param>
-    public CacheService(ILogger<CacheService> logger, IDtoMapper mapper, IMemoryCache memoryCache)
+    public CacheService(ILogger<CacheService> logger, IMemoryCache memoryCache)
     {
         _logger = logger;
-        _mapper = mapper;
         _cache = memoryCache;
         _cacheEntryOptions = new MemoryCacheEntryOptions
         {
@@ -91,7 +87,7 @@ internal sealed class CacheService : ICacheService
     public long GetOrCreateStepExecutionTimeEntry(Guid iterationId, IStepProxy stepProxy)
     {
         var key = new StepCacheKey(iterationId, stepProxy.Id);
-        return _cache.GetOrCreate<long>(key, entry =>
+        return _cache.GetOrCreate(key, entry =>
         {
             entry.SetOptions(_cacheEntryOptions);
             return stepProxy.ExecutionTimeMs;
@@ -101,13 +97,13 @@ internal sealed class CacheService : ICacheService
     private void CreatePortEntry(Guid iterationId, IPort port)
     {
         var key = new PortCacheKey(iterationId, port.Id);
-        PortDto portDto = _mapper.Map(port);
-        _cache.Set<PortDto>(key, portDto, _cacheEntryOptions);
+        Port portDto = RuntimeMapper.FromRuntime(port);
+        _cache.Set(key, portDto, _cacheEntryOptions);
     }
 
     private void CreateStepEntry(Guid iterationId, IStepProxy stepProxy)
     {
         var key = new StepCacheKey(iterationId, stepProxy.Id);
-        _cache.Set<long>(key, stepProxy.ExecutionTimeMs, _cacheEntryOptions);
+        _cache.Set(key, stepProxy.ExecutionTimeMs, _cacheEntryOptions);
     }
 }

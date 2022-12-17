@@ -1,4 +1,3 @@
-using System.Text.Json;
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class EnumInputField : BaseInputField
@@ -11,7 +10,7 @@ public partial class EnumInputField : BaseInputField
     {
         _selectedNames.Clear();
         if (Port.Value == null) throw new ArgumentNullException(nameof(Port.Value));
-        else if (Port.Value is SDK.Data.Bindings.Enum value)
+        if (Port.Value is SDK.Data.Bindings.Enum value)
         {
             _value = value;
         }

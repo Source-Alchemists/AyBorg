@@ -42,7 +42,6 @@ builder.Services.AddMemoryCache();
 
 builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
-builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
 builder.Services.AddSingleton<IRuntimeConverterService, RuntimeConverterService>();
 builder.Services.AddSingleton<IPluginsService, PluginsService>();

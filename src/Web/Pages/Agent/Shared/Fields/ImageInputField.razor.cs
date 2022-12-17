@@ -44,17 +44,17 @@ public partial class ImageInputField : BaseInputField
 
     private void SetImageUrl(ImageDto imageDto)
     {
-        switch (imageDto.Meta.EncoderType)
-        {
-            case EncoderType.Jpeg:
-                _imageUrl = $"data:image/jpeg;base64,{imageDto.Base64}";
-                break;
-            case EncoderType.Png:
-                _imageUrl = $"data:image/png;base64,{imageDto.Base64}";
-                break;
-            case EncoderType.Bmp:
-                _imageUrl = $"data:image/bmp;base64,{imageDto.Base64}";
-                break;
-        }
+        // switch (imageDto.Meta.EncoderType)
+        // {
+        //     case EncoderType.Jpeg:
+        //         _imageUrl = $"data:image/jpeg;base64,{imageDto.Base64}";
+        //         break;
+        //     case EncoderType.Png:
+        //         _imageUrl = $"data:image/png;base64,{imageDto.Base64}";
+        //         break;
+        //     case EncoderType.Bmp:
+        //         _imageUrl = $"data:image/bmp;base64,{imageDto.Base64}";
+        //         break;
+        // }
     }
 }

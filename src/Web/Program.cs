@@ -2,7 +2,6 @@ using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.Web;
 using AyBorg.Web.Areas.Identity;
@@ -76,7 +75,6 @@ builder.Services.AddHostedService<RegistryBackgroundService>();
 
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
-builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
 builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 
 builder.Services.AddScoped<IAuthorizationHeaderUtilService, AuthorizationHeaderUtilService>();

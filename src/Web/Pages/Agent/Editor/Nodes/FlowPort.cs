@@ -120,16 +120,16 @@ public class FlowPort : PortModel, IDisposable
                 }
             case PortBrand.Rectangle:
                 {
-                    Port.Value = JsonSerializer.Deserialize<RectangleDto>(Encoding.UTF8.GetString(e.Payload));
+                    Port.Value = JsonSerializer.Deserialize<Rectangle>(Encoding.UTF8.GetString(e.Payload));
                     break;
                 }
             case PortBrand.Image:
                 {
-                    var image = new ImageDto();
-                    if (Port.Value != null) image = (ImageDto)Port.Value;
-                    else Port.Value = image;
-                    if (e.Topic.EndsWith("data")) image.Base64 = Convert.ToBase64String(e.Payload);
-                    if (e.Topic.EndsWith("meta")) image.Meta = JsonSerializer.Deserialize<ImageMetaDto>(Encoding.UTF8.GetString(e.Payload))!;
+                    // var image = new ImageMeta();
+                    // if (Port.Value != null) image = (ImageDto)Port.Value;
+                    // else Port.Value = image;
+                    // if (e.Topic.EndsWith("data")) image.Base64 = Convert.ToBase64String(e.Payload);
+                    // if (e.Topic.EndsWith("meta")) image.Meta = JsonSerializer.Deserialize<ImageMeta>(Encoding.UTF8.GetString(e.Payload))!;
                     break;
                 }
         }
