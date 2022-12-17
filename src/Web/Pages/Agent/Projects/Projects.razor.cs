@@ -11,7 +11,6 @@ namespace AyBorg.Web.Pages.Agent.Projects;
 
 public partial class Projects : ComponentBase
 {
-    private string _serviceUniqueName = string.Empty;
     private string _serviceName = string.Empty;
     private bool _hasServiceError = false;
     private IEnumerable<ProjectMeta> _readyProjects = new List<ProjectMeta>();
@@ -41,7 +40,6 @@ public partial class Projects : ComponentBase
             }
 
             _serviceName = service.Name;
-            _serviceUniqueName = service.UniqueName;
 
             await StateService.SetAgentStateAsync(new UiAgentState(service));
 
@@ -52,7 +50,7 @@ public partial class Projects : ComponentBase
 
     private async Task ReceiveProjectsAsync()
     {
-        IEnumerable<ProjectMeta> allProjectMetas = await ProjectManagementService.GetMetasAsync(_serviceUniqueName);
+        IEnumerable<ProjectMeta> allProjectMetas = await ProjectManagementService.GetMetasAsync();
         _readyProjects = allProjectMetas.Where(p => p.State == SDK.Projects.ProjectState.Ready);
         _reviewProjects = allProjectMetas.Where(p => p.State == SDK.Projects.ProjectState.Review);
         _draftProjects = allProjectMetas.Where(p => p.State == SDK.Projects.ProjectState.Draft);
@@ -61,7 +59,7 @@ public partial class Projects : ComponentBase
 
     private async Task OnActivateProjectClicked(ProjectMeta project)
     {
-        if (await ProjectManagementService.TryActivateAsync(_serviceUniqueName, project))
+        if (await ProjectManagementService.TryActivateAsync(project))
         {
             await ReceiveProjectsAsync();
         }
@@ -78,7 +76,7 @@ public partial class Projects : ComponentBase
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
-            if (await ProjectManagementService.TryDeleteAsync(_serviceUniqueName, project))
+            if (await ProjectManagementService.TryDeleteAsync(project))
             {
                 await ReceiveProjectsAsync();
             }
@@ -97,7 +95,7 @@ public partial class Projects : ComponentBase
         if (!result.Cancelled)
         {
             ProjectSaveInfo stateChange = (ProjectSaveInfo)result.Data;
-            if (await ProjectManagementService.TrySaveAsync(_serviceUniqueName, projectMeta, stateChange))
+            if (await ProjectManagementService.TrySaveAsync(projectMeta, stateChange))
             {
                 await ReceiveProjectsAsync();
             }
@@ -119,7 +117,7 @@ public partial class Projects : ComponentBase
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
-            if (await ProjectManagementService.TrySaveAsync(_serviceUniqueName, projectMeta, new ProjectSaveInfo
+            if (await ProjectManagementService.TrySaveAsync(projectMeta, new ProjectSaveInfo
             {
                 State = SDK.Projects.ProjectState.Draft,
                 VersionName = projectMeta.VersionName,
@@ -146,7 +144,7 @@ public partial class Projects : ComponentBase
         if (!result.Cancelled)
         {
             var resultProjectMetaDto = (ProjectMeta)result.Data;
-            if (await ProjectManagementService.TryApproveAsync(_serviceUniqueName, projectMeta.DbId, new ProjectSaveInfo
+            if (await ProjectManagementService.TryApproveAsync(projectMeta.DbId, new ProjectSaveInfo
             {
                 State = SDK.Projects.ProjectState.Draft,
                 VersionName = projectMeta.VersionName,
@@ -162,10 +160,7 @@ public partial class Projects : ComponentBase
     private async Task OnNewProjectClicked()
     {
         var options = new DialogOptions();
-        var parameters = new DialogParameters
-        {
-            { "ServiceUniqueName", _serviceUniqueName }
-        };
+        var parameters = new DialogParameters();
         IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)

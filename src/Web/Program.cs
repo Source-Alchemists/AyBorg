@@ -1,6 +1,6 @@
-using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
+using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.Web;
@@ -10,6 +10,7 @@ using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +65,7 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
 });
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazoredSessionStorage();
 
 builder.Services.AddHttpClient<PluginsService>();
 builder.Services.AddHttpClient<IFlowService, FlowService>();

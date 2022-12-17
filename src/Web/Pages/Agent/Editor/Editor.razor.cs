@@ -51,7 +51,7 @@ public partial class Editor : ComponentBase
 
             await StateService.SetAgentStateAsync(new UiAgentState(service));
 
-            _projectMeta = await ProjectManagementService!.GetActiveMetaAsync(_serviceUniqueName);
+            _projectMeta = await ProjectManagementService!.GetActiveMetaAsync();
 
             _areSubComponentsHidden = false;
             _isProjectServerWaiting = false;
@@ -62,7 +62,7 @@ public partial class Editor : ComponentBase
     private async void OnProjectSaveClicked()
     {
         _isProjectServerWaiting = true;
-        await ProjectManagementService!.TrySaveAsync(_serviceUniqueName, _projectMeta!, new ProjectSaveInfo
+        await ProjectManagementService!.TrySaveAsync(_projectMeta!, new ProjectSaveInfo
         {
             State = SDK.Projects.ProjectState.Draft,
             VersionName = _projectMeta!.VersionName,

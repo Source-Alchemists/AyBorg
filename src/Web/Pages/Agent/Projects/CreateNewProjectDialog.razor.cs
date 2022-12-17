@@ -11,7 +11,6 @@ public partial class CreateNewProjectDialog : ComponentBase
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     [Inject] IProjectManagementService ProjectManagementService { get; set; } = null!;
-    [Parameter] public string ServiceUniqueName { get; set; } = string.Empty;
 
     private readonly ProjectMeta _newProject = new() { VersionName = "__DRAFT__" };
     private readonly IList<string> _errors = new List<string>();
@@ -31,7 +30,7 @@ public partial class CreateNewProjectDialog : ComponentBase
             return;
         }
 
-        ProjectMeta createdProject = await ProjectManagementService.CreateAsync(ServiceUniqueName, _newProject.Name);
+        ProjectMeta createdProject = await ProjectManagementService.CreateAsync(_newProject.Name);
         if (createdProject != null)
         {
             MudDialog.Close(DialogResult.Ok(createdProject));
