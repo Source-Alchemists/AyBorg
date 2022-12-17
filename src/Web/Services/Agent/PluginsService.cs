@@ -1,5 +1,5 @@
 ﻿using AyBorg.SDK.Communication.gRPC;
-using AyBorg.SDK.Data.Bindings;
+using AyBorg.SDK.Common.Models;
 
 namespace AyBorg.Web.Services.Agent;
 

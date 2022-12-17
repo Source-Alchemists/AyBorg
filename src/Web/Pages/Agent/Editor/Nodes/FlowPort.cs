@@ -3,8 +3,7 @@ using System.Text;
 using System.Text.Json;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.Data.Bindings;
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using Blazor.Diagrams.Core.Models;
@@ -76,7 +75,7 @@ public class FlowPort : PortModel, IDisposable
     /// </summary>
     public async Task UpdateAsync()
     {
-        Port newPort = await _flowService.GetPortAsync(_stateService.AgentState.UniqueName, Port.Id);
+        Port newPort = await _flowService.GetPortAsync(Port.Id);
         if (newPort == null) return;
         Port = newPort;
         PortChanged?.Invoke();
@@ -87,7 +86,7 @@ public class FlowPort : PortModel, IDisposable
     /// </summary>
     public async Task SendValueAsync()
     {
-        if (!await _flowService.TrySetPortValueAsync(_stateService.AgentState.UniqueName, Port))
+        if (!await _flowService.TrySetPortValueAsync(Port))
         {
             throw new Exception("Failed to set port value.");
         }

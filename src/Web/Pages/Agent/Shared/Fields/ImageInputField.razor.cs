@@ -1,5 +1,5 @@
 using System.Text.Json;
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.ImageProcessing.Encoding;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.Data.Bindings;
+using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using Blazor.Diagrams.Core.Geometry;

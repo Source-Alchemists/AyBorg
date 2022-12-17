@@ -6,41 +6,34 @@ namespace AyBorg.Web.Services.Agent;
 
 public interface IRuntimeService
 {
-    /// <summary>
-    /// Creates the hub connection.
-    /// </summary>
-    /// <returns>The hub connection.</returns>
-    HubConnection CreateHubConnection();
+    // /// <summary>
+    // /// Creates the hub connection.
+    // /// </summary>
+    // /// <returns>The hub connection.</returns>
+    // HubConnection CreateHubConnection();
 
     /// <summary>
     /// Gets the status.
     /// </summary>
     /// <returns>The status.</returns>
-    Task<EngineMeta> GetStatusAsync();
-
-    /// <summary>
-    /// Gets the status.
-    /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
-    /// <returns>The status.</returns>
-    Task<EngineMeta> GetStatusAsync(string baseUrl);
+    ValueTask<EngineMeta> GetStatusAsync();
 
     /// <summary>
     /// Starts the engine.
     /// </summary>
     /// <param name="executionType">Type of the execution.</param>
     /// <returns>The status</returns>
-    Task<EngineMeta> StartRunAsync(EngineExecutionType executionType);
+    ValueTask<EngineMeta> StartRunAsync(EngineExecutionType executionType);
 
     /// <summary>
     /// Stops the engine.
     /// </summary>
     /// <returns>The status</returns>
-    Task<EngineMeta> StopRunAsync();
+    ValueTask<EngineMeta> StopRunAsync();
 
     /// <summary>
     /// Aborts the engine.
     /// </summary>
     /// <returns>The status</returns>
-    Task<EngineMeta> AbortRunAsync();
+    ValueTask<EngineMeta> AbortRunAsync();
 }

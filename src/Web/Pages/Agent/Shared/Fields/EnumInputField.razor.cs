@@ -2,7 +2,7 @@ namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class EnumInputField : BaseInputField
 {
-    private SDK.Data.Bindings.Enum _value = new();
+    private SDK.Common.Models.Enum _value = new();
     private readonly IList<string> _selectedNames = new List<string>();
     private string[] _names = Array.Empty<string>();
 
@@ -10,7 +10,7 @@ public partial class EnumInputField : BaseInputField
     {
         _selectedNames.Clear();
         if (Port.Value == null) throw new ArgumentNullException(nameof(Port.Value));
-        if (Port.Value is SDK.Data.Bindings.Enum value)
+        if (Port.Value is SDK.Common.Models.Enum value)
         {
             _value = value;
         }

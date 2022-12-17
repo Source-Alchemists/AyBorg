@@ -8,16 +8,12 @@ public class AgentOverviewService : IAgentOverviewService
     private readonly IRegistryService _registryService;
     private readonly IRuntimeService _runtimeService;
     private readonly IProjectManagementService _projectManagementService;
-    private readonly List<AgentServiceEntry> _AgentServices = new();
+    private readonly List<AgentServiceEntry> _agentServices = new();
 
-    private int _AgentsCount = 0;
-    private int _activeAgentsCount = 0;
-    private int _inactiveAgentsCount = 0;
-
-    public IEnumerable<AgentServiceEntry> AgentServices => _AgentServices;
-    public int AgentsCount => _AgentsCount;
-    public int ActiveAgentsCount => _activeAgentsCount;
-    public int InactiveAgentsCount => _inactiveAgentsCount;
+    public IEnumerable<AgentServiceEntry> AgentServices => _agentServices;
+    public int AgentsCount { get; private set; } = 0;
+    public int ActiveAgentsCount { get; private set; } = 0;
+    public int InactiveAgentsCount { get; private set; } = 0;
 
     public AgentOverviewService(IRegistryService registryService, IRuntimeService runtimeService, IProjectManagementService projectManagementService)
     {
@@ -29,11 +25,11 @@ public class AgentOverviewService : IAgentOverviewService
     public async Task UpdateAsync()
     {
         var tmpAgentList = new List<AgentServiceEntry>();
-        foreach (var Agent in await _registryService!.ReceiveServicesAsync("AyBorg.Agent"))
+        foreach (ServiceInfoEntry Agent in await _registryService!.ReceiveServicesAsync("AyBorg.Agent"))
         {
-            var baseUrl = Agent.Url;
-            var projectMeta = await _projectManagementService!.GetActiveMetaAsync(baseUrl);
-            var status = await _runtimeService!.GetStatusAsync(baseUrl);
+            string baseUrl = Agent.Url;
+            Shared.Models.Agent.ProjectMeta projectMeta = await _projectManagementService!.GetActiveMetaAsync(baseUrl);
+            EngineMeta status = await _runtimeService!.GetStatusAsync();
             tmpAgentList.Add(new AgentServiceEntry(Agent)
             {
                 ActiveProjectName = projectMeta?.Name ?? "None",
@@ -42,22 +38,22 @@ public class AgentOverviewService : IAgentOverviewService
         }
 
         // If there are Agents with the same name, we will add a number to the name.
-        foreach (var g in tmpAgentList.GroupBy(x => x.Name))
+        foreach (IGrouping<string, AgentServiceEntry> g in tmpAgentList.GroupBy(x => x.Name))
         {
             int count = 1;
             if (g.Count() > 1)
             {
-                foreach (var v in g)
+                foreach (AgentServiceEntry v in g)
                 {
                     v.Name = $"{v.Name} - {count++}";
                 }
             }
         }
 
-        _AgentServices.Clear();
-        _AgentServices.AddRange(tmpAgentList.OrderBy(x => x.Name));
-        _AgentsCount = _AgentServices.Count;
-        _activeAgentsCount = _AgentServices.Count(x => x.Status != null && x.Status.State == EngineState.Running);
-        _inactiveAgentsCount = _AgentServices.Count(x => x.Status == null || x.Status.State != EngineState.Running);
+        _agentServices.Clear();
+        _agentServices.AddRange(tmpAgentList.OrderBy(x => x.Name));
+        AgentsCount = _agentServices.Count;
+        ActiveAgentsCount = _agentServices.Count(x => x.Status != null && x.Status.State == EngineState.Running);
+        InactiveAgentsCount = _agentServices.Count(x => x.Status == null || x.Status.State != EngineState.Running);
     }
 }

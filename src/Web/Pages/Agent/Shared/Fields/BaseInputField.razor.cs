@@ -1,5 +1,5 @@
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Data.Bindings;
+using AyBorg.SDK.Common.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;

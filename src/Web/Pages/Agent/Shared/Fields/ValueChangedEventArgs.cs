@@ -1,4 +1,4 @@
-using AyBorg.SDK.Data.Bindings;
+using AyBorg.SDK.Common.Models;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 

@@ -1,4 +1,4 @@
-using AyBorg.SDK.Data.Bindings;
+using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Services.Agent;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;

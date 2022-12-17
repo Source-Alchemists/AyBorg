@@ -138,7 +138,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
                 Names = Enum.GetNames(enumValue.GetType())
             };
         }
-        else if (value is SDK.Data.Bindings.Enum enumBinding)
+        else if (value is SDK.Common.Models.Enum enumBinding)
         {
             record = new EnumRecord
             {

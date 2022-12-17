@@ -87,13 +87,13 @@ internal sealed class EngineHost : IEngineHost
         if (_engine == null)
         {
             _logger.LogTrace("No active engine.");
-            return null!;
+            return new EngineMeta();
         }
 
         if (_engineMeta == null)
         {
             _logger.LogWarning("Engine meta is null.");
-            return null!;
+            return new EngineMeta();
         }
 
         _engineMeta.State = _engine.State;

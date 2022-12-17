@@ -31,7 +31,7 @@ public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
             var result = new GetAvailableStepsResponse();
             foreach (SDK.Common.IStepProxy step in _pluginsService.Steps)
             {
-                SDK.Data.Bindings.Step stepBinding = RuntimeMapper.FromRuntime(step);
+                SDK.Common.Models.Step stepBinding = RuntimeMapper.FromRuntime(step);
                 Step rpcStep = RpcMapper.ToRpc(stepBinding);
                 result.Steps.Add(rpcStep);
             }
@@ -201,7 +201,7 @@ public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
 
     public override async Task<Empty> UpdateFlowPort(UpdateFlowPortRequest request, ServerCallContext context)
     {
-        SDK.Data.Bindings.Port port = RpcMapper.FromRpc(request.Port);
+        SDK.Common.Models.Port port = RpcMapper.FromRpc(request.Port);
         if(!await _flowService.TryUpdatePortValueAsync(port.Id, port.Value!))
         {
             _logger.LogWarning("Could not update port: {PortId}", port.Id);

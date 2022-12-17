@@ -1,6 +1,6 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Data.Bindings;
+using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Services;
