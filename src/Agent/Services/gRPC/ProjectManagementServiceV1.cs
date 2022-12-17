@@ -5,7 +5,7 @@ using Grpc.Core;
 
 namespace AyBorg.Agent.Services.gRPC;
 
-public sealed class ProjectManagementServiceV1 : AgentProjectManagement.AgentProjectManagementBase
+public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManagementBase
 {
     private readonly ILogger<ProjectManagementServiceV1> _logger;
     private readonly IProjectManagementService _projectManagementService;

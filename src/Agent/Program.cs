@@ -68,6 +68,7 @@ app.MapGrpcService<ProjectManagementServiceV1>();
 app.MapGrpcService<ProjectSettingsServiceV1>();
 app.MapGrpcService<EditorServiceV1>();
 app.MapGrpcService<RuntimeServiceV1>();
+app.MapGrpcService<StorageServiceV1>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists

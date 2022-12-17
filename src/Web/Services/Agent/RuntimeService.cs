@@ -1,6 +1,7 @@
 using System.Runtime.CompilerServices;
 using AyBorg.SDK.System.Runtime;
 using AyBorg.Web.Services.AppState;
+using Ayborg.Gateway.Agent.V1;
 
 namespace AyBorg.Web.Services.Agent;
 
@@ -9,7 +10,7 @@ public class RuntimeService : IRuntimeService
     private readonly ILogger<RuntimeService> _logger;
     private readonly IStateService _stateService;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
-    private readonly Ayborg.Gateway.Agent.V1.AgentRuntime.AgentRuntimeClient _agentRuntimeClient;
+    private readonly Runtime.RuntimeClient _runtimeClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RuntimeService"/> class.
@@ -17,15 +18,16 @@ public class RuntimeService : IRuntimeService
     /// <param name="logger">The logger.</param>
     /// <param name="stateService">The state service.</param>
     /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
+    /// <param name="runtimeClient">The runtime client.</param>
     public RuntimeService(ILogger<RuntimeService> logger,
                             IStateService stateService,
                             IAuthorizationHeaderUtilService authorizationHeaderUtilService,
-                            Ayborg.Gateway.Agent.V1.AgentRuntime.AgentRuntimeClient agentRuntimeClient)
+                            Runtime.RuntimeClient runtimeClient)
     {
         _logger = logger;
         _stateService = stateService;
         _authorizationHeaderUtilService = authorizationHeaderUtilService;
-        _agentRuntimeClient = agentRuntimeClient;
+        _runtimeClient = runtimeClient;
     }
 
     /// <summary>
@@ -35,7 +37,7 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status.</returns>
     public async ValueTask<EngineMeta> GetStatusAsync()
     {
-        Ayborg.Gateway.Agent.V1.GetRuntimeStatusResponse response = await _agentRuntimeClient.GetStatusAsync(new Ayborg.Gateway.Agent.V1.GetRuntimeStatusRequest
+        GetRuntimeStatusResponse response = await _runtimeClient.GetStatusAsync(new GetRuntimeStatusRequest
         {
             AgentUniqueName = _stateService.AgentState.UniqueName
         });
@@ -49,7 +51,7 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status</returns>
     public async ValueTask<EngineMeta> StartRunAsync(EngineExecutionType executionType)
     {
-        Ayborg.Gateway.Agent.V1.StartRunResponse response = await _agentRuntimeClient.StartRunAsync(new Ayborg.Gateway.Agent.V1.StartRunRequest
+        StartRunResponse response = await _runtimeClient.StartRunAsync(new StartRunRequest
         {
             AgentUniqueName = _stateService.AgentState.UniqueName,
             EngineExecutionType = (int)executionType,
@@ -64,7 +66,7 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status</returns>
     public async ValueTask<EngineMeta> StopRunAsync()
     {
-        Ayborg.Gateway.Agent.V1.StopRunResponse response = await _agentRuntimeClient.StopRunAsync(new Ayborg.Gateway.Agent.V1.StopRunRequest
+        StopRunResponse response = await _runtimeClient.StopRunAsync(new StopRunRequest
         {
             AgentUniqueName = _stateService.AgentState.UniqueName,
             EngineId = string.Empty
@@ -78,7 +80,7 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status</returns>
     public async ValueTask<EngineMeta> AbortRunAsync()
     {
-        Ayborg.Gateway.Agent.V1.AbortRunResponse response = await _agentRuntimeClient.AbortRunAsync(new Ayborg.Gateway.Agent.V1.AbortRunRequest
+        AbortRunResponse response = await _runtimeClient.AbortRunAsync(new AbortRunRequest
         {
             AgentUniqueName = _stateService.AgentState.UniqueName,
             EngineId = string.Empty
@@ -99,15 +101,12 @@ public class RuntimeService : IRuntimeService
     // }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static EngineMeta CreateEngineMeta(Ayborg.Gateway.Agent.V1.EngineMetaInfo engineMetaInfo)
+    private static EngineMeta CreateEngineMeta(EngineMetaDto engineMetaInfo) => new()
     {
-        return new()
-        {
-            Id = Guid.Parse(engineMetaInfo.Id),
-            State = (EngineState)engineMetaInfo.State,
-            ExecutionType = (EngineExecutionType)engineMetaInfo.ExecutionType,
-            StartedAt = engineMetaInfo.StartTime.ToDateTime(),
-            StoppedAt = engineMetaInfo.StopTime.ToDateTime()
-        };
-    }
+        Id = Guid.Parse(engineMetaInfo.Id),
+        State = (EngineState)engineMetaInfo.State,
+        ExecutionType = (EngineExecutionType)engineMetaInfo.ExecutionType,
+        StartedAt = engineMetaInfo.StartTime.ToDateTime(),
+        StoppedAt = engineMetaInfo.StopTime.ToDateTime()
+    };
 }

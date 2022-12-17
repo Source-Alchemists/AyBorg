@@ -6,7 +6,7 @@ using Grpc.Core;
 
 namespace AyBorg.Agent.Services.gRPC;
 
-public sealed class RuntimeServiceV1 : AgentRuntime.AgentRuntimeBase
+public sealed class RuntimeServiceV1 : Ayborg.Gateway.Agent.V1.Runtime.RuntimeBase
 {
     private readonly ILogger<RuntimeServiceV1> _logger;
     private readonly IEngineHost _engineHost;
@@ -67,9 +67,9 @@ public sealed class RuntimeServiceV1 : AgentRuntime.AgentRuntimeBase
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static EngineMetaInfo CreateEngineMetaInfo(EngineMeta status)
+    private static EngineMetaDto CreateEngineMetaInfo(EngineMeta status)
     {
-        return new EngineMetaInfo
+        return new EngineMetaDto
         {
             Id = status.Id.ToString(),
             State = (int)status.State,

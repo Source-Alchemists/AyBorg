@@ -16,22 +16,27 @@ internal static class GrpcClientRegisterTool
             option.Address = new Uri(gatewayUrl!);
         });
 
-        builder.Services.AddGrpcClient<AgentProjectManagement.AgentProjectManagementClient>(option =>
+        builder.Services.AddGrpcClient<ProjectManagement.ProjectManagementClient>(option =>
         {
             option.Address = new Uri(gatewayUrl!);
         });
 
-        builder.Services.AddGrpcClient<AgentProjectSettings.AgentProjectSettingsClient>(option =>
+        builder.Services.AddGrpcClient<ProjectSettings.ProjectSettingsClient>(option =>
         {
             option.Address = new Uri(gatewayUrl!);
         });
 
-        builder.Services.AddGrpcClient<AgentEditor.AgentEditorClient>(option =>
+        builder.Services.AddGrpcClient<Editor.EditorClient>(option =>
         {
             option.Address = new Uri(gatewayUrl!);
         });
 
-        builder.Services.AddGrpcClient<AgentRuntime.AgentRuntimeClient>(option =>
+        builder.Services.AddGrpcClient<Runtime.RuntimeClient>(option =>
+        {
+            option.Address = new Uri(gatewayUrl!);
+        });
+
+        builder.Services.AddGrpcClient<Storage.StorageClient>(option =>
         {
             option.Address = new Uri(gatewayUrl!);
         });

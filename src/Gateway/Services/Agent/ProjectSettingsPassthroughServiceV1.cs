@@ -4,7 +4,7 @@ using Grpc.Core;
 
 namespace AyBorg.Gateway.Services.Agent;
 
-public sealed class ProjectSettingsPassthroughServiceV1 : AgentProjectSettings.AgentProjectSettingsBase
+public sealed class ProjectSettingsPassthroughServiceV1 : ProjectSettings.ProjectSettingsBase
 {
     private readonly ILogger<ProjectManagementPassthroughServiceV1> _logger;
     private readonly IGrpcChannelService _grpcChannelService;
@@ -17,13 +17,13 @@ public sealed class ProjectSettingsPassthroughServiceV1 : AgentProjectSettings.A
 
     public override async Task<GetProjectSettingsResponse> GetProjectSettings(GetProjectSettingsRequest request, ServerCallContext context)
     {
-        AgentProjectSettings.AgentProjectSettingsClient client = _grpcChannelService.CreateClient<AgentProjectSettings.AgentProjectSettingsClient>(request.AgentUniqueName);
+        ProjectSettings.ProjectSettingsClient client = _grpcChannelService.CreateClient<ProjectSettings.ProjectSettingsClient>(request.AgentUniqueName);
         return await client.GetProjectSettingsAsync(request);
     }
 
     public override async Task<Empty> UpdateProjectSettings(UpdateProjectSettingsRequest request, ServerCallContext context)
     {
-        AgentProjectSettings.AgentProjectSettingsClient client = _grpcChannelService.CreateClient<AgentProjectSettings.AgentProjectSettingsClient>(request.AgentUniqueName);
+        ProjectSettings.ProjectSettingsClient client = _grpcChannelService.CreateClient<ProjectSettings.ProjectSettingsClient>(request.AgentUniqueName);
         return await client.UpdateProjectSettingsAsync(request);
     }
 }

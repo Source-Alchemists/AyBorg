@@ -7,20 +7,21 @@ public class PluginsService
 {
     private readonly ILogger<PluginsService> _logger;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
-    private readonly Ayborg.Gateway.Agent.V1.AgentEditor.AgentEditorClient _agentEditorClient;
+    private readonly Ayborg.Gateway.Agent.V1.Editor.EditorClient _editorClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginsService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
+    /// <param name="editorClient">The editor client.</param>
     public PluginsService(ILogger<PluginsService> logger,
                             IAuthorizationHeaderUtilService authorizationHeaderUtilService,
-                            Ayborg.Gateway.Agent.V1.AgentEditor.AgentEditorClient agentEditorClient)
+                            Ayborg.Gateway.Agent.V1.Editor.EditorClient editorClient)
     {
         _logger = logger;
         _authorizationHeaderUtilService = authorizationHeaderUtilService;
-        _agentEditorClient = agentEditorClient;
+        _editorClient = editorClient;
     }
 
     /// <summary>
@@ -28,9 +29,9 @@ public class PluginsService
     /// </summary>
     public async Task<IEnumerable<Step>> ReceiveStepsAsync(string agentUniqueName)
     {
-        Ayborg.Gateway.Agent.V1.GetAvailableStepsResponse response = await _agentEditorClient.GetAvailableStepsAsync(new Ayborg.Gateway.Agent.V1.GetAvailableStepsRequest { AgentUniqueName = agentUniqueName });
+        Ayborg.Gateway.Agent.V1.GetAvailableStepsResponse response = await _editorClient.GetAvailableStepsAsync(new Ayborg.Gateway.Agent.V1.GetAvailableStepsRequest { AgentUniqueName = agentUniqueName });
         var steps = new List<Step>();
-        foreach (Ayborg.Gateway.Agent.V1.Step? s in response.Steps)
+        foreach (Ayborg.Gateway.Agent.V1.StepDto? s in response.Steps)
         {
             steps.Add(RpcMapper.FromRpc(s));
         }

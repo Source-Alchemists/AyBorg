@@ -4,7 +4,7 @@ using Grpc.Core;
 
 namespace AyBorg.Agent.Services.gRPC;
 
-public sealed class ProjectSettingsServiceV1 : AgentProjectSettings.AgentProjectSettingsBase
+public sealed class ProjectSettingsServiceV1 : ProjectSettings.ProjectSettingsBase
 {
     private readonly ILogger<ProjectManagementServiceV1> _logger;
     private readonly IProjectSettingsService _projectSettingsService;
@@ -26,7 +26,7 @@ public sealed class ProjectSettingsServiceV1 : AgentProjectSettings.AgentProject
 
         return new GetProjectSettingsResponse
         {
-            ProjectSettings = new ProjectSettings
+            ProjectSettings = new ProjectSettingsDto
             {
                 IsForceResultCommunicationEnabled = projectSettingsRecord.IsForceResultCommunicationEnabled,
                 IsForceWebUiCommunicationEnabled = projectSettingsRecord.IsForceWebUiCommunicationEnabled
@@ -41,7 +41,7 @@ public sealed class ProjectSettingsServiceV1 : AgentProjectSettings.AgentProject
             throw new RpcException(new Status(StatusCode.InvalidArgument, "ProjectDbId is not a valid GUID"));
         }
 
-        ProjectSettings settings = request.ProjectSettings;
+        ProjectSettingsDto settings = request.ProjectSettings;
 
         if (!await _projectSettingsService.TryUpdateActiveProjectSettingsAsync(dbId, new SDK.Projects.ProjectSettings
         {

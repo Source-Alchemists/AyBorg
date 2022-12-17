@@ -7,15 +7,21 @@ public sealed class ProjectSettingsService : IProjectSettingsService
 {
     private readonly ILogger<ProjectSettingsService> _logger;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
-    private readonly AgentProjectSettings.AgentProjectSettingsClient _agentProjectSettingsClient;
+    private readonly ProjectSettings.ProjectSettingsClient _projectSettingsClient;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="ProjectSettingsService"/> class.
+    /// </summary>
+    /// <param name="logger">The logger.</param>
+    /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
+    /// <param name="projectSettingsClient">The project settings client.</param>
     public ProjectSettingsService(ILogger<ProjectSettingsService> logger,
                                     IAuthorizationHeaderUtilService authorizationHeaderUtilService,
-                                    AgentProjectSettings.AgentProjectSettingsClient agentProjectSettingsClient)
+                                    ProjectSettings.ProjectSettingsClient projectSettingsClient)
     {
         _logger = logger;
         _authorizationHeaderUtilService = authorizationHeaderUtilService;
-        _agentProjectSettingsClient = agentProjectSettingsClient;
+        _projectSettingsClient = projectSettingsClient;
     }
 
     /// <summary>
@@ -28,7 +34,7 @@ public sealed class ProjectSettingsService : IProjectSettingsService
     {
         try
         {
-            GetProjectSettingsResponse response = await _agentProjectSettingsClient.GetProjectSettingsAsync(new GetProjectSettingsRequest
+            GetProjectSettingsResponse response = await _projectSettingsClient.GetProjectSettingsAsync(new GetProjectSettingsRequest
             {
                 AgentUniqueName = agentUniqueName,
                 ProjectDbId = projectMeta.DbId
@@ -54,11 +60,11 @@ public sealed class ProjectSettingsService : IProjectSettingsService
     {
         try
         {
-            _ = await _agentProjectSettingsClient.UpdateProjectSettingsAsync(new UpdateProjectSettingsRequest
+            _ = await _projectSettingsClient.UpdateProjectSettingsAsync(new UpdateProjectSettingsRequest
             {
                 AgentUniqueName = agentUniqueName,
                 ProjectDbId = projectMeta.DbId,
-                ProjectSettings = new ProjectSettings
+                ProjectSettings = new ProjectSettingsDto
                 {
                     IsForceResultCommunicationEnabled = projectSettings.IsForceResultCommunicationEnabled,
                     IsForceWebUiCommunicationEnabled = projectSettings.IsForceWebUiCommunicationEnabled

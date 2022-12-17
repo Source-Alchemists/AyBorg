@@ -1,5 +1,4 @@
 using AyBorg.Web.Services;
-using AyBorg.Web.Services.AppState;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -9,7 +8,6 @@ public partial class DirectoryBrowser : ComponentBase
 {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
     [Inject] protected IStorageService StorageService { get; set; } = null!;
-    [Inject] protected IStateService StateService { get; set; } = null!;
     [Parameter] public string? RootPath { get; set; }
 
     private readonly HashSet<DirectoryItem> _items = new();
@@ -20,7 +18,7 @@ public partial class DirectoryBrowser : ComponentBase
         await base.OnParametersSetAsync();
         _items.Clear();
         _selectedItem = null;
-        foreach (string dir in await StorageService!.GetDirectoriesAsync(StateService.AgentState.UniqueName, "/"))
+        foreach (string dir in await StorageService!.GetDirectoriesAsync("/"))
         {
             DirectoryItem item = await CreateDirectoryItemAsync(dir);
             _items.Add(item);
@@ -35,7 +33,7 @@ public partial class DirectoryBrowser : ComponentBase
         var childs = new List<DirectoryItem>();
         if (dir != "/")
         {
-            IEnumerable<string> subDirs = await StorageService!.GetDirectoriesAsync(StateService.AgentState.UniqueName, dir);
+            IEnumerable<string> subDirs = await StorageService!.GetDirectoriesAsync(dir);
             foreach (string subDir in subDirs)
             {
                 DirectoryItem subItem = await CreateDirectoryItemAsync(subDir);

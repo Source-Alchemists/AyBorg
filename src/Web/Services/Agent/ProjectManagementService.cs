@@ -9,22 +9,24 @@ public class ProjectManagementService : IProjectManagementService
     private readonly ILogger<ProjectManagementService> _logger;
     private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
-    private readonly AgentProjectManagement.AgentProjectManagementClient _agentProjectManagementClient;
+    private readonly ProjectManagement.ProjectManagementClient _projectManagementClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectManagementService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
+    /// <param name="authenticationStateProvider">The authentication state provider.</param>
+    /// <param name="projectManagementClient">The project management client.</param>
     public ProjectManagementService(ILogger<ProjectManagementService> logger,
                                     IAuthorizationHeaderUtilService authorizationHeaderUtilService,
                                     AuthenticationStateProvider authenticationStateProvider,
-                                    AgentProjectManagement.AgentProjectManagementClient agentProjectManagementClient)
+                                    ProjectManagement.ProjectManagementClient projectManagementClient)
     {
         _logger = logger;
         _authorizationHeaderUtilService = authorizationHeaderUtilService;
         _authenticationStateProvider = authenticationStateProvider;
-        _agentProjectManagementClient = agentProjectManagementClient;
+        _projectManagementClient = projectManagementClient;
     }
 
     /// <summary>
@@ -36,7 +38,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
-            GetProjectMetasResponse response = await _agentProjectManagementClient.GetProjectMetasAsync(new GetProjectMetasRequest
+            GetProjectMetasResponse response = await _projectManagementClient.GetProjectMetasAsync(new GetProjectMetasRequest
             {
                 AgentUniqueName = agentUniqueName
             });
@@ -79,7 +81,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
-            CreateProjectResponse response = await _agentProjectManagementClient.CreateProjectAsync(new CreateProjectRequest
+            CreateProjectResponse response = await _projectManagementClient.CreateProjectAsync(new CreateProjectRequest
             {
                 AgentUniqueName = agentUniqueName,
                 ProjectName = projectName
@@ -104,7 +106,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
-            _ = await _agentProjectManagementClient.DeleteProjectAsync(new DeleteProjectRequest
+            _ = await _projectManagementClient.DeleteProjectAsync(new DeleteProjectRequest
             {
                 AgentUniqueName = agentUniqueName,
                 ProjectId = projectMeta.Id
@@ -129,7 +131,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
-            _ = await _agentProjectManagementClient.ActivateProjectAsync(new ActivateProjectRequest
+            _ = await _projectManagementClient.ActivateProjectAsync(new ActivateProjectRequest
             {
                 AgentUniqueName = agentUniqueName,
                 ProjectDbId = projectMeta.DbId
@@ -156,7 +158,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
-            _ = await _agentProjectManagementClient.SaveProjectAsync(new SaveProjectRequest
+            _ = await _projectManagementClient.SaveProjectAsync(new SaveProjectRequest
             {
                 AgentUniqueName = agentUniqueName,
                 ProjectDbId = projectMeta.DbId,
@@ -186,7 +188,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
-            _ = await _agentProjectManagementClient.ApproveProjectAsync(new ApproveProjectRequest
+            _ = await _projectManagementClient.ApproveProjectAsync(new ApproveProjectRequest
             {
                 AgentUniqueName = agentUniqueName,
                 ProjectDbId = dbId,

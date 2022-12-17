@@ -6,7 +6,7 @@ using Grpc.Core;
 
 namespace AyBorg.Agent.Services.gRPC;
 
-public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
+public sealed class EditorServiceV1 : Editor.EditorBase
 {
     private readonly ILogger<EditorServiceV1> _logger;
     private readonly IPluginsService _pluginsService;
@@ -32,7 +32,7 @@ public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
             foreach (SDK.Common.IStepProxy step in _pluginsService.Steps)
             {
                 SDK.Common.Models.Step stepBinding = RuntimeMapper.FromRuntime(step);
-                Step rpcStep = RpcMapper.ToRpc(stepBinding);
+                StepDto rpcStep = RpcMapper.ToRpc(stepBinding);
                 result.Steps.Add(rpcStep);
             }
 
@@ -73,7 +73,7 @@ public sealed class EditorServiceV1 : AgentEditor.AgentEditorBase
 
     public override async Task<GetFlowPortsResponse> GetFlowPorts(GetFlowPortsRequest request, ServerCallContext context)
     {
-        var resultPorts = new List<Port>();
+        var resultPorts = new List<PortDto>();
         Guid iterationId = Guid.Empty;
         if (!string.IsNullOrEmpty(request.IterationId))
         {
