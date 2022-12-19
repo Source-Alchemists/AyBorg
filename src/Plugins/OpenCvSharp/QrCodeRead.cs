@@ -1,6 +1,8 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.ImageProcessing.Pixels;
 using Microsoft.Extensions.Logging;
+using OpenCvSharp;
 
 namespace AyBorg.Plugins.OpenCvSharp
 {
@@ -28,6 +30,13 @@ namespace AyBorg.Plugins.OpenCvSharp
 
         public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
         {
+  
+            using var mat = Mat.FromImageData(_inputImagePort.Value.AsPacked<Rgb24>().Buffer);
+            var qrDetector = new QRCodeDetector();
+            qrDetector.Detect(mat, out var points);
+            var value = qrDetector.Decode(mat,points);
+            
+
             return ValueTask.FromResult(true);
         }
     }
