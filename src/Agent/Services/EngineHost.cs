@@ -1,8 +1,11 @@
 using System.Text.Json;
+using Ayborg.Gateway.Agent.V1;
 using AyBorg.Agent.Runtime;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
+using Grpc.Core;
 
 namespace AyBorg.Agent.Services;
 
@@ -13,6 +16,8 @@ internal sealed class EngineHost : IEngineHost
     private readonly IMqttClientProvider _mqttClientProvider;
     private readonly ICacheService _cacheService;
     private readonly CommunicationStateProvider _communicationStateProvider;
+    private readonly IServiceConfiguration _serviceConfiguration;
+    private readonly Notify.NotifyClient _notifyClient;
     private IEngine? _engine;
     private EngineMeta? _engineMeta;
     private bool _isDisposed = false;
@@ -27,13 +32,17 @@ internal sealed class EngineHost : IEngineHost
                         IEngineFactory engineFactory,
                         IMqttClientProvider mqttClientProvider,
                         ICacheService cacheService,
-                        ICommunicationStateProvider communicationStateProvider)
+                        ICommunicationStateProvider communicationStateProvider,
+                        IServiceConfiguration serviceConfiguration,
+                        Notify.NotifyClient notifyClient)
     {
         _logger = logger;
         _engineFactory = engineFactory;
         _mqttClientProvider = mqttClientProvider;
         _cacheService = cacheService;
         _communicationStateProvider = (CommunicationStateProvider)communicationStateProvider;
+        _serviceConfiguration = serviceConfiguration;
+        _notifyClient = notifyClient;
     }
 
     /// <summary>
@@ -291,5 +300,17 @@ internal sealed class EngineHost : IEngineHost
         }
 
         await _cacheService.CreateCacheAsync(e.IterationId, ActiveProject);
+        try
+        {
+            await _notifyClient.EngineIterationFinishedAsync(new EngineIterationFinishedArgsDto
+            {
+                AgentUniqueName = _serviceConfiguration.UniqueName,
+                IterationId = e.IterationId.ToString()
+            });
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to notify engine iteration finished.");
+        }
     }
 }

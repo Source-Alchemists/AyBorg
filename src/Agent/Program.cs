@@ -30,10 +30,16 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddGrpc();
 
-builder.Services.AddGrpcClient<Ayborg.Gateway.V1.Register.RegisterClient>(option =>
+builder.Services.AddGrpcClient<Ayborg.Gateway.V1.Register.RegisterClient>(options =>
 {
     string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
-    option.Address = new Uri(gatewayUrl!);
+    options.Address = new Uri(gatewayUrl!);
+});
+
+builder.Services.AddGrpcClient<Ayborg.Gateway.Agent.V1.Notify.NotifyClient>(options =>
+{
+    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
+    options.Address = new Uri(gatewayUrl!);
 });
 
 builder.Services.AddHostedService<RegistryBackgroundService>();

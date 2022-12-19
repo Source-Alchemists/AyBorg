@@ -26,17 +26,9 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
             Version = request.Version
         };
 
-        try
-        {
-            Guid id = await _keeperService.RegisterAsync(newServiceEntry);
-            _logger.LogInformation("Registered {Name} ({Url}) with id [{Id}].", newServiceEntry.Name, newServiceEntry.Url, id);
-            return new StatusResponse { Success = true, Id = id.ToString(), ErrorMessage = string.Empty };
-        }
-        catch (InvalidOperationException ex)
-        {
-            _logger.LogWarning("Failed to register", ex);
-            return new StatusResponse { Success = false, Id = string.Empty, ErrorMessage = "Failed to register" };
-        }
+        Guid id = await _keeperService.RegisterAsync(newServiceEntry);
+        _logger.LogInformation("Registered {Name} ({Url}) with id [{Id}].", newServiceEntry.Name, newServiceEntry.Url, id);
+        return new StatusResponse { Success = true, Id = id.ToString(), ErrorMessage = string.Empty };
     }
 
     public override async Task<StatusResponse> Unregister(UnregisterRequest request, ServerCallContext context)
@@ -54,7 +46,7 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogWarning("Failed to unregister", ex);
+            _logger.LogWarning("Failed to unregister", ex.Message);
             return new StatusResponse { Success = false, Id = request.Id, ErrorMessage = "Failed to unregister" };
         }
     }
@@ -80,7 +72,7 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogWarning("Failed to update timestamp", ex);
+            _logger.LogWarning("Failed to update timestamp", ex.Message);
             return new StatusResponse { Success = false, Id = request.Id, ErrorMessage = "Failed to update timestamp" };
         }
     }

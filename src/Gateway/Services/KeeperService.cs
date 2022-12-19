@@ -148,7 +148,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
             await context.ServiceEntries!.AddAsync(serviceEntry);
         }
 
-        if(!_grpcChannelService.TryRegisterChannel(serviceEntry.UniqueName, serviceEntry.Url))
+        if(!_grpcChannelService.TryRegisterChannel(serviceEntry.UniqueName, serviceEntry.Type, serviceEntry.Url))
         {
             throw new InvalidOperationException($"Adding a service with unique name ({serviceEntry.UniqueName} is not allowed! A service with the name is already registered.");
         }
