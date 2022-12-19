@@ -9,10 +9,24 @@ public interface IProjectManagementService
     ValueTask<IEnumerable<Shared.Models.Agent.ProjectMeta>> GetMetasAsync();
 
     /// <summary>
+    /// Receives asynchronous.
+    /// </summary>
+    /// <param name="serviceUniqueName">The service unique name.</param>
+    /// <returns></returns>
+    ValueTask<IEnumerable<Shared.Models.Agent.ProjectMeta>> GetMetasAsync(string serviceUniqueName);
+
+    /// <summary>
     /// Receives active project meta asynchronous.
     /// </summary>
     /// <returns></returns>
     ValueTask<Shared.Models.Agent.ProjectMeta> GetActiveMetaAsync();
+
+    /// <summary>
+    /// Receives active project meta asynchronous.
+    /// </summary>
+    /// <param name="serviceUniqueName">The service unique name.</param>
+    /// <returns></returns>
+    ValueTask<Shared.Models.Agent.ProjectMeta> GetActiveMetaAsync(string serviceUniqueName);
 
     /// <summary>
     /// Creates asynchronous.

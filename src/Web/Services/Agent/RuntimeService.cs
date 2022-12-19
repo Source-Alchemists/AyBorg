@@ -33,13 +33,22 @@ public class RuntimeService : IRuntimeService
     /// <summary>
     /// Gets the status.
     /// </summary>
-    /// <param name="serviceUniqueName">The service unique name.</param>
     /// <returns>The status.</returns>
     public async ValueTask<EngineMeta> GetStatusAsync()
     {
+        return await GetStatusAsync(_stateService.AgentState.UniqueName);
+    }
+
+    /// <summary>
+    /// Gets the status.
+    /// </summary>
+    /// <param name="serviceUniqueName">The service unique name.</param>
+    /// <returns>The status.</returns>
+    public async ValueTask<EngineMeta> GetStatusAsync(string serviceUniqueName)
+    {
         GetRuntimeStatusResponse response = await _runtimeClient.GetStatusAsync(new GetRuntimeStatusRequest
         {
-            AgentUniqueName = _stateService.AgentState.UniqueName
+            AgentUniqueName = serviceUniqueName
         });
         return CreateEngineMeta(response.EngineMetaInfos.First());
     }

@@ -68,4 +68,15 @@ public sealed class EditorPassthroughServiceV1 : Editor.EditorBase
         Editor.EditorClient client = _grpcChannelService.CreateClient<Editor.EditorClient>(request.AgentUniqueName);
         return await client.UpdateFlowPortAsync(request);
     }
+
+    public override async Task GetImageStream(GetImageStreamRequest request, IServerStreamWriter<ImageChunkDto> responseStream, ServerCallContext context)
+    {
+        Editor.EditorClient client = _grpcChannelService.CreateClient<Editor.EditorClient>(request.AgentUniqueName);
+
+        AsyncServerStreamingCall<ImageChunkDto> stream = client.GetImageStream(request);
+        await foreach (ImageChunkDto? chunk in stream.ResponseStream.ReadAllAsync())
+        {
+            await responseStream.WriteAsync(chunk);
+        }
+    }
 }

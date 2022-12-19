@@ -19,6 +19,13 @@ public interface IRuntimeService
     ValueTask<EngineMeta> GetStatusAsync();
 
     /// <summary>
+    /// Gets the status.
+    /// </summary>
+    /// <param name="serviceUniqueName">The service unique name.</param>
+    /// <returns>The status.</returns>
+    ValueTask<EngineMeta> GetStatusAsync(string serviceUniqueName);
+
+    /// <summary>
     /// Starts the engine.
     /// </summary>
     /// <param name="executionType">Type of the execution.</param>

@@ -40,11 +40,21 @@ public class ProjectManagementService : IProjectManagementService
     /// <returns></returns>
     public async ValueTask<IEnumerable<Shared.Models.Agent.ProjectMeta>> GetMetasAsync()
     {
+        return await GetMetasAsync(_stateService.AgentState.UniqueName);
+    }
+
+    /// <summary>
+    /// Receives asynchronous.
+    /// </summary>
+    /// <param name="serviceUniqueName">The service unique name.</param>
+    /// <returns></returns>
+    public async ValueTask<IEnumerable<Shared.Models.Agent.ProjectMeta>> GetMetasAsync(string serviceUniqueName)
+    {
         try
         {
             GetProjectMetasResponse response = await _projectManagementClient.GetProjectMetasAsync(new GetProjectMetasRequest
             {
-                AgentUniqueName = _stateService.AgentState.UniqueName
+                AgentUniqueName = serviceUniqueName
             });
 
             var result = new List<Shared.Models.Agent.ProjectMeta>();
@@ -69,7 +79,17 @@ public class ProjectManagementService : IProjectManagementService
     /// <returns></returns>
     public async ValueTask<Shared.Models.Agent.ProjectMeta> GetActiveMetaAsync()
     {
-        IEnumerable<Shared.Models.Agent.ProjectMeta> projectMetas = await GetMetasAsync();
+        return await GetActiveMetaAsync(_stateService.AgentState.UniqueName);
+    }
+
+    /// <summary>
+    /// Receives active project meta asynchronous.
+    /// </summary>
+    /// <param name="serviceUniqueName">The service unique name.</param>
+    /// <returns></returns>
+    public async ValueTask<Shared.Models.Agent.ProjectMeta> GetActiveMetaAsync(string serviceUniqueName)
+    {
+        IEnumerable<Shared.Models.Agent.ProjectMeta> projectMetas = await GetMetasAsync(serviceUniqueName);
         return projectMetas.FirstOrDefault(pm => pm.IsActive)!;
     }
 

@@ -27,8 +27,8 @@ public class AgentOverviewService : IAgentOverviewService
         var tmpAgentList = new List<AgentServiceEntry>();
         foreach (ServiceInfoEntry Agent in await _registryService!.ReceiveServicesAsync("AyBorg.Agent"))
         {
-            Shared.Models.Agent.ProjectMeta projectMeta = await _projectManagementService!.GetActiveMetaAsync();
-            EngineMeta status = await _runtimeService!.GetStatusAsync();
+            Shared.Models.Agent.ProjectMeta projectMeta = await _projectManagementService!.GetActiveMetaAsync(Agent.UniqueName);
+            EngineMeta status = await _runtimeService!.GetStatusAsync(Agent.UniqueName);
             tmpAgentList.Add(new AgentServiceEntry(Agent)
             {
                 ActiveProjectName = projectMeta?.Name ?? "None",

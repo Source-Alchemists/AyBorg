@@ -1,15 +1,15 @@
 using AyBorg.Agent.Guards;
 using AyBorg.Agent.Services;
-using AyBorg.SDK.Communication.gRPC.Registry;
+using AyBorg.Agent.Services.gRPC;
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
+using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
 using Microsoft.EntityFrameworkCore;
-using AyBorg.Agent.Services.gRPC;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 

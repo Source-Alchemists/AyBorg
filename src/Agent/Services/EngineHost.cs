@@ -290,7 +290,6 @@ internal sealed class EngineHost : IEngineHost
             return;
         }
 
-        _cacheService.CreateCache(e.IterationId, ActiveProject);
-        await ValueTask.CompletedTask;
+        await _cacheService.CreateCacheAsync(e.IterationId, ActiveProject);
     }
 }

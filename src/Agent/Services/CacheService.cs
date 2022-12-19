@@ -1,34 +1,28 @@
+using System.Runtime.Caching;
+using System.Runtime.CompilerServices;
 using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Common.Models;
+using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Agent;
 using AyBorg.SDK.System.Caching;
-using Microsoft.Extensions.Caching.Memory;
 
 namespace AyBorg.Agent.Services;
 
 internal sealed class CacheService : ICacheService
 {
     private readonly ILogger<CacheService> _logger;
-    private readonly IMemoryCache _cache;
-    private readonly MemoryCacheEntryOptions _cacheEntryOptions;
+    private readonly MemoryCache _memoryCache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CacheService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="mapper">The mapper.</param>
-    /// <param name="memoryCache">The cache.</param>
-    public CacheService(ILogger<CacheService> logger, IMemoryCache memoryCache)
+    public CacheService(ILogger<CacheService> logger)
     {
         _logger = logger;
-        _cache = memoryCache;
-        _cacheEntryOptions = new MemoryCacheEntryOptions
-        {
-            SlidingExpiration = TimeSpan.FromSeconds(5),
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromSeconds(15)
-        };
+        _memoryCache = MemoryCache.Default;
     }
 
     /// <summary>
@@ -36,9 +30,10 @@ internal sealed class CacheService : ICacheService
     /// </summary>
     /// <param name="iteration">The iteration.</param>
     /// <param name="project">The project.</param>
-    public void CreateCache(Guid iterationId, Project project)
+    public async ValueTask CreateCacheAsync(Guid iterationId, Project project)
     {
-        _ = Parallel.ForEach(project.Steps, step =>
+        CancellationToken token = CancellationToken.None;
+        await Parallel.ForEachAsync(project.Steps, async (step, token) =>
         {
             CreateStepEntry(iterationId, step);
             foreach (IPort port in step.Ports)
@@ -47,7 +42,7 @@ internal sealed class CacheService : ICacheService
                 // All other ports are not changing there displayed value at real time.
                 if (port.Direction == PortDirection.Input && port.IsConnected)
                 {
-                    CreatePortEntry(iterationId, port);
+                    await CreatePortEntryAsync(iterationId, port);
                 }
             }
         });
@@ -60,14 +55,21 @@ internal sealed class CacheService : ICacheService
     /// <param name="port">The port.</param>
     /// <returns></returns>
     /// <remarks>If the iteration does not exist, it will create a port entry from the last iteration.</remarks>
-    public Port GetOrCreatePortEntry(Guid iterationId, IPort port)
+    public async ValueTask<Port> GetOrCreatePortEntryAsync(Guid iterationId, IPort port)
     {
         var key = new PortCacheKey(iterationId, port.Id);
-        Port? result = _cache.GetOrCreate(key, entry =>
+        string keyStr = key.ToString();
+        CacheItem cacheItem = _memoryCache.GetCacheItem(keyStr);
+        Port? result;
+        if (cacheItem == null)
         {
-            entry.SetOptions(_cacheEntryOptions);
-            return RuntimeMapper.FromRuntime(port);
-        });
+            result = await RuntimeMapper.FromRuntimeAsync(port);
+            _memoryCache.Add(new CacheItem(keyStr, result), CreateCacheItemPolicy());
+        }
+        else
+        {
+            result = (Port)cacheItem.Value;
+        }
 
         if (result == null)
         {
@@ -87,23 +89,50 @@ internal sealed class CacheService : ICacheService
     public long GetOrCreateStepExecutionTimeEntry(Guid iterationId, IStepProxy stepProxy)
     {
         var key = new StepCacheKey(iterationId, stepProxy.Id);
-        return _cache.GetOrCreate(key, entry =>
+        string keyStr = key.ToString();
+        CacheItem cacheItem = _memoryCache.GetCacheItem(keyStr);
+        if (cacheItem == null)
         {
-            entry.SetOptions(_cacheEntryOptions);
+            _memoryCache.Add(new CacheItem(keyStr, stepProxy.ExecutionTimeMs), CreateCacheItemPolicy());
             return stepProxy.ExecutionTimeMs;
-        });
+        }
+        else
+        {
+            return (long)cacheItem.Value;
+        }
     }
 
-    private void CreatePortEntry(Guid iterationId, IPort port)
+    private async ValueTask CreatePortEntryAsync(Guid iterationId, IPort port)
     {
         var key = new PortCacheKey(iterationId, port.Id);
-        Port portDto = RuntimeMapper.FromRuntime(port);
-        _cache.Set(key, portDto, _cacheEntryOptions);
+        Port cachePort = await RuntimeMapper.FromRuntimeAsync(port);
+        _memoryCache.Add(key.ToString(), cachePort, CreateCacheItemPolicy());
     }
 
     private void CreateStepEntry(Guid iterationId, IStepProxy stepProxy)
     {
         var key = new StepCacheKey(iterationId, stepProxy.Id);
-        _cache.Set(key, stepProxy.ExecutionTimeMs, _cacheEntryOptions);
+        _memoryCache.Add(key.ToString(), stepProxy.ExecutionTimeMs, CreateCacheItemPolicy());
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static CacheItemPolicy CreateCacheItemPolicy()
+    {
+        var policy = new CacheItemPolicy
+        {
+            AbsoluteExpiration = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(5),
+            RemovedCallback = CacheItemRemovedCallback
+        };
+
+        return policy;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void CacheItemRemovedCallback(CacheEntryRemovedArguments arguments)
+    {
+        if (arguments.CacheItem.Value is Port oldPort)
+        {
+            oldPort.Dispose();
+        }
     }
 }
