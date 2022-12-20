@@ -1,40 +1,49 @@
-using Ayborg.Gateway.Agent.V1;
-using AyBorg.SDK.System.Configuration;
+using System.Collections.Concurrent;
+using AyBorg.SDK.Communication.gRPC;
 
 namespace AyBorg.Web.Services;
 
-public sealed class NotifyService : BackgroundService, INotifyService
+public sealed class NotifyService : INotifyService
 {
     private readonly ILogger<NotifyService> _logger;
-    private readonly Notify.NotifyClient _notifyClient;
-    private readonly IServiceConfiguration _serviceConfiguration;
 
-    public Action<Guid> AgentIterationFinished { get; set; } = null!;
+    public ConcurrentBag<Subscription> Subscriptions { get; } =  new();
 
-    public NotifyService(ILogger<NotifyService> logger, Notify.NotifyClient notifyClient, IServiceConfiguration serviceConfiguration)
+    public NotifyService(ILogger<NotifyService> logger)
     {
         _logger = logger;
-        _notifyClient = notifyClient;
-        _serviceConfiguration = serviceConfiguration;
     }
 
-    protected override Task ExecuteAsync(CancellationToken stoppingToken)
+    public Subscription CreateSubscription(string ServiceUniqueName, NotifyType type)
     {
-        return Task.Factory.StartNew(async () =>
+        var sub = new Subscription { ServiceUniqueName = ServiceUniqueName, Type = type };
+        Subscriptions.Add(sub);
+        return sub;
+    }
+
+    public void Unsubscribe(Subscription subscription)
+    {
+        var tmpSubs = new List<Subscription>();
+        while (Subscriptions.TryTake(out Subscription? sub))
         {
-            Grpc.Core.AsyncServerStreamingCall<NotifyMessage> response = _notifyClient.CreateDownstream(new CreateNotifyStreamRequest { ServiceUniqueName = _serviceConfiguration.UniqueName }, cancellationToken: stoppingToken);
-            while (!stoppingToken.IsCancellationRequested)
+            if (sub == subscription)
             {
-                if (await response.ResponseStream.MoveNext(stoppingToken))
-                {
-                    NotifyMessage notifyMessage = response.ResponseStream.Current;
-                    Console.WriteLine(notifyMessage.ToString());
-                }
-                else
-                {
-                    await Task.Delay(100);
-                }
+                continue;
             }
-        }, TaskCreationOptions.LongRunning);
+
+            tmpSubs.Add(sub);
+        }
+
+        foreach (Subscription ts in tmpSubs)
+        {
+            Subscriptions.Add(ts);
+        }
+    }
+
+    public record Subscription
+    {
+        public string ServiceUniqueName { get; init; } = string.Empty;
+        public NotifyType Type { get; init; }
+        public Action<object> Callback { get; set; } = null!;
     }
 }

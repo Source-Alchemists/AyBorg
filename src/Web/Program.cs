@@ -70,10 +70,11 @@ builder.Services.AddBlazoredSessionStorage();
 GrpcClientRegisterTool.Register(builder);
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
-builder.Services.AddHostedService<NotifyService>();
+builder.Services.AddHostedService<NotifyBackgroundService>();
 
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
+builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 
 builder.Services.AddScoped<IAuthorizationHeaderUtilService, AuthorizationHeaderUtilService>();

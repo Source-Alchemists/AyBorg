@@ -1,17 +1,14 @@
-using System.Text;
-using System.Text.Json;
-using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.System.Runtime;
+using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using Microsoft.AspNetCore.Components;
-using MQTTnet;
 
 
 namespace AyBorg.Web.Pages.Agent.Shared;
 
 #nullable disable
 
-public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
+public partial class RuntimeToolbar : ComponentBase, IDisposable
 {
     [Parameter]
     [EditorRequired]
@@ -19,7 +16,7 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
 
     [Inject] IRuntimeService RuntimeService { get; set; }
 
-    [Inject] IMqttClientProvider MqttClientProvider { get; set; }
+    [Inject] INotifyService NotifyService { get; set; }
 
     private string StopClass => _isAbortVisible ? "w50" : "mud-full-width";
 
@@ -29,16 +26,8 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
     private bool _isAbortVisible = false;
     private bool _areButtonsDisabled = false;
     private bool _isButtonLoading = false;
-    private MqttSubscription _statusSubscription;
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_statusSubscription != null)
-        {
-            _statusSubscription.MessageReceived -= OnMqttMessageReceived;
-            await MqttClientProvider.UnsubscribeAsync(_statusSubscription);
-        }
-    }
+    private NotifyService.Subscription _statusSubscription;
+    private bool _disposedValue;
 
     protected override async Task OnParametersSetAsync()
     {
@@ -46,12 +35,11 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
         UpdateButtonsState();
         if (_statusSubscription != null)
         {
-            _statusSubscription.MessageReceived -= OnMqttMessageReceived;
-            await MqttClientProvider.UnsubscribeAsync(_statusSubscription);
+            _statusSubscription.Callback -= StatusCallbackReceived;
+            NotifyService.Unsubscribe(_statusSubscription);
         }
-        _statusSubscription = await MqttClientProvider.SubscribeAsync($"AyBorg/agents/{ServiceUniqueName}/engine/status");
-        _statusSubscription.MessageReceived += OnMqttMessageReceived;
-
+        _statusSubscription = NotifyService.CreateSubscription(ServiceUniqueName, SDK.Communication.gRPC.NotifyType.AgentEngineStateChanged);
+        _statusSubscription.Callback += StatusCallbackReceived;
         await base.OnParametersSetAsync();
     }
 
@@ -60,13 +48,14 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
         await InvokeAsync(StateHasChanged);
     }
 
-    private async void OnMqttMessageReceived(MqttApplicationMessage message)
+    private async void StatusCallbackReceived(object obj)
     {
-        if (message.Payload is null) return;
-        EngineMeta status = JsonSerializer.Deserialize<EngineMeta>(Encoding.UTF8.GetString(message.Payload));
-        _status = status;
-        UpdateButtonsState();
-        await InvokeAsync(StateHasChanged);
+        if (obj is EngineMeta engineMeta)
+        {
+            _status = engineMeta;
+            UpdateButtonsState();
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private void UpdateButtonsState()
@@ -138,5 +127,27 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
             _status.State = EngineState.Idle;
             UpdateButtonsState();
         }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                if (_statusSubscription != null)
+                {
+                    _statusSubscription.Callback -= StatusCallbackReceived;
+                    NotifyService.Unsubscribe(_statusSubscription);
+                }
+            }
+            _disposedValue = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

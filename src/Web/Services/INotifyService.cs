@@ -1,6 +1,14 @@
+using System.Collections.Concurrent;
+using AyBorg.SDK.Communication.gRPC;
+using static AyBorg.Web.Services.NotifyService;
+
 namespace AyBorg.Web.Services;
 
 public interface INotifyService
 {
-    Action<Guid> AgentIterationFinished { get; set; }
+    ConcurrentBag<Subscription> Subscriptions { get; }
+
+    Subscription CreateSubscription(string ServiceUniqueName, NotifyType type);
+
+    void Unsubscribe(Subscription subscription);
 }
