@@ -7,16 +7,16 @@ using ZXing;
 
 namespace AyBorg.Plugins.ZXing
 {
-    public sealed class BarcodeRead : IStepBody
+    public sealed class MatrixBarcodeRead : IStepBody
     {
-        private readonly ILogger<BarcodeRead> _logger;
+        private readonly ILogger<MatrixBarcodeRead> _logger;
         private readonly ImagePort _inputImagePort = new("Image", PortDirection.Input, null!);
-        private readonly EnumPort _inputEmumPort = new("Barcode Format", PortDirection.Input, BarcodeFormats.Undefined);
+        private readonly EnumPort _inputEmumPort = new("Matrix Barcode Format", PortDirection.Input, MatrixBarcodeFormats.Undefined);
         private readonly StringPort _outputStringPort = new("String", PortDirection.Output, String.Empty);
 
-        public string DefaultName => "Barcode.Read";
+        public string DefaultName => "MatrixBarcode.Read";
 
-        public BarcodeRead(ILogger<BarcodeRead> logger)
+        public MatrixBarcodeRead(ILogger<MatrixBarcodeRead> logger)
         {
             _logger = logger;
             Ports = new IPort[]
@@ -35,27 +35,22 @@ namespace AyBorg.Plugins.ZXing
             
             var imageBuffer = _inputImagePort.Value.AsPacked<Rgb24>().Buffer;
             var reader = new BarcodeReaderGeneric();
-            reader.Options.PureBarcode = true; // if no format is given lib will still search for QR code
+            reader.Options.PureBarcode = false;
+            reader.Options.TryInverted = true;
+            reader.Options.TryHarder = true;
+            reader.AutoRotate = true;
             var rgbLumSrc = new RGBLuminanceSource(imageBuffer.ToArray(),_inputImagePort.Value.Width, _inputImagePort.Value.Height );
             
-            if(_inputEmumPort.Value.Equals(BarcodeFormats.Undefined))
+
+            // possible improvements: input of a list of possible formats
+            if(_inputEmumPort.Value.Equals(MatrixBarcodeFormats.Undefined))
             {
                 reader.Options.PossibleFormats = new List<BarcodeFormat>(){
-                    BarcodeFormat.CODABAR,
-                    BarcodeFormat.CODE_39,
-                    BarcodeFormat.CODE_93,
-                    BarcodeFormat.CODE_128,
-                    BarcodeFormat.EAN_8,
-                    BarcodeFormat.EAN_13,
-                    BarcodeFormat.ITF,
-                    BarcodeFormat.RSS_14,
-                    BarcodeFormat.UPC_A,
-                    BarcodeFormat.UPC_E,
-                    BarcodeFormat.UPC_EAN_EXTENSION,
-                    BarcodeFormat.MSI,
-                    BarcodeFormat.PLESSEY,
-                    BarcodeFormat.IMB,
-                    BarcodeFormat.PHARMA_CODE                
+                    BarcodeFormat.AZTEC,
+                    BarcodeFormat.DATA_MATRIX,
+                    BarcodeFormat.MAXICODE,
+                    BarcodeFormat.PDF_417,
+                    BarcodeFormat.QR_CODE
                 };
             }
             else
@@ -66,7 +61,7 @@ namespace AyBorg.Plugins.ZXing
                 }
                 else 
                 {
-                    _logger.LogWarning("Provided Barcode Format is not valid. Please provide a correct search format.");
+                    _logger.LogWarning("Provided Matrix Barcode Format is not valid. Please provide a correct search format.");
                     return ValueTask.FromResult(false);
                 }
             }
@@ -74,16 +69,12 @@ namespace AyBorg.Plugins.ZXing
             var value = reader.Decode(rgbLumSrc);
             if(value is null)
             {
-                _logger.LogWarning("Could not find a barcode.");
+                _logger.LogWarning("Could not find a matrix barcode.");
                 return ValueTask.FromResult(false);
             }
             _outputStringPort.Value = value.Text;
-            _logger.LogDebug($"Barcode string: '{_outputStringPort.Value}'");
+            _logger.LogDebug($"Matrix barcode string: '{_outputStringPort.Value}'");
             return ValueTask.FromResult(true);
         }
-
-
     }
-
-
 }
