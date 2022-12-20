@@ -67,13 +67,10 @@ builder.Services.AddMudServices(config =>
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredSessionStorage();
 
-builder.Services.AddHttpClient<PluginsService>();
-builder.Services.AddHttpClient<IFlowService, FlowService>();
-builder.Services.AddHttpClient<IRuntimeService>();
-
 GrpcClientRegisterTool.Register(builder);
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
+builder.Services.AddHostedService<NotifyService>();
 
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();

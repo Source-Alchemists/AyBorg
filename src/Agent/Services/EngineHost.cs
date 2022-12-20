@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Agent.Runtime;
-using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
@@ -13,7 +13,6 @@ internal sealed class EngineHost : IEngineHost
 {
     private readonly ILogger<EngineHost> _logger;
     private readonly IEngineFactory _engineFactory;
-    private readonly IMqttClientProvider _mqttClientProvider;
     private readonly ICacheService _cacheService;
     private readonly CommunicationStateProvider _communicationStateProvider;
     private readonly IServiceConfiguration _serviceConfiguration;
@@ -30,7 +29,6 @@ internal sealed class EngineHost : IEngineHost
     /// <param name="mqttClientProvider">The MQTT client provider.</param>
     public EngineHost(ILogger<EngineHost> logger,
                         IEngineFactory engineFactory,
-                        IMqttClientProvider mqttClientProvider,
                         ICacheService cacheService,
                         ICommunicationStateProvider communicationStateProvider,
                         IServiceConfiguration serviceConfiguration,
@@ -38,7 +36,6 @@ internal sealed class EngineHost : IEngineHost
     {
         _logger = logger;
         _engineFactory = engineFactory;
-        _mqttClientProvider = mqttClientProvider;
         _cacheService = cacheService;
         _communicationStateProvider = (CommunicationStateProvider)communicationStateProvider;
         _serviceConfiguration = serviceConfiguration;
@@ -279,7 +276,11 @@ internal sealed class EngineHost : IEngineHost
             _logger.LogTrace($"Engine is done. Removing engine.");
         }
 
-        await _mqttClientProvider.PublishAsync($"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/status", JsonSerializer.Serialize(_engineMeta), new MqttPublishOptions());
+        await _notifyClient.CreateNotificationFromAgentAsync(new NotifyMessage {
+            AgentUniqueName = _serviceConfiguration.UniqueName,
+            Type = (int)NotifyType.AgentEngineStateChanged,
+            Payload = JsonSerializer.Serialize(_engineMeta)
+        });
     }
 
     private void DisposeEngine()
@@ -302,10 +303,11 @@ internal sealed class EngineHost : IEngineHost
         await _cacheService.CreateCacheAsync(e.IterationId, ActiveProject);
         try
         {
-            await _notifyClient.EngineIterationFinishedAsync(new EngineIterationFinishedArgsDto
+            await _notifyClient.CreateNotificationFromAgentAsync(new NotifyMessage
             {
                 AgentUniqueName = _serviceConfiguration.UniqueName,
-                IterationId = e.IterationId.ToString()
+                Type = (int)NotifyType.AgentIterationFinished,
+                Payload = e.IterationId.ToString()
             });
         }
         catch (RpcException ex)

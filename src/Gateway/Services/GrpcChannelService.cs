@@ -35,12 +35,11 @@ public sealed class GrpcChannelService : IGrpcChannelService
 
     public bool TryUnregisterChannel(string uniqueServiceName)
     {
-        if (_channels.ContainsKey(uniqueServiceName))
+        if (!_channels.ContainsKey(uniqueServiceName))
         {
             _logger.LogWarning("Channel for {UniqueServiceName} not found.", uniqueServiceName);
             return false;
         }
-
 
         bool result = _channels.Remove(uniqueServiceName, out ChannelInfo? channelInfo);
         channelInfo?.Dispose();

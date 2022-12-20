@@ -15,9 +15,9 @@ public sealed class NotifyServiceV1 : Notify.NotifyBase
         _notifyService = notifyService;
     }
 
-    public override Task<Empty> EngineIterationFinished(EngineIterationFinishedArgsDto request, ServerCallContext context)
+    public override Task<Empty> CreateNotificationFromAgent(NotifyMessage request, ServerCallContext context)
     {
-        if (!Guid.TryParse(request.IterationId, out Guid iterationId))
+        if (!Guid.TryParse(request.Payload, out Guid iterationId))
         {
             _notifyService.AgentIterationFinished?.Invoke(iterationId);
         }

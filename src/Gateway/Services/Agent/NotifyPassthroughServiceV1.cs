@@ -17,7 +17,7 @@ public sealed class NotifyPassthroughServiceV1 : Notify.NotifyBase
         _channelService = service;
     }
 
-    public override Task CreateStream(CreateNotifyStreamRequest request, IServerStreamWriter<NotifyMessage> responseStream, ServerCallContext context)
+    public override Task CreateDownstream(CreateNotifyStreamRequest request, IServerStreamWriter<NotifyMessage> responseStream, ServerCallContext context)
     {
         return Task.Factory.StartNew(async () =>
         {
@@ -28,45 +28,56 @@ public sealed class NotifyPassthroughServiceV1 : Notify.NotifyBase
                 return;
             }
 
-            while (!context.CancellationToken.IsCancellationRequested)
+            try
             {
-                if (!channelInfo.Notifications.TryDequeue(out Notification? cachecNotification))
+                channelInfo.IsAcceptingNotifications = true;
+                while (!context.CancellationToken.IsCancellationRequested)
                 {
-                    _logger.LogWarning("Notifications for {ServiceUniqueName} could not be dequeued.", request.ServiceUniqueName);
-                    continue;
-                }
+                    if (!channelInfo.Notifications.TryTake(out Notification? cachecNotification, -1, context.CancellationToken))
+                    {
+                        continue;
+                    }
 
-                if (cachecNotification == null)
-                {
-                    _logger.LogWarning("Notification for {ServiceUniqueName} was null.", request.ServiceUniqueName);
-                    continue;
-                }
+                    if (cachecNotification == null)
+                    {
+                        _logger.LogWarning("Notification for {ServiceUniqueName} was null.", request.ServiceUniqueName);
+                        continue;
+                    }
 
-                await responseStream.WriteAsync(new NotifyMessage
+                    await responseStream.WriteAsync(new NotifyMessage
+                    {
+                        AgentUniqueName = cachecNotification.ServiceUniqueName,
+                        Type = (int)cachecNotification.NotifyType,
+                        Payload = cachecNotification.Payload
+                    });
+                }
+            }
+            finally
+            {
+                if (channelInfo != null)
                 {
-                    AgentUniqueName = cachecNotification.ServiceUniqueName,
-                    Type = (int)cachecNotification.NotifyType,
-                    Payload = cachecNotification.Payload
-                });
+                    channelInfo.IsAcceptingNotifications = false;
+                    while (channelInfo.Notifications.TryTake(out _)) ;
+                }
             }
         });
     }
 
-    public override Task<Empty> EngineIterationFinished(EngineIterationFinishedArgsDto request, ServerCallContext context)
+    public override Task<Empty> CreateNotificationFromAgent(NotifyMessage request, ServerCallContext context)
     {
         return Task.Factory.StartNew(() =>
         {
             IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName("AyBorg.Web");
-            foreach (ChannelInfo channel in channels)
+            foreach (ChannelInfo channel in channels.Where(c => c.IsAcceptingNotifications))
             {
-                if(channel.Notifications.Count > 10)
+                if (channel.Notifications.Count > 10)
                 {
-                    _ = channel.Notifications.TryDequeue(out _);
+                    _ = channel.Notifications.TryTake(out _);
                 }
-                channel.Notifications.Enqueue(new Notification(
+                channel.Notifications.Add(new Notification(
                 request.AgentUniqueName,
-                NotifyType.AgentIterationFinished,
-                request.IterationId));
+                (NotifyType)request.Type,
+                request.Payload));
             }
 
             return new Empty();

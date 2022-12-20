@@ -9,7 +9,8 @@ public record ChannelInfo : IDisposable
     public string ServiceUniqueName { get; init; } = string.Empty;
     public string TypeName { get; init; } = string.Empty;
     public GrpcChannel Channel { get; init; } = null!;
-    public ConcurrentQueue<Notification> Notifications { get; } = new ConcurrentQueue<Notification>();
+    public BlockingCollection<Notification> Notifications { get; } = new BlockingCollection<Notification>();
+    public bool IsAcceptingNotifications { get; set; } = false;
 
     protected virtual void Dispose(bool disposing)
     {

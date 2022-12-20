@@ -40,5 +40,10 @@ internal static class GrpcClientRegisterTool
         {
             option.Address = new Uri(gatewayUrl!);
         });
+
+        builder.Services.AddGrpcClient<Notify.NotifyClient>(option =>
+        {
+            option.Address = new Uri(gatewayUrl!);
+        });
     }
 }
