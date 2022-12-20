@@ -24,21 +24,19 @@ namespace AyBorg.Plugins.ZXing
                 _inputImagePort,
                 _inputEmumPort,
                 _outputStringPort
-
             };
         }
-        
+
         public IEnumerable<IPort> Ports { get; }
 
         public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
         {
-            
             var imageBuffer = _inputImagePort.Value.AsPacked<Rgb24>().Buffer;
             var reader = new BarcodeReaderGeneric();
             reader.Options.PureBarcode = true; // if no format is given lib will still search for QR code
-            var rgbLumSrc = new RGBLuminanceSource(imageBuffer.ToArray(),_inputImagePort.Value.Width, _inputImagePort.Value.Height );
-            
-            if(_inputEmumPort.Value.Equals(BarcodeFormats.Undefined))
+            var rgbLumSrc = new RGBLuminanceSource(imageBuffer.ToArray(), _inputImagePort.Value.Width, _inputImagePort.Value.Height);
+
+            if (_inputEmumPort.Value.Equals(BarcodeFormats.Undefined))
             {
                 reader.Options.PossibleFormats = new List<BarcodeFormat>(){
                     BarcodeFormat.CODABAR,
@@ -55,24 +53,24 @@ namespace AyBorg.Plugins.ZXing
                     BarcodeFormat.MSI,
                     BarcodeFormat.PLESSEY,
                     BarcodeFormat.IMB,
-                    BarcodeFormat.PHARMA_CODE                
+                    BarcodeFormat.PHARMA_CODE
                 };
             }
             else
             {
-                if(Enum.TryParse(_inputEmumPort.Value.ToString(), out BarcodeFormat outFormat))
+                if (Enum.TryParse(_inputEmumPort.Value.ToString(), out BarcodeFormat outFormat))
                 {
-                    reader.Options.PossibleFormats = new List<BarcodeFormat>(){outFormat};
+                    reader.Options.PossibleFormats = new List<BarcodeFormat>() { outFormat };
                 }
-                else 
+                else
                 {
                     _logger.LogWarning("Provided Barcode Format is not valid. Please provide a correct search format.");
                     return ValueTask.FromResult(false);
                 }
             }
-            
+
             var value = reader.Decode(rgbLumSrc);
-            if(value is null)
+            if (value is null)
             {
                 _logger.LogWarning("Could not find a barcode.");
                 return ValueTask.FromResult(false);

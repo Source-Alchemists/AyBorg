@@ -24,26 +24,22 @@ namespace AyBorg.Plugins.ZXing
                 _inputImagePort,
                 _inputEmumPort,
                 _outputStringPort
-
             };
         }
-        
+
         public IEnumerable<IPort> Ports { get; }
 
         public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
         {
-            
             var imageBuffer = _inputImagePort.Value.AsPacked<Rgb24>().Buffer;
             var reader = new BarcodeReaderGeneric();
             reader.Options.PureBarcode = false;
             reader.Options.TryInverted = true;
             reader.Options.TryHarder = true;
             reader.AutoRotate = true;
-            var rgbLumSrc = new RGBLuminanceSource(imageBuffer.ToArray(),_inputImagePort.Value.Width, _inputImagePort.Value.Height );
-            
+            var rgbLumSrc = new RGBLuminanceSource(imageBuffer.ToArray(), _inputImagePort.Value.Width, _inputImagePort.Value.Height);
 
-            // possible improvements: input of a list of possible formats
-            if(_inputEmumPort.Value.Equals(MatrixBarcodeFormats.Undefined))
+            if (_inputEmumPort.Value.Equals(MatrixBarcodeFormats.Undefined))
             {
                 reader.Options.PossibleFormats = new List<BarcodeFormat>(){
                     BarcodeFormat.AZTEC,
@@ -55,19 +51,19 @@ namespace AyBorg.Plugins.ZXing
             }
             else
             {
-                if(Enum.TryParse(_inputEmumPort.Value.ToString(), out BarcodeFormat outFormat))
+                if (Enum.TryParse(_inputEmumPort.Value.ToString(), out BarcodeFormat outFormat))
                 {
-                    reader.Options.PossibleFormats = new List<BarcodeFormat>(){outFormat};
+                    reader.Options.PossibleFormats = new List<BarcodeFormat>() { outFormat };
                 }
-                else 
+                else
                 {
                     _logger.LogWarning("Provided Matrix Barcode Format is not valid. Please provide a correct search format.");
                     return ValueTask.FromResult(false);
                 }
             }
-            
+
             var value = reader.Decode(rgbLumSrc);
-            if(value is null)
+            if (value is null)
             {
                 _logger.LogWarning("Could not find a matrix barcode.");
                 return ValueTask.FromResult(false);
