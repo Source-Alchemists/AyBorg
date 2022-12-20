@@ -6,15 +6,15 @@ using Xunit;
 
 namespace AyBorg.Plugins.ZXing.Tests
 {
-    public sealed class MatrixBarcodeReadTests
+    public sealed class BarcodeMatrixReadTests
     {
 
-        private readonly NullLogger<MatrixBarcodeRead> _logger = new(); 
+        private readonly NullLogger<BarcodeMatrixRead> _logger = new(); 
 
         [Fact]
         public async Task Test_TryRunAsync_Success()
         {
-            var readerMatrixBarcode = new MatrixBarcodeRead(_logger);
+            var readerMatrixBarcode = new BarcodeMatrixRead(_logger);
             var imagePort = readerMatrixBarcode.Ports.Single(x => x.Name == "Image")  as ImagePort;
             imagePort!.Value = Image.Load("./resources/qr-code.png");
             var formatPort = readerMatrixBarcode.Ports.Single(x => x.Name == "Matrix Barcode Format")  as EnumPort;
@@ -31,7 +31,7 @@ namespace AyBorg.Plugins.ZXing.Tests
         [Fact]
         public async Task Test_TryRunAsync_ReadAllFormats_Success()
         {
-            var readerMatrixBarcode = new MatrixBarcodeRead(_logger);
+            var readerMatrixBarcode = new BarcodeMatrixRead(_logger);
             var imagePort = readerMatrixBarcode.Ports.Single(x => x.Name == "Image")  as ImagePort;
             imagePort!.Value = Image.Load("./resources/qr-code.png");
             var formatPort = readerMatrixBarcode.Ports.Single(x => x.Name == "Matrix Barcode Format")  as EnumPort;
@@ -47,7 +47,7 @@ namespace AyBorg.Plugins.ZXing.Tests
         [Fact]
         public async Task Test_TryRunAsync_MatrixCodeReadOnWrongFormat_Fail()
         {
-            var readerMatrixBarcode = new MatrixBarcodeRead(_logger);
+            var readerMatrixBarcode = new BarcodeMatrixRead(_logger);
             var imagePort = readerMatrixBarcode.Ports.Single(x => x.Name == "Image")  as ImagePort;
             imagePort!.Value = Image.Load("./resources/qr-code.png");
             var formatPort = readerMatrixBarcode.Ports.Single(x => x.Name == "Matrix Barcode Format")  as EnumPort;
@@ -64,7 +64,7 @@ namespace AyBorg.Plugins.ZXing.Tests
         [Fact]
         public async Task Test_TryRunAsync_NoMatrixBarcode_Fail()
         {
-            var readerMatrixBarcode = new MatrixBarcodeRead(_logger);
+            var readerMatrixBarcode = new BarcodeMatrixRead(_logger);
             var imagePort = readerMatrixBarcode.Ports.Single(x => x.Name == "Image")  as ImagePort;
             imagePort!.Value = Image.Load("./resources/Code-128.png");
             var formatPort = readerMatrixBarcode.Ports.Single(x => x.Name == "Matrix Barcode Format")  as EnumPort;

@@ -7,16 +7,16 @@ using ZXing;
 
 namespace AyBorg.Plugins.ZXing
 {
-    public sealed class MatrixBarcodeRead : IStepBody
+    public sealed class BarcodeMatrixRead : IStepBody
     {
-        private readonly ILogger<MatrixBarcodeRead> _logger;
+        private readonly ILogger<BarcodeMatrixRead> _logger;
         private readonly ImagePort _inputImagePort = new("Image", PortDirection.Input, null!);
         private readonly EnumPort _inputEmumPort = new("Matrix Barcode Format", PortDirection.Input, MatrixBarcodeFormats.Undefined);
         private readonly StringPort _outputStringPort = new("String", PortDirection.Output, String.Empty);
 
-        public string DefaultName => "MatrixBarcode.Read";
+        public string DefaultName => "Barcode.Matrix.Read";
 
-        public MatrixBarcodeRead(ILogger<MatrixBarcodeRead> logger)
+        public BarcodeMatrixRead(ILogger<BarcodeMatrixRead> logger)
         {
             _logger = logger;
             Ports = new IPort[]
