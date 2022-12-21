@@ -4,6 +4,7 @@ using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
+using Grpc.Core;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
@@ -58,23 +59,27 @@ public class FlowNode : NodeModel, IDisposable
 
     private async void NotificationReceived(object obj)
     {
-        if (!Guid.TryParse(obj.ToString(), out Guid iterationId))
+        try
         {
-            return;
-        }
-        Step step = await _flowService.GetStepAsync(Step.Id, iterationId);
-        Step.ExecutionTimeMs = step.ExecutionTimeMs;
-        foreach (FlowPort targetFlowPort in Ports.Cast<FlowPort>())
-        {
-            Port sourcePort = step.Ports.FirstOrDefault(p => p.Id.Equals(targetFlowPort.Port.Id));
-            if(sourcePort == null)
+            if (!Guid.TryParse(obj.ToString(), out Guid iterationId))
             {
-                continue;
+                return;
             }
+            Step step = await _flowService.GetStepAsync(Step.Id, iterationId);
+            Step.ExecutionTimeMs = step.ExecutionTimeMs;
+            foreach (FlowPort targetFlowPort in Ports.Cast<FlowPort>())
+            {
+                Port sourcePort = step.Ports.FirstOrDefault(p => p.Id.Equals(targetFlowPort.Port.Id));
+                if (sourcePort == null)
+                {
+                    continue;
+                }
 
-            targetFlowPort.Port.Value = sourcePort.Value;
+                targetFlowPort.Port.Value = sourcePort.Value;
+            }
+            StepChanged?.Invoke();
         }
-        StepChanged?.Invoke();
+        catch (RpcException) { }
     }
 
     protected virtual void Dispose(bool disposing)
