@@ -1,7 +1,5 @@
 using System.Runtime.CompilerServices;
 using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Runtime;
 
@@ -17,7 +15,6 @@ internal sealed class Engine : IEngine
     private readonly ILogger<Engine> _logger;
     private readonly ILogger<PathExecuter> _pathExecuterLogger;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly IMqttClientProvider _mqttClientProvider;
     private readonly Project _project;
     private readonly CancellationTokenSource _abortTokenSource = new();
     private readonly CancellationTokenSource _stopTokenSource = new();
@@ -55,14 +52,12 @@ internal sealed class Engine : IEngine
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="mqttClientProvider">The MQTT client provider.</param>
     /// <param name="project">The project.</param>
     /// <param name="executionType">Type of the execution.</param>
-    public Engine(ILogger<Engine> logger, ILoggerFactory loggerFactory, IMqttClientProvider mqttClientProvider, Project project, EngineExecutionType executionType)
+    public Engine(ILogger<Engine> logger, ILoggerFactory loggerFactory, Project project, EngineExecutionType executionType)
     {
         _logger = logger;
         _loggerFactory = loggerFactory;
-        _mqttClientProvider = mqttClientProvider;
         _project = project;
         _pathExecuterLogger = _loggerFactory.CreateLogger<PathExecuter>();
         ExecutionType = executionType;
@@ -254,7 +249,7 @@ internal sealed class Engine : IEngine
         }
     }
 
-    private async void StepCompleted(object? sender, bool success)
+    private void StepCompleted(object? sender, bool success)
     {
         if (sender is not IStepProxy stepProxy) return;
 
@@ -263,30 +258,6 @@ internal sealed class Engine : IEngine
         {
             _logger.LogWarning("Step [{stepProxy.Name}] failed.", stepProxy.Name);
         }
-
-        await SendStepInfoAsync(stepProxy);
-    }
-
-    private async ValueTask SendStepInfoAsync(IStepProxy stepProxy)
-    {
-        if(_project.Meta.State != ProjectState.Ready && _project.Settings.IsForceWebUiCommunicationEnabled) return;
-        if(_project.Meta.State == ProjectState.Ready && !_project.Settings.IsForceWebUiCommunicationEnabled) return;
-        await SendStepInputPortsAsync(stepProxy);
-
-        string baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/";
-        await _mqttClientProvider.PublishAsync($"{baseTopic}executionTimeMs", stepProxy.ExecutionTimeMs.ToString(), new MqttPublishOptions());
-    }
-
-    private async ValueTask SendStepInputPortsAsync(IStepProxy stepProxy)
-    {
-        string baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/ports/";
-
-        IEnumerable<IPort> inputPorts = stepProxy.StepBody.Ports.Where(p => p.Direction == PortDirection.Input);
-        CancellationToken token = CancellationToken.None;
-        await Parallel.ForEachAsync(inputPorts, async (port, token) =>
-        {
-            await _mqttClientProvider.PublishAsync($"{baseTopic}{port.Id}", port, new MqttPublishOptions { Resize = true });
-        });
     }
 
     private static async ValueTask WaitAndClearExecutors(HashSet<PathExecuter> executers, List<Task<bool>> executingTasks)

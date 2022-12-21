@@ -1,5 +1,6 @@
 using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
+using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Modals;
@@ -10,7 +11,6 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor;
-using AyBorg.Web.Services;
 
 namespace AyBorg.Web.Pages.Agent.Editor;
 
@@ -337,7 +337,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         var selectedNodes = _diagram.Nodes.Where(n => n.Selected).ToList();
         foreach (NodeModel? node in selectedNodes)
         {
-            if(await ShowDeleteConfirmDialogAsync(node.Title))
+            if (await ShowDeleteConfirmDialogAsync(node.Title))
             {
                 OnNodeRemoved(node);
             }
