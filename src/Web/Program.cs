@@ -1,7 +1,6 @@
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Communication.gRPC.Registry;
-using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.Web;
 using AyBorg.Web.Areas.Identity;
@@ -75,7 +74,6 @@ builder.Services.AddHostedService<NotifyBackgroundService>();
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
 builder.Services.AddSingleton<INotifyService, NotifyService>();
-builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 
 builder.Services.AddScoped<IAuthorizationHeaderUtilService, AuthorizationHeaderUtilService>();
 builder.Services.AddScoped<IJwtProviderService, JwtProviderService>();
@@ -121,6 +119,5 @@ app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbCont
 // Initialize identity
 IServiceProvider scopedServiceProvider = app.Services.CreateScope().ServiceProvider;
 await IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).AsTask();
-await app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().AsTask()!;
 
 app.Run();
