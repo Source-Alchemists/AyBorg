@@ -35,17 +35,34 @@ internal sealed class CacheService : ICacheService
         CancellationToken token = CancellationToken.None;
         await Parallel.ForEachAsync(project.Steps, async (step, token) =>
         {
-            CreateStepEntry(iterationId, step);
-            foreach (IPort port in step.Ports)
-            {
-                // Only input ports that are connected to another port are cached.
-                // All other ports are not changing there displayed value at real time.
-                if (port.Direction == PortDirection.Input && port.IsConnected)
-                {
-                    await CreatePortEntryAsync(iterationId, port);
-                }
-            }
+            await GetOrCreateStepEntryAsync(iterationId, step);
         });
+    }
+
+    /// <summary>
+    /// Gets or creates the step cache entry for the specified iteration.
+    /// </summary>
+    /// <param name="iterationId">The iteration identifier.</param>
+    /// <param name="step">The step.</param>
+    /// <returns></returns>
+    /// <remarks>If the iteration does not exist, it will create a step entry from the last iteration.</remarks>
+    public async ValueTask<Step> GetOrCreateStepEntryAsync(Guid iterationId, IStepProxy step)
+    {
+        Step cachedStep = await GetOrCreateStepMetaEntryAsync(iterationId, step);
+        var cachedPorts = new HashSet<Port>();
+        foreach (IPort port in step.Ports)
+        {
+            // Only input ports that are connected to another port are cached.
+            // All other ports are not changing there displayed value at real time.
+            if (port.Direction == PortDirection.Input && port.IsConnected)
+            {
+                Port cachedPort = await GetOrCreatePortEntryAsync(iterationId, port);
+                cachedPorts.Add(cachedPort);
+            }
+        }
+
+        cachedStep.Ports = cachedPorts;
+        return cachedStep;
     }
 
     /// <summary>
@@ -79,40 +96,21 @@ internal sealed class CacheService : ICacheService
         return result;
     }
 
-    /// <summary>
-    /// Gets or creates the step cache entry for the specified iteration.
-    /// </summary>
-    /// <param name="iterationId">The iteration identifier.</param>
-    /// <param name="step">The step.</param>
-    /// <returns></returns>
-    /// <remarks>If the iteration does not exist, it will create a step entry from the last iteration.</remarks>
-    public long GetOrCreateStepExecutionTimeEntry(Guid iterationId, IStepProxy stepProxy)
+    private async ValueTask<Step> GetOrCreateStepMetaEntryAsync(Guid iterationId, IStepProxy stepProxy)
     {
-        var key = new StepCacheKey(iterationId, stepProxy.Id);
+        var key = new StepCacheKey { IterationId = iterationId, StepId = stepProxy.Id };
         string keyStr = key.ToString();
         CacheItem cacheItem = _memoryCache.GetCacheItem(keyStr);
         if (cacheItem == null)
         {
-            _memoryCache.Add(new CacheItem(keyStr, stepProxy.ExecutionTimeMs), CreateCacheItemPolicy());
-            return stepProxy.ExecutionTimeMs;
+            Step step = await RuntimeMapper.FromRuntimeAsync(stepProxy, true);
+            _memoryCache.Add(new CacheItem(keyStr, step), CreateCacheItemPolicy());
+            return step;
         }
         else
         {
-            return (long)cacheItem.Value;
+            return (Step)cacheItem.Value;
         }
-    }
-
-    private async ValueTask CreatePortEntryAsync(Guid iterationId, IPort port)
-    {
-        var key = new PortCacheKey(iterationId, port.Id);
-        Port cachePort = await RuntimeMapper.FromRuntimeAsync(port);
-        _memoryCache.Add(key.ToString(), cachePort, CreateCacheItemPolicy());
-    }
-
-    private void CreateStepEntry(Guid iterationId, IStepProxy stepProxy)
-    {
-        var key = new StepCacheKey(iterationId, stepProxy.Id);
-        _memoryCache.Add(key.ToString(), stepProxy.ExecutionTimeMs, CreateCacheItemPolicy());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

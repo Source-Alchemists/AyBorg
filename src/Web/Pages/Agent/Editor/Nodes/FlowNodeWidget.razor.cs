@@ -20,7 +20,6 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
         foreach (FlowPort ip in _inputPorts.Cast<FlowPort>())
         {
             ip.PortChanged -= OnChangedAsync;
-            ip.Dispose();
         }
         Node.Dispose();
         return ValueTask.CompletedTask;

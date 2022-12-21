@@ -15,6 +15,15 @@ public interface ICacheService
     ValueTask CreateCacheAsync(Guid iterationId, Project project);
 
     /// <summary>
+    /// Gets or creates the step cache entry for the specified iteration.
+    /// </summary>
+    /// <param name="iterationId">The iteration identifier.</param>
+    /// <param name="step">The step.</param>
+    /// <returns></returns>
+    /// <remarks>If the iteration does not exist, it will create a step entry from the last iteration.</remarks>
+    ValueTask<Step> GetOrCreateStepEntryAsync(Guid iterationId, IStepProxy step);
+
+    /// <summary>
     /// Gets or creates the port cache entry for the specified iteration.
     /// </summary>
     /// <param name="iterationId">The iteration identifier.</param>
@@ -22,13 +31,4 @@ public interface ICacheService
     /// <returns></returns>
     /// <remarks>If the iteration does not exist, it will create a port entry from the last iteration.</remarks>
     ValueTask<Port> GetOrCreatePortEntryAsync(Guid iterationId, IPort port);
-
-    /// <summary>
-    /// Gets or creates the step cache entry for the specified iteration.
-    /// </summary>
-    /// <param name="iterationId">The iteration identifier.</param>
-    /// <param name="step">The step.</param>
-    /// <returns></returns>
-    /// <remarks>If the iteration does not exist, it will create a step entry from the last iteration.</remarks>
-    long GetOrCreateStepExecutionTimeEntry(Guid iterationId, IStepProxy stepProxy);
 }

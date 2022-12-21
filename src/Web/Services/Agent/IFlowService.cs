@@ -65,6 +65,14 @@ public interface IFlowService
     ValueTask<Port> GetPortAsync(Guid portId, Guid? iterationId = null);
 
     /// <summary>
+    /// Gets the step.
+    /// </summary>
+    /// <param name="stepId">The step id.</param>
+    /// <param name="iterationId">The iteration id.</param>
+    /// <returns>The step.</returns>
+    ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null);
+
+    /// <summary>
     /// Try to set the port value.
     /// </summary>
     /// <param name="port">The port.</param>

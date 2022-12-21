@@ -47,11 +47,45 @@ public sealed class EditorServiceV1 : Editor.EditorBase
     public override async Task<GetFlowStepsResponse> GetFlowSteps(GetFlowStepsRequest request, ServerCallContext context)
     {
         var result = new GetFlowStepsResponse();
-
         IEnumerable<SDK.Common.IStepProxy> flowSteps = _flowService.GetSteps();
+        Guid iterationId = Guid.Empty;
+        if (!string.IsNullOrEmpty(request.IterationId))
+        {
+            if (!Guid.TryParse(request.IterationId, out iterationId))
+            {
+                _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
+            }
+        }
+
+        if (request.StepIds.Any())
+        {
+            var targetIds = new HashSet<Guid>();
+            foreach (string? idStr in request.StepIds)
+            {
+                if (!Guid.TryParse(idStr, out Guid stepId))
+                {
+                    _logger.LogWarning("Invalid step id: {StepId}", idStr);
+                    continue;
+                }
+
+                targetIds.Add(stepId);
+            }
+
+            // Filter steps
+            flowSteps = flowSteps.Where(x => targetIds.Contains(x.Id));
+        }
+
         foreach (SDK.Common.IStepProxy fs in flowSteps)
         {
-            result.Steps.Add(RpcMapper.ToRpc(await RuntimeMapper.FromRuntimeAsync(fs)));
+            if (iterationId != Guid.Empty)
+            {
+                result.Steps.Add(RpcMapper.ToRpc(await _cacheService.GetOrCreateStepEntryAsync(iterationId, fs)));
+            }
+            else
+            {
+                result.Steps.Add(RpcMapper.ToRpc(await RuntimeMapper.FromRuntimeAsync(fs)));
+            }
         }
 
         return result;
@@ -81,6 +115,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             if (!Guid.TryParse(request.IterationId, out iterationId))
             {
                 _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
             }
         }
 

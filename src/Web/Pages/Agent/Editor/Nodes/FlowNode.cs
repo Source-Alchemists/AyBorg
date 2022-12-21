@@ -1,20 +1,20 @@
-﻿using System.Text;
-using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.Common.Models;
+﻿using AyBorg.SDK.Common.Models;
+using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using Blazor.Diagrams.Core.Geometry;
 using Blazor.Diagrams.Core.Models;
-using MQTTnet;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
+
+#nullable disable
 
 public class FlowNode : NodeModel, IDisposable
 {
     private readonly IFlowService _flowService;
     private readonly IStateService _stateService;
-    private readonly IMqttClientProvider _mqttClientProvider;
-    private MqttSubscription? _subscription;
+    private readonly INotifyService _notifyService;
+    private NotifyService.Subscription _subscription;
     private bool _disposedValue;
 
     public Step Step { get; private set; }
@@ -22,20 +22,20 @@ public class FlowNode : NodeModel, IDisposable
     /// <summary>
     /// Called when a step is updated.
     /// </summary>
-    public Action? StepChanged { get; set; }
-    public Action? OnDelete { get; set; }
+    public Action StepChanged { get; set; }
+    public Action OnDelete { get; set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FlowNode"/> class.
     /// </summary>
     /// <param name="flowService">The flow service.</param>
-    /// <param name="mqttClientProvider">The MQTT client provider.</param>
+    /// <param name="notifyService">The notify service.</param>
     /// <param name="baseUrl">The base URL.</param>
     /// <param name="step">The step.</param>
-    public FlowNode(IFlowService flowService, IMqttClientProvider mqttClientProvider, IStateService stateService, Step step, bool locked = false) : base(new Point(step.X, step.Y))
+    public FlowNode(IFlowService flowService, INotifyService notifyService, IStateService stateService, Step step, bool locked = false) : base(new Point(step.X, step.Y))
     {
         _flowService = flowService;
-        _mqttClientProvider = mqttClientProvider;
+        _notifyService = notifyService;
         _stateService = stateService;
         Title = step.Name;
         Step = step;
@@ -44,25 +44,40 @@ public class FlowNode : NodeModel, IDisposable
         if (step.Ports == null) return;
         foreach (Port port in step.Ports)
         {
-            _ = AddPort(new FlowPort(this, port, step, _flowService, _mqttClientProvider, _stateService) { Locked = locked });
+            _ = AddPort(new FlowPort(this, port, step, _flowService) { Locked = locked });
         }
 
-        MqttSubscribe();
+        Subscribe();
     }
 
-    private async void MqttSubscribe()
+    private void Subscribe()
     {
-        _subscription = await _mqttClientProvider.SubscribeAsync($"AyBorg/agents/{_stateService.AgentState.UniqueName}/engine/steps/{Step.Id}/executionTimeMs");
-        _subscription.MessageReceived += MqttMessageReceived;
+        _subscription = _notifyService.CreateSubscription(_stateService.AgentState.UniqueName, SDK.Communication.gRPC.NotifyType.AgentIterationFinished);
+        _subscription.Callback += NotificationReceived;
     }
 
-    private void MqttMessageReceived(MqttApplicationMessage e)
+    private async void NotificationReceived(object obj)
     {
-        Step.ExecutionTimeMs = long.Parse(Encoding.UTF8.GetString(e.Payload));
+        if (!Guid.TryParse(obj.ToString(), out Guid iterationId))
+        {
+            return;
+        }
+        Step step = await _flowService.GetStepAsync(Step.Id, iterationId);
+        Step.ExecutionTimeMs = step.ExecutionTimeMs;
+        foreach (FlowPort targetFlowPort in Ports.Cast<FlowPort>())
+        {
+            Port sourcePort = step.Ports.FirstOrDefault(p => p.Id.Equals(targetFlowPort.Port.Id));
+            if(sourcePort == null)
+            {
+                continue;
+            }
+
+            targetFlowPort.Port.Value = sourcePort.Value;
+        }
         StepChanged?.Invoke();
     }
 
-    protected virtual async Task Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
         if (!_disposedValue)
         {
@@ -70,8 +85,8 @@ public class FlowNode : NodeModel, IDisposable
             {
                 if (_subscription != null)
                 {
-                    _subscription.MessageReceived -= MqttMessageReceived;
-                    await _mqttClientProvider.UnsubscribeAsync(_subscription);
+                    _subscription.Callback -= NotificationReceived;
+                    _notifyService.Unsubscribe(_subscription);
                 }
             }
 
@@ -81,7 +96,7 @@ public class FlowNode : NodeModel, IDisposable
 
     public void Dispose()
     {
-        Dispose(disposing: true).GetAwaiter().GetResult();
+        Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 

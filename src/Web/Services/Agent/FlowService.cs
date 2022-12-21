@@ -59,6 +59,36 @@ public class FlowService : IFlowService
     }
 
     /// <summary>
+    /// Gets the step.
+    /// </summary>
+    /// <param name="stepId">The step id.</param>
+    /// <param name="iterationId">The iteration id.</param>
+    /// <returns>The step.</returns>
+    public async ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null)
+    {
+        var request = new GetFlowStepsRequest
+        {
+            AgentUniqueName = _stateService.AgentState.UniqueName,
+            IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
+        };
+        request.StepIds.Add(stepId.ToString());
+        GetFlowStepsResponse response = await _editorClient.GetFlowStepsAsync(request);
+        StepDto? resultStep = response.Steps.FirstOrDefault();
+        if (resultStep == null)
+        {
+            _logger.LogWarning("Could not find step with id {StepId} in iteration {IterationId}", stepId, iterationId);
+            return null!;
+        }
+
+        Step stepModel = RpcMapper.FromRpc(resultStep);
+        foreach (Port portModel in stepModel.Ports!)
+        {
+            await LazyLoadAsync(portModel, iterationId);
+        }
+        return stepModel;
+    }
+
+    /// <summary>
     /// Gets the links.
     /// </summary>
     /// <returns>The links.</returns>
@@ -278,7 +308,7 @@ public class FlowService : IFlowService
             int offset = 0;
             await foreach (ImageChunkDto? chunk in imageResponse.ResponseStream.ReadAllAsync())
             {
-                if(memoryOwner == null)
+                if (memoryOwner == null)
                 {
                     memoryOwner = MemoryPool<byte>.Shared.Rent((int)chunk.FullStreamLength);
                     resultImage.Width = chunk.FullWidth;
@@ -290,7 +320,7 @@ public class FlowService : IFlowService
                 chunk.Data.Memory.CopyTo(targetMemorySlice);
             }
 
-            if(memoryOwner != null)
+            if (memoryOwner != null)
             {
                 // No image to convert
                 resultImage.Base64 = Convert.ToBase64String(memoryOwner.Memory.ToArray());

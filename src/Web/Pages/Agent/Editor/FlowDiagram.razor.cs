@@ -1,4 +1,3 @@
-using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services.Agent;
@@ -11,6 +10,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor;
+using AyBorg.Web.Services;
 
 namespace AyBorg.Web.Pages.Agent.Editor;
 
@@ -21,7 +21,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     private bool _suspendDiagramRefresh = false;
 
     [Inject] IFlowService FlowService { get; set; } = null!;
-    [Inject] IMqttClientProvider MqttClientProvider { get; set; } = null!;
+    [Inject] INotifyService NotifyService { get; set; } = null!;
     [Inject] ILogger<FlowDiagram> Logger { get; set; } = null!;
     [Inject] IStateService StateService { get; set; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
@@ -168,7 +168,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
     private FlowNode CreateNode(Step step)
     {
-        var node = new FlowNode(FlowService, MqttClientProvider, StateService, step, Disabled);
+        var node = new FlowNode(FlowService, NotifyService, StateService, step, Disabled);
         node.Moving += async (n) => await OnNodeMovingAsync(n);
         node.OnDelete += ShouldDeleteNodeAsync;
         return node;

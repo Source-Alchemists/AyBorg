@@ -33,7 +33,6 @@ public sealed class NotifyBackgroundService : BackgroundService
                 {
                     NotifyMessage notifyMessage = response.ResponseStream.Current;
                     var notifyType = (NotifyType)notifyMessage.Type;
-                    Console.WriteLine(notifyMessage.ToString());
                     IEnumerable<Subscription> matchingSubscriptions = _notifyService.Subscriptions.Where(s => s.ServiceUniqueName.Equals(notifyMessage.AgentUniqueName, StringComparison.InvariantCultureIgnoreCase)
                                                                                             && s.Type.Equals(notifyType));
 
