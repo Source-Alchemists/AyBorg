@@ -193,27 +193,29 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                 await InvokeAsync(() => _diagram.Links.Remove(link));
                 await UpdatePortByLinkModelAsync((LinkModel)link);
             }
+
+            // Update steps
+            foreach (string stepIdStr in flowChangeArgs.ChangedSteps)
+            {
+                Guid stepId = Guid.Parse(stepIdStr);
+                IEnumerable<FlowNode> diagramNodes = _diagram.Nodes.Cast<FlowNode>();
+
+                FlowNode node = diagramNodes.FirstOrDefault(n => n.Step.Id.Equals(stepId));
+                if (node == null)
+                {
+                    // Already removed
+                    continue;
+                }
+
+                Step newStep = await FlowService.GetStepAsync(stepId, updatePorts: false);
+                await InvokeAsync(() =>
+                {
+                    node.Update(newStep);
+                    node.Refresh();
+                });
+            }
         }
         catch (RpcException) { }
-    }
-
-    private async ValueTask UpdatePortByLinkModelAsync(LinkModel linkModel)
-    {
-        if (linkModel.TargetPort != null)
-        {
-            var tp = (FlowPort)linkModel.TargetPort;
-            Port newPort = await FlowService.GetPortAsync(tp.Port.Id);
-            tp.Update(newPort);
-        }
-    }
-
-    private void CreateAndAddNode(Step step)
-    {
-        if (_diagram.Nodes.Cast<FlowNode>().Any(n => n.Step.Id.Equals(step.Id))) return;
-        var node = new FlowNode(step, Disabled);
-        node.Moving += async (n) => await OnNodeMovingAsync(n);
-        node.OnDelete += ShouldDeleteNodeAsync;
-        _diagram.Nodes.Add(node);
     }
 
     private async Task CreateFlow()
@@ -246,6 +248,15 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         }
     }
 
+    private void CreateAndAddNode(Step step)
+    {
+        if (_diagram.Nodes.Cast<FlowNode>().Any(n => n.Step.Id.Equals(step.Id))) return;
+        var node = new FlowNode(step, Disabled);
+        node.Moving += async (n) => await OnNodeMovingAsync(n);
+        node.OnDelete += ShouldDeleteNodeAsync;
+        _diagram.Nodes.Add(node);
+    }
+
     private LinkModel CreateLinkModel(Link link)
     {
         NodeModel targetNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.TargetId) != false);
@@ -269,6 +280,15 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         return linkModel;
     }
 
+    private async ValueTask UpdatePortByLinkModelAsync(LinkModel linkModel)
+    {
+        if (linkModel.TargetPort != null)
+        {
+            var tp = (FlowPort)linkModel.TargetPort;
+            Port newPort = await FlowService.GetPortAsync(tp.Port.Id);
+            tp.Update(newPort);
+        }
+    }
 
     private async Task OnLinkTargetPortChangedAsync(BaseLinkModel tmpLink, PortModel _, PortModel p2)
     {

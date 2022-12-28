@@ -69,8 +69,9 @@ public interface IFlowService
     /// </summary>
     /// <param name="stepId">The step id.</param>
     /// <param name="iterationId">The iteration id.</param>
+    /// <param name="updatePorts">Whether to update the ports.</param>
     /// <returns>The step.</returns>
-    ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null);
+    ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null, bool updatePorts = true);
 
     /// <summary>
     /// Gets the link.

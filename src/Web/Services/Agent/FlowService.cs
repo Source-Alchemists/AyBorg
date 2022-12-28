@@ -63,8 +63,9 @@ public class FlowService : IFlowService
     /// </summary>
     /// <param name="stepId">The step id.</param>
     /// <param name="iterationId">The iteration id.</param>
+    /// <param name="updatePorts">if set to <c>true</c> [update ports].</param>
     /// <returns>The step.</returns>
-    public async ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null)
+    public async ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null, bool updatePorts = true)
     {
         var request = new GetFlowStepsRequest
         {
@@ -81,9 +82,12 @@ public class FlowService : IFlowService
         }
 
         Step stepModel = RpcMapper.FromRpc(resultStep);
-        foreach (Port portModel in stepModel.Ports!)
+        if (updatePorts)
         {
-            await LazyLoadAsync(portModel, iterationId);
+            foreach (Port portModel in stepModel.Ports!)
+            {
+                await LazyLoadAsync(portModel, iterationId);
+            }
         }
         return stepModel;
     }
