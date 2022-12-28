@@ -47,7 +47,7 @@ public interface IFlowService
     /// <param name="sourcePortId">The source port identifier.</param>
     /// <param name="targetPortId">The target port identifier.</param>
     /// <returns></returns>
-    ValueTask<bool> TryAddLinkAsync(Guid sourcePortId, Guid targetPortId);
+    ValueTask<Guid?> AddLinkAsync(Guid sourcePortId, Guid targetPortId);
 
     /// <summary>
     /// Removes the link.
@@ -71,6 +71,13 @@ public interface IFlowService
     /// <param name="iterationId">The iteration id.</param>
     /// <returns>The step.</returns>
     ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null);
+
+    /// <summary>
+    /// Gets the link.
+    /// </summary>
+    /// <param name="linkId">The link identifier.</param>
+    /// <returns>The link.</returns>
+    ValueTask<Link> GetLinkAsync(Guid linkId);
 
     /// <summary>
     /// Try to set the port value.

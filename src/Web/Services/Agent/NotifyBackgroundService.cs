@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.Communication.gRPC;
+using AyBorg.SDK.Communication.gRPC.Models;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
 using static AyBorg.Web.Services.NotifyService;
@@ -45,6 +46,10 @@ public sealed class NotifyBackgroundService : BackgroundService
                             break;
                         case NotifyType.AgentIterationFinished:
                             callbackObject = Guid.Parse(notifyMessage.Payload);
+                            break;
+                        case NotifyType.AgentAutomationFlowChanged:
+                            AgentAutomationFlowChangeArgs? flowChangeArgs = JsonSerializer.Deserialize<AgentAutomationFlowChangeArgs>(notifyMessage.Payload);
+                            callbackObject = flowChangeArgs!;
                             break;
                         default:
                             break;

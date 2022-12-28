@@ -1,9 +1,5 @@
-using System.Text.Json;
-using Ayborg.Gateway.Agent.V1;
 using AyBorg.Agent.Runtime;
-using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Projects;
-using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
 using Grpc.Core;
 
@@ -15,8 +11,7 @@ internal sealed class EngineHost : IEngineHost
     private readonly IEngineFactory _engineFactory;
     private readonly ICacheService _cacheService;
     private readonly CommunicationStateProvider _communicationStateProvider;
-    private readonly IServiceConfiguration _serviceConfiguration;
-    private readonly Notify.NotifyClient _notifyClient;
+    private readonly INotifyService _notifyService;
     private IEngine? _engine;
     private EngineMeta? _engineMeta;
     private bool _isDisposed = false;
@@ -31,15 +26,13 @@ internal sealed class EngineHost : IEngineHost
                         IEngineFactory engineFactory,
                         ICacheService cacheService,
                         ICommunicationStateProvider communicationStateProvider,
-                        IServiceConfiguration serviceConfiguration,
-                        Notify.NotifyClient notifyClient)
+                        INotifyService notifyService)
     {
         _logger = logger;
         _engineFactory = engineFactory;
         _cacheService = cacheService;
         _communicationStateProvider = (CommunicationStateProvider)communicationStateProvider;
-        _serviceConfiguration = serviceConfiguration;
-        _notifyClient = notifyClient;
+        _notifyService = notifyService;
     }
 
     /// <summary>
@@ -276,11 +269,7 @@ internal sealed class EngineHost : IEngineHost
             _logger.LogTrace($"Engine is done. Removing engine.");
         }
 
-        await _notifyClient.CreateNotificationFromAgentAsync(new NotifyMessage {
-            AgentUniqueName = _serviceConfiguration.UniqueName,
-            Type = (int)NotifyType.AgentEngineStateChanged,
-            Payload = JsonSerializer.Serialize(_engineMeta)
-        });
+        await _notifyService.SendEngineStateAsync(_engineMeta);
     }
 
     private void DisposeEngine()
@@ -303,12 +292,7 @@ internal sealed class EngineHost : IEngineHost
         await _cacheService.CreateCacheAsync(e.IterationId, ActiveProject);
         try
         {
-            await _notifyClient.CreateNotificationFromAgentAsync(new NotifyMessage
-            {
-                AgentUniqueName = _serviceConfiguration.UniqueName,
-                Type = (int)NotifyType.AgentIterationFinished,
-                Payload = e.IterationId.ToString()
-            });
+            await _notifyService.SendIterationFinishedAsync(e.IterationId);
         }
         catch (RpcException ex)
         {

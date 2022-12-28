@@ -55,6 +55,7 @@ builder.Services.AddSingleton<IProjectManagementService, ProjectManagementServic
 builder.Services.AddSingleton<IEngineHost, EngineHost>();
 builder.Services.AddSingleton<IEngineFactory, EngineFactory>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
+builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
 

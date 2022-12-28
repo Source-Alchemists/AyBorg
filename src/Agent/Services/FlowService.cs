@@ -10,6 +10,7 @@ internal sealed class FlowService : IFlowService
     private readonly IPluginsService _pluginsService;
     private readonly IEngineHost _runtimeHost;
     private readonly IRuntimeConverterService _runtimeConverterService;
+    private readonly INotifyService _notifyService;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FlowService"/> class.
@@ -18,15 +19,18 @@ internal sealed class FlowService : IFlowService
     /// <param name="pluginsService">The plugins service.</param>
     /// <param name="engineHost">The engine host.</param>
     /// <param name="runtimeConverterService">The runtime converter service.</param>
+    /// <param name="notifyService">The notify service.</param>
     public FlowService(ILogger<FlowService> logger,
                         IPluginsService pluginsService,
                         IEngineHost engineHost,
-                        IRuntimeConverterService runtimeConverterService)
+                        IRuntimeConverterService runtimeConverterService,
+                        INotifyService notifyService)
     {
         _logger = logger;
         _pluginsService = pluginsService;
         _runtimeHost = engineHost;
         _runtimeConverterService = runtimeConverterService;
+        _notifyService = notifyService;
     }
 
     /// <summary>
@@ -109,7 +113,10 @@ internal sealed class FlowService : IFlowService
         stepProxy.Y = y;
 
         _runtimeHost.ActiveProject.Steps.Add(stepProxy);
-
+        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        {
+            AddedSteps = new[] { stepProxy.Id.ToString() }
+        });
         return await ValueTask.FromResult(stepProxy);
     }
 
@@ -134,18 +141,8 @@ internal sealed class FlowService : IFlowService
         }
 
         project.Steps.Remove(step);
-
-        var stepLinks = new List<PortLink>();
+        var removedLinks = new List<PortLink>();
         foreach (PortLink link in step.Links)
-        {
-            stepLinks.Add(link);
-            if (project.Links.Contains(link))
-            {
-                project.Links.Remove(link);
-            }
-        }
-
-        foreach (PortLink link in stepLinks)
         {
             foreach (IStepProxy? linkedStep in project.Steps.Where(s => s.Links.Contains(link)))
             {
@@ -155,10 +152,22 @@ internal sealed class FlowService : IFlowService
                 }
 
                 linkedStep.Links.Remove(link);
+                removedLinks.Add(link);
+                if (project.Links.Contains(link))
+                {
+                    project.Links.Remove(link);
+                }
             }
         }
-        // ToDo: Dispose step if needed.
-        return await ValueTask.FromResult(true);
+
+        step.Dispose();
+        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        {
+            RemovedSteps = new[] { step.Id.ToString() },
+            RemovedLinks = removedLinks.Select(l => l.Id.ToString()).ToArray()
+        });
+
+        return true;
     }
 
     /// <summary>
@@ -185,7 +194,12 @@ internal sealed class FlowService : IFlowService
         step.X = x;
         step.Y = y;
 
-        return await ValueTask.FromResult(true);
+        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        {
+            ChangedSteps = new[] { step.Id.ToString() }
+        });
+
+        return true;
     }
 
     /// <summary>
@@ -246,7 +260,13 @@ internal sealed class FlowService : IFlowService
         sourceStep.Links.Add(link);
         targetStep.Links.Add(link);
         _runtimeHost.ActiveProject.Links.Add(link);
-        return await ValueTask.FromResult(link);
+
+        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        {
+            AddedLinks = new[] { link.Id.ToString() }
+        });
+
+        return link;
     }
 
     /// <summary>
@@ -281,7 +301,13 @@ internal sealed class FlowService : IFlowService
         }
 
         _runtimeHost.ActiveProject.Links.Remove(link);
-        return await ValueTask.FromResult(true);
+
+        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        {
+            RemovedLinks = new[] { link.Id.ToString() }
+        });
+
+        return true;
     }
 
     /// <summary>
@@ -306,6 +332,12 @@ internal sealed class FlowService : IFlowService
         }
 
         IPort port = targetStep.Ports.First(p => p.Id == portId);
+
+        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        {
+            ChangedPorts = new[] { port.Id.ToString() }
+        });
+
         return await _runtimeConverterService.TryUpdatePortValueAsync(port, value);
     }
 

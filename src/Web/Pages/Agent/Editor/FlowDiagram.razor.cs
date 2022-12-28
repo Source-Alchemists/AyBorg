@@ -1,4 +1,5 @@
 using AyBorg.SDK.Common.Models;
+using AyBorg.SDK.Communication.gRPC.Models;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
@@ -7,18 +8,22 @@ using AyBorg.Web.Shared.Modals;
 using Blazor.Diagrams.Core;
 using Blazor.Diagrams.Core.Models;
 using Blazor.Diagrams.Core.Models.Base;
+using Grpc.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.AspNetCore.SignalR.Client;
 using MudBlazor;
 
 namespace AyBorg.Web.Pages.Agent.Editor;
 
-public partial class FlowDiagram : ComponentBase, IAsyncDisposable
+#nullable disable
+
+public partial class FlowDiagram : ComponentBase, IDisposable
 {
     private readonly Diagram _diagram;
-    private HubConnection _flowHubConnection = null!;
     private bool _suspendDiagramRefresh = false;
+    private NotifyService.Subscription _iterationFinishedSubscription = null!;
+    private NotifyService.Subscription _flowChangedSubscription = null!;
+    private bool _disposedValue;
 
     [Inject] IFlowService FlowService { get; set; } = null!;
     [Inject] INotifyService NotifyService { get; set; } = null!;
@@ -90,88 +95,125 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
                 _diagram.PanChanged -= OnPanChanged;
             }
             _diagram.Refresh();
+            Subscribe();
         }
     }
 
-    /// <summary>
-    /// Updates the component.
-    /// </summary>
-    public async Task UpdateAsync()
+    private void Subscribe()
     {
-        await InvokeAsync(StateHasChanged);
+        if (_iterationFinishedSubscription != null) _iterationFinishedSubscription.Callback -= IterationFinishedNotificationReceived;
+        _iterationFinishedSubscription = NotifyService.CreateSubscription(StateService.AgentState.UniqueName, SDK.Communication.gRPC.NotifyType.AgentIterationFinished);
+        _iterationFinishedSubscription.Callback += IterationFinishedNotificationReceived;
+
+        if (_flowChangedSubscription != null) _flowChangedSubscription.Callback -= FlowChangedNotificationReceived;
+        _flowChangedSubscription = NotifyService.CreateSubscription(StateService.AgentState.UniqueName, SDK.Communication.gRPC.NotifyType.AgentAutomationFlowChanged);
+        _flowChangedSubscription.Callback += FlowChangedNotificationReceived;
     }
 
-    /// <summary>
-    /// Dispose the component.
-    /// </summary>
-    public async ValueTask DisposeAsync()
+    private async void IterationFinishedNotificationReceived(object obj)
     {
-        if (_flowHubConnection != null) await _flowHubConnection.DisposeAsync();
-    }
-
-    // private async Task ConnectHubEventsAsync()
-    // {
-    //     _flowHubConnection = FlowService.CreateHubConnection(StateService.AgentState.BaseUrl);
-    //     ConnectLinkChangedHubEvent();
-    //     await _flowHubConnection.StartAsync();
-    // }
-
-    private void ConnectLinkChangedHubEvent()
-    {
-        _flowHubConnection.On<Link, bool>("LinkChanged", async (linkDto, removed) =>
+        try
         {
-            Logger.LogTrace("LinkChanged event received from server. Link: {link}, Removed: {removed}", linkDto, removed);
-            if (removed)
+            Guid iterationId = (Guid)obj;
+            IEnumerable<FlowNode> flowNodes = _diagram.Nodes.Cast<FlowNode>();
+            CancellationToken token = CancellationToken.None;
+            await Parallel.ForEachAsync(flowNodes, async (node, token) =>
             {
-                BaseLinkModel linkModel = FindLinkModel(linkDto);
-                if (linkModel != null)
+                Step newStep = await FlowService.GetStepAsync(node.Step.Id, iterationId);
+                node.Update(newStep);
+            });
+        }
+        catch (RpcException) { }
+    }
+
+    private async void FlowChangedNotificationReceived(object obj)
+    {
+        try
+        {
+            var flowChangeArgs = (AgentAutomationFlowChangeArgs)obj;
+
+            // Add steps
+            foreach (string stepIdStr in flowChangeArgs.AddedSteps)
+            {
+                Guid stepId = Guid.Parse(stepIdStr);
+                if (_diagram.Nodes.Cast<FlowNode>().Any(n => n.Step.Id.Equals(stepId)))
                 {
-                    _diagram.Links.Remove(linkModel);
+                    // Already exists
+                    continue;
+                }
+                Step newStep = await FlowService.GetStepAsync(stepId);
+                await InvokeAsync(() => CreateAndAddNode(newStep));
+            }
+
+            // Add links
+            foreach (string linkIdStr in flowChangeArgs.AddedLinks)
+            {
+                Guid linkId = Guid.Parse(linkIdStr);
+                if (_diagram.Links.Any(l => l.Id.Equals(linkId.ToString())))
+                {
+                    // Already exists
+                    continue;
                 }
 
-                FlowNode? tn = _diagram.Nodes.Cast<FlowNode>().FirstOrDefault(n => n.Step.Ports?.Any(p => p.Id == linkDto.TargetId) != false);
-                if (tn == null) return;
-                FlowPort tp = tn.Ports.Cast<FlowPort>().First(p => p.Port.Id.Equals(linkDto.TargetId));
-                await tp.UpdateAsync();
+                Link newLink = await FlowService.GetLinkAsync(linkId);
+                LinkModel linkModel = CreateLinkModel(newLink);
+                await InvokeAsync(() => _diagram.Links.Add(linkModel));
+                await UpdatePortByLinkModelAsync(linkModel);
             }
-            else
-            {
-                BaseLinkModel link = FindLinkModel(linkDto);
 
-                if (link != null)
+            // Remove steps
+            foreach (string stepIdStr in flowChangeArgs.RemovedSteps)
+            {
+                Guid stepId = Guid.Parse(stepIdStr);
+                IEnumerable<FlowNode> diagramNodes = _diagram.Nodes.Cast<FlowNode>();
+
+                FlowNode node = diagramNodes.FirstOrDefault(n => n.Step.Id.Equals(stepId));
+                if (node == null)
                 {
-                    if (link.TargetPort != null)
-                    {
-                        var targetPort = (FlowPort)link.TargetPort;
-                        await targetPort.UpdateAsync();
-                    }
-                    return;
+                    // Already removed
+                    continue;
                 }
 
-                _diagram.Links.Add(CreateLinkModel(linkDto));
+                _diagram.Nodes.Removed -= OnNodeRemoved;
+                await InvokeAsync(() => _diagram.Nodes.Remove(node));
+                _diagram.Nodes.Removed += OnNodeRemoved;
             }
-        });
-    }
 
-    private BaseLinkModel FindLinkModel(Link linkDto)
-    {
-        foreach (BaseLinkModel li in _diagram.Links)
-        {
-            if (li.SourcePort is FlowPort sp && sp.Port.Id.Equals(linkDto.SourceId) && li.TargetPort is FlowPort tp && tp.Port.Id.Equals(linkDto.TargetId))
+            // Remove links
+            foreach (string linkIdStr in flowChangeArgs.RemovedLinks)
             {
-                return li;
+                Guid linkId = Guid.Parse(linkIdStr);
+                BaseLinkModel link = _diagram.Links.FirstOrDefault(l => l.Id.Equals(linkId.ToString()));
+                if (link == null)
+                {
+                    // Already removed
+                    continue;
+                }
+
+                await InvokeAsync(() => _diagram.Links.Remove(link));
+                await UpdatePortByLinkModelAsync((LinkModel)link);
             }
         }
-
-        return null!;
+        catch (RpcException) { }
     }
 
-    private FlowNode CreateNode(Step step)
+    private async ValueTask UpdatePortByLinkModelAsync(LinkModel linkModel)
     {
-        var node = new FlowNode(FlowService, NotifyService, StateService, step, Disabled);
+        if (linkModel.TargetPort != null)
+        {
+            var tp = (FlowPort)linkModel.TargetPort;
+            Port newPort = await FlowService.GetPortAsync(tp.Port.Id);
+            tp.Update(newPort);
+        }
+    }
+
+    private void CreateAndAddNode(Step step)
+    {
+        if (_diagram.Nodes.Cast<FlowNode>().Any(n => n.Step.Id.Equals(step.Id))) return;
+        var node = new FlowNode(step, Disabled);
         node.Moving += async (n) => await OnNodeMovingAsync(n);
         node.OnDelete += ShouldDeleteNodeAsync;
-        return node;
+        _diagram.Nodes.Add(node);
     }
 
     private async Task CreateFlow()
@@ -182,7 +224,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
             // First create all nodes
             foreach (Step step in steps)
             {
-                _diagram.Nodes.Add(CreateNode(step));
+                CreateAndAddNode(step);
             }
             // Next create all links
             IEnumerable<Link> links = await FlowService.GetLinksAsync();
@@ -206,17 +248,19 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
 
     private LinkModel CreateLinkModel(Link link)
     {
-        NodeModel? targetNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.TargetId) != false);
-        NodeModel? sourceNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.SourceId) != false);
+        NodeModel targetNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.TargetId) != false);
+        NodeModel sourceNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.SourceId) != false);
         if (targetNode == null || sourceNode == null)
         {
-            throw new Exception("Could not find source or target node");
+            Logger.LogWarning("Could not find source or target node");
+            return null;
         }
-        PortModel? targetPort = targetNode.Ports.FirstOrDefault(p => ((FlowPort)p).Port.Id == link.TargetId);
-        PortModel? sourcePort = sourceNode.Ports.FirstOrDefault(p => ((FlowPort)p).Port.Id == link.SourceId);
+        PortModel targetPort = targetNode.Ports.FirstOrDefault(p => ((FlowPort)p).Port.Id == link.TargetId);
+        PortModel sourcePort = sourceNode.Ports.FirstOrDefault(p => ((FlowPort)p).Port.Id == link.SourceId);
         if (targetPort == null || sourcePort == null)
         {
-            throw new Exception("Could not find source or target port");
+            Logger.LogWarning("Could not find source or target port");
+            return null;
         }
         var linkModel = new LinkModel(link.Id.ToString(), sourcePort, targetPort)
         {
@@ -226,12 +270,12 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     }
 
 
-    private async Task OnLinkTargetPortChangedAsync(BaseLinkModel link, PortModel _, PortModel p2)
+    private async Task OnLinkTargetPortChangedAsync(BaseLinkModel tmpLink, PortModel _, PortModel p2)
     {
         if (_suspendDiagramRefresh) return;
-        if (link.SourcePort == null) return;
+        if (tmpLink.SourcePort == null) return;
 
-        var fp1 = (FlowPort)link.SourcePort;
+        var fp1 = (FlowPort)tmpLink.SourcePort;
         var fp2 = (FlowPort)p2;
         FlowPort sourcePort;
         FlowPort targetPort;
@@ -252,16 +296,26 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         {
             Logger.LogWarning("Port {targetPort.Port.Id} already has a link", targetPort.Port.Id);
             Snackbar.Add("Port already has a link", Severity.Warning);
-            _diagram.Links.Remove(link);
+            _diagram.Links.Remove(tmpLink);
             return;
         }
 
-        bool result = await FlowService.TryAddLinkAsync(sourcePort.Port.Id, targetPort.Port.Id);
-        if (!result)
+        Guid? newLinkId = await FlowService.AddLinkAsync(sourcePort.Port.Id, targetPort.Port.Id);
+        Link newLink = await FlowService.GetLinkAsync((Guid)newLinkId);
+        if (newLink != null && !tmpLink.Id.Equals(newLink.Id.ToString()))
+        {
+            _diagram.Links.Remove(tmpLink);
+        }
+        if (newLink == null)
         {
             Logger.LogWarning("Failed to add link from {Id} to {Id}", sourcePort.Port.Id, targetPort.Port.Id);
-            _diagram.Links.Remove(link);
             Snackbar.Add("Link is not compatible", Severity.Warning);
+        }
+        else
+        {
+            LinkModel linkModel = CreateLinkModel(newLink);
+            _diagram.Links.Add(linkModel);
+            await UpdatePortByLinkModelAsync(linkModel);
         }
     }
 
@@ -275,16 +329,16 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     private async Task OnDrop(DragEventArgs args)
     {
         if (_diagram == null) return;
-        Step? step = DragDropStateHandler.DraggedStep;
+        Step step = DragDropStateHandler.DraggedStep;
         if (step == null) return;
         Blazor.Diagrams.Core.Geometry.Point relativePosition = _diagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
         step.X = (int)relativePosition.X;
         step.Y = (int)relativePosition.Y;
 
         Step receivedStep = await FlowService.AddStepAsync(step.Id, step.X, step.Y);
-        if (receivedStep != null)
+        if (receivedStep != null && !_diagram.Nodes.Cast<FlowNode>().Any(n => n.Step.Id.Equals(receivedStep.Id)))
         {
-            _diagram.Nodes.Add(CreateNode(receivedStep));
+            CreateAndAddNode(receivedStep);
         }
     }
 
@@ -300,7 +354,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         IEnumerable<Link> links = await FlowService.GetLinksAsync();
         var sp = (FlowPort)link.SourcePort;
         var tp = (FlowPort)link.TargetPort;
-        Link? orgLink = links.FirstOrDefault(l => l.SourceId == sp.Port.Id && l.TargetId == tp.Port.Id);
+        Link orgLink = links.FirstOrDefault(l => l.Id.ToString().Equals(link.Id));
         if (orgLink == null) return; // Nothing to do. Already removed.
         if (!await FlowService.TryRemoveLinkAsync(orgLink.Id))
         {
@@ -308,7 +362,8 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
             return;
         }
 
-        await tp.UpdateAsync();
+        Port newPort = await FlowService.GetPortAsync(tp.Port.Id);
+        tp.Update(newPort);
     }
 
     private async void OnNodeRemoved(NodeModel node)
@@ -316,9 +371,9 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
         if (_suspendDiagramRefresh) return;
         if (node is FlowNode flowNode)
         {
-            if (await FlowService.TryRemoveStepAsync(flowNode.Step.Id))
+            if (!await FlowService.TryRemoveStepAsync(flowNode.Step.Id))
             {
-                _diagram.Nodes.Remove(node);
+                _diagram.Nodes.Add(node);
             }
         }
     }
@@ -335,7 +390,7 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     private async void ShouldDeleteNodeAsync()
     {
         var selectedNodes = _diagram.Nodes.Where(n => n.Selected).ToList();
-        foreach (NodeModel? node in selectedNodes)
+        foreach (NodeModel node in selectedNodes)
         {
             if (await ShowDeleteConfirmDialogAsync(node.Title))
             {
@@ -369,5 +424,25 @@ public partial class FlowDiagram : ComponentBase, IAsyncDisposable
     private async void OnPanChanged()
     {
         await StateService.AutomationFlowState.SetOffsetAsync(_diagram.Pan.X, _diagram.Pan.Y);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                if (_iterationFinishedSubscription != null) _iterationFinishedSubscription.Callback -= IterationFinishedNotificationReceived;
+                if (_flowChangedSubscription != null) _flowChangedSubscription.Callback -= FlowChangedNotificationReceived;
+            }
+
+            _disposedValue = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

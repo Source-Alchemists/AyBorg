@@ -97,7 +97,25 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         {
             var result = new GetFlowLinksResponse();
 
-            IEnumerable<PortLink> flowLinks = _flowService.GetLinks();
+            IEnumerable<PortLink> flowLinks = _flowService.GetLinks().ToList();
+            var targetPorts = new HashSet<PortLink>();
+            if (request.LinkIds.Any())
+            {
+                // Filter links
+                foreach (string? idStr in request.LinkIds)
+                {
+                    if (!Guid.TryParse(idStr, out Guid linkId))
+                    {
+                        _logger.LogWarning("Invalid link id: {LinkId}", idStr);
+                        continue;
+                    }
+
+                    targetPorts.Add(flowLinks.First(x => x.Id == linkId));
+                }
+
+                flowLinks = targetPorts;
+            }
+
             foreach (PortLink fl in flowLinks)
             {
                 result.Links.Add(RpcMapper.ToRpc(fl));
@@ -130,7 +148,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             IPort port = _flowService.GetPort(portId);
             if (port == null)
             {
-                _logger.LogWarning("Port not found: {PortId}", portId);
+                _logger.LogTrace("Port not found: {PortId}", portId);
                 continue;
             }
 
@@ -204,7 +222,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         return new Empty();
     }
 
-    public override async Task<Empty> LinkFlowPorts(LinkFlowPortsRequest request, ServerCallContext context)
+    public override async Task<LinkFlowPortsResponse> LinkFlowPorts(LinkFlowPortsRequest request, ServerCallContext context)
     {
         if (!Guid.TryParse(request.SourceId, out Guid sourceId))
         {
@@ -221,7 +239,11 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid target id"));
             }
 
-            _ = await _flowService.LinkPortsAsync(sourceId, targetId);
+            PortLink newPortLink = await _flowService.LinkPortsAsync(sourceId, targetId);
+            return new LinkFlowPortsResponse
+            {
+                LinkId = newPortLink.Id.ToString()
+            };
         }
         else
         {
@@ -231,9 +253,9 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                 _logger.LogWarning("Source port not found: {SourceId}", request.SourceId);
                 throw new RpcException(new Status(StatusCode.NotFound, "Source port not found"));
             }
-        }
 
-        return new Empty();
+            return new LinkFlowPortsResponse { LinkId = string.Empty };
+        }
     }
 
     public override async Task<Empty> UpdateFlowPort(UpdateFlowPortRequest request, ServerCallContext context)
@@ -331,8 +353,8 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                 await responseStream.WriteAsync(new ImageChunkDto
                 {
                     Data = UnsafeByteOperations.UnsafeWrap(slice),
-                    FullWidth = targetImage.Width,
-                    FullHeight = targetImage.Height,
+                    FullWidth = originalImage.Width,
+                    FullHeight = originalImage.Height,
                     FullStreamLength = fullStreamLength
                 });
             }

@@ -108,6 +108,29 @@ public class FlowService : IFlowService
     }
 
     /// <summary>
+    /// Gets the link.
+    /// </summary>
+    /// <param name="linkId">The link identifier.</param>
+    /// <returns>The link.</returns>
+    public async ValueTask<Link> GetLinkAsync(Guid linkId)
+    {
+        var request = new GetFlowLinksRequest
+        {
+            AgentUniqueName = _stateService.AgentState.UniqueName
+        };
+        request.LinkIds.Add(linkId.ToString());
+        GetFlowLinksResponse response = await _editorClient.GetFlowLinksAsync(request);
+        LinkDto? resultLink = response.Links.FirstOrDefault();
+        if (resultLink == null)
+        {
+            _logger.LogWarning("Could not find link with id {LinkId}", linkId);
+            return null!;
+        }
+
+        return RpcMapper.FromRpc(resultLink);
+    }
+
+    /// <summary>
     /// Adds the step asynchronous.
     /// </summary>
     /// <param name="stepId">The step identifier.</param>
@@ -183,22 +206,29 @@ public class FlowService : IFlowService
     /// <param name="sourcePortId">The source port identifier.</param>
     /// <param name="targetPortId">The target port identifier.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryAddLinkAsync(Guid sourcePortId, Guid targetPortId)
+    public async ValueTask<Guid?> AddLinkAsync(Guid sourcePortId, Guid targetPortId)
     {
         try
         {
-            _ = await _editorClient.LinkFlowPortsAsync(new LinkFlowPortsRequest
+            LinkFlowPortsResponse response = await _editorClient.LinkFlowPortsAsync(new LinkFlowPortsRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 SourceId = sourcePortId.ToString(),
                 TargetId = targetPortId.ToString()
             });
-            return true;
+            if (Guid.TryParse(response.LinkId, out Guid linkId))
+            {
+                return linkId;
+            }
+            else
+            {
+                return Guid.Empty;
+            }
         }
         catch (RpcException ex)
         {
             _logger.LogWarning(ex, "Error linking ports");
-            return false;
+            return null;
         }
     }
 
@@ -244,7 +274,6 @@ public class FlowService : IFlowService
         PortDto? resultPort = response.Ports.FirstOrDefault();
         if (resultPort == null)
         {
-            _logger.LogWarning("Could not find port with id {PortId} in iteration {IterationId}", portId, iterationId);
             return null!;
         }
 
@@ -322,8 +351,7 @@ public class FlowService : IFlowService
 
             if (memoryOwner != null)
             {
-                // No image to convert
-                resultImage.Base64 = Convert.ToBase64String(memoryOwner.Memory.ToArray());
+                resultImage.Base64 = Convert.ToBase64String(memoryOwner.Memory.Span);
             }
         }
         finally

@@ -105,7 +105,7 @@ public class FlowPortTests
         flowPort.PortChanged += () => { invoked++; };
 
         // Act
-        await flowPort.UpdateAsync();
+        await flowPort.Update();
 
         // Assert
         Assert.Equal(hasPort ? 1 : 0, invoked);

@@ -57,7 +57,7 @@ public sealed class EditorPassthroughServiceV1 : Editor.EditorBase
         return await client.MoveFlowStepAsync(request);
     }
 
-    public override async Task<Empty> LinkFlowPorts(LinkFlowPortsRequest request, ServerCallContext context)
+    public override async Task<LinkFlowPortsResponse> LinkFlowPorts(LinkFlowPortsRequest request, ServerCallContext context)
     {
         Editor.EditorClient client = _grpcChannelService.CreateClient<Editor.EditorClient>(request.AgentUniqueName);
         return await client.LinkFlowPortsAsync(request);
