@@ -149,15 +149,23 @@ public class FlowService : IFlowService
     /// <returns></returns>
     public async ValueTask<Step> AddStepAsync(Guid stepId, int x, int y)
     {
-        AddFlowStepResponse response = await _editorClient.AddFlowStepAsync(new AddFlowStepRequest
+        try
         {
-            AgentUniqueName = _stateService.AgentState.UniqueName,
-            StepId = stepId.ToString(),
-            X = x,
-            Y = y
-        });
+            AddFlowStepResponse response = await _editorClient.AddFlowStepAsync(new AddFlowStepRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                StepId = stepId.ToString(),
+                X = x,
+                Y = y
+            });
 
-        return RpcMapper.FromRpc(response.Step);
+            return RpcMapper.FromRpc(response.Step);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error adding step");
+            return null!;
+        }
     }
 
     /// <summary>
