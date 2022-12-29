@@ -1,28 +1,30 @@
-using System.Runtime.Caching;
+using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Agent;
-using AyBorg.SDK.System.Caching;
 
 namespace AyBorg.Agent.Services;
 
 internal sealed class CacheService : ICacheService
 {
     private readonly ILogger<CacheService> _logger;
-    private readonly MemoryCache _memoryCache;
+    private readonly ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> _portCache = new();
+    private readonly ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> _stepCache = new();
+    private readonly int _maxCacheTimeSeconds = 5;
+    private readonly int _maxCacheIterations = 10;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="CacheService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="mapper">The mapper.</param>
-    public CacheService(ILogger<CacheService> logger)
+    public CacheService(ILogger<CacheService> logger, IConfiguration configuration)
     {
         _logger = logger;
-        _memoryCache = MemoryCache.Default;
+        _maxCacheTimeSeconds = configuration.GetValue("AyBorg:Cache:MaxSeconds", 10);
+        _maxCacheIterations = configuration.GetValue("AyBorg:Cache:MaxIterations", 5);
     }
 
     /// <summary>
@@ -30,12 +32,13 @@ internal sealed class CacheService : ICacheService
     /// </summary>
     /// <param name="iteration">The iteration.</param>
     /// <param name="project">The project.</param>
-    public async ValueTask CreateCacheAsync(Guid iterationId, Project project)
+    public void CreateCache(Guid iterationId, Project project)
     {
-        CancellationToken token = CancellationToken.None;
-        await Parallel.ForEachAsync(project.Steps, async (step, token) =>
+        ClearOutdatedCache(_stepCache);
+        ClearOutdatedCache(_portCache);
+        Parallel.ForEach(project.Steps, (step) =>
         {
-            await GetOrCreateStepEntryAsync(iterationId, step);
+            CreateStepEntry(iterationId, step);
         });
     }
 
@@ -46,23 +49,9 @@ internal sealed class CacheService : ICacheService
     /// <param name="step">The step.</param>
     /// <returns></returns>
     /// <remarks>If the iteration does not exist, it will create a step entry from the last iteration.</remarks>
-    public async ValueTask<Step> GetOrCreateStepEntryAsync(Guid iterationId, IStepProxy step)
+    public Step GetOrCreateStepEntry(Guid iterationId, IStepProxy step)
     {
-        Step cachedStep = await GetOrCreateStepMetaEntryAsync(iterationId, step);
-        var cachedPorts = new HashSet<Port>();
-        foreach (IPort port in step.Ports)
-        {
-            // Only input ports that are connected to another port are cached.
-            // All other ports are not changing there displayed value at real time.
-            if (port.Direction == PortDirection.Input && port.IsConnected)
-            {
-                Port cachedPort = await GetOrCreatePortEntryAsync(iterationId, port);
-                cachedPorts.Add(cachedPort);
-            }
-        }
-
-        cachedStep.Ports = cachedPorts;
-        return cachedStep;
+        return GetOrCreateStepMetaEntry(iterationId, step);
     }
 
     /// <summary>
@@ -72,65 +61,167 @@ internal sealed class CacheService : ICacheService
     /// <param name="port">The port.</param>
     /// <returns></returns>
     /// <remarks>If the iteration does not exist, it will create a port entry from the last iteration.</remarks>
-    public async ValueTask<Port> GetOrCreatePortEntryAsync(Guid iterationId, IPort port)
+    public Port GetOrCreatePortEntry(Guid iterationId, IPort port)
     {
-        var key = new PortCacheKey(iterationId, port.Id);
-        string keyStr = key.ToString();
-        CacheItem cacheItem = _memoryCache.GetCacheItem(keyStr);
-        Port? result;
-        if (cacheItem == null)
+        object cacheItem = GetCacheItem(_portCache, iterationId, port.Id);
+        cacheItem ??= CreatePortEntry(iterationId, port);
+        return (Port)cacheItem;
+    }
+
+    private Step GetOrCreateStepMetaEntry(Guid iterationId, IStepProxy stepProxy)
+    {
+        object cacheItem = GetCacheItem(_stepCache, iterationId, stepProxy.Id);
+        cacheItem ??= CreateStepEntry(iterationId, stepProxy);
+        return (Step)cacheItem;
+    }
+
+    private Step CreateStepEntry(Guid iterationId, IStepProxy step)
+    {
+        Step cachedStep = CreateStepMetaEntry(iterationId, step);
+        var cachedPorts = new HashSet<Port>();
+        foreach (IPort port in step.Ports)
         {
-            result = await RuntimeMapper.FromRuntimeAsync(port);
-            _memoryCache.Add(new CacheItem(keyStr, result), CreateCacheItemPolicy());
+            // Only input ports that are connected to another port are cached.
+            // All other ports are not changing there displayed value at real time.
+            if (port.Direction == PortDirection.Input && port.IsConnected)
+            {
+                Port cachedPort = CreatePortEntry(iterationId, port);
+                cachedPorts.Add(cachedPort);
+            }
+        }
+
+        cachedStep.Ports = cachedPorts;
+        return cachedStep;
+    }
+
+    private Step CreateStepMetaEntry(Guid iterationId, IStepProxy stepProxy)
+    {
+        Step step = RuntimeMapper.FromRuntime(stepProxy, true);
+        var cacheItem = new CacheItem(stepProxy.Id, step);
+        CacheKey? key = _stepCache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
+        if (key != null && _stepCache.TryGetValue(key, out ConcurrentBag<CacheItem>? value))
+        {
+            if (!value.Any(v => v.Id.Equals(stepProxy.Id)))
+            {
+                value.Add(cacheItem);
+            }
         }
         else
         {
-            result = (Port)cacheItem.Value;
+            _stepCache.TryAdd(new CacheKey(iterationId), new ConcurrentBag<CacheItem> { cacheItem });
+        }
+        return step;
+    }
+
+    private Port CreatePortEntry(Guid iterationId, IPort port)
+    {
+        Port? result;
+        result = RuntimeMapper.FromRuntime(port);
+        var cacheItem = new CacheItem(port.Id, result);
+        CacheKey? key = _portCache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
+        if (key != null && _portCache.TryGetValue(key, out ConcurrentBag<CacheItem>? value))
+        {
+            if (!value.Any(v => v.Id.Equals(port.Id)))
+            {
+                value.Add(cacheItem);
+            }
         }
 
-        if (result == null)
-        {
-            _logger.LogWarning("No port entry found or created for iteration {IterationId} and port {PortId}.", iterationId, port.Id);
-            throw new InvalidOperationException($"No port entry found or created for iteration {iterationId} and port {port.Id}.");
-        }
+        _portCache.TryAdd(new CacheKey(iterationId), new ConcurrentBag<CacheItem> { cacheItem });
         return result;
     }
 
-    private async ValueTask<Step> GetOrCreateStepMetaEntryAsync(Guid iterationId, IStepProxy stepProxy)
+    private void ClearOutdatedCache(ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> cache)
     {
-        var key = new StepCacheKey { IterationId = iterationId, StepId = stepProxy.Id };
-        string keyStr = key.ToString();
-        CacheItem cacheItem = _memoryCache.GetCacheItem(keyStr);
-        if (cacheItem == null)
+        IOrderedEnumerable<CacheKey> cacheKeys = cache.Keys.GroupBy(k => k.Id).Select(g => g.First()).OrderBy(k => k.CreateTime);
+        int cacheSize = cacheKeys.Count();
+        IEnumerable<CacheKey> tmpOutdatedKeys;
+        if (cacheKeys.Count() > _maxCacheIterations)
         {
-            Step step = await RuntimeMapper.FromRuntimeAsync(stepProxy, true);
-            _memoryCache.Add(new CacheItem(keyStr, step), CreateCacheItemPolicy());
-            return step;
+            tmpOutdatedKeys = cacheKeys.TakeLast(cacheSize + 1 - _maxCacheIterations);
         }
         else
         {
-            return (Step)cacheItem.Value;
+            tmpOutdatedKeys = cacheKeys.Where(k => k.CreateTime + TimeSpan.FromSeconds(_maxCacheTimeSeconds) < DateTime.UtcNow);
+        }
+
+        List<CacheKey> outdatedKeys = new();
+        foreach (CacheKey tk in tmpOutdatedKeys)
+        {
+            outdatedKeys.AddRange(cache.Keys.Where(k => k.Id.Equals(tk.Id)));
+        }
+
+        foreach (CacheKey outdatedKey in outdatedKeys)
+        {
+            cache.Remove(outdatedKey, out ConcurrentBag<CacheItem>? items);
+            foreach (CacheItem item in items!)
+            {
+                if (item.Value is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
+            items.Clear();
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static CacheItemPolicy CreateCacheItemPolicy()
+    private static KeyValuePair<CacheKey, ConcurrentBag<CacheItem>> GetCachePairFromLastIteration(ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> cache, Guid objectId)
     {
-        var policy = new CacheItemPolicy
-        {
-            AbsoluteExpiration = DateTimeOffset.UtcNow + TimeSpan.FromSeconds(5),
-            RemovedCallback = CacheItemRemovedCallback
-        };
-
-        return policy;
+        return cache.Where(c => c.Value.Any(v => v.Id.Equals(objectId))).OrderBy(c => c.Key.CreateTime).LastOrDefault();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static void CacheItemRemovedCallback(CacheEntryRemovedArguments arguments)
+    private static object GetCacheItem(ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> cache, Guid iterationId, Guid objectId)
     {
-        if (arguments.CacheItem.Value is Port oldPort)
+        CacheKey? key = cache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
+        if (key == null)
         {
-            oldPort.Dispose();
+            key = GetCachePairFromLastIteration(cache, objectId).Key;
+            if (key == null)
+            {
+                return null!;
+            }
+        }
+
+        ConcurrentBag<CacheItem> iterationObjects = cache[key];
+        CacheItem? cacheItem = iterationObjects.FirstOrDefault(o => o.Id.Equals(objectId));
+        if (cacheItem == null)
+        {
+            KeyValuePair<CacheKey, ConcurrentBag<CacheItem>> pair = GetCachePairFromLastIteration(cache, objectId);
+            if (pair.Value != null)
+            {
+                return pair.Value.First(o => o.Id.Equals(objectId)).Value;
+            }
+
+            return null!;
+        }
+
+        return cacheItem.Value;
+    }
+
+    private record CacheKey
+    {
+        public Guid Id { get; }
+
+        public DateTime CreateTime { get; } = DateTime.UtcNow;
+
+        public CacheKey(Guid id)
+        {
+            Id = id;
+        }
+    }
+
+    private record CacheItem
+    {
+        public Guid Id { get; } = Guid.Empty;
+
+        public object Value { get; } = null!;
+
+        public CacheItem(Guid id, object value)
+        {
+            Id = id;
+            Value = value;
         }
     }
 }

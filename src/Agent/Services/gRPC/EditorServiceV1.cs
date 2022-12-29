@@ -31,64 +31,70 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         _cacheService = cacheService;
     }
 
-    public override async Task<GetAvailableStepsResponse> GetAvailableSteps(GetAvailableStepsRequest request, ServerCallContext context)
+    public override Task<GetAvailableStepsResponse> GetAvailableSteps(GetAvailableStepsRequest request, ServerCallContext context)
     {
-        var result = new GetAvailableStepsResponse();
-        foreach (SDK.Common.IStepProxy step in _pluginsService.Steps)
+        return Task.Factory.StartNew(() =>
         {
-            Step stepBinding = await RuntimeMapper.FromRuntimeAsync(step);
-            StepDto rpcStep = RpcMapper.ToRpc(stepBinding);
-            result.Steps.Add(rpcStep);
-        }
+            var result = new GetAvailableStepsResponse();
+            foreach (SDK.Common.IStepProxy step in _pluginsService.Steps)
+            {
+                Step stepBinding = RuntimeMapper.FromRuntime(step);
+                StepDto rpcStep = RpcMapper.ToRpc(stepBinding);
+                result.Steps.Add(rpcStep);
+            }
 
-        return result;
+            return result;
+        });
     }
 
-    public override async Task<GetFlowStepsResponse> GetFlowSteps(GetFlowStepsRequest request, ServerCallContext context)
+    public override Task<GetFlowStepsResponse> GetFlowSteps(GetFlowStepsRequest request, ServerCallContext context)
     {
-        var result = new GetFlowStepsResponse();
-        IEnumerable<SDK.Common.IStepProxy> flowSteps = _flowService.GetSteps();
-        Guid iterationId = Guid.Empty;
-        if (!string.IsNullOrEmpty(request.IterationId))
+        return Task.Factory.StartNew(() =>
         {
-            if (!Guid.TryParse(request.IterationId, out iterationId))
+            var result = new GetFlowStepsResponse();
+            IEnumerable<SDK.Common.IStepProxy> flowSteps = _flowService.GetSteps();
+            Guid iterationId = Guid.Empty;
+            if (!string.IsNullOrEmpty(request.IterationId))
             {
-                _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
-            }
-        }
-
-        if (request.StepIds.Any())
-        {
-            var targetIds = new HashSet<Guid>();
-            foreach (string? idStr in request.StepIds)
-            {
-                if (!Guid.TryParse(idStr, out Guid stepId))
+                if (!Guid.TryParse(request.IterationId, out iterationId))
                 {
-                    _logger.LogWarning("Invalid step id: {StepId}", idStr);
-                    continue;
+                    _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
+                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
+                }
+            }
+
+            if (request.StepIds.Any())
+            {
+                var targetIds = new HashSet<Guid>();
+                foreach (string? idStr in request.StepIds)
+                {
+                    if (!Guid.TryParse(idStr, out Guid stepId))
+                    {
+                        _logger.LogWarning("Invalid step id: {StepId}", idStr);
+                        continue;
+                    }
+
+                    targetIds.Add(stepId);
                 }
 
-                targetIds.Add(stepId);
+                // Filter steps
+                flowSteps = flowSteps.Where(x => targetIds.Contains(x.Id));
             }
 
-            // Filter steps
-            flowSteps = flowSteps.Where(x => targetIds.Contains(x.Id));
-        }
-
-        foreach (SDK.Common.IStepProxy fs in flowSteps)
-        {
-            if (iterationId != Guid.Empty)
+            foreach (SDK.Common.IStepProxy fs in flowSteps)
             {
-                result.Steps.Add(RpcMapper.ToRpc(await _cacheService.GetOrCreateStepEntryAsync(iterationId, fs)));
+                if (iterationId != Guid.Empty)
+                {
+                    result.Steps.Add(RpcMapper.ToRpc(_cacheService.GetOrCreateStepEntry(iterationId, fs)));
+                }
+                else
+                {
+                    result.Steps.Add(RpcMapper.ToRpc(RuntimeMapper.FromRuntime(fs)));
+                }
             }
-            else
-            {
-                result.Steps.Add(RpcMapper.ToRpc(await RuntimeMapper.FromRuntimeAsync(fs)));
-            }
-        }
 
-        return result;
+            return result;
+        });
     }
 
     public override Task<GetFlowLinksResponse> GetFlowLinks(GetFlowLinksRequest request, ServerCallContext context)
@@ -154,11 +160,11 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
             if (iterationId != Guid.Empty)
             {
-                resultPorts.Add(RpcMapper.ToRpc(await _cacheService.GetOrCreatePortEntryAsync(iterationId, port)));
+                resultPorts.Add(RpcMapper.ToRpc(_cacheService.GetOrCreatePortEntry(iterationId, port)));
             }
             else
             {
-                resultPorts.Add(RpcMapper.ToRpc(await RuntimeMapper.FromRuntimeAsync(port)));
+                resultPorts.Add(RpcMapper.ToRpc(RuntimeMapper.FromRuntime(port)));
             }
         }
 
@@ -184,7 +190,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
         return new AddFlowStepResponse
         {
-            Step = RpcMapper.ToRpc(await RuntimeMapper.FromRuntimeAsync(stepProxy))
+            Step = RpcMapper.ToRpc(RuntimeMapper.FromRuntime(stepProxy))
         };
     }
 
@@ -297,11 +303,11 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         bool isOriginalPortModelCreated = false;
         if (iterationId != Guid.Empty)
         {
-            portModel = await _cacheService.GetOrCreatePortEntryAsync(iterationId, port);
+            portModel = _cacheService.GetOrCreatePortEntry(iterationId, port);
         }
         else
         {
-            portModel = await RuntimeMapper.FromRuntimeAsync(port);
+            portModel = RuntimeMapper.FromRuntime(port);
             isOriginalPortModelCreated = true;
         }
 

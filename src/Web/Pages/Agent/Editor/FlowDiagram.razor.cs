@@ -120,7 +120,14 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             await Parallel.ForEachAsync(flowNodes, async (node, token) =>
             {
                 Step newStep = await FlowService.GetStepAsync(node.Step.Id, iterationId);
-                node.Update(newStep);
+                if (newStep != null)
+                {
+                    node.Update(newStep);
+                }
+                else
+                {
+                    Logger.LogWarning("Step not found");
+                }
             });
         }
         catch (RpcException) { }

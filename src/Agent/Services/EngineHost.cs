@@ -289,7 +289,7 @@ internal sealed class EngineHost : IEngineHost
             return;
         }
 
-        await _cacheService.CreateCacheAsync(e.IterationId, ActiveProject);
+        _cacheService.CreateCache(e.IterationId, ActiveProject);
         try
         {
             await _notifyService.SendIterationFinishedAsync(e.IterationId);

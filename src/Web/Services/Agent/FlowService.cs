@@ -64,8 +64,9 @@ public class FlowService : IFlowService
     /// <param name="stepId">The step id.</param>
     /// <param name="iterationId">The iteration id.</param>
     /// <param name="updatePorts">if set to <c>true</c> [update ports].</param>
+    /// <param name="skipOutputPorts">if set to <c>true</c> [skip output ports].</param>
     /// <returns>The step.</returns>
-    public async ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null, bool updatePorts = true)
+    public async ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true)
     {
         var request = new GetFlowStepsRequest
         {
@@ -86,6 +87,11 @@ public class FlowService : IFlowService
         {
             foreach (Port portModel in stepModel.Ports!)
             {
+                if (portModel.Direction == SDK.Common.Ports.PortDirection.Output && skipOutputPorts)
+                {
+                    // Nothing to do as we only need to update input ports
+                    continue;
+                }
                 await LazyLoadAsync(portModel, iterationId);
             }
         }
