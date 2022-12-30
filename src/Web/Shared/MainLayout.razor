@@ -17,8 +17,8 @@
                     <MudSwitch T="bool" Checked="@_isDarkMode" CheckedChanged="OnThemeSwitchChanged"></MudSwitch>
                     <UserMenu />
                 </MudAppBar>
-                
-                <MudDrawer @bind-Open="@_isDrawerOpen" Elevation="0" Variant="@DrawerVariant.Mini" OpenMiniOnHover="true">
+
+                <MudDrawer @bind-Open="@_isDrawerOpen" Elevation="0" Variant="@DrawerVariant.Responsive">
                     <MudDrawerHeader>
                         <MudText Typo="Typo.h5" hidden="@(!_isDrawerOpen)">AyBorg</MudText>
                     </MudDrawerHeader>
@@ -26,7 +26,7 @@
                         <NavMenu />
                     </MudNavMenu>
                 </MudDrawer>
-                
+
                 <MudMainContent Class="mud-height-full">
                     <MudContainer Class="mud-height-full py-0" MaxWidth="MaxWidth.ExtraExtraLarge">
                         @Body

@@ -2,7 +2,7 @@ using AyBorg.SDK.System.Runtime;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using Microsoft.AspNetCore.Components;
-
+using MudBlazor;
 
 namespace AyBorg.Web.Pages.Agent.Shared;
 
@@ -17,6 +17,8 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
     [Inject] IRuntimeService RuntimeService { get; set; }
 
     [Inject] INotifyService NotifyService { get; set; }
+
+    [Inject] ISnackbar Snackbar { get; set; }
 
     private string StopClass => _isAbortVisible ? "w50" : "mud-full-width";
 
@@ -101,21 +103,36 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        await RuntimeService.StartRunAsync(EngineExecutionType.SingleRun);
+        if (await RuntimeService.StartRunAsync(EngineExecutionType.SingleRun) == null)
+        {
+            _status.State = EngineState.Idle;
+            UpdateButtonsState();
+            Snackbar.Add("Failed to start run", Severity.Warning);
+        }
     }
 
     private async Task OnContinuousRunClicked()
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        await RuntimeService.StartRunAsync(EngineExecutionType.ContinuousRun);
+        if(await RuntimeService.StartRunAsync(EngineExecutionType.ContinuousRun) == null)
+        {
+            _status.State = EngineState.Idle;
+            UpdateButtonsState();
+            Snackbar.Add("Failed to start run", Severity.Warning);
+        }
     }
 
     private async Task OnStopClicked()
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        await RuntimeService.StopRunAsync();
+        if(await RuntimeService.StopRunAsync() == null)
+        {
+            _status.State = EngineState.Idle;
+            UpdateButtonsState();
+            Snackbar.Add("Failed to stop run", Severity.Warning);
+        }
     }
 
     private async Task OnAbortClicked()
@@ -126,6 +143,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
+            Snackbar.Add("Failed to abort run", Severity.Warning);
         }
     }
 

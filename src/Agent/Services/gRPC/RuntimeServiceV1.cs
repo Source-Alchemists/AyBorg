@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Authorization;
 using AyBorg.SDK.System.Runtime;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -29,6 +30,7 @@ public sealed class RuntimeServiceV1 : Ayborg.Gateway.Agent.V1.Runtime.RuntimeBa
 
     public override async Task<StartRunResponse> StartRun(StartRunRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
         EngineMeta status = await _engineHost.StartRunAsync((EngineExecutionType)request.EngineExecutionType);
         ThrowIfNull(status);
 
@@ -39,6 +41,7 @@ public sealed class RuntimeServiceV1 : Ayborg.Gateway.Agent.V1.Runtime.RuntimeBa
 
     public override async Task<StopRunResponse> StopRun(StopRunRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
         EngineMeta status = await _engineHost.StopRunAsync();
         ThrowIfNull(status);
 
@@ -49,6 +52,7 @@ public sealed class RuntimeServiceV1 : Ayborg.Gateway.Agent.V1.Runtime.RuntimeBa
 
     public override async Task<AbortRunResponse> AbortRun(AbortRunRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
         EngineMeta status = await _engineHost.AbortRunAsync();
         ThrowIfNull(status);
 

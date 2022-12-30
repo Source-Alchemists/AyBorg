@@ -1,4 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Authorization;
 using Grpc.Core;
 
 namespace AyBorg.Agent.Services.gRPC;
@@ -16,6 +17,7 @@ public sealed class StorageServiceV1 : Storage.StorageBase
 
     public override Task<GetDirectoriesResponse> GetDirectories(GetDirectoriesRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
         return Task.Factory.StartNew(() =>
         {
             IEnumerable<string> directories = _storageService.GetDirectories(request.Path);

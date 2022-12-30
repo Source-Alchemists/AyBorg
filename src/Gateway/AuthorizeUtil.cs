@@ -9,7 +9,9 @@ public static class AuthorizeUtil
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Metadata Protect(HttpContext httpContext, IEnumerable<string> roles)
     {
-        string token = AuthorizeGuard.ThrowIfNotAuthorized(httpContext, roles);
+        AuthorizeGuard.ThrowIfNotAuthorized(httpContext, roles);
+        string token = httpContext.Request.Headers["Authorization"].First()!;
+
         return new Metadata
         {
             { "Authorization", token! }

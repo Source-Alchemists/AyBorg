@@ -1,4 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Data.DAL;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -18,6 +19,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
 
     public override async Task<Empty> ActivateProject(ActivateProjectRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
         if (!Guid.TryParse(request.ProjectDbId, out Guid dbId))
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ProjectDbId"));
@@ -33,6 +35,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
 
     public override async Task<Empty> ApproveProject(ApproveProjectRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Reviewer });
         if (!Guid.TryParse(request.ProjectDbId, out Guid dbId))
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ProjectDbId"));
@@ -53,6 +56,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
 
     public override async Task<CreateProjectResponse> CreateProject(CreateProjectRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         ProjectRecord projectRecord = await _projectManagementService.CreateAsync(request.ProjectName);
         return new CreateProjectResponse
         {
@@ -62,6 +66,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
 
     public override async Task<Empty> DeleteProject(DeleteProjectRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         if (!Guid.TryParse(request.ProjectId, out Guid id))
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ProjectId"));
@@ -96,6 +101,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
 
     public override async Task<Empty> SaveProject(SaveProjectRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
         ProjectManagementResult result;
         ProjectSaveInfo saveInfo = request.ProjectSaveInfo;
         var state = (SDK.Projects.ProjectState)saveInfo.State;

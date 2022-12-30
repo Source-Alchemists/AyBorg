@@ -1,4 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Authorization;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -35,6 +36,7 @@ public sealed class ProjectSettingsServiceV1 : ProjectSettings.ProjectSettingsBa
 
     public override async Task<Empty> UpdateProjectSettings(UpdateProjectSettingsRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator });
         if (!Guid.TryParse(request.ProjectDbId, out Guid dbId))
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "ProjectDbId is not a valid GUID"));

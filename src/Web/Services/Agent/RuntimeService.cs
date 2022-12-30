@@ -1,7 +1,8 @@
 using System.Runtime.CompilerServices;
+using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.System.Runtime;
 using AyBorg.Web.Services.AppState;
-using Ayborg.Gateway.Agent.V1;
+using Grpc.Core;
 
 namespace AyBorg.Web.Services.Agent;
 
@@ -56,13 +57,21 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status</returns>
     public async ValueTask<EngineMeta> StartRunAsync(EngineExecutionType executionType)
     {
-        StartRunResponse response = await _runtimeClient.StartRunAsync(new StartRunRequest
+        try
         {
-            AgentUniqueName = _stateService.AgentState.UniqueName,
-            EngineExecutionType = (int)executionType,
-            EngineId = string.Empty
-        });
-        return CreateEngineMeta(response.EngineMetaInfos.First());
+            StartRunResponse response = await _runtimeClient.StartRunAsync(new StartRunRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                EngineExecutionType = (int)executionType,
+                EngineId = string.Empty
+            });
+            return CreateEngineMeta(response.EngineMetaInfos.First());
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to start run");
+            return null!;
+        }
     }
 
     /// <summary>
@@ -71,12 +80,20 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status</returns>
     public async ValueTask<EngineMeta> StopRunAsync()
     {
-        StopRunResponse response = await _runtimeClient.StopRunAsync(new StopRunRequest
+        try
         {
-            AgentUniqueName = _stateService.AgentState.UniqueName,
-            EngineId = string.Empty
-        });
-        return CreateEngineMeta(response.EngineMetaInfos.First());
+            StopRunResponse response = await _runtimeClient.StopRunAsync(new StopRunRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                EngineId = string.Empty
+            });
+            return CreateEngineMeta(response.EngineMetaInfos.First());
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to stop run");
+            return null!;
+        }
     }
 
     /// <summary>
@@ -85,25 +102,21 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status</returns>
     public async ValueTask<EngineMeta> AbortRunAsync()
     {
-        AbortRunResponse response = await _runtimeClient.AbortRunAsync(new AbortRunRequest
+        try
         {
-            AgentUniqueName = _stateService.AgentState.UniqueName,
-            EngineId = string.Empty
-        });
-        return CreateEngineMeta(response.EngineMetaInfos.First());
+            AbortRunResponse response = await _runtimeClient.AbortRunAsync(new AbortRunRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                EngineId = string.Empty
+            });
+            return CreateEngineMeta(response.EngineMetaInfos.First());
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to abort run");
+            return null!;
+        }
     }
-
-    // /// <summary>
-    // /// Creates the hub connection.
-    // /// </summary>
-    // /// <returns>The hub connection.</returns>
-    // public HubConnection CreateHubConnection()
-    // {
-    //     HubConnection hubConnection = new HubConnectionBuilder()
-    //         .WithUrl($"{_stateService.AgentState.UniqueName}/hubs/runtime")
-    //         .Build();
-    //     return hubConnection;
-    // }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static EngineMeta CreateEngineMeta(EngineMetaDto engineMetaInfo) => new()

@@ -1,5 +1,6 @@
 using System.Buffers;
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
@@ -175,6 +176,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
     public override async Task<AddFlowStepResponse> AddFlowStep(AddFlowStepRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         if (!Guid.TryParse(request.StepId, out Guid stepId))
         {
             _logger.LogWarning("Invalid step id: {StepId}", request.StepId);
@@ -196,6 +198,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
     public override async Task<Empty> DeleteFlowStep(DeleteFlowStepRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         if (!Guid.TryParse(request.StepId, out Guid stepId))
         {
             _logger.LogWarning("Invalid step id: {StepId}", request.StepId);
@@ -213,6 +216,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
     public override async Task<Empty> MoveFlowStep(MoveFlowStepRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         if (!Guid.TryParse(request.StepId, out Guid stepId))
         {
             _logger.LogWarning("Invalid step id: {StepId}", request.StepId);
@@ -230,6 +234,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
     public override async Task<LinkFlowPortsResponse> LinkFlowPorts(LinkFlowPortsRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         if (!Guid.TryParse(request.SourceId, out Guid sourceId))
         {
             _logger.LogWarning("Invalid source id: {SourceId}", request.SourceId);
@@ -266,6 +271,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
     public override async Task<Empty> UpdateFlowPort(UpdateFlowPortRequest request, ServerCallContext context)
     {
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         Port port = RpcMapper.FromRpc(request.Port);
         if (!await _flowService.TryUpdatePortValueAsync(port.Id, port.Value!))
         {
