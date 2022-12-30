@@ -12,10 +12,10 @@ namespace AyBorg.Plugins.ZXing
     {
         private readonly ILogger<BarcodeRead> _logger;
         private readonly ImagePort _inputImagePort = new("Image", PortDirection.Input, null!);
-        private readonly EnumPort _inputEmumPort = new("Barcode Format", PortDirection.Input, BarcodeFormats.All);
-        private readonly BooleanPort _allowAutoRotate = new("Allow Auto Rotate", PortDirection.Input, false);
-        private readonly BooleanPort _allowTryInvert = new("Allow try Invert", PortDirection.Input, false);
-        private readonly BooleanPort _allowTryHarder = new("Allow try Harder", PortDirection.Input, false);
+        private readonly EnumPort _inputEmumPort = new("Barcode format", PortDirection.Input, BarcodeFormats.All);
+        private readonly BooleanPort _allowAutoRotate = new("Allow auto rotate", PortDirection.Input, false);
+        private readonly BooleanPort _allowTryInvert = new("Allow try invert", PortDirection.Input, false);
+        private readonly BooleanPort _allowTryHarder = new("Allow try harder", PortDirection.Input, false);
         private readonly StringPort _outputStringPort = new("String", PortDirection.Output, string.Empty);
 
         public string DefaultName => "Barcode.Read";
