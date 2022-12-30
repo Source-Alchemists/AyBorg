@@ -363,7 +363,13 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         step.Y = (int)relativePosition.Y;
 
         Step receivedStep = await FlowService.AddStepAsync(step.Id, step.X, step.Y);
-        if (receivedStep != null && !_diagram.Nodes.Cast<FlowNode>().Any(n => n.Step.Id.Equals(receivedStep.Id)))
+        if (receivedStep == null)
+        {
+            Snackbar.Add($"Could not add '{step.Name}' (Step not found)", Severity.Warning);
+            return;
+        }
+
+        if (!_diagram.Nodes.Cast<FlowNode>().Any(n => n.Step.Id.Equals(receivedStep.Id)))
         {
             CreateAndAddNode(receivedStep);
         }
