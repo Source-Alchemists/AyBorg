@@ -11,8 +11,7 @@ namespace AyBorg.Agent.Services;
 internal sealed class CacheService : ICacheService
 {
     private readonly ILogger<CacheService> _logger;
-    private readonly ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> _portCache = new();
-    private readonly ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> _stepCache = new();
+    private readonly ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> _cache = new();
     private readonly int _maxCacheTimeSeconds = 5;
     private readonly int _maxCacheIterations = 10;
 
@@ -34,8 +33,8 @@ internal sealed class CacheService : ICacheService
     /// <param name="project">The project.</param>
     public void CreateCache(Guid iterationId, Project project)
     {
-        ClearOutdatedCache(_stepCache);
-        ClearOutdatedCache(_portCache);
+        ClearOutdatedCache(_cache);
+        _cache.TryAdd(new CacheKey(iterationId), new ConcurrentBag<CacheItem>());
         Parallel.ForEach(project.Steps, (step) =>
         {
             CreateStepEntry(iterationId, step);
@@ -63,14 +62,14 @@ internal sealed class CacheService : ICacheService
     /// <remarks>If the iteration does not exist, it will create a port entry from the last iteration.</remarks>
     public Port GetOrCreatePortEntry(Guid iterationId, IPort port)
     {
-        object cacheItem = GetCacheItem(_portCache, iterationId, port.Id);
+        object cacheItem = GetCacheItem(_cache, iterationId, port.Id);
         cacheItem ??= CreatePortEntry(iterationId, port);
         return (Port)cacheItem;
     }
 
     private Step GetOrCreateStepMetaEntry(Guid iterationId, IStepProxy stepProxy)
     {
-        object cacheItem = GetCacheItem(_stepCache, iterationId, stepProxy.Id);
+        object cacheItem = GetCacheItem(_cache, iterationId, stepProxy.Id);
         cacheItem ??= CreateStepEntry(iterationId, stepProxy);
         return (Step)cacheItem;
     }
@@ -98,8 +97,8 @@ internal sealed class CacheService : ICacheService
     {
         Step step = RuntimeMapper.FromRuntime(stepProxy, true);
         var cacheItem = new CacheItem(stepProxy.Id, step);
-        CacheKey? key = _stepCache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
-        if (key != null && _stepCache.TryGetValue(key, out ConcurrentBag<CacheItem>? value))
+        CacheKey? key = _cache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
+        if (key != null && _cache.TryGetValue(key, out ConcurrentBag<CacheItem>? value))
         {
             if (!value.Any(v => v.Id.Equals(stepProxy.Id)))
             {
@@ -108,7 +107,7 @@ internal sealed class CacheService : ICacheService
         }
         else
         {
-            _stepCache.TryAdd(new CacheKey(iterationId), new ConcurrentBag<CacheItem> { cacheItem });
+            _cache.TryAdd(new CacheKey(iterationId), new ConcurrentBag<CacheItem> { cacheItem });
         }
         return step;
     }
@@ -118,8 +117,8 @@ internal sealed class CacheService : ICacheService
         Port? result;
         result = RuntimeMapper.FromRuntime(port);
         var cacheItem = new CacheItem(port.Id, result);
-        CacheKey? key = _portCache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
-        if (key != null && _portCache.TryGetValue(key, out ConcurrentBag<CacheItem>? value))
+        CacheKey? key = _cache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
+        if (key != null && _cache.TryGetValue(key, out ConcurrentBag<CacheItem>? value))
         {
             if (!value.Any(v => v.Id.Equals(port.Id)))
             {
@@ -127,7 +126,7 @@ internal sealed class CacheService : ICacheService
             }
         }
 
-        _portCache.TryAdd(new CacheKey(iterationId), new ConcurrentBag<CacheItem> { cacheItem });
+        _cache.TryAdd(new CacheKey(iterationId), new ConcurrentBag<CacheItem> { cacheItem });
         return result;
     }
 
