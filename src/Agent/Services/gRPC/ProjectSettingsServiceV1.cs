@@ -28,8 +28,7 @@ public sealed class ProjectSettingsServiceV1 : ProjectSettings.ProjectSettingsBa
         {
             ProjectSettings = new ProjectSettingsDto
             {
-                IsForceResultCommunicationEnabled = projectSettingsRecord.IsForceResultCommunicationEnabled,
-                IsForceWebUiCommunicationEnabled = projectSettingsRecord.IsForceWebUiCommunicationEnabled
+                IsForceResultCommunicationEnabled = projectSettingsRecord.IsForceResultCommunicationEnabled
             }
         };
     }
@@ -45,8 +44,7 @@ public sealed class ProjectSettingsServiceV1 : ProjectSettings.ProjectSettingsBa
 
         if (!await _projectSettingsService.TryUpdateActiveProjectSettingsAsync(dbId, new SDK.Projects.ProjectSettings
         {
-            IsForceResultCommunicationEnabled = settings.IsForceResultCommunicationEnabled,
-            IsForceWebUiCommunicationEnabled = settings.IsForceWebUiCommunicationEnabled
+            IsForceResultCommunicationEnabled = settings.IsForceResultCommunicationEnabled
         }))
         {
             throw new RpcException(new Status(StatusCode.Internal, "Could not update project settings"));

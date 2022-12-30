@@ -66,8 +66,7 @@ public sealed class ProjectSettingsService : IProjectSettingsService
                 ProjectDbId = projectMeta.DbId,
                 ProjectSettings = new ProjectSettingsDto
                 {
-                    IsForceResultCommunicationEnabled = projectSettings.IsForceResultCommunicationEnabled,
-                    IsForceWebUiCommunicationEnabled = projectSettings.IsForceWebUiCommunicationEnabled
+                    IsForceResultCommunicationEnabled = projectSettings.IsForceResultCommunicationEnabled
                 }
             });
 

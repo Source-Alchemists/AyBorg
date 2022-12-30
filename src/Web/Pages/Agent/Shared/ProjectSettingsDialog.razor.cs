@@ -39,21 +39,6 @@ public sealed partial class ProjectSettingsDialog : ComponentBase
         }
     }
 
-    private async Task ChangeUiCommunicationClicked()
-    {
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Change UI communication",
-                                            new DialogParameters {
-                                                { "NeedPassword", true },
-                                                { "ContentText", "Are you sure you want to change the UI communication?" }
-                                            });
-        DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
-        {
-            _projectSettings.IsForceWebUiCommunicationEnabled = !_projectSettings.IsForceWebUiCommunicationEnabled;
-            await UpdateCommunicationSettings();
-        }
-    }
-
     private async ValueTask UpdateCommunicationSettings()
     {
         bool apiResult = await ProjectSettingsService.TryUpdateProjectCommunicationSettingsAsync(StateService.AgentState.UniqueName, ProjectMeta, _projectSettings);

@@ -11,27 +11,16 @@ public sealed record CommunicationStateProvider : ICommunicationStateProvider
     public bool IsResultCommunicationEnabled { get; private set; }
 
     /// <summary>
-    /// Gets a value indicating whether the web ui communication is enabled.
-    /// </summary>
-    public bool IsWebUiCommunicationEnabled { get; private set; }
-
-    /// <summary>
     /// Updates the communication state.
     /// </summary>
     /// <param name="project">The project.</param>
     public void Update(Project project)
     {
         IsResultCommunicationEnabled = project.Meta.State == ProjectState.Ready;
-        IsWebUiCommunicationEnabled = project.Meta.State != ProjectState.Ready;
 
         if (project.Settings.IsForceResultCommunicationEnabled)
         {
             IsResultCommunicationEnabled = !IsResultCommunicationEnabled;
-        }
-
-        if (project.Settings.IsForceWebUiCommunicationEnabled)
-        {
-            IsWebUiCommunicationEnabled = !IsWebUiCommunicationEnabled;
         }
     }
 }
