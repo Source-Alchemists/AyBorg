@@ -9,7 +9,7 @@ namespace AyBorg.Plugins.ZXing.Tests
     public sealed class BarcodeReadTests
     {
 
-        private readonly NullLogger<BarcodeRead> _logger = new(); 
+        private readonly NullLogger<BarcodeRead> _logger = new();
 
         [Fact]
         public async Task Test_TryRunAsync_Success()
@@ -35,7 +35,7 @@ namespace AyBorg.Plugins.ZXing.Tests
             var imagePort = readerBarcode.Ports.Single(x => x.Name == "Image")  as ImagePort;
             imagePort!.Value = Image.Load("./resources/qr-code.png");
             var formatPort = readerBarcode.Ports.Single(x => x.Name == "Barcode Format")  as EnumPort;
-            formatPort!.Value = BarcodeFormats.Undefined;
+            formatPort!.Value = BarcodeFormats.All;
 
 
             bool result = await readerBarcode.TryRunAsync(CancellationToken.None);

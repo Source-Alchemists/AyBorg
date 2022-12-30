@@ -2,7 +2,7 @@ namespace AyBorg.Plugins.ZXing.Models
 {
         public enum BarcodeFormats
         {
-                Undefined,
+                All,
                 AZTEC,
                 CODABAR,
                 CODE_39,
