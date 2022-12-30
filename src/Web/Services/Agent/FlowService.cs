@@ -13,7 +13,6 @@ public class FlowService : IFlowService
 {
     private readonly ILogger<FlowService> _logger;
     private readonly IStateService _stateService;
-    private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
     private readonly Editor.EditorClient _editorClient;
 
     /// <summary>
@@ -21,16 +20,13 @@ public class FlowService : IFlowService
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="stateService">The state service.</param>
-    /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
     /// <param name="editorClient">The editor client.</param>
     public FlowService(ILogger<FlowService> logger,
                         IStateService stateService,
-                        IAuthorizationHeaderUtilService authorizationHeaderUtilService,
                         Editor.EditorClient editorClient)
     {
         _logger = logger;
         _stateService = stateService;
-        _authorizationHeaderUtilService = authorizationHeaderUtilService;
         _editorClient = editorClient;
     }
 

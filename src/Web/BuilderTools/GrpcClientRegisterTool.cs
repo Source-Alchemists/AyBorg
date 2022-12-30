@@ -1,5 +1,7 @@
 using Ayborg.Gateway.Agent.V1;
 using Ayborg.Gateway.V1;
+using AyBorg.Web.Services;
+using Grpc.Core;
 
 namespace AyBorg.Web.BuilderTools;
 
@@ -7,43 +9,38 @@ internal static class GrpcClientRegisterTool
 {
     private const string FallbackUrl = "http://localhost:5000";
     private const string GatewayUrlConfig = "AyBorg:Gateway:Url";
+
     public static void Register(WebApplicationBuilder builder)
     {
-        string? gatewayUrl = builder.Configuration.GetValue(GatewayUrlConfig, FallbackUrl);
+        Uri? gatewayUrl = new(builder.Configuration.GetValue(GatewayUrlConfig, FallbackUrl)!);
+        // Open endpoints
+        CreateClientFactory<Register.RegisterClient>(builder, gatewayUrl, false);
+        CreateClientFactory<Notify.NotifyClient>(builder, gatewayUrl, false);
+        // Secured endpoints
+        CreateClientFactory<ProjectManagement.ProjectManagementClient>(builder, gatewayUrl);
+        CreateClientFactory<ProjectSettings.ProjectSettingsClient>(builder, gatewayUrl);
+        CreateClientFactory<Editor.EditorClient>(builder, gatewayUrl);
+        CreateClientFactory<Runtime.RuntimeClient>(builder, gatewayUrl);
+        CreateClientFactory<Storage.StorageClient>(builder, gatewayUrl);
+    }
 
-        builder.Services.AddGrpcClient<Register.RegisterClient>(option =>
+    private static void CreateClientFactory<T>(WebApplicationBuilder builder, Uri uri, bool tokenRequired = true) where T : ClientBase
+    {
+        IHttpClientBuilder httpClientBuilder = builder.Services.AddGrpcClient<T>(option =>
         {
-            option.Address = new Uri(gatewayUrl!);
+            option.ChannelOptionsActions.Add(o => o.UnsafeUseInsecureChannelCallCredentials = true);
+            option.Address = uri;
+
         });
 
-        builder.Services.AddGrpcClient<ProjectManagement.ProjectManagementClient>(option =>
+        if (tokenRequired)
         {
-            option.Address = new Uri(gatewayUrl!);
-        });
-
-        builder.Services.AddGrpcClient<ProjectSettings.ProjectSettingsClient>(option =>
-        {
-            option.Address = new Uri(gatewayUrl!);
-        });
-
-        builder.Services.AddGrpcClient<Editor.EditorClient>(option =>
-        {
-            option.Address = new Uri(gatewayUrl!);
-        });
-
-        builder.Services.AddGrpcClient<Runtime.RuntimeClient>(option =>
-        {
-            option.Address = new Uri(gatewayUrl!);
-        });
-
-        builder.Services.AddGrpcClient<Storage.StorageClient>(option =>
-        {
-            option.Address = new Uri(gatewayUrl!);
-        });
-
-        builder.Services.AddGrpcClient<Notify.NotifyClient>(option =>
-        {
-            option.Address = new Uri(gatewayUrl!);
-        });
+            httpClientBuilder.AddCallCredentials(async (context, metaData, serviceProvider) =>
+            {
+                ITokenProvider tokenProvider = serviceProvider.GetRequiredService<ITokenProvider>();
+                string token = await tokenProvider.GenerateTokenAsync();
+                metaData.Add("Authorization", $"Bearer {token}");
+            });
+        }
     }
 }

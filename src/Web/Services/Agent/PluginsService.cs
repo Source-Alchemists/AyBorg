@@ -6,21 +6,17 @@ namespace AyBorg.Web.Services.Agent;
 public class PluginsService
 {
     private readonly ILogger<PluginsService> _logger;
-    private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
     private readonly Ayborg.Gateway.Agent.V1.Editor.EditorClient _editorClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginsService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
     /// <param name="editorClient">The editor client.</param>
     public PluginsService(ILogger<PluginsService> logger,
-                            IAuthorizationHeaderUtilService authorizationHeaderUtilService,
                             Ayborg.Gateway.Agent.V1.Editor.EditorClient editorClient)
     {
         _logger = logger;
-        _authorizationHeaderUtilService = authorizationHeaderUtilService;
         _editorClient = editorClient;
     }
 

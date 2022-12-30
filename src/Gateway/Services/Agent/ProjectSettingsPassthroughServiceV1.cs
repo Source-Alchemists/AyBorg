@@ -1,4 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Authorization;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -23,7 +24,8 @@ public sealed class ProjectSettingsPassthroughServiceV1 : ProjectSettings.Projec
 
     public override async Task<Empty> UpdateProjectSettings(UpdateProjectSettingsRequest request, ServerCallContext context)
     {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator });
         ProjectSettings.ProjectSettingsClient client = _grpcChannelService.CreateClient<ProjectSettings.ProjectSettingsClient>(request.AgentUniqueName);
-        return await client.UpdateProjectSettingsAsync(request);
+        return await client.UpdateProjectSettingsAsync(request, headers);
     }
 }

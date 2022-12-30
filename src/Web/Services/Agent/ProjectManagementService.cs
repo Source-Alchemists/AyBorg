@@ -9,7 +9,6 @@ public class ProjectManagementService : IProjectManagementService
 {
     private readonly ILogger<ProjectManagementService> _logger;
     private readonly IStateService _stateService;
-    private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
     private readonly AuthenticationStateProvider _authenticationStateProvider;
     private readonly ProjectManagement.ProjectManagementClient _projectManagementClient;
 
@@ -18,18 +17,15 @@ public class ProjectManagementService : IProjectManagementService
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="stateService">The state service.</param>
-    /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
     /// <param name="authenticationStateProvider">The authentication state provider.</param>
     /// <param name="projectManagementClient">The project management client.</param>
     public ProjectManagementService(ILogger<ProjectManagementService> logger,
                                     IStateService stateService,
-                                    IAuthorizationHeaderUtilService authorizationHeaderUtilService,
                                     AuthenticationStateProvider authenticationStateProvider,
                                     ProjectManagement.ProjectManagementClient projectManagementClient)
     {
         _logger = logger;
         _stateService = stateService;
-        _authorizationHeaderUtilService = authorizationHeaderUtilService;
         _authenticationStateProvider = authenticationStateProvider;
         _projectManagementClient = projectManagementClient;
     }

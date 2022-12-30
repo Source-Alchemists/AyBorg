@@ -1,4 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Authorization;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -41,38 +42,42 @@ public sealed class EditorPassthroughServiceV1 : Editor.EditorBase
 
     public override async Task<AddFlowStepResponse> AddFlowStep(AddFlowStepRequest request, ServerCallContext context)
     {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         Editor.EditorClient client = _grpcChannelService.CreateClient<Editor.EditorClient>(request.AgentUniqueName);
-        return await client.AddFlowStepAsync(request);
+        return await client.AddFlowStepAsync(request, headers);
     }
 
     public override async Task<Empty> DeleteFlowStep(DeleteFlowStepRequest request, ServerCallContext context)
     {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         Editor.EditorClient client = _grpcChannelService.CreateClient<Editor.EditorClient>(request.AgentUniqueName);
-        return await client.DeleteFlowStepAsync(request);
+        return await client.DeleteFlowStepAsync(request, headers);
     }
 
     public override async Task<Empty> MoveFlowStep(MoveFlowStepRequest request, ServerCallContext context)
     {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         Editor.EditorClient client = _grpcChannelService.CreateClient<Editor.EditorClient>(request.AgentUniqueName);
-        return await client.MoveFlowStepAsync(request);
+        return await client.MoveFlowStepAsync(request, headers);
     }
 
     public override async Task<LinkFlowPortsResponse> LinkFlowPorts(LinkFlowPortsRequest request, ServerCallContext context)
     {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         Editor.EditorClient client = _grpcChannelService.CreateClient<Editor.EditorClient>(request.AgentUniqueName);
-        return await client.LinkFlowPortsAsync(request);
+        return await client.LinkFlowPortsAsync(request, headers);
     }
 
     public override async Task<Empty> UpdateFlowPort(UpdateFlowPortRequest request, ServerCallContext context)
     {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         Editor.EditorClient client = _grpcChannelService.CreateClient<Editor.EditorClient>(request.AgentUniqueName);
-        return await client.UpdateFlowPortAsync(request);
+        return await client.UpdateFlowPortAsync(request, headers);
     }
 
     public override async Task GetImageStream(GetImageStreamRequest request, IServerStreamWriter<ImageChunkDto> responseStream, ServerCallContext context)
     {
         Editor.EditorClient client = _grpcChannelService.CreateClient<Editor.EditorClient>(request.AgentUniqueName);
-
         AsyncServerStreamingCall<ImageChunkDto> stream = client.GetImageStream(request);
         await foreach (ImageChunkDto? chunk in stream.ResponseStream.ReadAllAsync())
         {

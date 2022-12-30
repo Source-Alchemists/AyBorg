@@ -9,7 +9,6 @@ public class RuntimeService : IRuntimeService
 {
     private readonly ILogger<RuntimeService> _logger;
     private readonly IStateService _stateService;
-    private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
     private readonly Runtime.RuntimeClient _runtimeClient;
 
     /// <summary>
@@ -17,16 +16,13 @@ public class RuntimeService : IRuntimeService
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="stateService">The state service.</param>
-    /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
     /// <param name="runtimeClient">The runtime client.</param>
     public RuntimeService(ILogger<RuntimeService> logger,
                             IStateService stateService,
-                            IAuthorizationHeaderUtilService authorizationHeaderUtilService,
                             Runtime.RuntimeClient runtimeClient)
     {
         _logger = logger;
         _stateService = stateService;
-        _authorizationHeaderUtilService = authorizationHeaderUtilService;
         _runtimeClient = runtimeClient;
     }
 

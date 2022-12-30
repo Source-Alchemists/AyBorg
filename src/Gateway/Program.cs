@@ -1,6 +1,7 @@
 using AyBorg.Database.Data;
 using AyBorg.Gateway.Services;
 using AyBorg.Gateway.Services.Agent;
+using AyBorg.SDK.Authorization;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
@@ -47,9 +48,12 @@ builder.Services.AddSingleton<IGatewayConfiguration, GatewayConfiguration>();
 builder.Services.AddSingleton<IGrpcChannelService, GrpcChannelService>();
 builder.Services.AddSingleton<IKeeperService, KeeperService>();
 
+builder.Services.AddScoped<IJwtConsumer, JwtConsumer>();
+
 WebApplication app = builder.Build();
 
 app.UseAuthorization();
+app.UseJwtMiddleware();
 
 app.MapGrpcService<RegisterServiceV1>();
 app.MapGrpcService<ProjectManagementPassthroughServiceV1>();

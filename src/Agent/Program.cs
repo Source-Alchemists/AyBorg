@@ -44,8 +44,6 @@ builder.Services.AddGrpcClient<Ayborg.Gateway.Agent.V1.Notify.NotifyClient>(opti
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
 
-builder.Services.AddMemoryCache();
-
 builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
@@ -60,14 +58,13 @@ builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
 
 builder.Services.AddScoped<IProjectSettingsService, ProjectSettingsService>();
-builder.Services.AddScoped<IJwtConsumerService, JwtConsumerService>();
+builder.Services.AddScoped<IJwtConsumer, JwtConsumer>();
 builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IStorageService, StorageService>();
 
 WebApplication app = builder.Build();
 
 app.UseAuthorization();
-
 app.UseJwtMiddleware();
 app.UseProjectStateGuardMiddleware();
 

@@ -6,7 +6,6 @@ namespace AyBorg.Web.Services.Agent;
 public class StorageService : IStorageService
 {
     private readonly IStateService _stateService;
-    private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
     private readonly Storage.StorageClient _storageClient;
 
 
@@ -15,12 +14,10 @@ public class StorageService : IStorageService
     /// Initializes a new instance of the <see cref="StorageService"/> class.
     /// </summary>
     /// <param name="stateService">The state service.</param>
-    /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
     /// <param name="storageClient">The storage client.</param>
-    public StorageService(IStateService stateService, IAuthorizationHeaderUtilService authorizationHeaderUtilService, Storage.StorageClient storageClient)
+    public StorageService(IStateService stateService, Storage.StorageClient storageClient)
     {
         _stateService = stateService;
-        _authorizationHeaderUtilService = authorizationHeaderUtilService;
         _storageClient = storageClient;
     }
 

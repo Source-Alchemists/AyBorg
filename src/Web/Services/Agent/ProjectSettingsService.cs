@@ -6,21 +6,17 @@ namespace AyBorg.Web.Services.Agent;
 public sealed class ProjectSettingsService : IProjectSettingsService
 {
     private readonly ILogger<ProjectSettingsService> _logger;
-    private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
     private readonly ProjectSettings.ProjectSettingsClient _projectSettingsClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ProjectSettingsService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
     /// <param name="projectSettingsClient">The project settings client.</param>
     public ProjectSettingsService(ILogger<ProjectSettingsService> logger,
-                                    IAuthorizationHeaderUtilService authorizationHeaderUtilService,
                                     ProjectSettings.ProjectSettingsClient projectSettingsClient)
     {
         _logger = logger;
-        _authorizationHeaderUtilService = authorizationHeaderUtilService;
         _projectSettingsClient = projectSettingsClient;
     }
 
