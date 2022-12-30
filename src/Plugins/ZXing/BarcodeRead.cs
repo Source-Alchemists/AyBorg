@@ -11,12 +11,12 @@ namespace AyBorg.Plugins.ZXing
     public sealed class BarcodeRead : IStepBody
     {
         private readonly ILogger<BarcodeRead> _logger;
-        private readonly ImagePort _inputImagePort = new("Image", PortDirection.Input, null!);
-        private readonly EnumPort _inputEmumPort = new("Barcode format", PortDirection.Input, BarcodeFormats.All);
-        private readonly BooleanPort _allowAutoRotate = new("Allow auto rotate", PortDirection.Input, false);
-        private readonly BooleanPort _allowTryInvert = new("Allow try invert", PortDirection.Input, false);
-        private readonly BooleanPort _allowTryHarder = new("Allow try harder", PortDirection.Input, false);
-        private readonly StringPort _outputStringPort = new("String", PortDirection.Output, string.Empty);
+        private readonly ImagePort _imagePort = new("Image", PortDirection.Input, null!);
+        private readonly EnumPort _barcodeFormatPort = new("Barcode format", PortDirection.Input, BarcodeFormats.All);
+        private readonly BooleanPort _allowAutoRotatePort = new("Allow auto rotate", PortDirection.Input, false);
+        private readonly BooleanPort _allowTryInvertPort = new("Allow try invert", PortDirection.Input, false);
+        private readonly BooleanPort _allowTryHarderPort = new("Allow try harder", PortDirection.Input, false);
+        private readonly StringPort _codePort = new("Code", PortDirection.Output, string.Empty);
 
         public string DefaultName => "Barcode.Read";
 
@@ -25,12 +25,12 @@ namespace AyBorg.Plugins.ZXing
             _logger = logger;
             Ports = new IPort[]
             {
-                _inputImagePort,
-                _inputEmumPort,
-                _outputStringPort,
-                _allowAutoRotate,
-                _allowTryInvert,
-                _allowTryHarder
+                _imagePort,
+                _barcodeFormatPort,
+                _codePort,
+                _allowAutoRotatePort,
+                _allowTryInvertPort,
+                _allowTryHarderPort
             };
         }
 
@@ -38,15 +38,15 @@ namespace AyBorg.Plugins.ZXing
 
         public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
         {
-            ReadOnlySpan<byte> imageBuffer = _inputImagePort.Value.AsPacked<Rgb24>().Buffer;
+            ReadOnlySpan<byte> imageBuffer = _imagePort.Value.AsPacked<Rgb24>().Buffer;
             var reader = new BarcodeReaderGeneric();
             reader.Options.PureBarcode = true; // if no format is given lib will still search for QR code
-            var rgbLumSrc = new RGBLuminanceSource(imageBuffer.ToArray(), _inputImagePort.Value.Width, _inputImagePort.Value.Height);
+            var rgbLumSrc = new RGBLuminanceSource(imageBuffer.ToArray(), _imagePort.Value.Width, _imagePort.Value.Height);
 
-            reader.Options.PossibleFormats = GetBarcodeFormats(_inputEmumPort.Value);
-            reader.AutoRotate = _allowAutoRotate.Value;
-            reader.Options.TryInverted = _allowTryInvert.Value;
-            reader.Options.TryHarder = _allowTryHarder.Value;
+            reader.Options.PossibleFormats = GetBarcodeFormats(_barcodeFormatPort.Value);
+            reader.AutoRotate = _allowAutoRotatePort.Value;
+            reader.Options.TryInverted = _allowTryInvertPort.Value;
+            reader.Options.TryHarder = _allowTryHarderPort.Value;
 
             Result? value = reader.Decode(rgbLumSrc);
 
@@ -56,8 +56,8 @@ namespace AyBorg.Plugins.ZXing
                 return ValueTask.FromResult(false);
             }
 
-            _outputStringPort.Value = value.Text;
-            _logger.LogDebug("Barcode string: '{_outputStringPort.Value}'", _outputStringPort.Value);
+            _codePort.Value = value.Text;
+            _logger.LogDebug("Barcode string: '{_codePort.Value}'", _codePort.Value);
             return ValueTask.FromResult(true);
         }
 
