@@ -57,7 +57,6 @@ public sealed class ProjectSettingsService : IProjectSettingsService
         if (_projectManagementService.ActiveProjectId == projectMeta.Id)
         {
             _engineHost.ActiveProject!.Settings.IsForceResultCommunicationEnabled = projectSettings.IsForceResultCommunicationEnabled;
-            _engineHost.ActiveProject!.Settings.IsForceWebUiCommunicationEnabled = projectSettings.IsForceWebUiCommunicationEnabled;
         }
 
         return true;

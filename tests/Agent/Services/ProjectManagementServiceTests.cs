@@ -194,40 +194,6 @@ public sealed class ProjectManagementServiceTests : IDisposable
         Assert.Equal(expectedProjectState, resultProjectMeta.State);
     }
 
-    [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public async Task Test_GetSettingsAsync(bool projectAvailable)
-    {
-        // Arrange
-        Guid projectMetaDbId = Guid.NewGuid();
-        if (projectAvailable)
-        {
-            ProjectContext context = _mockDbContextFactory.Object.CreateDbContext();
-            ProjectRecord projectRecord = new()
-            {
-                Meta = new ProjectMetaRecord(),
-                Settings = new ProjectSettingsRecord()
-            };
-            context.AyBorgProjects.Add(projectRecord);
-            await context.SaveChangesAsync();
-            projectMetaDbId = projectRecord.Meta.DbId;
-        }
-
-        // Act
-        ProjectSettingsRecord result = await _service.GetSettingsAsync(projectMetaDbId);
-
-        // Assert
-        if (projectAvailable)
-        {
-            Assert.NotNull(result);
-        }
-        else
-        {
-            Assert.Null(result);
-        }
-    }
-
     public void Dispose()
     {
         Dispose(true);

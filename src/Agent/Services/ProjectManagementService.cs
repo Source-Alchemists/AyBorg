@@ -323,8 +323,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         ProjectSettingsRecord projectSettingsRecord = previousProjectRecord.Settings with
         {
             DbId = Guid.Empty,
-            IsForceResultCommunicationEnabled = false,
-            IsForceWebUiCommunicationEnabled = false
+            IsForceResultCommunicationEnabled = false
         };
 
         ProjectRecord projectRecord = previousProjectRecord with {
@@ -361,7 +360,6 @@ internal sealed class ProjectManagementService : IProjectManagementService
             if(_engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(previousProjectMetaRecord.Id))
             {
                 _engineHost.ActiveProject.Settings.IsForceResultCommunicationEnabled = false;
-                _engineHost.ActiveProject.Settings.IsForceWebUiCommunicationEnabled = false;
             }
         }
         catch (Exception ex)

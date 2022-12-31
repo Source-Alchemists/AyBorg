@@ -37,7 +37,7 @@ public class FlowPort : PortModel
     /// <param name="node">The node.</param>
     /// <param name="port">The port.</param>
     public FlowPort(FlowNode node, Port port)
-            : base(node, port.Direction == PortDirection.Input ? PortAlignment.Left : PortAlignment.Right)
+            : base(port.Id.ToString(), node, port.Direction == PortDirection.Input ? PortAlignment.Left : PortAlignment.Right)
     {
         Port = port;
         Name = port.Name;

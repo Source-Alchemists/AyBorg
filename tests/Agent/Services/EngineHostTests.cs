@@ -1,6 +1,5 @@
 using AyBorg.Agent.Services;
 using AyBorg.SDK.Common;
-using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Projects;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -11,8 +10,8 @@ public sealed class EngineHostTests : IDisposable
 {
     private readonly NullLogger<EngineHost> _logger = new();
     private readonly Mock<IEngineFactory> _mockEngineFactory = new();
-    private readonly Mock<IMqttClientProvider> _mockMqttClientProvider = new();
     private readonly Mock<ICacheService> _mockCacheService = new();
+    private readonly Mock<INotifyService> _mockNotifyService = new();
     private readonly CommunicationStateProvider _communicationStateProvider = new();
     private readonly EngineHost _service;
     private bool _isDisposed;
@@ -21,9 +20,9 @@ public sealed class EngineHostTests : IDisposable
     {
         _service = new EngineHost(_logger,
                                 _mockEngineFactory.Object,
-                                _mockMqttClientProvider.Object,
                                 _mockCacheService.Object,
-                                _communicationStateProvider);
+                                _communicationStateProvider,
+                                _mockNotifyService.Object);
     }
 
     [Fact]

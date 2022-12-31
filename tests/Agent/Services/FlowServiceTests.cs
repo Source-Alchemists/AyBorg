@@ -1,4 +1,3 @@
-using AyBorg.Agent.Hubs;
 using AyBorg.Agent.Services;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
@@ -13,8 +12,8 @@ public class FlowServiceTests
     private readonly NullLogger<FlowService> _logger = new();
     private readonly Mock<IPluginsService> _mockPluginsService = new();
     private readonly Mock<IEngineHost> _mockEngineHost = new();
-    private readonly Mock<IFlowHub> _mockFlowHub = new();
     private readonly Mock<IRuntimeConverterService> _mockRuntimeConverterService = new();
+    private readonly Mock<INotifyService> _mockNotifyService = new();
     private readonly FlowService _service;
 
     public FlowServiceTests()
@@ -22,8 +21,8 @@ public class FlowServiceTests
         _service = new FlowService(_logger,
                                         _mockPluginsService.Object,
                                         _mockEngineHost.Object,
-                                        _mockFlowHub.Object,
-                                        _mockRuntimeConverterService.Object);
+                                        _mockRuntimeConverterService.Object,
+                                        _mockNotifyService.Object);
     }
 
     [Fact]

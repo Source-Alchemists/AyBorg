@@ -1,7 +1,6 @@
 using AyBorg.Database.Data;
 using AyBorg.Gateway.Models;
 using AyBorg.Gateway.Services;
-using AyBorg.SDK.Data.DTOs;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
