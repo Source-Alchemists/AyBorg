@@ -38,11 +38,11 @@ public sealed class KeeperService : IKeeperService, IDisposable
         _registryContextFactory = registryContextFactory;
         _grpcChannelService = grpcChannelService;
 
-        string? serverUrl = configuration.GetValue<string>("AyBorg:Service:Url");
+        string? serverUrl = configuration.GetValue<string>("Kestrel:Endpoints:gRPC:Url");
 
         if (string.IsNullOrEmpty(serverUrl))
         {
-            _logger.LogError("Server url is not set in configuration. (Hint: AyBorg:Service:Url)");
+            _logger.LogError("Server url is not set in configuration. (Hint: Kestrel:Endpoints:gRPC:Url)");
             throw new InvalidOperationException("Server url is not set in configuration.");
         }
 

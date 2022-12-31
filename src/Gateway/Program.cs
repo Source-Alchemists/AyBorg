@@ -3,29 +3,9 @@ using AyBorg.Gateway.Services;
 using AyBorg.Gateway.Services.Agent;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.System.Configuration;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
-
-builder.WebHost.ConfigureKestrel(options =>
-{
-    string? serviceUrl = builder.Configuration.GetValue("AyBorg:Service:Url", string.Empty);
-    if (string.IsNullOrEmpty(serviceUrl))
-    {
-        throw new Exception("Service url is not set");
-    }
-
-    bool useTls = serviceUrl.StartsWith("https");
-    if (useTls) return; // Nothing to configure as TLS is used by default.
-
-    string portStr = serviceUrl.Substring(serviceUrl.LastIndexOf(":")+1);
-    if (!int.TryParse(portStr, out int port))
-    {
-        throw new Exception("Invalid port");
-    }
-    options.ListenLocalhost(port, o => o.Protocols = HttpProtocols.Http2);
-});
 
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
