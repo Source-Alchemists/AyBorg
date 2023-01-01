@@ -3,6 +3,8 @@ namespace AyBorg.Plugins.ZXing.Models
         public enum BarcodeFormats
         {
                 All,
+                All_1D,
+                All_2D,
                 AZTEC,
                 CODABAR,
                 CODE_39,
@@ -19,7 +21,6 @@ namespace AyBorg.Plugins.ZXing.Models
                 RSS_EXPANDED,
                 UPC_A,
                 UPC_E,
-                All_1D,
                 UPC_EAN_EXTENSION,
                 MSI,
                 PLESSEY,
