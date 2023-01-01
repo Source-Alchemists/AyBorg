@@ -19,6 +19,9 @@ public sealed class KeeperServiceTests : IDisposable
     private readonly DbContextOptions<RegistryContext> _contextOptions;
     private readonly Mock<IGrpcChannelService> _mockGrpcChannelService = new();
 
+    private readonly KeeperService _service;
+    private readonly ServiceEntry _validServiceEntry = new() { Name = "Test", UniqueName = "Test-1", Url = "https://myservice:7777" };
+
     private bool _disposed = false;
 
     /// <summary>
@@ -28,6 +31,7 @@ public sealed class KeeperServiceTests : IDisposable
     {
         _configuration = new ConfigurationBuilder().AddInMemoryCollection(
             initialData: new List<KeyValuePair<string, string>> {
+                new("Kestrel:Endpoints:gRPC:Url", "https://localhost:5001"),
                 new("AyBorg:Service:Url", "https://localhost:5001")
             }!).Build();
 
@@ -43,6 +47,9 @@ public sealed class KeeperServiceTests : IDisposable
         context.Database.EnsureCreated();
 
         _mockGrpcChannelService = new Mock<IGrpcChannelService>();
+        _mockGrpcChannelService.Setup(c => c.TryRegisterChannel(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(true);
+
+        _service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object, _mockGrpcChannelService.Object);
     }
 
     [Theory]
@@ -50,11 +57,12 @@ public sealed class KeeperServiceTests : IDisposable
     [InlineData("")]
     [InlineData("http://test.org")]
     [InlineData("https://test.org")]
-    public void TestConfigurationServerUrl(string url)
+    public void Test_ConfigurationServerUrl(string url)
     {
         // Arrange
         IConfigurationRoot configuration = new ConfigurationBuilder().AddInMemoryCollection(
             initialData: new List<KeyValuePair<string, string>> {
+                new("Kestrel:Endpoints:gRPC:Url", url),
                 new("AyBorg:Service:Url", url)
             }!).Build();
         var registryConfiguration = new GatewayConfiguration(_registryConfigurationLogger, configuration);
@@ -74,99 +82,68 @@ public sealed class KeeperServiceTests : IDisposable
         }
     }
 
-    [Fact]
-    public async Task TestRegisterAsync()
+    [Theory]
+    [InlineData(false, false)]
+    [InlineData(true, false)]
+    [InlineData(true, true)]
+    public async Task Test_RegisterAsync(bool registerTwice, bool unregister)
     {
         // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object, _mockGrpcChannelService.Object);
-        var entry = new ServiceEntry { Name = "Test", Url = "https://myservice:7777" };
-
         // Act
-        Guid result = await service.RegisterAsync(entry);
+        Guid result = await _service.RegisterAsync(_validServiceEntry);
+        if(unregister)
+        {
+            await _service.UnregisterAsync(result);
+        }
+        if(registerTwice)
+        {
+            _mockGrpcChannelService.Setup(c => c.TryRegisterChannel(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(false);
+            await Assert.ThrowsAsync<InvalidOperationException>(() => _service.RegisterAsync(_validServiceEntry));
+        }
 
         // Assert
         Assert.NotEqual(Guid.Empty, result);
-        await Assert.ThrowsAsync<InvalidOperationException>(() => service.RegisterAsync(entry));
     }
 
     [Fact]
-    public async Task TestRegisterKnownServiceAgain()
+    public async Task Test_UnregisterAsync_unknownService()
     {
         // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object, _mockGrpcChannelService.Object);
-        var entry = new ServiceEntry { Name = "Test", Url = "https://myservice:7777" };
+        // Assert
+        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UnregisterAsync(Guid.Empty));
+    }
 
-        Guid expectedResult = await service.RegisterAsync(entry);
-        await service.UnregisterAsync(expectedResult);
+    [Fact]
+    public async Task Test_GetAllServicRegistryEntriesAsync()
+    {
+        // Arrange
+        var entry2 = new ServiceEntry { Name = "Test2", UniqueName = "Test2", Url = "https://myservice2:7777" };
 
         // Act
-        Guid result = await service.RegisterAsync(entry);
-
-        // Assert
-        Assert.Equal(expectedResult, result);
-    }
-
-    [Fact]
-    public async Task TestUnregisterAsync_success()
-    {
-        // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object, _mockGrpcChannelService.Object);
-        var entry = new ServiceEntry { Name = "Test", Url = "https://myservice:7777" };
-
-        // Act
-        Guid result1 = await service.RegisterAsync(entry);
-        await service.UnregisterAsync(result1);
-        Guid result2 = await service.RegisterAsync(entry);
-
-        // Assert
-        Assert.NotEqual(Guid.Empty, result2);
-    }
-
-    [Fact]
-    public async Task TestUnregisterAsync_unknownService()
-    {
-        // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object, _mockGrpcChannelService.Object);
-
-        // Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => service.UnregisterAsync(Guid.Empty));
-    }
-
-    [Fact]
-    public async Task TestGetAllServicRegistryEntriesAsync()
-    {
-        // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object, _mockGrpcChannelService.Object);
-        var entry1 = new ServiceEntry { Name = "Test", Url = "https://myservice:7777" };
-        var entry2 = new ServiceEntry { Name = "Test2", Url = "https://myservice2:7777" };
-
-        // Act
-        await service.RegisterAsync(entry1);
-        await service.RegisterAsync(entry2);
-        IEnumerable<ServiceEntry> result = await service.GetAllRegistryEntriesAsync();
+        await _service.RegisterAsync(_validServiceEntry);
+        await _service.RegisterAsync(entry2);
+        IEnumerable<ServiceEntry> result = await _service.GetAllRegistryEntriesAsync();
 
         // Assert
         Assert.Equal(3, result.Count());
-        Assert.Contains(entry1, result);
+        Assert.Contains(_validServiceEntry, result);
         Assert.Contains(entry2, result);
     }
 
     [Fact]
-    public async Task TestFindRegistryEntriesAsync()
+    public async Task Test_FindRegistryEntriesAsync()
     {
         // Arrange
-        using var service = new KeeperService(s_logger, _configuration, _registryConfiguration, CreateContextFactoryMock().Object, _mockGrpcChannelService.Object);
-        var entry1 = new ServiceEntry { Name = "Test", Url = "https://myservice:7777" };
-        var entry2 = new ServiceEntry { Name = "Test2", Url = "https://myservice2:7777" };
+        var entry2 = new ServiceEntry { Name = "Test2", UniqueName = "Test2", Url = "https://myservice2:7777" };
 
         // Act
-        await service.RegisterAsync(entry1);
-        await service.RegisterAsync(entry2);
-        IEnumerable<ServiceEntry> result = await service.FindRegistryEntriesAsync("Test");
+        await _service.RegisterAsync(_validServiceEntry);
+        await _service.RegisterAsync(entry2);
+        IEnumerable<ServiceEntry> result = await _service.FindRegistryEntriesAsync("Test");
 
         // Assert
         Assert.Single(result);
-        Assert.Contains(entry1, result);
+        Assert.Contains(_validServiceEntry, result);
     }
 
     public void Dispose()
@@ -179,6 +156,7 @@ public sealed class KeeperServiceTests : IDisposable
     {
         if (disposing && !_disposed)
         {
+            _service.Dispose();
             _connection.Dispose();
             _disposed = true;
         }

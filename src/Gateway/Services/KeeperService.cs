@@ -142,7 +142,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
         {
             if (await context.ServiceEntries!.AnyAsync(x => x.UniqueName == serviceEntry.UniqueName))
             {
-                throw new InvalidOperationException($"Adding a service with unique name ({serviceEntry.UniqueName} is not allowed! A service with the name is already registered.");
+                throw new InvalidOperationException($"Adding a service with unique name '{serviceEntry.UniqueName}' is not allowed! A service with the name is already registered.");
             }
             serviceEntry.Id = Guid.NewGuid();
             await context.ServiceEntries!.AddAsync(serviceEntry);
@@ -150,7 +150,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
 
         if(!_grpcChannelService.TryRegisterChannel(serviceEntry.UniqueName, serviceEntry.Type, serviceEntry.Url))
         {
-            throw new InvalidOperationException($"Adding a service with unique name ({serviceEntry.UniqueName} is not allowed! A service with the name is already registered.");
+            throw new InvalidOperationException($"Adding a service with unique name '{serviceEntry.UniqueName}' is not allowed! A service with the name is already registered.");
         }
 
         await context.SaveChangesAsync();
