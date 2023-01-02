@@ -65,16 +65,8 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
             return new StatusResponse { Success = false, Id = request.Id, ErrorMessage = "Service not found" };
         }
 
-        try
-        {
-            await _keeperService.UpdateTimestamp(serviceEntry);
-            return new StatusResponse { Success = true, Id = request.Id, ErrorMessage = string.Empty };
-        }
-        catch (KeyNotFoundException ex)
-        {
-            _logger.LogWarning("Failed to update timestamp", ex.Message);
-            return new StatusResponse { Success = false, Id = request.Id, ErrorMessage = "Failed to update timestamp" };
-        }
+        await _keeperService.UpdateTimestamp(serviceEntry);
+        return new StatusResponse { Success = true, Id = request.Id, ErrorMessage = string.Empty };
     }
 
     public override async Task<GetServicesResponse> GetServices(GetServicesRequest request, ServerCallContext context)
