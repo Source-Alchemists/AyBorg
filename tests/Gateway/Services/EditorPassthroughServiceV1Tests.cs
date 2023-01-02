@@ -1,36 +1,22 @@
 using System.Security.Claims;
 using Ayborg.Gateway.Agent.V1;
-using AyBorg.Gateway.Services;
 using AyBorg.Gateway.Services.Agent;
 using AyBorg.Gateway.Tests.Helpers;
 using AyBorg.SDK.Authorization;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace AyBorg.Gateway.Tests.Services;
 
-public class EditorPassthroughServiceV1Tests
+public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.EditorClient>
 {
     private static readonly NullLogger<EditorPassthroughServiceV1> s_logger = new();
-    private readonly Mock<IGrpcChannelService> _mockGrpcChannelService = new();
-    private readonly Mock<Editor.EditorClient> _mockEditorClient = new();
-    private readonly Mock<ClaimsPrincipal> _mockContextUser = new();
-    private readonly DefaultHttpContext _httpContext = new();
-    private readonly TestServerCallContext _serverCallContext;
     private readonly EditorPassthroughServiceV1 _serviceV1;
 
     public EditorPassthroughServiceV1Tests()
     {
-        _httpContext.Request.Headers.Add("Authorization", "TokenValue");
-        _httpContext.User = _mockContextUser.Object;
-        _serverCallContext = TestServerCallContext.Create();
-        _serverCallContext.UserState["__HttpContext"] = _httpContext;
-
-        _mockGrpcChannelService.Setup(s => s.CreateClient<Editor.EditorClient>(It.IsAny<string>())).Returns(_mockEditorClient.Object);
-
         _serviceV1 = new EditorPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
     }
 
@@ -39,7 +25,7 @@ public class EditorPassthroughServiceV1Tests
     {
         // Arrange
         AsyncUnaryCall<GetAvailableStepsResponse> mockCallGetAvailableSteps = GrpcCallHelpers.CreateAsyncUnaryCall(new GetAvailableStepsResponse());
-        _mockEditorClient.Setup(c => c.GetAvailableStepsAsync(It.IsAny<GetAvailableStepsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCallGetAvailableSteps);
+        _mockClient.Setup(c => c.GetAvailableStepsAsync(It.IsAny<GetAvailableStepsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCallGetAvailableSteps);
         var request = new GetAvailableStepsRequest
         {
             AgentUniqueName = "Test"
@@ -57,7 +43,7 @@ public class EditorPassthroughServiceV1Tests
     {
         // Arrange
         AsyncUnaryCall<GetFlowStepsResponse> mockCallGetFlowSteps = GrpcCallHelpers.CreateAsyncUnaryCall(new GetFlowStepsResponse());
-        _mockEditorClient.Setup(c => c.GetFlowStepsAsync(It.IsAny<GetFlowStepsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCallGetFlowSteps);
+        _mockClient.Setup(c => c.GetFlowStepsAsync(It.IsAny<GetFlowStepsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCallGetFlowSteps);
         var request = new GetFlowStepsRequest
         {
             AgentUniqueName = "Test"
@@ -75,7 +61,7 @@ public class EditorPassthroughServiceV1Tests
     {
         // Arrange
         AsyncUnaryCall<GetFlowLinksResponse> mockCallGetFlowLinks = GrpcCallHelpers.CreateAsyncUnaryCall(new GetFlowLinksResponse());
-        _mockEditorClient.Setup(c => c.GetFlowLinksAsync(It.IsAny<GetFlowLinksRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCallGetFlowLinks);
+        _mockClient.Setup(c => c.GetFlowLinksAsync(It.IsAny<GetFlowLinksRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCallGetFlowLinks);
         var request = new GetFlowLinksRequest
         {
             AgentUniqueName = "Test"
@@ -93,7 +79,7 @@ public class EditorPassthroughServiceV1Tests
     {
         // Arrange
         AsyncUnaryCall<GetFlowPortsResponse> mockCallGetFlowPorts = GrpcCallHelpers.CreateAsyncUnaryCall(new GetFlowPortsResponse());
-        _mockEditorClient.Setup(c => c.GetFlowPortsAsync(It.IsAny<GetFlowPortsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCallGetFlowPorts);
+        _mockClient.Setup(c => c.GetFlowPortsAsync(It.IsAny<GetFlowPortsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCallGetFlowPorts);
         var request = new GetFlowPortsRequest
         {
             AgentUniqueName = "Test"
@@ -116,7 +102,7 @@ public class EditorPassthroughServiceV1Tests
         // Arrange
         AsyncUnaryCall<AddFlowStepResponse> mockCallAddFlowStep = GrpcCallHelpers.CreateAsyncUnaryCall(new AddFlowStepResponse());
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
-        _mockEditorClient.Setup(c => c.AddFlowStepAsync(It.IsAny<AddFlowStepRequest>(), It.IsAny<Metadata>(), null, It.IsAny<CancellationToken>())).Returns(mockCallAddFlowStep);
+        _mockClient.Setup(c => c.AddFlowStepAsync(It.IsAny<AddFlowStepRequest>(), It.IsAny<Metadata>(), null, It.IsAny<CancellationToken>())).Returns(mockCallAddFlowStep);
         var request = new AddFlowStepRequest
         {
             AgentUniqueName = "Test"
@@ -148,7 +134,7 @@ public class EditorPassthroughServiceV1Tests
         // Arrange
         AsyncUnaryCall<Empty> mockCallDeleteFlowStep = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
-        _mockEditorClient.Setup(c => c.DeleteFlowStepAsync(It.IsAny<DeleteFlowStepRequest>(), It.IsAny<Metadata>(), null, It.IsAny<CancellationToken>())).Returns(mockCallDeleteFlowStep);
+        _mockClient.Setup(c => c.DeleteFlowStepAsync(It.IsAny<DeleteFlowStepRequest>(), It.IsAny<Metadata>(), null, It.IsAny<CancellationToken>())).Returns(mockCallDeleteFlowStep);
         var request = new DeleteFlowStepRequest
         {
             AgentUniqueName = "Test"
@@ -180,7 +166,7 @@ public class EditorPassthroughServiceV1Tests
         // Arrange
         AsyncUnaryCall<Empty> mockCallMoveFlowStep = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
-        _mockEditorClient.Setup(c => c.MoveFlowStepAsync(It.IsAny<MoveFlowStepRequest>(), It.IsAny<Metadata>(), null, It.IsAny<CancellationToken>())).Returns(mockCallMoveFlowStep);
+        _mockClient.Setup(c => c.MoveFlowStepAsync(It.IsAny<MoveFlowStepRequest>(), It.IsAny<Metadata>(), null, It.IsAny<CancellationToken>())).Returns(mockCallMoveFlowStep);
         var request = new MoveFlowStepRequest
         {
             AgentUniqueName = "Test"
@@ -212,7 +198,7 @@ public class EditorPassthroughServiceV1Tests
         // Arrange
         AsyncUnaryCall<LinkFlowPortsResponse> mockCallLinkFlowPorts = GrpcCallHelpers.CreateAsyncUnaryCall(new LinkFlowPortsResponse());
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
-        _mockEditorClient.Setup(c => c.LinkFlowPortsAsync(It.IsAny<LinkFlowPortsRequest>(), It.IsAny<Metadata>(), null, It.IsAny<CancellationToken>())).Returns(mockCallLinkFlowPorts);
+        _mockClient.Setup(c => c.LinkFlowPortsAsync(It.IsAny<LinkFlowPortsRequest>(), It.IsAny<Metadata>(), null, It.IsAny<CancellationToken>())).Returns(mockCallLinkFlowPorts);
         var request = new LinkFlowPortsRequest
         {
             AgentUniqueName = "Test"
@@ -244,7 +230,7 @@ public class EditorPassthroughServiceV1Tests
         // Arrange
         AsyncUnaryCall<Empty> mockCallUpdateFlowPort = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
-        _mockEditorClient.Setup(c => c.UpdateFlowPortAsync(It.IsAny<UpdateFlowPortRequest>(), It.IsAny<Metadata>(), null, It.IsAny<CancellationToken>())).Returns(mockCallUpdateFlowPort);
+        _mockClient.Setup(c => c.UpdateFlowPortAsync(It.IsAny<UpdateFlowPortRequest>(), It.IsAny<Metadata>(), null, It.IsAny<CancellationToken>())).Returns(mockCallUpdateFlowPort);
         var request = new UpdateFlowPortRequest
         {
             AgentUniqueName = "Test"
@@ -274,7 +260,7 @@ public class EditorPassthroughServiceV1Tests
             new ImageChunkDto()
         };
         AsyncServerStreamingCall<ImageChunkDto> mockCallGetImageStream = GrpcCallHelpers.CreateAsyncServerStreamingCall(chunks);
-        _mockEditorClient.Setup(c => c.GetImageStream(It.IsAny<GetImageStreamRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCallGetImageStream);
+        _mockClient.Setup(c => c.GetImageStream(It.IsAny<GetImageStreamRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCallGetImageStream);
         var request = new GetImageStreamRequest
         {
             AgentUniqueName = "Test"
@@ -286,7 +272,7 @@ public class EditorPassthroughServiceV1Tests
         await _serviceV1.GetImageStream(request, mockServerStreamWriter.Object, _serverCallContext);
 
         // Assert
-        _mockEditorClient.Verify(c => c.GetImageStream(It.IsAny<GetImageStreamRequest>(), null, null, It.IsAny<CancellationToken>()), Times.Once);
+        _mockClient.Verify(c => c.GetImageStream(It.IsAny<GetImageStreamRequest>(), null, null, It.IsAny<CancellationToken>()), Times.Once);
         mockServerStreamWriter.Verify(w => w.WriteAsync(It.IsAny<ImageChunkDto>()), Times.Once);
     }
 }

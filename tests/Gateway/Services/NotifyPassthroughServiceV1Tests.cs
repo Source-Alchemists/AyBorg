@@ -1,35 +1,19 @@
-using System.Security.Claims;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Gateway.Models;
-using AyBorg.Gateway.Services;
 using AyBorg.Gateway.Services.Agent;
-using AyBorg.Gateway.Tests.Helpers;
-using AyBorg.SDK.Communication.gRPC;
 using Grpc.Core;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace AyBorg.Gateway.Tests.Services;
 
-public class NotifyPassthroughServiceV1Tests
+public class NotifyPassthroughServiceV1Tests : BaseGrpcServiceTests<Notify.NotifyClient>
 {
     private static readonly NullLogger<NotifyPassthroughServiceV1> s_logger = new();
-    private readonly Mock<IGrpcChannelService> _mockGrpcChannelService = new();
-    private readonly Mock<ClaimsPrincipal> _mockContextUser = new();
-    private readonly DefaultHttpContext _httpContext = new();
-    private readonly TestServerCallContext _serverCallContext;
     private readonly NotifyPassthroughServiceV1 _serviceV1;
-    private readonly CancellationTokenSource _cancellationTokenSource;
 
     public NotifyPassthroughServiceV1Tests()
     {
-        _cancellationTokenSource = new CancellationTokenSource();
-        _httpContext.Request.Headers.Add("Authorization", "TokenValue");
-        _httpContext.User = _mockContextUser.Object;
-        _serverCallContext = TestServerCallContext.Create(null, _cancellationTokenSource.Token);
-        _serverCallContext.UserState["__HttpContext"] = _httpContext;
-
         _serviceV1 = new NotifyPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
     }
 
@@ -74,7 +58,7 @@ public class NotifyPassthroughServiceV1Tests
             }
 
         }
-        _cancellationTokenSource.Cancel();
+        _serverCallContextCancellationTokenSource.Cancel();
         await streamTask;
 
         // Assert

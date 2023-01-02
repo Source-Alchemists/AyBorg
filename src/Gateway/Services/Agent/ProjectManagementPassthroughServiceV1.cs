@@ -16,6 +16,12 @@ public sealed class ProjectManagementPassthroughServiceV1 : ProjectManagement.Pr
         _grpcChannelService = grpcChannelService;
     }
 
+    public override async Task<GetProjectMetasResponse> GetProjectMetas(GetProjectMetasRequest request, ServerCallContext context)
+    {
+        ProjectManagement.ProjectManagementClient client = _grpcChannelService.CreateClient<ProjectManagement.ProjectManagementClient>(request.AgentUniqueName);
+        return await client.GetProjectMetasAsync(request);
+    }
+
     public override async Task<Empty> ActivateProject(ActivateProjectRequest request, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
@@ -42,12 +48,6 @@ public sealed class ProjectManagementPassthroughServiceV1 : ProjectManagement.Pr
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         ProjectManagement.ProjectManagementClient client = _grpcChannelService.CreateClient<ProjectManagement.ProjectManagementClient>(request.AgentUniqueName);
         return await client.DeleteProjectAsync(request, headers);
-    }
-
-    public override async Task<GetProjectMetasResponse> GetProjectMetas(GetProjectMetasRequest request, ServerCallContext context)
-    {
-        ProjectManagement.ProjectManagementClient client = _grpcChannelService.CreateClient<ProjectManagement.ProjectManagementClient>(request.AgentUniqueName);
-        return await client.GetProjectMetasAsync(request);
     }
 
     public override async Task<Empty> SaveProject(SaveProjectRequest request, ServerCallContext context)
