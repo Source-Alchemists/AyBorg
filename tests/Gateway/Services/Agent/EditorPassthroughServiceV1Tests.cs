@@ -7,7 +7,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Moq;
 
-namespace AyBorg.Gateway.Tests.Services;
+namespace AyBorg.Gateway.Tests.Services.Agent;
 
 public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<EditorPassthroughServiceV1, Editor.EditorClient>
 {

@@ -6,7 +6,7 @@ using AyBorg.SDK.Authorization;
 using Grpc.Core;
 using Moq;
 
-namespace AyBorg.Gateway.Tests.Services;
+namespace AyBorg.Gateway.Tests.Services.Agent;
 
 public class RuntimePassthroughServiceV1Tests : BaseGrpcServiceTests<RuntimePassthroughServiceV1, Runtime.RuntimeClient>
 {

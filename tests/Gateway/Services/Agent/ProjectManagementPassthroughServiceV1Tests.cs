@@ -7,7 +7,7 @@ using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Moq;
 
-namespace AyBorg.Gateway.Tests.Services;
+namespace AyBorg.Gateway.Tests.Services.Agent;
 
 public class ProjectManagementPassthroughServiceV1Tests : BaseGrpcServiceTests<ProjectManagementPassthroughServiceV1, ProjectManagement.ProjectManagementClient>
 {
