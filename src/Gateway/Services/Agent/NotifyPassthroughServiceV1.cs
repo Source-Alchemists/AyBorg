@@ -11,6 +11,8 @@ public sealed class NotifyPassthroughServiceV1 : Notify.NotifyBase
     private readonly ILogger<NotifyPassthroughServiceV1> _logger;
     private readonly IGrpcChannelService _channelService;
 
+    public Action<NotifyMessage> DownstreamNotified { get; set; } = null!;
+
     public NotifyPassthroughServiceV1(ILogger<NotifyPassthroughServiceV1> logger, IGrpcChannelService service)
     {
         _logger = logger;
@@ -44,12 +46,15 @@ public sealed class NotifyPassthroughServiceV1 : Notify.NotifyBase
                         continue;
                     }
 
-                    await responseStream.WriteAsync(new NotifyMessage
+                    var message = new NotifyMessage
                     {
                         AgentUniqueName = cachecNotification.ServiceUniqueName,
                         Type = (int)cachecNotification.NotifyType,
                         Payload = cachecNotification.Payload
-                    });
+                    };
+                    await responseStream.WriteAsync(message);
+
+                    DownstreamNotified?.Invoke(message);
                 }
             }
             finally
@@ -70,7 +75,7 @@ public sealed class NotifyPassthroughServiceV1 : Notify.NotifyBase
             IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName("AyBorg.Web");
             foreach (ChannelInfo channel in channels.Where(c => c.IsAcceptingNotifications))
             {
-                if (channel.Notifications.Count > 10)
+                while (channel.Notifications.Count >= 10)
                 {
                     _ = channel.Notifications.TryTake(out _);
                 }
