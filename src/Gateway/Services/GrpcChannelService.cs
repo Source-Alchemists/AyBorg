@@ -10,7 +10,6 @@ public sealed class GrpcChannelService : IGrpcChannelService
     private readonly ILogger<GrpcChannelService> _logger;
     private readonly ConcurrentDictionary<string, ChannelInfo> _channels = new();
 
-
     public GrpcChannelService(ILogger<GrpcChannelService> logger)
     {
         _logger = logger;
