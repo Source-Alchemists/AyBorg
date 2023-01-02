@@ -211,31 +211,6 @@ internal sealed class EngineHost : IEngineHost
             return;
         }
 
-        _logger.LogTrace("Engine state changed to '{state}'.", state);
-
-        if (state == EngineState.Stopped)
-        {
-            _logger.LogInformation("Engine stopped at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
-        }
-        else if (state == EngineState.Aborted)
-        {
-            _logger.LogInformation("Engine aborted at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
-        }
-        else if (state == EngineState.Finished)
-        {
-            _logger.LogInformation("Engine finished single run at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
-        }
-        else if (state == EngineState.Running)
-        {
-            _logger.LogInformation("Engine started at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
-        }
-
-        if (state == EngineState.Stopped || state == EngineState.Aborted || state == EngineState.Finished)
-        {
-            _engine.Meta.StoppedAt = DateTime.UtcNow;
-            _logger.LogTrace($"Engine is done. Removing engine.");
-        }
-
         await _notifyService.SendEngineStateAsync(_engine.Meta);
     }
 

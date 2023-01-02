@@ -32,7 +32,7 @@ internal sealed class Engine : IEngine
     /// </summary>
     public event EventHandler<EngineState>? StateChanged;
 
-     /// <summary>
+    /// <summary>
     /// Gets the meta information.
     /// </summary>
     public EngineMeta Meta { get; }
@@ -56,7 +56,8 @@ internal sealed class Engine : IEngine
         _project = project;
         _pathExecuterLogger = _loggerFactory.CreateLogger<PathExecuter>();
         ExecutionType = executionType;
-        Meta = new EngineMeta {
+        Meta = new EngineMeta
+        {
             Id = Guid.NewGuid(),
             State = EngineState.Idle,
             ExecutionType = executionType
@@ -66,6 +67,8 @@ internal sealed class Engine : IEngine
         {
             step.Completed += StepCompleted;
         }
+
+        StateChanged += StateChangedCallback;
 
         _logger.LogTrace("Engine [{Id}] with execution type [{executionType}] created.", Meta.Id, executionType);
     }
@@ -169,6 +172,7 @@ internal sealed class Engine : IEngine
                 step.Completed -= StepCompleted;
             }
 
+            StateChanged -= StateChangedCallback;
             _isDisposed = true;
         }
     }
@@ -257,6 +261,34 @@ internal sealed class Engine : IEngine
         if (!success)
         {
             _logger.LogWarning("Step [{stepProxy.Name}] failed.", stepProxy.Name);
+        }
+    }
+
+    private void StateChangedCallback(object? sender, EngineState state)
+    {
+        _logger.LogTrace("Engine state changed to '{state}'.", state);
+
+        if (state == EngineState.Stopped)
+        {
+            _logger.LogInformation("Engine stopped at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+        }
+        else if (state == EngineState.Aborted)
+        {
+            _logger.LogInformation("Engine aborted at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+        }
+        else if (state == EngineState.Finished)
+        {
+            _logger.LogInformation("Engine finished single run at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+        }
+        else if (state == EngineState.Running)
+        {
+            _logger.LogInformation("Engine started at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+        }
+
+        if (state == EngineState.Stopped || state == EngineState.Aborted || state == EngineState.Finished)
+        {
+            Meta.StoppedAt = DateTime.UtcNow;
+            _logger.LogTrace($"Engine is done. Removing engine.");
         }
     }
 
