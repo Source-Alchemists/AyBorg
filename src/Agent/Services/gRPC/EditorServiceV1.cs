@@ -20,16 +20,19 @@ public sealed class EditorServiceV1 : Editor.EditorBase
     private readonly IPluginsService _pluginsService;
     private readonly IFlowService _flowService;
     private readonly ICacheService _cacheService;
+    private readonly IRuntimeMapper _runtimeMapper;
 
     public EditorServiceV1(ILogger<EditorServiceV1> logger,
                             IPluginsService pluginsService,
                             IFlowService flowService,
-                            ICacheService cacheService)
+                            ICacheService cacheService,
+                            IRuntimeMapper runtimeMapper)
     {
         _logger = logger;
         _pluginsService = pluginsService;
         _flowService = flowService;
         _cacheService = cacheService;
+        _runtimeMapper = runtimeMapper;
     }
 
     public override Task<GetAvailableStepsResponse> GetAvailableSteps(GetAvailableStepsRequest request, ServerCallContext context)
@@ -39,7 +42,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             var result = new GetAvailableStepsResponse();
             foreach (SDK.Common.IStepProxy step in _pluginsService.Steps)
             {
-                Step stepBinding = RuntimeMapper.FromRuntime(step);
+                Step stepBinding = _runtimeMapper.FromRuntime(step);
                 StepDto rpcStep = RpcMapper.ToRpc(stepBinding);
                 result.Steps.Add(rpcStep);
             }
@@ -90,7 +93,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                 }
                 else
                 {
-                    result.Steps.Add(RpcMapper.ToRpc(RuntimeMapper.FromRuntime(fs)));
+                    result.Steps.Add(RpcMapper.ToRpc(_runtimeMapper.FromRuntime(fs)));
                 }
             }
 
@@ -165,7 +168,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             }
             else
             {
-                resultPorts.Add(RpcMapper.ToRpc(RuntimeMapper.FromRuntime(port)));
+                resultPorts.Add(RpcMapper.ToRpc(_runtimeMapper.FromRuntime(port)));
             }
         }
 
@@ -192,7 +195,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
         return new AddFlowStepResponse
         {
-            Step = RpcMapper.ToRpc(RuntimeMapper.FromRuntime(stepProxy))
+            Step = RpcMapper.ToRpc(_runtimeMapper.FromRuntime(stepProxy))
         };
     }
 
@@ -313,7 +316,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         }
         else
         {
-            portModel = RuntimeMapper.FromRuntime(port);
+            portModel = _runtimeMapper.FromRuntime(port);
             isOriginalPortModelCreated = true;
         }
 

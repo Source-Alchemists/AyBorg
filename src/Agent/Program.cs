@@ -7,6 +7,7 @@ using AyBorg.SDK.Common;
 using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.System.Agent;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
 using Microsoft.EntityFrameworkCore;
@@ -46,6 +47,7 @@ builder.Services.AddHostedService<RegistryBackgroundService>();
 
 builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
+builder.Services.AddSingleton<IRuntimeMapper, RuntimeMapper>();
 builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
 builder.Services.AddSingleton<IRuntimeConverterService, RuntimeConverterService>();
 builder.Services.AddSingleton<IPluginsService, PluginsService>();

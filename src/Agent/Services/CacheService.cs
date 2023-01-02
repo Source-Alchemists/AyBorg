@@ -11,17 +11,24 @@ namespace AyBorg.Agent.Services;
 internal sealed class CacheService : ICacheService
 {
     private readonly ILogger<CacheService> _logger;
+    private readonly IRuntimeMapper _runtimeMapper;
     private readonly ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> _cache = new();
     private readonly int _maxCacheTimeSeconds = 5;
     private readonly int _maxCacheIterations = 10;
 
     /// <summary>
+    /// Gets the size of the cache.
+    /// </summary>
+    public int CacheSize => _cache.Count;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="CacheService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    public CacheService(ILogger<CacheService> logger, IConfiguration configuration)
+    public CacheService(ILogger<CacheService> logger, IRuntimeMapper runtimeMapper, IConfiguration configuration)
     {
         _logger = logger;
+        _runtimeMapper = runtimeMapper;
         _maxCacheTimeSeconds = configuration.GetValue("AyBorg:Cache:MaxSeconds", 10);
         _maxCacheIterations = configuration.GetValue("AyBorg:Cache:MaxIterations", 5);
     }
@@ -95,7 +102,7 @@ internal sealed class CacheService : ICacheService
 
     private Step CreateStepMetaEntry(Guid iterationId, IStepProxy stepProxy)
     {
-        Step step = RuntimeMapper.FromRuntime(stepProxy, true);
+        Step step = _runtimeMapper.FromRuntime(stepProxy, true);
         var cacheItem = new CacheItem(stepProxy.Id, step);
         CacheKey? key = _cache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
         if (key != null && _cache.TryGetValue(key, out ConcurrentBag<CacheItem>? value))
@@ -115,7 +122,7 @@ internal sealed class CacheService : ICacheService
     private Port CreatePortEntry(Guid iterationId, IPort port)
     {
         Port? result;
-        result = RuntimeMapper.FromRuntime(port);
+        result = _runtimeMapper.FromRuntime(port);
         var cacheItem = new CacheItem(port.Id, result);
         CacheKey? key = _cache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
         if (key != null && _cache.TryGetValue(key, out ConcurrentBag<CacheItem>? value))

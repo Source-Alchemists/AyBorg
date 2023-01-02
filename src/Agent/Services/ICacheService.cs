@@ -8,6 +8,11 @@ namespace AyBorg.Agent.Services;
 public interface ICacheService
 {
     /// <summary>
+    /// Gets the size of the cache.
+    /// </summary>
+    int CacheSize { get; }
+
+    /// <summary>
     /// Fills the cache with the values for the specified iteration.
     /// </summary>
     /// <param name="iteration">The iteration.</param>
