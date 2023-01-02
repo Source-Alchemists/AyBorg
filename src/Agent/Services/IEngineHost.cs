@@ -23,10 +23,10 @@ public interface IEngineHost : IDisposable
     ValueTask<bool> TryDeactivateProjectAsync();
 
     /// <summary>
-    /// Gets the engine status asynchronous.
+    /// Gets the engine status.
     /// </summary>
     /// <returns></returns>
-    ValueTask<EngineMeta> GetEngineStatusAsync();
+    EngineMeta GetEngineStatus();
 
     /// <summary>
     /// Start the engine.

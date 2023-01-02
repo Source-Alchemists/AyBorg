@@ -32,15 +32,10 @@ internal sealed class Engine : IEngine
     /// </summary>
     public event EventHandler<EngineState>? StateChanged;
 
-    /// <summary>
-    /// Gets the identifier.
+     /// <summary>
+    /// Gets the meta information.
     /// </summary>
-    public Guid Id { get; } = Guid.NewGuid();
-
-    /// <summary>
-    /// Gets the state.
-    /// </summary>
-    public EngineState State { get; private set; } = EngineState.Idle;
+    public EngineMeta Meta { get; }
 
     /// <summary>
     /// Gets the execution type.
@@ -61,13 +56,18 @@ internal sealed class Engine : IEngine
         _project = project;
         _pathExecuterLogger = _loggerFactory.CreateLogger<PathExecuter>();
         ExecutionType = executionType;
+        Meta = new EngineMeta {
+            Id = Guid.NewGuid(),
+            State = EngineState.Idle,
+            ExecutionType = executionType
+        };
 
         foreach (IStepProxy step in _project.Steps)
         {
             step.Completed += StepCompleted;
         }
 
-        _logger.LogTrace("Engine [{Id}] with execution type [{executionType}] created.", Id, executionType);
+        _logger.LogTrace("Engine [{Id}] with execution type [{executionType}] created.", Meta.Id, executionType);
     }
 
     /// <summary>
@@ -76,25 +76,25 @@ internal sealed class Engine : IEngine
     /// <returns></returns>
     public async ValueTask<bool> TryStartAsync()
     {
-        if (State != EngineState.Idle)
+        if (Meta.State != EngineState.Idle)
         {
             _logger.LogWarning($"Engine is not in idle state. Cannot start.");
             return false;
         }
 
-        _logger.LogTrace("Engine [{Id}] starting.", Id);
-        State = EngineState.Starting;
-        StateChanged?.Invoke(this, State);
+        _logger.LogTrace("Engine [{Id}] starting.", Meta.Id);
+        Meta.State = EngineState.Starting;
+        StateChanged?.Invoke(this, Meta.State);
 
         var pathfinder = new Pathfinder();
         IEnumerable<PathItem> pathItems = await pathfinder.CreatePathAsync(_project.Steps, _project.Links);
-        _logger.LogTrace("Engine [{Id}] path created.", Id);
+        _logger.LogTrace("Engine [{Id}] path created.", Meta.Id);
 
         _executionTask = Task.Factory.StartNew(async () => await ExecutePathAsync(pathItems, _stopTokenSource.Token, _abortTokenSource.Token), TaskCreationOptions.LongRunning);
-        _logger.LogTrace("Engine [{Id}] execution started.", Id);
+        _logger.LogTrace("Engine [{Id}] execution started.", Meta.Id);
 
-        State = EngineState.Running;
-        StateChanged?.Invoke(this, State);
+        Meta.State = EngineState.Running;
+        StateChanged?.Invoke(this, Meta.State);
         return true;
     }
 
@@ -109,15 +109,15 @@ internal sealed class Engine : IEngine
             _logger.LogWarning($"Engine is a single run engine. Cannot stop.");
             return false;
         }
-        if (State != EngineState.Running)
+        if (Meta.State != EngineState.Running)
         {
             _logger.LogWarning($"Engine is not in running state. Cannot stop.");
             return false;
         }
 
-        _logger.LogTrace("Engine [{Id}] stopping.", Id);
-        State = EngineState.Stopping;
-        StateChanged?.Invoke(this, State);
+        _logger.LogTrace("Engine [{Id}] stopping.", Meta.Id);
+        Meta.State = EngineState.Stopping;
+        StateChanged?.Invoke(this, Meta.State);
         _stopTokenSource.Cancel();
         return await ValueTask.FromResult(true);
     }
@@ -128,15 +128,15 @@ internal sealed class Engine : IEngine
     /// <returns></returns>
     public async ValueTask<bool> TryAbortAsync()
     {
-        if (State != EngineState.Running && State != EngineState.Stopping)
+        if (Meta.State != EngineState.Running && Meta.State != EngineState.Stopping)
         {
             _logger.LogWarning($"Engine is not in running or stopping state. Cannot abort.");
             return false;
         }
 
-        _logger.LogTrace("Engine [{Id}] aborting.", Id);
-        State = EngineState.Aborting;
-        StateChanged?.Invoke(this, State);
+        _logger.LogTrace("Engine [{Id}] aborting.", Meta.Id);
+        Meta.State = EngineState.Aborting;
+        StateChanged?.Invoke(this, Meta.State);
         _abortTokenSource.Cancel();
         return await ValueTask.FromResult(true);
     }
@@ -156,7 +156,7 @@ internal sealed class Engine : IEngine
         {
             if (_executionTask != null && !_executionTask.IsCompleted)
             {
-                _logger.LogWarning("Engine [{Id}] is still running while disposing. Aborting.", Id);
+                _logger.LogWarning("Engine [{Id}] is still running while disposing. Aborting.", Meta.Id);
                 _abortTokenSource.Cancel();
                 _executionTask.Wait();
                 _executionTask.Dispose();
@@ -181,7 +181,7 @@ internal sealed class Engine : IEngine
         while (!stopToken.IsCancellationRequested && !abortToken.IsCancellationRequested)
         {
             _iterationId = Guid.NewGuid();
-            _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] started.", Id, _iterationId);
+            _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] started.", Meta.Id, _iterationId);
 
             await StartExecuteAllPathItemsAsync(executers, pathItems, executingTasks, abortToken);
             await WaitAndClearExecutors(executers, executingTasks);
@@ -189,7 +189,7 @@ internal sealed class Engine : IEngine
             // All steps are executed and the iteration is finished.
             IterationFinished?.Invoke(this, new IterationFinishedEventArgs(_iterationId, executers.All(e => e.State == PathExecutionState.Completed)));
 
-            _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] finished.", Id, _iterationId);
+            _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] finished.", Meta.Id, _iterationId);
 
             // If the execution type is single run, stop the engine.
             if (ExecutionType == EngineExecutionType.SingleRun)
@@ -203,21 +203,21 @@ internal sealed class Engine : IEngine
         // Else set the state to idle.
         if (_abortTokenSource.IsCancellationRequested)
         {
-            State = EngineState.Aborted;
-            _logger.LogTrace("Engine [{Id}] aborted.", Id);
+            Meta.State = EngineState.Aborted;
+            _logger.LogTrace("Engine [{Id}] aborted.", Meta.Id);
         }
         else if (_stopTokenSource.IsCancellationRequested)
         {
-            State = EngineState.Stopped;
-            _logger.LogTrace("Engine [{Id}] stopped.", Id);
+            Meta.State = EngineState.Stopped;
+            _logger.LogTrace("Engine [{Id}] stopped.", Meta.Id);
         }
         else
         {
-            State = EngineState.Finished;
-            _logger.LogTrace("Engine [{Id}] single run finished.", Id);
+            Meta.State = EngineState.Finished;
+            _logger.LogTrace("Engine [{Id}] single run finished.", Meta.Id);
         }
 
-        StateChanged?.Invoke(this, State);
+        StateChanged?.Invoke(this, Meta.State);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

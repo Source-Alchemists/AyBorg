@@ -20,12 +20,12 @@ public sealed class RuntimeServiceV1 : Ayborg.Gateway.Agent.V1.Runtime.RuntimeBa
 
     public override async Task<GetRuntimeStatusResponse> GetStatus(GetRuntimeStatusRequest request, ServerCallContext context)
     {
-        EngineMeta status = await _engineHost.GetEngineStatusAsync();
+        EngineMeta status = _engineHost.GetEngineStatus();
         ThrowIfNull(status);
 
         var result = new GetRuntimeStatusResponse();
         result.EngineMetaInfos.Add(CreateEngineMetaInfo(status));
-        return result;
+        return await Task.FromResult(result);
     }
 
     public override async Task<StartRunResponse> StartRun(StartRunRequest request, ServerCallContext context)
