@@ -45,6 +45,9 @@ builder.Services.AddGrpcClient<Ayborg.Gateway.Agent.V1.Notify.NotifyClient>(opti
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
 
+// Repositories
+builder.Services.AddSingleton<IProjectRepository, ProjectRepository>();
+
 builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRuntimeMapper, RuntimeMapper>();

@@ -10,7 +10,7 @@ namespace AyBorg.Agent.Tests.Services;
 
 public sealed class EngineHostTests : IDisposable
 {
-    private readonly NullLogger<EngineHost> _logger = new();
+    private static readonly NullLogger<EngineHost> s_logger = new();
     private readonly Mock<IEngineFactory> _mockEngineFactory = new();
     private readonly Mock<IEngine> _mockEngine = new();
     private readonly Mock<ICacheService> _mockCacheService = new();
@@ -21,7 +21,7 @@ public sealed class EngineHostTests : IDisposable
 
     public EngineHostTests()
     {
-        _service = new EngineHost(_logger,
+        _service = new EngineHost(s_logger,
                                 _mockEngineFactory.Object,
                                 _mockCacheService.Object,
                                 _communicationStateProvider,
@@ -175,6 +175,7 @@ public sealed class EngineHostTests : IDisposable
 
         if (hasEngine)
         {
+            await _service.StartRunAsync(EngineExecutionType.SingleRun);
             _mockEngine.Setup(e => e.TryStopAsync()).ReturnsAsync(true);
             _mockEngine.Setup(e => e.Meta).Returns(new EngineMeta
             {
@@ -220,6 +221,7 @@ public sealed class EngineHostTests : IDisposable
 
         if (hasEngine)
         {
+            await _service.StartRunAsync(EngineExecutionType.SingleRun);
             _mockEngine.Setup(e => e.TryAbortAsync()).ReturnsAsync(true);
             _mockEngine.Setup(e => e.Meta).Returns(new EngineMeta
             {
