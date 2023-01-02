@@ -1,13 +1,18 @@
 using System.Security.Claims;
 using AyBorg.Gateway.Services;
 using AyBorg.Gateway.Tests.Helpers;
+using Grpc.Core;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace AyBorg.Gateway.Tests.Services;
 
-public abstract class BaseGrpcServiceTests<TClient> where TClient : Grpc.Core.ClientBase<TClient>
+public abstract class BaseGrpcServiceTests<TService, TClient>
+    where TService : class
+    where TClient : ClientBase<TClient>
 {
+    protected static readonly NullLogger<TService> s_logger = new();
     protected readonly Mock<TClient> _mockClient = new();
     protected readonly Mock<IGrpcChannelService> _mockGrpcChannelService = new();
     protected readonly Mock<ClaimsPrincipal> _mockContextUser = new();
@@ -15,7 +20,9 @@ public abstract class BaseGrpcServiceTests<TClient> where TClient : Grpc.Core.Cl
     protected readonly TestServerCallContext _serverCallContext;
     protected readonly CancellationTokenSource _serverCallContextCancellationTokenSource;
 
-    public BaseGrpcServiceTests()
+    protected TService _service = null!;
+
+    protected BaseGrpcServiceTests()
     {
         _serverCallContextCancellationTokenSource = new CancellationTokenSource();
         _httpContext.Request.Headers.Add("Authorization", "TokenValue");

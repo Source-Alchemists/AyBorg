@@ -5,19 +5,15 @@ using AyBorg.Gateway.Tests.Helpers;
 using AyBorg.SDK.Authorization;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace AyBorg.Gateway.Tests.Services;
 
-public class ProjectManagementPassthroughServiceV1Tests : BaseGrpcServiceTests<ProjectManagement.ProjectManagementClient>
+public class ProjectManagementPassthroughServiceV1Tests : BaseGrpcServiceTests<ProjectManagementPassthroughServiceV1, ProjectManagement.ProjectManagementClient>
 {
-    private static readonly NullLogger<ProjectManagementPassthroughServiceV1> s_logger = new();
-    private readonly ProjectManagementPassthroughServiceV1 _serviceV1;
-
     public ProjectManagementPassthroughServiceV1Tests()
     {
-        _serviceV1 = new ProjectManagementPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
+        _service = new ProjectManagementPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
     }
 
     [Fact]
@@ -32,7 +28,7 @@ public class ProjectManagementPassthroughServiceV1Tests : BaseGrpcServiceTests<P
         };
 
         // Act
-        GetProjectMetasResponse resultResponse = await _serviceV1.GetProjectMetas(request, _serverCallContext);
+        GetProjectMetasResponse resultResponse = await _service.GetProjectMetas(request, _serverCallContext);
 
         // Assert
         Assert.NotNull(resultResponse);
@@ -58,11 +54,11 @@ public class ProjectManagementPassthroughServiceV1Tests : BaseGrpcServiceTests<P
         Empty resultResponse = null!;
         if (isAllowed)
         {
-            resultResponse = await _serviceV1.ActivateProject(request, _serverCallContext);
+            resultResponse = await _service.ActivateProject(request, _serverCallContext);
         }
         else
         {
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _serviceV1.ActivateProject(request, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.ActivateProject(request, _serverCallContext));
             return;
         }
 
@@ -90,11 +86,11 @@ public class ProjectManagementPassthroughServiceV1Tests : BaseGrpcServiceTests<P
         Empty resultResponse = null!;
         if (isAllowed)
         {
-            resultResponse = await _serviceV1.ApproveProject(request, _serverCallContext);
+            resultResponse = await _service.ApproveProject(request, _serverCallContext);
         }
         else
         {
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _serviceV1.ApproveProject(request, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.ApproveProject(request, _serverCallContext));
             return;
         }
 
@@ -122,11 +118,11 @@ public class ProjectManagementPassthroughServiceV1Tests : BaseGrpcServiceTests<P
         CreateProjectResponse resultResponse = null!;
         if (isAllowed)
         {
-            resultResponse = await _serviceV1.CreateProject(request, _serverCallContext);
+            resultResponse = await _service.CreateProject(request, _serverCallContext);
         }
         else
         {
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _serviceV1.CreateProject(request, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.CreateProject(request, _serverCallContext));
             return;
         }
 
@@ -154,11 +150,11 @@ public class ProjectManagementPassthroughServiceV1Tests : BaseGrpcServiceTests<P
         Empty resultResponse = null!;
         if (isAllowed)
         {
-            resultResponse = await _serviceV1.DeleteProject(request, _serverCallContext);
+            resultResponse = await _service.DeleteProject(request, _serverCallContext);
         }
         else
         {
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _serviceV1.DeleteProject(request, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.DeleteProject(request, _serverCallContext));
             return;
         }
 
@@ -186,11 +182,11 @@ public class ProjectManagementPassthroughServiceV1Tests : BaseGrpcServiceTests<P
         Empty resultResponse = null!;
         if (isAllowed)
         {
-            resultResponse = await _serviceV1.SaveProject(request, _serverCallContext);
+            resultResponse = await _service.SaveProject(request, _serverCallContext);
         }
         else
         {
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _serviceV1.SaveProject(request, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.SaveProject(request, _serverCallContext));
             return;
         }
 

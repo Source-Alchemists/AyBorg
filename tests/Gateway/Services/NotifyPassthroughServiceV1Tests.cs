@@ -2,19 +2,15 @@ using Ayborg.Gateway.Agent.V1;
 using AyBorg.Gateway.Models;
 using AyBorg.Gateway.Services.Agent;
 using Grpc.Core;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace AyBorg.Gateway.Tests.Services;
 
-public class NotifyPassthroughServiceV1Tests : BaseGrpcServiceTests<Notify.NotifyClient>
+public class NotifyPassthroughServiceV1Tests : BaseGrpcServiceTests<NotifyPassthroughServiceV1, Notify.NotifyClient>
 {
-    private static readonly NullLogger<NotifyPassthroughServiceV1> s_logger = new();
-    private readonly NotifyPassthroughServiceV1 _serviceV1;
-
     public NotifyPassthroughServiceV1Tests()
     {
-        _serviceV1 = new NotifyPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
+        _service = new NotifyPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
     }
 
     [Theory]
@@ -41,14 +37,14 @@ public class NotifyPassthroughServiceV1Tests : BaseGrpcServiceTests<Notify.Notif
         var mockServerStreamWriter = new Mock<IServerStreamWriter<NotifyMessage>>();
 
         // Act
-        Task streamTask = _serviceV1.CreateDownstream(request, mockServerStreamWriter.Object, _serverCallContext);
+        Task streamTask = _service.CreateDownstream(request, mockServerStreamWriter.Object, _serverCallContext);
 
         if (notifyCount > 0)
         {
             var tokenSource = new CancellationTokenSource();
             tokenSource.CancelAfter(TimeSpan.FromSeconds(5));
             bool notified = false;
-            _serviceV1.DownstreamNotified += (m) =>
+            _service.DownstreamNotified += (m) =>
             {
                 notified = true;
             };
@@ -97,7 +93,7 @@ public class NotifyPassthroughServiceV1Tests : BaseGrpcServiceTests<Notify.Notif
         for (int index = 0; index < notifyCount; index++)
         {
             var request = new NotifyMessage { AgentUniqueName = "AyBorg.Agent", Type = 0, Payload = string.Empty };
-            await _serviceV1.CreateNotificationFromAgent(request, _serverCallContext);
+            await _service.CreateNotificationFromAgent(request, _serverCallContext);
         }
 
         // Assert

@@ -5,19 +5,15 @@ using AyBorg.Gateway.Tests.Helpers;
 using AyBorg.SDK.Authorization;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace AyBorg.Gateway.Tests.Services;
 
-public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.EditorClient>
+public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<EditorPassthroughServiceV1, Editor.EditorClient>
 {
-    private static readonly NullLogger<EditorPassthroughServiceV1> s_logger = new();
-    private readonly EditorPassthroughServiceV1 _serviceV1;
-
     public EditorPassthroughServiceV1Tests()
     {
-        _serviceV1 = new EditorPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
+        _service = new EditorPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
     }
 
     [Fact]
@@ -32,7 +28,7 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.Edito
         };
 
         // Act
-        GetAvailableStepsResponse resultResponse = await _serviceV1.GetAvailableSteps(request, _serverCallContext);
+        GetAvailableStepsResponse resultResponse = await _service.GetAvailableSteps(request, _serverCallContext);
 
         // Assert
         Assert.NotNull(resultResponse);
@@ -50,7 +46,7 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.Edito
         };
 
         // Act
-        GetFlowStepsResponse resultResponse = await _serviceV1.GetFlowSteps(request, _serverCallContext);
+        GetFlowStepsResponse resultResponse = await _service.GetFlowSteps(request, _serverCallContext);
 
         // Assert
         Assert.NotNull(resultResponse);
@@ -68,7 +64,7 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.Edito
         };
 
         // Act
-        GetFlowLinksResponse resultResponse = await _serviceV1.GetFlowLinks(request, _serverCallContext);
+        GetFlowLinksResponse resultResponse = await _service.GetFlowLinks(request, _serverCallContext);
 
         // Assert
         Assert.NotNull(resultResponse);
@@ -86,7 +82,7 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.Edito
         };
 
         // Act
-        GetFlowPortsResponse resultResponse = await _serviceV1.GetFlowPorts(request, _serverCallContext);
+        GetFlowPortsResponse resultResponse = await _service.GetFlowPorts(request, _serverCallContext);
 
         // Assert
         Assert.NotNull(resultResponse);
@@ -112,11 +108,11 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.Edito
         AddFlowStepResponse resultResponse = null!;
         if (isAllowed)
         {
-            resultResponse = await _serviceV1.AddFlowStep(request, _serverCallContext);
+            resultResponse = await _service.AddFlowStep(request, _serverCallContext);
         }
         else
         {
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _serviceV1.AddFlowStep(request, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.AddFlowStep(request, _serverCallContext));
             return;
         }
 
@@ -144,11 +140,11 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.Edito
         Empty resultResponse = null!;
         if (isAllowed)
         {
-            resultResponse = await _serviceV1.DeleteFlowStep(request, _serverCallContext);
+            resultResponse = await _service.DeleteFlowStep(request, _serverCallContext);
         }
         else
         {
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _serviceV1.DeleteFlowStep(request, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.DeleteFlowStep(request, _serverCallContext));
             return;
         }
 
@@ -176,11 +172,11 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.Edito
         Empty resultResponse = null!;
         if (isAllowed)
         {
-            resultResponse = await _serviceV1.MoveFlowStep(request, _serverCallContext);
+            resultResponse = await _service.MoveFlowStep(request, _serverCallContext);
         }
         else
         {
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _serviceV1.MoveFlowStep(request, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.MoveFlowStep(request, _serverCallContext));
             return;
         }
 
@@ -208,11 +204,11 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.Edito
         LinkFlowPortsResponse resultResponse = null!;
         if (isAllowed)
         {
-            resultResponse = await _serviceV1.LinkFlowPorts(request, _serverCallContext);
+            resultResponse = await _service.LinkFlowPorts(request, _serverCallContext);
         }
         else
         {
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _serviceV1.LinkFlowPorts(request, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.LinkFlowPorts(request, _serverCallContext));
             return;
         }
 
@@ -240,11 +236,11 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.Edito
         Empty resultResponse = null!;
         if (isAllowed)
         {
-            resultResponse = await _serviceV1.UpdateFlowPort(request, _serverCallContext);
+            resultResponse = await _service.UpdateFlowPort(request, _serverCallContext);
         }
         else
         {
-            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _serviceV1.UpdateFlowPort(request, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.UpdateFlowPort(request, _serverCallContext));
             return;
         }
 
@@ -269,7 +265,7 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<Editor.Edito
         var mockServerStreamWriter = new Mock<IServerStreamWriter<ImageChunkDto>>();
 
         // Act
-        await _serviceV1.GetImageStream(request, mockServerStreamWriter.Object, _serverCallContext);
+        await _service.GetImageStream(request, mockServerStreamWriter.Object, _serverCallContext);
 
         // Assert
         _mockClient.Verify(c => c.GetImageStream(It.IsAny<GetImageStreamRequest>(), null, null, It.IsAny<CancellationToken>()), Times.Once);
