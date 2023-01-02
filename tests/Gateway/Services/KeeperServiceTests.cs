@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace AyBorg.Gateway.Tests;
+namespace AyBorg.Gateway.Tests.Services;
 
 public sealed class KeeperServiceTests : IDisposable
 {
