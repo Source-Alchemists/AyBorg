@@ -13,6 +13,7 @@ public class FlowService : IFlowService
 {
     private readonly ILogger<FlowService> _logger;
     private readonly IStateService _stateService;
+    private readonly IRpcMapper _rpcMapper;
     private readonly Editor.EditorClient _editorClient;
 
     /// <summary>
@@ -20,13 +21,16 @@ public class FlowService : IFlowService
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="stateService">The state service.</param>
+    /// <param name="rpcMapper">The RPC mapper.</param>
     /// <param name="editorClient">The editor client.</param>
     public FlowService(ILogger<FlowService> logger,
                         IStateService stateService,
+                        IRpcMapper rpcMapper,
                         Editor.EditorClient editorClient)
     {
         _logger = logger;
         _stateService = stateService;
+        _rpcMapper = rpcMapper;
         _editorClient = editorClient;
     }
 
@@ -43,7 +47,7 @@ public class FlowService : IFlowService
         var result = new List<Step>();
         foreach (StepDto? s in response.Steps)
         {
-            Step stepModel = RpcMapper.FromRpc(s);
+            Step stepModel = _rpcMapper.FromRpc(s);
             foreach (Port portModel in stepModel.Ports!)
             {
                 await LazyLoadAsync(portModel, null);
@@ -78,7 +82,7 @@ public class FlowService : IFlowService
             return null!;
         }
 
-        Step stepModel = RpcMapper.FromRpc(resultStep);
+        Step stepModel = _rpcMapper.FromRpc(resultStep);
         if (updatePorts)
         {
             foreach (Port portModel in stepModel.Ports!)
@@ -107,7 +111,7 @@ public class FlowService : IFlowService
         var result = new List<Link>();
         foreach (LinkDto? l in response.Links)
         {
-            result.Add(RpcMapper.FromRpc(l));
+            result.Add(_rpcMapper.FromRpc(l));
         }
 
         return result;
@@ -133,7 +137,7 @@ public class FlowService : IFlowService
             return null!;
         }
 
-        return RpcMapper.FromRpc(resultLink);
+        return _rpcMapper.FromRpc(resultLink);
     }
 
     /// <summary>
@@ -155,7 +159,7 @@ public class FlowService : IFlowService
                 Y = y
             });
 
-            return RpcMapper.FromRpc(response.Step);
+            return _rpcMapper.FromRpc(response.Step);
         }
         catch (RpcException ex)
         {
@@ -291,7 +295,7 @@ public class FlowService : IFlowService
             return null!;
         }
 
-        Port portModel = RpcMapper.FromRpc(resultPort);
+        Port portModel = _rpcMapper.FromRpc(resultPort);
         await LazyLoadAsync(portModel, iterationId);
         return portModel;
     }
@@ -308,7 +312,7 @@ public class FlowService : IFlowService
             _ = await _editorClient.UpdateFlowPortAsync(new UpdateFlowPortRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
-                Port = RpcMapper.ToRpc(port)
+                Port = _rpcMapper.ToRpc(port)
             });
             return true;
         }

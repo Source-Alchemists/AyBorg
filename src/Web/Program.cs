@@ -1,5 +1,6 @@
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
+using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.Web;
@@ -74,6 +75,7 @@ builder.Services.AddHostedService<NotifyBackgroundService>();
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
 builder.Services.AddSingleton<INotifyService, NotifyService>();
+builder.Services.AddSingleton<IRpcMapper, RpcMapper>();
 
 builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();

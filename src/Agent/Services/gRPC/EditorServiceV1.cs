@@ -21,18 +21,21 @@ public sealed class EditorServiceV1 : Editor.EditorBase
     private readonly IFlowService _flowService;
     private readonly ICacheService _cacheService;
     private readonly IRuntimeMapper _runtimeMapper;
+    private readonly IRpcMapper _rpcMapper;
 
     public EditorServiceV1(ILogger<EditorServiceV1> logger,
                             IPluginsService pluginsService,
                             IFlowService flowService,
                             ICacheService cacheService,
-                            IRuntimeMapper runtimeMapper)
+                            IRuntimeMapper runtimeMapper,
+                            IRpcMapper rpcMapper)
     {
         _logger = logger;
         _pluginsService = pluginsService;
         _flowService = flowService;
         _cacheService = cacheService;
         _runtimeMapper = runtimeMapper;
+        _rpcMapper = rpcMapper;
     }
 
     public override Task<GetAvailableStepsResponse> GetAvailableSteps(GetAvailableStepsRequest request, ServerCallContext context)
@@ -43,7 +46,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             foreach (SDK.Common.IStepProxy step in _pluginsService.Steps)
             {
                 Step stepBinding = _runtimeMapper.FromRuntime(step);
-                StepDto rpcStep = RpcMapper.ToRpc(stepBinding);
+                StepDto rpcStep = _rpcMapper.ToRpc(stepBinding);
                 result.Steps.Add(rpcStep);
             }
 
@@ -89,11 +92,11 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             {
                 if (iterationId != Guid.Empty)
                 {
-                    result.Steps.Add(RpcMapper.ToRpc(_cacheService.GetOrCreateStepEntry(iterationId, fs)));
+                    result.Steps.Add(_rpcMapper.ToRpc(_cacheService.GetOrCreateStepEntry(iterationId, fs)));
                 }
                 else
                 {
-                    result.Steps.Add(RpcMapper.ToRpc(_runtimeMapper.FromRuntime(fs)));
+                    result.Steps.Add(_rpcMapper.ToRpc(_runtimeMapper.FromRuntime(fs)));
                 }
             }
 
@@ -128,7 +131,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
             foreach (PortLink fl in flowLinks)
             {
-                result.Links.Add(RpcMapper.ToRpc(fl));
+                result.Links.Add(_rpcMapper.ToRpc(fl));
             }
             return result;
         });
@@ -164,11 +167,11 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
             if (iterationId != Guid.Empty)
             {
-                resultPorts.Add(RpcMapper.ToRpc(_cacheService.GetOrCreatePortEntry(iterationId, port)));
+                resultPorts.Add(_rpcMapper.ToRpc(_cacheService.GetOrCreatePortEntry(iterationId, port)));
             }
             else
             {
-                resultPorts.Add(RpcMapper.ToRpc(_runtimeMapper.FromRuntime(port)));
+                resultPorts.Add(_rpcMapper.ToRpc(_runtimeMapper.FromRuntime(port)));
             }
         }
 
@@ -195,7 +198,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
         return new AddFlowStepResponse
         {
-            Step = RpcMapper.ToRpc(_runtimeMapper.FromRuntime(stepProxy))
+            Step = _rpcMapper.ToRpc(_runtimeMapper.FromRuntime(stepProxy))
         };
     }
 
@@ -275,7 +278,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
     public override async Task<Empty> UpdateFlowPort(UpdateFlowPortRequest request, ServerCallContext context)
     {
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
-        Port port = RpcMapper.FromRpc(request.Port);
+        Port port = _rpcMapper.FromRpc(request.Port);
         if (!await _flowService.TryUpdatePortValueAsync(port.Id, port.Value!))
         {
             _logger.LogWarning("Could not update port: {PortId}", port.Id);

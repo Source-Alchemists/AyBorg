@@ -6,6 +6,7 @@ namespace AyBorg.Web.Services.Agent;
 public class PluginsService
 {
     private readonly ILogger<PluginsService> _logger;
+    private readonly IRpcMapper _rpcMapper;
     private readonly Ayborg.Gateway.Agent.V1.Editor.EditorClient _editorClient;
 
     /// <summary>
@@ -14,9 +15,11 @@ public class PluginsService
     /// <param name="logger">The logger.</param>
     /// <param name="editorClient">The editor client.</param>
     public PluginsService(ILogger<PluginsService> logger,
+                            IRpcMapper rpcMapper,
                             Ayborg.Gateway.Agent.V1.Editor.EditorClient editorClient)
     {
         _logger = logger;
+        _rpcMapper = rpcMapper;
         _editorClient = editorClient;
     }
 
@@ -29,7 +32,7 @@ public class PluginsService
         var steps = new List<Step>();
         foreach (Ayborg.Gateway.Agent.V1.StepDto? s in response.Steps)
         {
-            steps.Add(RpcMapper.FromRpc(s));
+            steps.Add(_rpcMapper.FromRpc(s));
         }
         return steps;
     }
