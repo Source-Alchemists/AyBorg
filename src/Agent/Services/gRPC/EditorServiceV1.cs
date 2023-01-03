@@ -59,7 +59,6 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         return Task.Factory.StartNew(() =>
         {
             var result = new GetFlowStepsResponse();
-            IEnumerable<SDK.Common.IStepProxy> flowSteps = _flowService.GetSteps();
             Guid iterationId = Guid.Empty;
             if (!string.IsNullOrEmpty(request.IterationId))
             {
@@ -70,6 +69,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                 }
             }
 
+            IEnumerable<SDK.Common.IStepProxy> flowSteps = _flowService.GetSteps();
             if (request.StepIds.Any())
             {
                 var targetIds = new HashSet<Guid>();
@@ -110,7 +110,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         {
             var result = new GetFlowLinksResponse();
 
-            IEnumerable<PortLink> flowLinks = _flowService.GetLinks().ToList();
+            IEnumerable<PortLink> flowLinks = _flowService.GetLinks();
             var targetPorts = new HashSet<PortLink>();
             if (request.LinkIds.Any())
             {
