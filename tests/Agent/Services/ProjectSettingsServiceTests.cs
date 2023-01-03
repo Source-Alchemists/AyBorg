@@ -19,7 +19,7 @@ public class ProjectSettingsServiceTests
 
     public ProjectSettingsServiceTests()
     {
-        _mockProjectRepository.Setup(r => r.GetSettingsRecordAsync(It.IsAny<Guid>())).ReturnsAsync(_projectSettingsRecord);
+        _mockProjectRepository.Setup(r => r.GetSettingAsync(It.IsAny<Guid>())).ReturnsAsync(_projectSettingsRecord);
 
         _service = new ProjectSettingsService(s_logger, _mockProjectRepository.Object, _mockProjectManagementService.Object, _mockEngineHost.Object);
     }

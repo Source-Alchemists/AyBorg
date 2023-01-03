@@ -26,7 +26,7 @@ public sealed class ProjectSettingsService : IProjectSettingsService
     /// <returns></returns>
     public ValueTask<ProjectSettingsRecord> GetSettingsRecordAsync(Guid projectMetaDbId)
     {
-        return _projectRepository.GetSettingsRecordAsync(projectMetaDbId);
+        return _projectRepository.GetSettingAsync(projectMetaDbId);
     }
 
     /// <summary>

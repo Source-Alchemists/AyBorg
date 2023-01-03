@@ -24,7 +24,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
         {
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ProjectDbId"));
         }
-        ProjectManagementResult result = await _projectManagementService.TryActivateAsync(dbId, true);
+        ProjectManagementResult result = await _projectManagementService.TryChangeActivationStateAsync(dbId, true);
         if (!result.IsSuccessful)
         {
             throw new RpcException(new Status(StatusCode.Internal, result.Message!));
