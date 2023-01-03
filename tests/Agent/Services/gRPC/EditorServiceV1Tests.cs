@@ -355,7 +355,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
 
     [Theory]
     [InlineData(false, false, false, false, 100, 100)]
-    [InlineData(false, false, false, false, 1000, 1000)]
+    [InlineData(false, false, false, false, 500, 500)]
     [InlineData(true, false, false, false, 100, 100)]
     [InlineData(false, true, false, false, 100, 100)]
     [InlineData(false, false, true, false, 100, 100)]

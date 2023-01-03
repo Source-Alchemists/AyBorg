@@ -17,6 +17,27 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
         _projectManagementService = projectManagementService;
     }
 
+    public override async Task<GetProjectMetasResponse> GetProjectMetas(GetProjectMetasRequest request, ServerCallContext context)
+    {
+        var result = new GetProjectMetasResponse();
+        foreach (IGrouping<Guid, ProjectMetaRecord> metaGroup in (await _projectManagementService.GetAllMetasAsync())
+                                                                .Where(x => x.ServiceUniqueName.Equals(request.AgentUniqueName, StringComparison.InvariantCultureIgnoreCase))
+                                                                .GroupBy(p => p.Id))
+        {
+            ProjectMetaRecord? activeMeta = metaGroup.FirstOrDefault(g => g.IsActive);
+            if (activeMeta != null)
+            {
+                result.ProjectMetas.Add(CreateProjectMeta(activeMeta));
+            }
+            else
+            {
+                ProjectMetaRecord meta = metaGroup.OrderByDescending(x => x.UpdatedDate).First();
+                result.ProjectMetas.Add(CreateProjectMeta(meta));
+            }
+        }
+        return result;
+    }
+
     public override async Task<Empty> ActivateProject(ActivateProjectRequest request, ServerCallContext context)
     {
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
@@ -78,25 +99,6 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
         }
 
         return new Empty();
-    }
-
-    public override async Task<GetProjectMetasResponse> GetProjectMetas(GetProjectMetasRequest request, ServerCallContext context)
-    {
-        var result = new GetProjectMetasResponse();
-        foreach (IGrouping<Guid, ProjectMetaRecord> metaGroup in (await _projectManagementService.GetAllMetasAsync()).Where(x => x.ServiceUniqueName == request.AgentUniqueName).GroupBy(p => p.Id))
-        {
-            ProjectMetaRecord? activeMeta = metaGroup.FirstOrDefault(g => g.IsActive);
-            if (activeMeta != null)
-            {
-                result.ProjectMetas.Add(CreateProjectMeta(activeMeta));
-            }
-            else
-            {
-                ProjectMetaRecord meta = metaGroup.OrderByDescending(x => x.UpdatedDate).First();
-                result.ProjectMetas.Add(CreateProjectMeta(meta));
-            }
-        }
-        return result;
     }
 
     public override async Task<Empty> SaveProject(SaveProjectRequest request, ServerCallContext context)
