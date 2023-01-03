@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common.Models;
@@ -60,13 +61,10 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         {
             var result = new GetFlowStepsResponse();
             Guid iterationId = Guid.Empty;
-            if (!string.IsNullOrEmpty(request.IterationId))
+            if (!string.IsNullOrEmpty(request.IterationId) && !Guid.TryParse(request.IterationId, out iterationId))
             {
-                if (!Guid.TryParse(request.IterationId, out iterationId))
-                {
-                    _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
-                    throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
-                }
+                _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
             }
 
             IEnumerable<SDK.Common.IStepProxy> flowSteps = _flowService.GetSteps();
@@ -141,13 +139,10 @@ public sealed class EditorServiceV1 : Editor.EditorBase
     {
         var resultPorts = new List<PortDto>();
         Guid iterationId = Guid.Empty;
-        if (!string.IsNullOrEmpty(request.IterationId))
+        if (!string.IsNullOrEmpty(request.IterationId) && !Guid.TryParse(request.IterationId, out iterationId))
         {
-            if (!Guid.TryParse(request.IterationId, out iterationId))
-            {
-                _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
-                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
-            }
+            _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
         }
 
         foreach (string? portIdStr in request.PortIds)
@@ -291,13 +286,12 @@ public sealed class EditorServiceV1 : Editor.EditorBase
     public override async Task GetImageStream(GetImageStreamRequest request, IServerStreamWriter<ImageChunkDto> responseStream, ServerCallContext context)
     {
         Guid iterationId = Guid.Empty;
-        if (!string.IsNullOrEmpty(request.IterationId))
+        if (!string.IsNullOrEmpty(request.IterationId) && !Guid.TryParse(request.IterationId, out iterationId))
         {
-            if (!Guid.TryParse(request.IterationId, out iterationId))
-            {
-                _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
-            }
+            _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
         }
+
         if (!Guid.TryParse(request.PortId, out Guid portId))
         {
             _logger.LogWarning("Invalid port id: {PortId}", request.PortId);
@@ -325,18 +319,23 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
         var originalImageModel = (CacheImage)portModel.Value!;
         Image originalImage = (Image)originalImageModel.OriginalImage!;
-        if (originalImage == null)
-        {
-            _logger.LogTrace("Image not found: {PortId}", portId);
-            return;
-        }
+        await SendImageAsync(originalImage, responseStream, request.AsThumbnail, context.CancellationToken);
 
+        if (isOriginalPortModelCreated)
+        {
+            portModel.Dispose();
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static async ValueTask SendImageAsync(Image originalImage, IServerStreamWriter<ImageChunkDto> responseStream, bool asThumbnail, CancellationToken cancellationToken)
+    {
         const int chunkSize = 32768;
         const int maxSize = 250;
         IImage targetImage = null!;
         try
         {
-            if (originalImage.Width <= maxSize && originalImage.Height <= maxSize || !request.AsThumbnail)
+            if (originalImage.Width <= maxSize && originalImage.Height <= maxSize || !asThumbnail)
             {
                 targetImage = originalImage;
             }
@@ -347,16 +346,16 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             }
 
             using MemoryStream stream = s_memoryManager.GetStream();
-            Image.Save(targetImage, stream, request.AsThumbnail ? SDK.ImageProcessing.Encoding.EncoderType.Jpeg : SDK.ImageProcessing.Encoding.EncoderType.Png);
+            Image.Save(targetImage, stream, asThumbnail ? SDK.ImageProcessing.Encoding.EncoderType.Jpeg : SDK.ImageProcessing.Encoding.EncoderType.Png);
             stream.Position = 0;
             long fullStreamLength = stream.Length;
             long bytesToSend = fullStreamLength;
             int bufferSize = fullStreamLength < chunkSize ? (int)fullStreamLength : chunkSize;
             int offset = 0;
             using IMemoryOwner<byte> memoryOwner = MemoryPool<byte>.Shared.Rent((int)fullStreamLength);
-            await stream.ReadAsync(memoryOwner.Memory, context.CancellationToken);
+            await stream.ReadAsync(memoryOwner.Memory, cancellationToken);
 
-            while (!context.CancellationToken.IsCancellationRequested && bytesToSend > 0)
+            while (!cancellationToken.IsCancellationRequested && bytesToSend > 0)
             {
                 if (bytesToSend < bufferSize)
                 {
@@ -374,15 +373,11 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                     FullWidth = originalImage.Width,
                     FullHeight = originalImage.Height,
                     FullStreamLength = fullStreamLength
-                });
+                }, cancellationToken);
             }
         }
         finally
         {
-            if (isOriginalPortModelCreated)
-            {
-                portModel.Dispose();
-            }
             targetImage?.Dispose();
         }
     }

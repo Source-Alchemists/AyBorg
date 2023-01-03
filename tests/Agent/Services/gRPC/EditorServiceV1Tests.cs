@@ -4,8 +4,12 @@ using AyBorg.Agent.Services;
 using AyBorg.Agent.Services.gRPC;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
+using AyBorg.SDK.ImageProcessing;
+using AyBorg.SDK.ImageProcessing.Buffers;
+using AyBorg.SDK.ImageProcessing.Pixels;
 using AyBorg.SDK.System.Agent;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -35,8 +39,8 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
             CreateStepProxyMock("S1", Guid.NewGuid()).Object,
             CreateStepProxyMock("S2", Guid.NewGuid()).Object
         });
-        _mockRuntimeMapper.Setup(r => r.FromRuntime(It.IsAny<IStepProxy>(), false)).Returns(new SDK.Common.Models.Step());
-        _mockRpcMapper.Setup(r => r.ToRpc(It.IsAny<SDK.Common.Models.Step>())).Returns(new StepDto());
+        _mockRuntimeMapper.Setup(r => r.FromRuntime(It.IsAny<IStepProxy>(), false)).Returns(new Step());
+        _mockRpcMapper.Setup(r => r.ToRpc(It.IsAny<Step>())).Returns(new StepDto());
         var request = new GetAvailableStepsRequest();
 
         // Act
@@ -69,8 +73,8 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
         _mockFlowService.Setup(f => f.GetSteps()).Returns(new List<IStepProxy>{
             CreateStepProxyMock("P1", stepId).Object
         });
-        _mockCacheService.Setup(c => c.GetOrCreateStepEntry(It.IsAny<Guid>(), It.IsAny<IStepProxy>())).Returns(new SDK.Common.Models.Step());
-        _mockRpcMapper.Setup(r => r.ToRpc(It.IsAny<SDK.Common.Models.Step>())).Returns(new StepDto());
+        _mockCacheService.Setup(c => c.GetOrCreateStepEntry(It.IsAny<Guid>(), It.IsAny<IStepProxy>())).Returns(new Step());
+        _mockRpcMapper.Setup(r => r.ToRpc(It.IsAny<Step>())).Returns(new StepDto());
 
         // Act
         if (!hasEmptyIdStr && hasInvalidIterationId)
@@ -133,9 +137,9 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
         request.PortIds.Add(portIdStr);
 
         _mockFlowService.Setup(f => f.GetPort(It.IsAny<Guid>())).Returns(hasWrongPortId ? null! : CreatePortMock("P1", Guid.NewGuid()).Object);
-        _mockCacheService.Setup(c => c.GetOrCreatePortEntry(It.IsAny<Guid>(), It.IsAny<IPort>())).Returns(new SDK.Common.Models.Port());
-        _mockRuntimeMapper.Setup(r => r.FromRuntime(It.IsAny<IPort>())).Returns(new SDK.Common.Models.Port());
-        _mockRpcMapper.Setup(r => r.ToRpc(It.IsAny<SDK.Common.Models.Port>())).Returns(new PortDto());
+        _mockCacheService.Setup(c => c.GetOrCreatePortEntry(It.IsAny<Guid>(), It.IsAny<IPort>())).Returns(new Port());
+        _mockRuntimeMapper.Setup(r => r.FromRuntime(It.IsAny<IPort>())).Returns(new Port());
+        _mockRpcMapper.Setup(r => r.ToRpc(It.IsAny<Port>())).Returns(new PortDto());
 
         // Act
         if (!hasEmptyIdStr && hasInvalidIterationId)
@@ -167,8 +171,8 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
         };
 
         _mockFlowService.Setup(f => f.AddStepAsync(It.IsAny<Guid>(), It.IsAny<int>(), It.IsAny<int>())).ReturnsAsync(hasWrongStepId ? null! : CreateStepProxyMock("P1", Guid.NewGuid()).Object);
-        _mockRuntimeMapper.Setup(r => r.FromRuntime(It.IsAny<IStepProxy>(), false)).Returns(new SDK.Common.Models.Step());
-        _mockRpcMapper.Setup(r => r.ToRpc(It.IsAny<SDK.Common.Models.Step>())).Returns(new StepDto());
+        _mockRuntimeMapper.Setup(r => r.FromRuntime(It.IsAny<IStepProxy>(), false)).Returns(new Step());
+        _mockRpcMapper.Setup(r => r.ToRpc(It.IsAny<Step>())).Returns(new StepDto());
 
         // Act
         if (!isAllowed)
@@ -313,6 +317,81 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
         {
             Assert.NotEqual(string.Empty, response.LinkId);
         }
+    }
+
+    [Theory]
+    [InlineData(Roles.Administrator, true, false)]
+    [InlineData(Roles.Engineer, true, false)]
+    [InlineData(Roles.Reviewer, false, false)]
+    [InlineData(Roles.Auditor, false, false)]
+    [InlineData(Roles.Administrator, true, true)]
+    public async ValueTask Test_UpdateFlowPort(string userRole, bool isAllowed, bool isUpdateFailing)
+    {
+        // Arrange
+        _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
+        _mockRpcMapper.Setup(r => r.FromRpc(It.IsAny<PortDto>())).Returns(new Port());
+        _mockFlowService.Setup(f => f.TryUpdatePortValueAsync(It.IsAny<Guid>(), It.IsAny<object>())).ReturnsAsync(!isUpdateFailing);
+
+        var request = new UpdateFlowPortRequest();
+
+        // Act
+        if (!isAllowed)
+        {
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.UpdateFlowPort(request, _serverCallContext));
+            return;
+        }
+
+        if (isUpdateFailing)
+        {
+            await Assert.ThrowsAsync<RpcException>(() => _service.UpdateFlowPort(request, _serverCallContext));
+            return;
+        }
+
+        Empty response = await _service.UpdateFlowPort(request, _serverCallContext);
+
+        // Assert
+        Assert.NotNull(response);
+    }
+
+    [Theory]
+    [InlineData(false, false, false, false, 100, 100)]
+    [InlineData(false, false, false, false, 1000, 1000)]
+    [InlineData(true, false, false, false, 100, 100)]
+    [InlineData(false, true, false, false, 100, 100)]
+    [InlineData(false, false, true, false, 100, 100)]
+    [InlineData(false, false, false, true, 100, 100)]
+    public async ValueTask Test_GetImageStream(bool hasEmpyIterationId, bool hasInvalidIterationId, bool hasInvalidPortId, bool hasWrongPortId, int imageWidth, int imageHeight)
+    {
+        // Arrange
+        var request = new GetImageStreamRequest
+        {
+            IterationId = hasEmpyIterationId ? Guid.Empty.ToString() : hasInvalidIterationId ? "42" : Guid.NewGuid().ToString(),
+            PortId = hasInvalidPortId ? "42" : Guid.NewGuid().ToString()
+        };
+
+        var planarPixelBuffer = new PackedPixelBuffer<Mono8>(imageWidth, imageHeight);
+        var cachedImage = new CacheImage
+        {
+            OriginalImage = new Image(planarPixelBuffer)
+        };
+
+        _mockFlowService.Setup(f => f.GetPort(It.IsAny<Guid>())).Returns(hasWrongPortId ? null! : CreatePortMock("P1", Guid.NewGuid()).Object);
+        _mockCacheService.Setup(c => c.GetOrCreatePortEntry(It.IsAny<Guid>(), It.IsAny<IPort>())).Returns(new Port { Value = cachedImage });
+        _mockRuntimeMapper.Setup(r => r.FromRuntime(It.IsAny<IPort>())).Returns(new Port { Value = cachedImage });
+
+        var mockServerStreamWriter = new Mock<IServerStreamWriter<ImageChunkDto>>();
+
+        // Act
+        if(hasInvalidIterationId || hasInvalidPortId || hasWrongPortId)
+        {
+            await Assert.ThrowsAsync<RpcException>(() => _service.GetImageStream(request, mockServerStreamWriter.Object, _serverCallContext));
+            return;
+        }
+
+        await _service.GetImageStream(request, mockServerStreamWriter.Object, _serverCallContext);
+
+        // Assert
+        mockServerStreamWriter.Verify(w => w.WriteAsync(It.IsAny<ImageChunkDto>(), It.IsAny<CancellationToken>()));
     }
 
     private static Mock<IStepProxy> CreateStepProxyMock(string name, Guid id)
