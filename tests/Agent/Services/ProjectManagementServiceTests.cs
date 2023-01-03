@@ -42,9 +42,9 @@ public sealed class ProjectManagementServiceTests
     }
 
     [Theory]
-    [InlineData(false, false)]
-    [InlineData(true, false)]
     [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
     public async ValueTask Test_CreateAsync(bool hasActiveProject, bool isActivateSuccessful)
     {
         // Arrange
@@ -72,15 +72,16 @@ public sealed class ProjectManagementServiceTests
     }
 
     [Theory]
-    [InlineData(true, true, true, true)]
-    [InlineData(false, true, true, false)]
-    [InlineData(false, true, false, true)]
-    [InlineData(false, false, true, true)]
-    public async ValueTask Test_TryDeleteAsync(bool expectedSuccess, bool isActiveProject, bool isDeactivationSuccessful, bool isDeleteSuccessful)
+    [InlineData(true, true, true, true, true)]
+    [InlineData(false, true, true, true, false)]
+    [InlineData(false, false, true, true, false)]
+    [InlineData(false, true, true, false, true)]
+    [InlineData(true, true, false, true, true)]
+    public async ValueTask Test_TryDeleteAsync(bool expectedSuccess, bool containsProject, bool isActiveProject, bool isDeactivationSuccessful, bool isDeleteSuccessful)
     {
         // Arrange
         var projectId = Guid.NewGuid();
-        _mockProjectRepository.Setup(r => r.GetAllMetasAsync(It.IsAny<Guid>())).ReturnsAsync(new List<ProjectMetaRecord> { new ProjectMetaRecord { Id = projectId, IsActive = isActiveProject } });
+        _mockProjectRepository.Setup(r => r.GetAllMetasAsync(It.IsAny<Guid>())).ReturnsAsync(containsProject ? new List<ProjectMetaRecord> { new ProjectMetaRecord { Id = projectId, IsActive = isActiveProject } } : new List<ProjectMetaRecord>());
         _mockProjectRepository.Setup(r => r.TryDeleteAsync(It.IsAny<Guid>())).ReturnsAsync(isDeleteSuccessful);
         _mockEngineHost.Setup(e => e.ActiveProject).Returns(new Project
         {

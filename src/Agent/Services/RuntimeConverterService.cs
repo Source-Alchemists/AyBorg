@@ -86,43 +86,19 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
     private static bool UpdateNumericPortValue(NumericPort port, object value)
     {
-        if (value is JsonElement jsonElement)
-        {
-            port.Value = jsonElement.GetDouble();
-        }
-        else
-        {
-            port.Value = Convert.ToDouble(value, CultureInfo.InvariantCulture);
-        }
-
+        port.Value = Convert.ToDouble(value, CultureInfo.InvariantCulture);
         return true;
     }
 
     private static bool UpdateStringPortValue(StringPort port, object value)
     {
-        if (value is JsonElement jsonElement)
-        {
-            port.Value = jsonElement.GetString() ?? string.Empty;
-        }
-        else
-        {
-            port.Value = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
-        }
-
+        port.Value = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
         return true;
     }
 
     private static bool UpdateBooleanPortValue(BooleanPort port, object value)
     {
-        if (value is JsonElement jsonElement)
-        {
-            port.Value = jsonElement.GetBoolean();
-        }
-        else
-        {
-            port.Value = Convert.ToBoolean(value, CultureInfo.InvariantCulture);
-        }
-
+        port.Value = Convert.ToBoolean(value, CultureInfo.InvariantCulture);
         return true;
     }
 
@@ -163,6 +139,18 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
     private static bool UpdateRectanglePortValue(RectanglePort port, object value)
     {
+        if (value is Rectangle rectangle)
+        {
+            port.Value = rectangle;
+            return true;
+        }
+
+        if (value is SDK.Common.Models.Rectangle rectangleModel)
+        {
+            port.Value = new Rectangle(rectangleModel.X, rectangleModel.Y, rectangleModel.Width, rectangleModel.Height);
+            return true;
+        }
+
         var options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true

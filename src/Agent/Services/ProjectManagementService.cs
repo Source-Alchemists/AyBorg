@@ -62,13 +62,9 @@ internal sealed class ProjectManagementService : IProjectManagementService
     public async ValueTask<ProjectRecord> CreateAsync(string name)
     {
         ProjectRecord result = await _projectRepository.CreateAsync(name, _serviceUniqueName);
-        if (!(await _projectRepository.GetAllMetasAsync(_serviceUniqueName)).Any(pm => pm.IsActive))
+        if (!(await _projectRepository.GetAllMetasAsync(_serviceUniqueName)).Any(pm => pm.IsActive) && (await TryChangeActivationStateAsync(result.Meta.DbId, true)).IsSuccessful)
         {
-            // If no active project, activate the new created one
-            if ((await TryChangeActivationStateAsync(result.Meta.DbId, true)).IsSuccessful)
-            {
-                result.Meta.IsActive = true;
-            }
+            result.Meta.IsActive = true;
         }
 
         return result;
