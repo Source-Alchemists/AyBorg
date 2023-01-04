@@ -26,4 +26,10 @@
     <ProjectReference Include="..\..\..\src\Plugins\Base\AyBorg.Plugins.Base.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+      <Content Include="resources\*.*">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+  </ItemGroup>
+
 </Project>

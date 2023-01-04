@@ -56,7 +56,7 @@ public sealed class ImageLoad : IStepBody, IDisposable
         _preloadTask.Dispose();
         _preloadTask = PreloadImage();
 
-        return await ValueTask.FromResult(true);
+        return true;
     }
 
     private Task<KeyValuePair<string, Image>> PreloadImage()
