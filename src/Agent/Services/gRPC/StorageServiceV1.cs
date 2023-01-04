@@ -17,7 +17,7 @@ public sealed class StorageServiceV1 : Storage.StorageBase
 
     public override Task<GetDirectoriesResponse> GetDirectories(GetDirectoriesRequest request, ServerCallContext context)
     {
-        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
+        AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer, Roles.Auditor });
         return Task.Factory.StartNew(() =>
         {
             IEnumerable<string> directories = _storageService.GetDirectories(request.Path);
