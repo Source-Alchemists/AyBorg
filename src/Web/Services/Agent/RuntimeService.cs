@@ -31,10 +31,7 @@ public class RuntimeService : IRuntimeService
     /// Gets the status.
     /// </summary>
     /// <returns>The status.</returns>
-    public async ValueTask<EngineMeta> GetStatusAsync()
-    {
-        return await GetStatusAsync(_stateService.AgentState.UniqueName);
-    }
+    public ValueTask<EngineMeta> GetStatusAsync() => GetStatusAsync(_stateService.AgentState.UniqueName);
 
     /// <summary>
     /// Gets the status.
@@ -43,11 +40,20 @@ public class RuntimeService : IRuntimeService
     /// <returns>The status.</returns>
     public async ValueTask<EngineMeta> GetStatusAsync(string serviceUniqueName)
     {
-        GetRuntimeStatusResponse response = await _runtimeClient.GetStatusAsync(new GetRuntimeStatusRequest
+        try
         {
-            AgentUniqueName = serviceUniqueName
-        });
-        return CreateEngineMeta(response.EngineMetaInfos.First());
+            GetRuntimeStatusResponse response = await _runtimeClient.GetStatusAsync(new GetRuntimeStatusRequest
+            {
+                AgentUniqueName = serviceUniqueName
+            });
+
+            return CreateEngineMeta(response.EngineMetaInfos.First());
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to get status");
+            return null!;
+        }
     }
 
     /// <summary>
@@ -65,6 +71,7 @@ public class RuntimeService : IRuntimeService
                 EngineExecutionType = (int)executionType,
                 EngineId = string.Empty
             });
+
             return CreateEngineMeta(response.EngineMetaInfos.First());
         }
         catch (RpcException ex)
@@ -87,6 +94,7 @@ public class RuntimeService : IRuntimeService
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 EngineId = string.Empty
             });
+
             return CreateEngineMeta(response.EngineMetaInfos.First());
         }
         catch (RpcException ex)
@@ -109,6 +117,7 @@ public class RuntimeService : IRuntimeService
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 EngineId = string.Empty
             });
+
             return CreateEngineMeta(response.EngineMetaInfos.First());
         }
         catch (RpcException ex)

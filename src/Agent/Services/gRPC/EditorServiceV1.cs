@@ -319,6 +319,12 @@ public sealed class EditorServiceV1 : Editor.EditorBase
 
         var originalImageModel = (CacheImage)portModel.Value!;
         Image originalImage = (Image)originalImageModel.OriginalImage!;
+        if (originalImage == null)
+        {
+            _logger.LogTrace("Image not found: {PortId}", portId);
+            return;
+        }
+
         await SendImageAsync(originalImage, responseStream, request.AsThumbnail, context.CancellationToken);
 
         if (isOriginalPortModelCreated)

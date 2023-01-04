@@ -41,14 +41,14 @@ public class ProjectManagementServiceTests
         var response = new GetProjectMetasResponse();
         response.ProjectMetas.Add(new ProjectMeta
         {
-            CreationDate = new Google.Protobuf.WellKnownTypes.Timestamp(),
-            ChangeDate = new Google.Protobuf.WellKnownTypes.Timestamp()
+            CreationDate = new Timestamp(),
+            ChangeDate = new Timestamp()
         });
         AsyncUnaryCall<GetProjectMetasResponse> call = GrpcCallHelpers.CreateAsyncUnaryCall(response);
         _mockProjectManagementClient.Setup(m => m.GetProjectMetasAsync(It.IsAny<GetProjectMetasRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
 
         // Act
-        IEnumerable<Shared.Models.Agent.ProjectMeta> result = await _service.GetMetasAsync("Test");
+        IEnumerable<Shared.Models.Agent.ProjectMeta> result = await _service.GetMetasAsync();
 
         // Assert
         Assert.Single(result);
@@ -61,21 +61,21 @@ public class ProjectManagementServiceTests
         var response = new GetProjectMetasResponse();
         response.ProjectMetas.Add(new ProjectMeta
         {
-            CreationDate = new Google.Protobuf.WellKnownTypes.Timestamp(),
-            ChangeDate = new Google.Protobuf.WellKnownTypes.Timestamp(),
+            CreationDate = new Timestamp(),
+            ChangeDate = new Timestamp(),
             IsActive = false
         });
         response.ProjectMetas.Add(new ProjectMeta
         {
-            CreationDate = new Google.Protobuf.WellKnownTypes.Timestamp(),
-            ChangeDate = new Google.Protobuf.WellKnownTypes.Timestamp(),
+            CreationDate = new Timestamp(),
+            ChangeDate = new Timestamp(),
             IsActive = true
         });
         AsyncUnaryCall<GetProjectMetasResponse> call = GrpcCallHelpers.CreateAsyncUnaryCall(response);
         _mockProjectManagementClient.Setup(m => m.GetProjectMetasAsync(It.IsAny<GetProjectMetasRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
 
         // Act
-        Shared.Models.Agent.ProjectMeta result = await _service.GetActiveMetaAsync("Test");
+        Shared.Models.Agent.ProjectMeta result = await _service.GetActiveMetaAsync();
 
         // Assert
         Assert.NotNull(result);
@@ -90,8 +90,8 @@ public class ProjectManagementServiceTests
         {
             ProjectMeta = new ProjectMeta
             {
-                CreationDate = new Google.Protobuf.WellKnownTypes.Timestamp(),
-                ChangeDate = new Google.Protobuf.WellKnownTypes.Timestamp()
+                CreationDate = new Timestamp(),
+                ChangeDate = new Timestamp()
             }
         };
         AsyncUnaryCall<CreateProjectResponse> call = GrpcCallHelpers.CreateAsyncUnaryCall(response);
