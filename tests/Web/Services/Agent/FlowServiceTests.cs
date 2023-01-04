@@ -7,6 +7,7 @@ using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Tests.Helpers;
 using Google.Protobuf;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -179,5 +180,140 @@ public class FlowServiceTests
         {
             Assert.Null(result);
         }
+    }
+
+    [Fact]
+    public async ValueTask Test_AddStepAsync()
+    {
+        // Arrange
+        AsyncUnaryCall<AddFlowStepResponse> call = GrpcCallHelpers.CreateAsyncUnaryCall(new AddFlowStepResponse());
+        _mockEditorClient.Setup(m => m.AddFlowStepAsync(It.IsAny<AddFlowStepRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
+
+        _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<StepDto>())).Returns(new Step());
+
+        // Act
+        Step result = await _service.AddStepAsync(Guid.NewGuid(), 0, 0);
+
+        // Assert
+        Assert.NotNull(result);
+    }
+
+    [Fact]
+    public async ValueTask Test_TryRemoveStepAsync()
+    {
+        // Arrange
+        AsyncUnaryCall<Empty> call = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
+        _mockEditorClient.Setup(m => m.DeleteFlowStepAsync(It.IsAny<DeleteFlowStepRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
+
+        // Act
+        bool result = await _service.TryRemoveStepAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async ValueTask Test_TryMoveStepAsync()
+    {
+        // Arrange
+        AsyncUnaryCall<Empty> call = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
+        _mockEditorClient.Setup(m => m.MoveFlowStepAsync(It.IsAny<MoveFlowStepRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
+
+        // Act
+        bool result = await _service.TryMoveStepAsync(Guid.NewGuid(), 0, 0);
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async ValueTask Test_AddLinkAsync(bool notLinking)
+    {
+        // Arrange
+        var expectedId = Guid.NewGuid();
+        AsyncUnaryCall<LinkFlowPortsResponse> callGetFlowLinks = GrpcCallHelpers.CreateAsyncUnaryCall(new LinkFlowPortsResponse
+        {
+            LinkId = notLinking ? "42" : expectedId.ToString()
+        });
+        _mockEditorClient.Setup(m => m.LinkFlowPortsAsync(It.IsAny<LinkFlowPortsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(callGetFlowLinks);
+
+        _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link());
+
+        // Act
+        Guid? result = await _service.AddLinkAsync(Guid.NewGuid(), Guid.NewGuid());
+
+        // Assert
+        if (!notLinking)
+        {
+            Assert.Equal(expectedId, result);
+        }
+        else
+        {
+            Assert.Equal(Guid.Empty, result);
+        }
+    }
+
+    [Fact]
+    public async ValueTask Test_TryRemoveLinkAsync()
+    {
+        // Arrange
+        AsyncUnaryCall<LinkFlowPortsResponse> callGetFlowLinks = GrpcCallHelpers.CreateAsyncUnaryCall(new LinkFlowPortsResponse());
+        _mockEditorClient.Setup(m => m.LinkFlowPortsAsync(It.IsAny<LinkFlowPortsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(callGetFlowLinks);
+
+        _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link());
+
+        // Act
+        bool result = await _service.TryRemoveLinkAsync(Guid.NewGuid());
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async ValueTask Test_GetPortAsync(bool hasPort)
+    {
+        // Arrange
+        var response = new GetFlowPortsResponse();
+        if (hasPort)
+        {
+            response.Ports.Add(new PortDto());
+        }
+        AsyncUnaryCall<GetFlowPortsResponse> call = GrpcCallHelpers.CreateAsyncUnaryCall(response);
+        _mockEditorClient.Setup(m => m.GetFlowPortsAsync(It.IsAny<GetFlowPortsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
+
+        _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<PortDto>())).Returns(new Port());
+
+        // Act
+        Port result = await _service.GetPortAsync(Guid.NewGuid(), Guid.NewGuid());
+
+        // Assert
+        if (!hasPort)
+        {
+            Assert.Null(result);
+        }
+        else
+        {
+            Assert.NotNull(result);
+        }
+    }
+
+    [Fact]
+    public async ValueTask Test_TrySetPortValueAsync()
+    {
+        // Arrange
+        AsyncUnaryCall<Empty> call = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
+        _mockEditorClient.Setup(m => m.UpdateFlowPortAsync(It.IsAny<UpdateFlowPortRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
+
+        _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<PortDto>())).Returns(new Port());
+
+        // Act
+        bool result = await _service.TrySetPortValueAsync(new Port());
+
+        // Assert
+        Assert.True(result);
     }
 }
