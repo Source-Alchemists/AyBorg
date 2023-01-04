@@ -13,6 +13,7 @@ namespace AyBorg.Agent.Tests.Services.gRPC;
 public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManagementServiceV1, ProjectManagement.ProjectManagementClient>
 {
     private readonly Mock<IProjectManagementService> _mockProjectManagementService = new();
+
     public ProjectManagementServiceV1Tests()
     {
         _service = new ProjectManagementServiceV1(s_logger, _mockProjectManagementService.Object);

@@ -21,8 +21,6 @@ public sealed class RuntimeServiceV1 : Ayborg.Gateway.Agent.V1.Runtime.RuntimeBa
     public override async Task<GetRuntimeStatusResponse> GetStatus(GetRuntimeStatusRequest request, ServerCallContext context)
     {
         EngineMeta status = _engineHost.GetEngineStatus();
-        ThrowIfNull(status);
-
         var result = new GetRuntimeStatusResponse();
         result.EngineMetaInfos.Add(CreateEngineMetaInfo(status));
         return await Task.FromResult(result);
@@ -32,8 +30,6 @@ public sealed class RuntimeServiceV1 : Ayborg.Gateway.Agent.V1.Runtime.RuntimeBa
     {
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
         EngineMeta status = await _engineHost.StartRunAsync((EngineExecutionType)request.EngineExecutionType);
-        ThrowIfNull(status);
-
         var result = new StartRunResponse();
         result.EngineMetaInfos.Add(CreateEngineMetaInfo(status));
         return result;
@@ -43,8 +39,6 @@ public sealed class RuntimeServiceV1 : Ayborg.Gateway.Agent.V1.Runtime.RuntimeBa
     {
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
         EngineMeta status = await _engineHost.StopRunAsync();
-        ThrowIfNull(status);
-
         var result = new StopRunResponse();
         result.EngineMetaInfos.Add(CreateEngineMetaInfo(status));
         return result;
@@ -54,20 +48,9 @@ public sealed class RuntimeServiceV1 : Ayborg.Gateway.Agent.V1.Runtime.RuntimeBa
     {
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
         EngineMeta status = await _engineHost.AbortRunAsync();
-        ThrowIfNull(status);
-
         var result = new AbortRunResponse();
         result.EngineMetaInfos.Add(CreateEngineMetaInfo(status));
         return result;
-    }
-
-    private void ThrowIfNull(EngineMeta status)
-    {
-        if (status == null)
-        {
-            _logger.LogWarning("No engine status found.");
-            throw new RpcException(new Status(StatusCode.NotFound, "No engine status found."));
-        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
