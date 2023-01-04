@@ -27,9 +27,10 @@ public class ImageLoadTests : IDisposable
         folderPort.Value = "resources";
 
         // Act
-        await _plugin.TryRunAsync(CancellationToken.None);
+        bool result = await _plugin.TryRunAsync(CancellationToken.None);
 
         // Assert
+        Assert.True(result);
         Assert.NotNull(imagePort.Value);
     }
 

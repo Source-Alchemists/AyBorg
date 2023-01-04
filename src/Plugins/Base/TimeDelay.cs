@@ -26,7 +26,7 @@ public sealed class TimeDelay : IStepBody
     {
         try
         {
-            int targetDelay = System.Convert.ToInt32(_milliseconds.Value);
+            int targetDelay = Convert.ToInt32(_milliseconds.Value);
             await Task.Delay(targetDelay, cancellationToken);
         }
         catch (TaskCanceledException)
