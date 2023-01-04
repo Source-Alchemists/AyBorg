@@ -119,12 +119,61 @@ public class FlowServiceTests
         if (hasStep)
         {
             Assert.NotNull(result);
-            if(!skipOutputPorts)
+            if (!skipOutputPorts)
             {
                 var image = (Image)result.Ports!.First(p => p.Brand == PortBrand.Image).Value!;
                 Assert.Equal(2, image.Width);
                 Assert.Equal(2, image.Height);
             }
+        }
+        else
+        {
+            Assert.Null(result);
+        }
+    }
+
+    [Fact]
+    public async ValueTask Test_GetLinksAsync()
+    {
+        // Arrange
+        var getFlowLinksResponse = new GetFlowLinksResponse();
+        getFlowLinksResponse.Links.Add(new LinkDto());
+        AsyncUnaryCall<GetFlowLinksResponse> callGetFlowLinks = GrpcCallHelpers.CreateAsyncUnaryCall(getFlowLinksResponse);
+        _mockEditorClient.Setup(m => m.GetFlowLinksAsync(It.IsAny<GetFlowLinksRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(callGetFlowLinks);
+
+        _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link());
+
+        // Act
+        IEnumerable<Link> result = await _service.GetLinksAsync();
+
+        // Assert
+        Assert.Single(result);
+    }
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async ValueTask Test_GetLinkAsync(bool hasLink)
+    {
+        // Arrange
+        var getFlowLinksResponse = new GetFlowLinksResponse();
+        if (hasLink)
+        {
+            getFlowLinksResponse.Links.Add(new LinkDto());
+        }
+
+        AsyncUnaryCall<GetFlowLinksResponse> callGetFlowLinks = GrpcCallHelpers.CreateAsyncUnaryCall(getFlowLinksResponse);
+        _mockEditorClient.Setup(m => m.GetFlowLinksAsync(It.IsAny<GetFlowLinksRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(callGetFlowLinks);
+
+        _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link());
+
+        // Act
+        Link result = await _service.GetLinkAsync(Guid.NewGuid());
+
+        // Assert
+        if (hasLink)
+        {
+            Assert.NotNull(result);
         }
         else
         {
