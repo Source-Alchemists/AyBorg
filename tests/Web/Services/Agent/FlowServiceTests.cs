@@ -20,12 +20,11 @@ public class FlowServiceTests
     private readonly Mock<IStateService> _mockStateService = new();
     private readonly Mock<IRpcMapper> _mockRpcMapper = new();
     private readonly Mock<Editor.EditorClient> _mockEditorClient = new();
-
     private readonly FlowService _service;
 
     public FlowServiceTests()
     {
-        _mockStateService.Setup(m => m.AgentState).Returns(new Shared.Models.UiAgentState
+        _mockStateService.Setup(m => m.AgentState).Returns(new UiAgentState
         {
             UniqueName = "Test"
         });

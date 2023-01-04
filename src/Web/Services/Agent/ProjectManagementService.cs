@@ -34,10 +34,7 @@ public class ProjectManagementService : IProjectManagementService
     /// Receives asynchronous.
     /// </summary>
     /// <returns></returns>
-    public async ValueTask<IEnumerable<Shared.Models.Agent.ProjectMeta>> GetMetasAsync()
-    {
-        return await GetMetasAsync(_stateService.AgentState.UniqueName);
-    }
+    public ValueTask<IEnumerable<Shared.Models.Agent.ProjectMeta>> GetMetasAsync() => GetMetasAsync(_stateService.AgentState.UniqueName);
 
     /// <summary>
     /// Receives asynchronous.
@@ -73,10 +70,7 @@ public class ProjectManagementService : IProjectManagementService
     /// Receives active project meta asynchronous.
     /// </summary>
     /// <returns></returns>
-    public async ValueTask<Shared.Models.Agent.ProjectMeta> GetActiveMetaAsync()
-    {
-        return await GetActiveMetaAsync(_stateService.AgentState.UniqueName);
-    }
+    public ValueTask<Shared.Models.Agent.ProjectMeta> GetActiveMetaAsync() => GetActiveMetaAsync(_stateService.AgentState.UniqueName);
 
     /// <summary>
     /// Receives active project meta asynchronous.
