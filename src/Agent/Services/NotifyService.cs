@@ -9,13 +9,11 @@ namespace AyBorg.Agent.Services;
 
 public sealed class NotifyService : INotifyService
 {
-    private readonly ILogger<NotifyService> _logger;
     private readonly IServiceConfiguration _serviceConfiguration;
     private readonly Notify.NotifyClient _notifyClient;
 
-    public NotifyService(ILogger<NotifyService> logger, IServiceConfiguration serviceConfiguration, Notify.NotifyClient notifyClient)
+    public NotifyService(IServiceConfiguration serviceConfiguration, Notify.NotifyClient notifyClient)
     {
-        _logger = logger;
         _serviceConfiguration = serviceConfiguration;
         _notifyClient = notifyClient;
     }

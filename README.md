@@ -5,10 +5,9 @@
 ## Why AyBorg?
 
 - **Easy to use!**
-  - AyBorg wants you to be successful with your automation solution, fast and easy!
-  - Don't spend a lot of time to write code, just use AyBorg's user **friendly no code** interface!
+  - Don't spend a lot of time to write code, just use instead AyBorg's user **friendly no code** interface!
   - If you ever need to write code, still don't spend to much time on it, with AyBorg's very simple plugin interface!
-- **One interface to fit them all!** Don't invest a lot of money to train your employees in different applications, use AyBorg instead!
+- **One interface to fit them all!** Don't invest a lot of money to train your employees in different applications!
 - **Scalable!** No matter how many devices are connected, AyBorg can handle them all in one interface!
 - **Easy to integrate into your existing infrastructure**, thanks to MQTT!
 - **No vendor lock-in!**
@@ -19,28 +18,6 @@
   - You need a new fancy plugin? Go for it, AyBorg is open to be extented.
   - AyBorg is not only easy to use, it is also easy to extend! (See [StepBody](doc/agent/plugins/custom-plugins.md#stepBody))
   - You write your logic, AyBorg does the rest!
-
-## Transfer protocols
-
-### MQTT
-
-![MqttLogo](doc/img/mqtt-logo.png)
-With MQTT, it should be easy to integrate into your existing ecosystem.
-
-![MosquittoLogo](doc/img/mosquitto-text-side.svg)
-
-We also provide you with a ready to use Docker compose setup, including Mosquitto as MQTT broker.
-
-### REST/HTTP
-
-Every aspect of the software can be controlled by a REST API.
-
-## Database
-
-We support following databases:
-
-- SqlLite
-- PostgreSql
 
 ### Steps
 
@@ -64,7 +41,16 @@ The default appsettings give you a good starting point and will also work locall
 
 > :warning: **The default password should be changed immediately!**
 
+## Example setups
+
+Services can be added any time. The AyBorg.Gateway will detect the new service and establish the communication.
+
 ![BlockDiagram](doc/img/block_diagram.png)
+
+### Using AyBorg.Agent as MQTT Consumer/Producer
+
+Typically, you will send the processed results to an MQTT broker so that other services (e.g. another AyBorg.Agent) can further process the data.
+![BlockDiagram](doc/img/block_diagram2.png)
 
 ## Want to contribute?
 

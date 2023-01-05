@@ -10,7 +10,6 @@ namespace AyBorg.Agent.Services;
 
 internal sealed class CacheService : ICacheService
 {
-    private readonly ILogger<CacheService> _logger;
     private readonly IRuntimeMapper _runtimeMapper;
     private readonly ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> _cache = new();
     private readonly int _maxCacheTimeSeconds;
@@ -25,14 +24,11 @@ internal sealed class CacheService : ICacheService
     /// Initializes a new instance of the <see cref="CacheService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    public CacheService(ILogger<CacheService> logger, IRuntimeMapper runtimeMapper, IConfiguration configuration)
+    public CacheService(IRuntimeMapper runtimeMapper, IConfiguration configuration)
     {
-        _logger = logger;
         _runtimeMapper = runtimeMapper;
         _maxCacheTimeSeconds = configuration.GetValue("AyBorg:Cache:MaxSeconds", 10);
         _maxCacheIterations = configuration.GetValue("AyBorg:Cache:MaxIterations", 5);
-
-        _logger.LogTrace("CacheService initialized with {maxCacheTimeSeconds} seconds and {maxCacheIterations} iterations.", _maxCacheTimeSeconds, _maxCacheIterations);
     }
 
     /// <summary>

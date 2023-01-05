@@ -9,14 +9,13 @@ namespace AyBorg.Agent.Tests.Services;
 
 public class NotifyServiceTests
 {
-    private static readonly NullLogger<NotifyService> s_logger = new();
     private readonly Mock<IServiceConfiguration> _mockServiceConfiguration = new();
     private readonly Mock<Notify.NotifyClient> _mockClient = new();
     private readonly NotifyService _service;
 
     public NotifyServiceTests()
     {
-        _service = new NotifyService(s_logger, _mockServiceConfiguration.Object, _mockClient.Object);
+        _service = new NotifyService(_mockServiceConfiguration.Object, _mockClient.Object);
     }
 
     [Fact]

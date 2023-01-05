@@ -11,7 +11,6 @@ namespace AyBorg.Agent.Tests.Services;
 
 public class CacheServiceTests
 {
-    private static readonly NullLogger<CacheService> s_logger = new();
     private readonly Mock<IRuntimeMapper> _mockRuntimeMapper = new();
     private readonly IConfiguration _configuration;
     private readonly CacheService _service;
@@ -24,7 +23,7 @@ public class CacheServiceTests
                 new("AyBorg:Cache:MaxIterations", "5")
             }!).Build();
 
-        _service = new CacheService(s_logger, _mockRuntimeMapper.Object, _configuration);
+        _service = new CacheService(_mockRuntimeMapper.Object, _configuration);
     }
 
     [Fact]

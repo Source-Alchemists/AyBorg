@@ -73,12 +73,9 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
     {
         IEnumerable<ServiceEntry> knownServices = await _keeperService.GetAllRegistryEntriesAsync();
 
-        if (!string.IsNullOrEmpty(request.Id))
+        if (!string.IsNullOrEmpty(request.Id) && Guid.TryParse(request.Id, out Guid id))
         {
-            if (Guid.TryParse(request.Id, out Guid id))
-            {
-                knownServices = knownServices.Where(s => s.Id.Equals(id));
-            }
+            knownServices = knownServices.Where(s => s.Id.Equals(id));
         }
 
         if (!string.IsNullOrEmpty(request.Name))

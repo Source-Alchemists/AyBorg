@@ -1,4 +1,3 @@
-using Microsoft.AspNetCore.SignalR.Client;
 using AyBorg.SDK.System.Runtime;
 
 
@@ -6,12 +5,6 @@ namespace AyBorg.Web.Services.Agent;
 
 public interface IRuntimeService
 {
-    // /// <summary>
-    // /// Creates the hub connection.
-    // /// </summary>
-    // /// <returns>The hub connection.</returns>
-    // HubConnection CreateHubConnection();
-
     /// <summary>
     /// Gets the status.
     /// </summary>
