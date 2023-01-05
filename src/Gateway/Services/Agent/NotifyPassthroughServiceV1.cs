@@ -62,7 +62,7 @@ public sealed class NotifyPassthroughServiceV1 : Notify.NotifyBase
                 if (channelInfo != null)
                 {
                     channelInfo.IsAcceptingNotifications = false;
-                    while (channelInfo.Notifications.TryTake(out _)) ;
+                    while (channelInfo.Notifications.TryTake(out _)) { await Task.Delay(0); }
                 }
             }
         });

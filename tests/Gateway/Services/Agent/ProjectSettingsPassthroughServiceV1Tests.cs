@@ -13,7 +13,7 @@ public class ProjectSettingsPassthroughServiceV1Test : BaseGrpcServiceTests<Proj
 {
     public ProjectSettingsPassthroughServiceV1Test()
     {
-        _service = new ProjectSettingsPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
+        _service = new ProjectSettingsPassthroughServiceV1(_mockGrpcChannelService.Object);
     }
 
     [Fact]

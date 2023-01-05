@@ -13,7 +13,7 @@ public class ProjectManagementPassthroughServiceV1Tests : BaseGrpcServiceTests<P
 {
     public ProjectManagementPassthroughServiceV1Tests()
     {
-        _service = new ProjectManagementPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
+        _service = new ProjectManagementPassthroughServiceV1(_mockGrpcChannelService.Object);
     }
 
     [Fact]

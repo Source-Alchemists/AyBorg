@@ -12,7 +12,7 @@ public class StoragePassthroughServiceV1Tests : BaseGrpcServiceTests<StoragePass
 {
     public StoragePassthroughServiceV1Tests()
     {
-        _service = new StoragePassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
+        _service = new StoragePassthroughServiceV1(_mockGrpcChannelService.Object);
     }
 
     [Theory]

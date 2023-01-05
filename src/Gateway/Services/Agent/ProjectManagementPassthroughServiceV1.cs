@@ -7,12 +7,10 @@ namespace AyBorg.Gateway.Services.Agent;
 
 public sealed class ProjectManagementPassthroughServiceV1 : ProjectManagement.ProjectManagementBase
 {
-    private readonly ILogger<ProjectManagementPassthroughServiceV1> _logger;
     private readonly IGrpcChannelService _grpcChannelService;
 
-    public ProjectManagementPassthroughServiceV1(ILogger<ProjectManagementPassthroughServiceV1> logger, IGrpcChannelService grpcChannelService)
+    public ProjectManagementPassthroughServiceV1(IGrpcChannelService grpcChannelService)
     {
-        _logger = logger;
         _grpcChannelService = grpcChannelService;
     }
 

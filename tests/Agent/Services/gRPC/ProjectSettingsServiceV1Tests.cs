@@ -15,7 +15,7 @@ public class ProjectSettingsServiceV1Tests : BaseGrpcServiceTests<ProjectSetting
 
     public ProjectSettingsServiceV1Tests()
     {
-        _service = new ProjectSettingsServiceV1(s_logger, _mockProjectSettingsService.Object);
+        _service = new ProjectSettingsServiceV1(_mockProjectSettingsService.Object);
     }
 
     [Theory]

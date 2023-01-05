@@ -79,7 +79,6 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             _diagram.Links.Clear();
             _suspendDiagramRefresh = false;
 
-            // await ConnectHubEventsAsync();
             double zoom = await StateService.AutomationFlowState.UpdateZoomAsync();
             _diagram.SetZoom(zoom);
             (double offsetX, double offsetY) = await StateService.AutomationFlowState.UpdateOffsetAsync();
@@ -116,8 +115,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         {
             Guid iterationId = (Guid)obj;
             IEnumerable<FlowNode> flowNodes = _diagram.Nodes.Cast<FlowNode>();
-            CancellationToken token = CancellationToken.None;
-            await Parallel.ForEachAsync(flowNodes, async (node, token) =>
+            await Parallel.ForEachAsync(flowNodes, async (node, Default) =>
             {
                 Step newStep = await FlowService.GetStepAsync(node.Step.Id, iterationId);
                 if (newStep != null)
@@ -130,7 +128,10 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                 }
             });
         }
-        catch (RpcException) { }
+        catch (RpcException ex)
+        {
+            Logger.LogWarning(ex, "Failed to get step");
+        }
     }
 
     private async void FlowChangedNotificationReceived(object obj)
@@ -222,7 +223,10 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                 });
             }
         }
-        catch (RpcException) { }
+        catch (RpcException ex)
+        {
+            Logger.LogWarning(ex, "Failed to get step");
+        }
     }
 
     private async Task CreateFlow()
@@ -297,7 +301,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         }
     }
 
-    private async Task OnLinkTargetPortChangedAsync(BaseLinkModel tmpLink, PortModel _, PortModel p2)
+    private async Task OnLinkTargetPortChangedAsync(BaseLinkModel tmpLink, PortModel p2)
     {
         if (_suspendDiagramRefresh) return;
         if (tmpLink.SourcePort == null) return;
@@ -377,7 +381,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
 
     private void OnLinkAdded(BaseLinkModel link)
     {
-        link.TargetPortChanged += async (l, p1, p2) => await OnLinkTargetPortChangedAsync(l, p1!, p2!);
+        link.TargetPortChanged += async (l, p1, p2) => await OnLinkTargetPortChangedAsync(l, p2!);
     }
 
     private async void OnLinkRemovedAsync(BaseLinkModel link)
@@ -385,8 +389,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         if (_suspendDiagramRefresh) return;
         if (link.TargetPort == null || link.SourcePort == null) return; // Nothing to do.
         IEnumerable<Link> links = await FlowService.GetLinksAsync();
-        var sp = (FlowPort)link.SourcePort;
-        var tp = (FlowPort)link.TargetPort;
+        var targetPort = (FlowPort)link.TargetPort;
         Link orgLink = links.FirstOrDefault(l => l.Id.ToString().Equals(link.Id));
         if (orgLink == null) return; // Nothing to do. Already removed.
         if (!await FlowService.TryRemoveLinkAsync(orgLink.Id))
@@ -395,19 +398,17 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             return;
         }
 
-        Port newPort = await FlowService.GetPortAsync(tp.Port.Id);
-        tp.Update(newPort);
+        Port newPort = await FlowService.GetPortAsync(targetPort.Port.Id);
+        targetPort.Update(newPort);
     }
 
     private async void OnNodeRemoved(NodeModel node)
     {
         if (_suspendDiagramRefresh) return;
-        if (node is FlowNode flowNode)
+        if (node is FlowNode flowNode
+            && !await FlowService.TryRemoveStepAsync(flowNode.Step.Id))
         {
-            if (!await FlowService.TryRemoveStepAsync(flowNode.Step.Id))
-            {
-                _diagram.Nodes.Add(node);
-            }
+            _diagram.Nodes.Add(node);
         }
     }
 

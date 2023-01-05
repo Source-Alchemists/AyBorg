@@ -14,7 +14,7 @@ public class RuntimeServiceV1Tests : BaseGrpcServiceTests<RuntimeServiceV1, Aybo
 
     public RuntimeServiceV1Tests()
     {
-        _service = new RuntimeServiceV1(s_logger, _mockEngineHost.Object);
+        _service = new RuntimeServiceV1(_mockEngineHost.Object);
     }
 
     [Fact]

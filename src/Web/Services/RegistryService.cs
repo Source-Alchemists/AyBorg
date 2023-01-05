@@ -5,16 +5,12 @@ namespace AyBorg.Web.Services;
 
 public class RegistryService : IRegistryService
 {
-    private readonly ILogger<RegistryService> _logger;
     private readonly Register.RegisterClient _registerClient;
 
     /// <summary>Initializes a new instance of the <see cref="RegistryService" /> class.</summary>
-    /// <param name="logger">The logger.</param>
-    /// <param name="gatewayConfiguration">The service configuration.</param>
-    /// <param name="httpClient">The HTTP client.</param>
-    public RegistryService(ILogger<RegistryService> logger, Register.RegisterClient registerClient)
+    /// <param name="registerClient">The register client.</param>
+    public RegistryService(Register.RegisterClient registerClient)
     {
-        _logger = logger;
         _registerClient = registerClient;
     }
 

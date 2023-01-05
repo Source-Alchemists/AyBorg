@@ -13,7 +13,7 @@ public class EditorPassthroughServiceV1Tests : BaseGrpcServiceTests<EditorPassth
 {
     public EditorPassthroughServiceV1Tests()
     {
-        _service = new EditorPassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
+        _service = new EditorPassthroughServiceV1(_mockGrpcChannelService.Object);
     }
 
     [Fact]

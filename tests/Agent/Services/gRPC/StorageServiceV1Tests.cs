@@ -13,7 +13,7 @@ public class StorageServiceV1Tests : BaseGrpcServiceTests<StorageServiceV1, Stor
 
     public StorageServiceV1Tests()
     {
-        _service = new StorageServiceV1(s_logger, _mockStorageService.Object);
+        _service = new StorageServiceV1(_mockStorageService.Object);
     }
 
     [Theory]

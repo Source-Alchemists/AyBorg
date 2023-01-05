@@ -7,12 +7,10 @@ namespace AyBorg.Agent.Services.gRPC;
 
 public sealed class ProjectSettingsServiceV1 : ProjectSettings.ProjectSettingsBase
 {
-    private readonly ILogger<ProjectSettingsServiceV1> _logger;
     private readonly IProjectSettingsService _projectSettingsService;
 
-    public ProjectSettingsServiceV1(ILogger<ProjectSettingsServiceV1> logger, IProjectSettingsService projectSettingsService)
+    public ProjectSettingsServiceV1(IProjectSettingsService projectSettingsService)
     {
-        _logger = logger;
         _projectSettingsService = projectSettingsService;
     }
 

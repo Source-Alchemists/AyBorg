@@ -7,12 +7,10 @@ namespace AyBorg.Gateway.Services.Agent;
 
 public sealed class EditorPassthroughServiceV1 : Editor.EditorBase
 {
-    private readonly ILogger<EditorPassthroughServiceV1> _logger;
     private readonly IGrpcChannelService _grpcChannelService;
 
-    public EditorPassthroughServiceV1(ILogger<EditorPassthroughServiceV1> logger, IGrpcChannelService grpcChannelService)
+    public EditorPassthroughServiceV1(IGrpcChannelService grpcChannelService)
     {
-        _logger = logger;
         _grpcChannelService = grpcChannelService;
     }
 

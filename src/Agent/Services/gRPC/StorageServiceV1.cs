@@ -6,12 +6,10 @@ namespace AyBorg.Agent.Services.gRPC;
 
 public sealed class StorageServiceV1 : Storage.StorageBase
 {
-    private readonly ILogger<StorageServiceV1> _logger;
     private readonly IStorageService _storageService;
 
-    public StorageServiceV1(ILogger<StorageServiceV1> logger, IStorageService storageService)
+    public StorageServiceV1(IStorageService storageService)
     {
-        _logger = logger;
         _storageService = storageService;
     }
 

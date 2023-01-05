@@ -6,12 +6,10 @@ namespace AyBorg.Gateway.Services.Agent;
 
 public sealed class RuntimePassthroughServiceV1 : Runtime.RuntimeBase
 {
-    private readonly ILogger<RuntimePassthroughServiceV1> _logger;
     private readonly IGrpcChannelService _grpcChannelService;
 
-    public RuntimePassthroughServiceV1(ILogger<RuntimePassthroughServiceV1> logger, IGrpcChannelService grpcChannelService)
+    public RuntimePassthroughServiceV1(IGrpcChannelService grpcChannelService)
     {
-        _logger = logger;
         _grpcChannelService = grpcChannelService;
     }
 

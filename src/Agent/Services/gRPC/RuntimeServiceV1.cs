@@ -9,12 +9,10 @@ namespace AyBorg.Agent.Services.gRPC;
 
 public sealed class RuntimeServiceV1 : Ayborg.Gateway.Agent.V1.Runtime.RuntimeBase
 {
-    private readonly ILogger<RuntimeServiceV1> _logger;
     private readonly IEngineHost _engineHost;
 
-    public RuntimeServiceV1(ILogger<RuntimeServiceV1> logger, IEngineHost engineHost)
+    public RuntimeServiceV1(IEngineHost engineHost)
     {
-        _logger = logger;
         _engineHost = engineHost;
     }
 

@@ -1,17 +1,10 @@
 using AyBorg.Web.Services;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AyBorg.Web.Tests.Services;
 
 public class NotifyServiceTests
 {
-    private static readonly NullLogger<NotifyService> s_logger = new();
-    private readonly NotifyService _service;
-
-    public NotifyServiceTests()
-    {
-        _service = new NotifyService(s_logger);
-    }
+    private readonly NotifyService _service = new();
 
     [Fact]
     public void Test_SubscribeAndUnsubscribe()

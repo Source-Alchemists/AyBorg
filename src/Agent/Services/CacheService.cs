@@ -13,8 +13,8 @@ internal sealed class CacheService : ICacheService
     private readonly ILogger<CacheService> _logger;
     private readonly IRuntimeMapper _runtimeMapper;
     private readonly ConcurrentDictionary<CacheKey, ConcurrentBag<CacheItem>> _cache = new();
-    private readonly int _maxCacheTimeSeconds = 5;
-    private readonly int _maxCacheIterations = 10;
+    private readonly int _maxCacheTimeSeconds;
+    private readonly int _maxCacheIterations;
 
     /// <summary>
     /// Gets the size of the cache.
@@ -31,6 +31,8 @@ internal sealed class CacheService : ICacheService
         _runtimeMapper = runtimeMapper;
         _maxCacheTimeSeconds = configuration.GetValue("AyBorg:Cache:MaxSeconds", 10);
         _maxCacheIterations = configuration.GetValue("AyBorg:Cache:MaxIterations", 5);
+
+        _logger.LogTrace("CacheService initialized with {maxCacheTimeSeconds} seconds and {maxCacheIterations} iterations.", _maxCacheTimeSeconds, _maxCacheIterations);
     }
 
     /// <summary>
@@ -125,12 +127,11 @@ internal sealed class CacheService : ICacheService
         result = _runtimeMapper.FromRuntime(port);
         var cacheItem = new CacheItem(port.Id, result);
         CacheKey? key = _cache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
-        if (key != null && _cache.TryGetValue(key, out ConcurrentBag<CacheItem>? value))
+        if (key != null
+            && _cache.TryGetValue(key, out ConcurrentBag<CacheItem>? value)
+            && !value.Any(v => v.Id.Equals(port.Id)))
         {
-            if (!value.Any(v => v.Id.Equals(port.Id)))
-            {
-                value.Add(cacheItem);
-            }
+            value.Add(cacheItem);
         }
 
         _cache.TryAdd(new CacheKey(iterationId), new ConcurrentBag<CacheItem> { cacheItem });
@@ -206,7 +207,7 @@ internal sealed class CacheService : ICacheService
         return cacheItem.Value;
     }
 
-    private record CacheKey
+    private sealed record CacheKey
     {
         public Guid Id { get; }
 
@@ -218,7 +219,7 @@ internal sealed class CacheService : ICacheService
         }
     }
 
-    private record CacheItem
+    private sealed record CacheItem
     {
         public Guid Id { get; } = Guid.Empty;
 

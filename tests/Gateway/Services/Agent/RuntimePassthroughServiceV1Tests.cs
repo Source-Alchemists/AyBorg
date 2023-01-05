@@ -12,7 +12,7 @@ public class RuntimePassthroughServiceV1Tests : BaseGrpcServiceTests<RuntimePass
 {
     public RuntimePassthroughServiceV1Tests()
     {
-        _service = new RuntimePassthroughServiceV1(s_logger, _mockGrpcChannelService.Object);
+        _service = new RuntimePassthroughServiceV1(_mockGrpcChannelService.Object);
     }
 
     [Fact]

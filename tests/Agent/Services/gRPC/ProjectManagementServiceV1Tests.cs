@@ -16,7 +16,7 @@ public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManag
 
     public ProjectManagementServiceV1Tests()
     {
-        _service = new ProjectManagementServiceV1(s_logger, _mockProjectManagementService.Object);
+        _service = new ProjectManagementServiceV1(_mockProjectManagementService.Object);
     }
 
     [Theory]

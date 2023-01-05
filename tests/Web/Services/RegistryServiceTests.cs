@@ -2,20 +2,18 @@ using Ayborg.Gateway.V1;
 using AyBorg.Web.Services;
 using AyBorg.Web.Tests.Helpers;
 using Grpc.Core;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace AyBorg.Web.Tests.Services;
 
 public class RegistryServiceTests
 {
-    private static readonly NullLogger<RegistryService> s_logger = new();
     protected readonly Mock<Register.RegisterClient> _mockRegisterClient = new();
     private readonly RegistryService _service;
 
     public RegistryServiceTests()
     {
-        _service = new RegistryService(s_logger, _mockRegisterClient.Object);
+        _service = new RegistryService(_mockRegisterClient.Object);
     }
 
     [Fact]

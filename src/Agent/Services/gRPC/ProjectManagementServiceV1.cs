@@ -8,12 +8,10 @@ namespace AyBorg.Agent.Services.gRPC;
 
 public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManagementBase
 {
-    private readonly ILogger<ProjectManagementServiceV1> _logger;
     private readonly IProjectManagementService _projectManagementService;
 
-    public ProjectManagementServiceV1(ILogger<ProjectManagementServiceV1> logger, IProjectManagementService projectManagementService)
+    public ProjectManagementServiceV1(IProjectManagementService projectManagementService)
     {
-        _logger = logger;
         _projectManagementService = projectManagementService;
     }
 

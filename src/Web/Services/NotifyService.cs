@@ -5,14 +5,7 @@ namespace AyBorg.Web.Services;
 
 public sealed class NotifyService : INotifyService
 {
-    private readonly ILogger<NotifyService> _logger;
-
     public ConcurrentBag<Subscription> Subscriptions { get; } =  new();
-
-    public NotifyService(ILogger<NotifyService> logger)
-    {
-        _logger = logger;
-    }
 
     public Subscription Subscribe(string ServiceUniqueName, NotifyType type)
     {

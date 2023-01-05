@@ -6,12 +6,10 @@ namespace AyBorg.Gateway.Services.Agent;
 
 public sealed class StoragePassthroughServiceV1 : Storage.StorageBase
 {
-    private readonly ILogger<StoragePassthroughServiceV1> _logger;
     private readonly IGrpcChannelService _grpcChannelService;
 
-    public StoragePassthroughServiceV1(ILogger<StoragePassthroughServiceV1> logger, IGrpcChannelService grpcChannelService)
+    public StoragePassthroughServiceV1(IGrpcChannelService grpcChannelService)
     {
-        _logger = logger;
         _grpcChannelService = grpcChannelService;
     }
 
