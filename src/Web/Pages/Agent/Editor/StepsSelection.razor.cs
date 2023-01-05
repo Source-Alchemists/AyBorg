@@ -19,7 +19,7 @@ public partial class StepsSelection : ComponentBase
         await base.OnParametersSetAsync();
     }
 
-    private async Task OnDragStart(DragEventArgs args, Step step)
+    private static async Task OnDragStart(DragEventArgs _, Step step)
     {
         DragDropStateHandler.DraggedStep = step;
         await Task.CompletedTask;

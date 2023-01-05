@@ -6,7 +6,6 @@ public partial class BooleanInputField : BaseInputField
 
     protected override Task OnParametersSetAsync()
     {
-        if (Port.Value == null) throw new ArgumentNullException(nameof(Port.Value));
         if (Port.Value is bool value)
         {
             _value = value;

@@ -115,7 +115,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        if(await RuntimeService.StartRunAsync(EngineExecutionType.ContinuousRun) == null)
+        if (await RuntimeService.StartRunAsync(EngineExecutionType.ContinuousRun) == null)
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
@@ -127,7 +127,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        if(await RuntimeService.StopRunAsync() == null)
+        if (await RuntimeService.StopRunAsync() == null)
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
@@ -149,18 +149,14 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_disposedValue
+            && disposing
+            && _statusSubscription != null)
         {
-            if (disposing)
-            {
-                if (_statusSubscription != null)
-                {
-                    _statusSubscription.Callback -= StatusCallbackReceived;
-                    NotifyService.Unsubscribe(_statusSubscription);
-                }
-            }
-            _disposedValue = true;
+            _statusSubscription.Callback -= StatusCallbackReceived;
+            NotifyService.Unsubscribe(_statusSubscription);
         }
+        _disposedValue = true;
     }
 
     public void Dispose()

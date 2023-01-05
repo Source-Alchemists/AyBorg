@@ -4,21 +4,19 @@ using AyBorg.SDK.Communication.gRPC;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Tests.Helpers;
 using Grpc.Core;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace AyBorg.Web.Tests.Services.Agent;
 
 public class PluginsServiceTests
 {
-    private static readonly NullLogger<PluginsService> s_logger = new();
     private readonly Mock<IRpcMapper> _mockRpcMapper = new();
     private readonly Mock<Editor.EditorClient> _mockEditorClient = new();
     private readonly PluginsService _service;
 
     public PluginsServiceTests()
     {
-        _service = new PluginsService(s_logger, _mockRpcMapper.Object, _mockEditorClient.Object);
+        _service = new PluginsService(_mockRpcMapper.Object, _mockEditorClient.Object);
     }
 
     [Fact]

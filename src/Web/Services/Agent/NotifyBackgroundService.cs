@@ -10,14 +10,12 @@ namespace AyBorg.Web.Services;
 
 public sealed class NotifyBackgroundService : BackgroundService
 {
-    private readonly ILogger<NotifyBackgroundService> _logger;
     private readonly Notify.NotifyClient _notifyClient;
     private readonly INotifyService _notifyService;
     private readonly IServiceConfiguration _serviceConfiguration;
 
-    public NotifyBackgroundService(ILogger<NotifyBackgroundService> logger, Notify.NotifyClient notifyClient, INotifyService notifyService, IServiceConfiguration serviceConfiguration)
+    public NotifyBackgroundService(Notify.NotifyClient notifyClient, INotifyService notifyService, IServiceConfiguration serviceConfiguration)
     {
-        _logger = logger;
         _notifyClient = notifyClient;
         _notifyService = notifyService;
         _serviceConfiguration = serviceConfiguration;

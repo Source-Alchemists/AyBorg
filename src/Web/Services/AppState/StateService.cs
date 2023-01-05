@@ -7,7 +7,6 @@ namespace AyBorg.Web.Services.AppState;
 public class StateService : IStateService
 {
     private readonly ISessionStorageService _sessionStorageService;
-    private readonly ILocalStorageService _localStorageService;
 
     public Action OnUpdate { get; set; } = null!;
 
@@ -18,8 +17,7 @@ public class StateService : IStateService
     public StateService(ISessionStorageService sessionStorageService, ILocalStorageService localStorageService)
     {
         _sessionStorageService = sessionStorageService;
-        _localStorageService = localStorageService;
-        AutomationFlowState = new AutomationFlowState(_localStorageService);
+        AutomationFlowState = new AutomationFlowState(localStorageService);
     }
 
     public async Task UpdateAgentStateFromLocalstorageAsync()

@@ -9,7 +9,6 @@ public partial class EnumInputField : BaseInputField
     protected override Task OnParametersSetAsync()
     {
         _selectedNames.Clear();
-        if (Port.Value == null) throw new ArgumentNullException(nameof(Port.Value));
         if (Port.Value is SDK.Common.Models.Enum value)
         {
             _value = value;

@@ -1,24 +1,20 @@
-﻿using AyBorg.SDK.Communication.gRPC;
-using AyBorg.SDK.Common.Models;
+﻿using AyBorg.SDK.Common.Models;
+using AyBorg.SDK.Communication.gRPC;
 
 namespace AyBorg.Web.Services.Agent;
 
 public class PluginsService
 {
-    private readonly ILogger<PluginsService> _logger;
     private readonly IRpcMapper _rpcMapper;
     private readonly Ayborg.Gateway.Agent.V1.Editor.EditorClient _editorClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginsService"/> class.
     /// </summary>
-    /// <param name="logger">The logger.</param>
+    /// <param name="rpcMapper">The RPC mapper.</param>
     /// <param name="editorClient">The editor client.</param>
-    public PluginsService(ILogger<PluginsService> logger,
-                            IRpcMapper rpcMapper,
-                            Ayborg.Gateway.Agent.V1.Editor.EditorClient editorClient)
+    public PluginsService(IRpcMapper rpcMapper, Ayborg.Gateway.Agent.V1.Editor.EditorClient editorClient)
     {
-        _logger = logger;
         _rpcMapper = rpcMapper;
         _editorClient = editorClient;
     }
