@@ -14,7 +14,7 @@ public sealed class NotifyService : INotifyService
         _logger = logger;
     }
 
-    public Subscription CreateSubscription(string ServiceUniqueName, NotifyType type)
+    public Subscription Subscribe(string ServiceUniqueName, NotifyType type)
     {
         var sub = new Subscription { ServiceUniqueName = ServiceUniqueName, Type = type };
         Subscriptions.Add(sub);

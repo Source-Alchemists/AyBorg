@@ -40,7 +40,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
             _statusSubscription.Callback -= StatusCallbackReceived;
             NotifyService.Unsubscribe(_statusSubscription);
         }
-        _statusSubscription = NotifyService.CreateSubscription(ServiceUniqueName, SDK.Communication.gRPC.NotifyType.AgentEngineStateChanged);
+        _statusSubscription = NotifyService.Subscribe(ServiceUniqueName, SDK.Communication.gRPC.NotifyType.AgentEngineStateChanged);
         _statusSubscription.Callback += StatusCallbackReceived;
         await base.OnParametersSetAsync();
     }

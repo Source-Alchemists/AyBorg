@@ -8,7 +8,7 @@ public interface INotifyService
 {
     ConcurrentBag<Subscription> Subscriptions { get; }
 
-    Subscription CreateSubscription(string ServiceUniqueName, NotifyType type);
+    Subscription Subscribe(string ServiceUniqueName, NotifyType type);
 
     void Unsubscribe(Subscription subscription);
 }

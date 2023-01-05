@@ -102,11 +102,11 @@ public partial class FlowDiagram : ComponentBase, IDisposable
     private void Subscribe()
     {
         if (_iterationFinishedSubscription != null) _iterationFinishedSubscription.Callback -= IterationFinishedNotificationReceived;
-        _iterationFinishedSubscription = NotifyService.CreateSubscription(StateService.AgentState.UniqueName, SDK.Communication.gRPC.NotifyType.AgentIterationFinished);
+        _iterationFinishedSubscription = NotifyService.Subscribe(StateService.AgentState.UniqueName, SDK.Communication.gRPC.NotifyType.AgentIterationFinished);
         _iterationFinishedSubscription.Callback += IterationFinishedNotificationReceived;
 
         if (_flowChangedSubscription != null) _flowChangedSubscription.Callback -= FlowChangedNotificationReceived;
-        _flowChangedSubscription = NotifyService.CreateSubscription(StateService.AgentState.UniqueName, SDK.Communication.gRPC.NotifyType.AgentAutomationFlowChanged);
+        _flowChangedSubscription = NotifyService.Subscribe(StateService.AgentState.UniqueName, SDK.Communication.gRPC.NotifyType.AgentAutomationFlowChanged);
         _flowChangedSubscription.Callback += FlowChangedNotificationReceived;
     }
 
