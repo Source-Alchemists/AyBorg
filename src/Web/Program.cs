@@ -84,7 +84,7 @@ builder.Services.AddScoped<IProjectSettingsService, ProjectSettingsService>();
 builder.Services.AddScoped<PluginsService>();
 builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IRuntimeService, RuntimeService>();
-builder.Services.AddScoped<IAgentOverviewService, AgentOverviewService>();
+builder.Services.AddScoped<IAgentOverviewService, AgentsOverviewService>();
 builder.Services.AddScoped<IStorageService, StorageService>();
 builder.Services.AddScoped<IStateService, StateService>();
 

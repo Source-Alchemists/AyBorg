@@ -3,7 +3,7 @@ using AyBorg.Web.Shared.Models;
 
 namespace AyBorg.Web.Services.Agent;
 
-public class AgentOverviewService : IAgentOverviewService
+public class AgentsOverviewService : IAgentOverviewService
 {
     private readonly IRegistryService _registryService;
     private readonly IRuntimeService _runtimeService;
@@ -15,7 +15,7 @@ public class AgentOverviewService : IAgentOverviewService
     public int ActiveAgentsCount { get; private set; } = 0;
     public int InactiveAgentsCount { get; private set; } = 0;
 
-    public AgentOverviewService(IRegistryService registryService, IRuntimeService runtimeService, IProjectManagementService projectManagementService)
+    public AgentsOverviewService(IRegistryService registryService, IRuntimeService runtimeService, IProjectManagementService projectManagementService)
     {
         _registryService = registryService;
         _runtimeService = runtimeService;
