@@ -18,23 +18,6 @@ public class RegistryService : IRegistryService
         _registerClient = registerClient;
     }
 
-    /// <summary>
-    /// Gets the URL.
-    /// </summary>
-    /// <param name="serviceInfoEntry">The service registry entry.</param>
-    /// <param name="serviceId">The service identifier.</param>
-    /// <returns></returns>
-    public string GetUrl(IEnumerable<ServiceInfoEntry> serviceInfoEntry, string serviceId)
-    {
-        ServiceInfoEntry? serviceDetails = serviceInfoEntry.FirstOrDefault(x => x.Id.Equals(serviceId, StringComparison.InvariantCultureIgnoreCase));
-        if (serviceDetails == null)
-        {
-            _logger.LogWarning("Service with id {serviceId} not found", serviceId);
-            return string.Empty;
-        }
-        return serviceDetails.Url;
-    }
-
     /// <summary>Receives all available services asynchronous.</summary>
     /// <returns>
     ///   Service registry entries.
