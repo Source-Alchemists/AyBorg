@@ -77,7 +77,6 @@ builder.Services.AddSingleton<IRegistryService, RegistryService>();
 builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IRpcMapper, RpcMapper>();
 
-builder.Services.AddScoped<ITokenProvider, TokenProvider>();
 builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
 builder.Services.AddScoped<IProjectManagementService, ProjectManagementService>();
 builder.Services.AddScoped<IProjectSettingsService, ProjectSettingsService>();
@@ -85,8 +84,10 @@ builder.Services.AddScoped<PluginsService>();
 builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IRuntimeService, RuntimeService>();
 builder.Services.AddScoped<IAgentOverviewService, AgentsOverviewService>();
-builder.Services.AddScoped<IStorageService, StorageService>();
 builder.Services.AddScoped<IStateService, StateService>();
+
+builder.Services.AddTransient<ITokenProvider, TokenProvider>();
+builder.Services.AddTransient<IStorageService, StorageService>();
 
 WebApplication app = builder.Build();
 

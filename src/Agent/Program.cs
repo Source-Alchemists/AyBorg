@@ -64,10 +64,11 @@ builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
 
-builder.Services.AddScoped<IProjectSettingsService, ProjectSettingsService>();
 builder.Services.AddScoped<IJwtConsumer, JwtConsumer>();
 builder.Services.AddScoped<IFlowService, FlowService>();
-builder.Services.AddScoped<IStorageService, StorageService>();
+
+builder.Services.AddTransient<IProjectSettingsService, ProjectSettingsService>();
+builder.Services.AddTransient<IStorageService, StorageService>();
 
 WebApplication app = builder.Build();
 
