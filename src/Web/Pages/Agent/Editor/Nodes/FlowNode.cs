@@ -57,8 +57,9 @@ public class FlowNode : NodeModel
             }
 
             targetFlowPort.Port.Value = sourcePort.Value;
-            StepChanged?.Invoke();
         }
+
+        StepChanged?.Invoke();
     }
 
     /// <summary>
