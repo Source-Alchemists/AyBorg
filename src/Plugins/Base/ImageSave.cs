@@ -16,7 +16,10 @@ public sealed class ImageSave : IStepBody
     private readonly StringPort _fileNameSuffixPort = new("File name suffix", PortDirection.Input, "_{DateTime}");
     private readonly FolderPort _folderPort = new("Folder", PortDirection.Input, string.Empty);
     private readonly StringPort _outputFileNamePort = new("File name", PortDirection.Output, string.Empty);
+
     public string DefaultName => "Image.Save";
+
+    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
     public IEnumerable<IPort> Ports { get; }
 
@@ -37,8 +40,8 @@ public sealed class ImageSave : IStepBody
 
     public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
-        var resultFileName = $"{ReplacePlaceHolder(_fileNamePrefixPort.Value)}{ReplacePlaceHolder(_inputFileNamePort.Value)}{ReplacePlaceHolder(_fileNameSuffixPort.Value)}.png";
-        var resultFilePath = Path.Combine($"{_environment.StorageLocation}{_folderPort.Value}", resultFileName);
+        string resultFileName = $"{ReplacePlaceHolder(_fileNamePrefixPort.Value)}{ReplacePlaceHolder(_inputFileNamePort.Value)}{ReplacePlaceHolder(_fileNameSuffixPort.Value)}.png";
+        string resultFilePath = Path.Combine($"{_environment.StorageLocation}{_folderPort.Value}", resultFileName);
         _logger.LogTrace("Saving image to {resultFilePath}", resultFilePath);
         Image.Save(_imagePort.Value, resultFilePath, EncoderType.Png);
         _outputFileNamePort.Value = resultFileName;
@@ -47,7 +50,7 @@ public sealed class ImageSave : IStepBody
 
     private static string ReplacePlaceHolder(string value)
     {
-        var result = Path.GetFileNameWithoutExtension(value);
+        string result = Path.GetFileNameWithoutExtension(value);
         result = result.Replace("{Guid}", Guid.NewGuid().ToString());
         result = result.Replace("{DateTime}", DateTime.UtcNow.ToString("yyyyMMddHHmmss"));
         result = result.Replace("{Date}", DateTime.UtcNow.ToString("yyyyMMdd"));

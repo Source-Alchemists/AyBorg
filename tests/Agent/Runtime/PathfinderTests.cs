@@ -1,6 +1,6 @@
 using AyBorg.Agent.Runtime;
-using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Tests.Runtime;
 
@@ -16,13 +16,13 @@ public class PathfinderTests
     public async Task TestCreateLinearPathWithConnectedSteps(int numberOfStep, int expectedPathItemCount, int numberOfInputPorts, int numberOfOutputPorts)
     {
         // Arrange
-        CreateLinearFlow(numberOfStep, numberOfInputPorts, numberOfOutputPorts, 
-                        out var steps, out var links, out var startStep, out var endStep);
+        CreateLinearFlow(numberOfStep, numberOfInputPorts, numberOfOutputPorts,
+                        out IList<IStepProxy> steps, out IList<PortLink> links, out IStepProxy startStep, out IStepProxy endStep);
 
         var pathfinder = new Pathfinder();
 
         // Act
-        var resultPathItems = await pathfinder.CreatePathAsync(steps, links);
+        IEnumerable<PathItem> resultPathItems = await pathfinder.CreatePathAsync(steps, links);
 
         // Assert
         Assert.Single(pathfinder.StartSteps);
@@ -42,10 +42,10 @@ public class PathfinderTests
     public async Task TestCreateForkPath()
     {
         // Arrange
-        var step1 = MockHelper.CreateStepProxyMock("Step 1", 1, 1).Object;
-        var step2a = MockHelper.CreateStepProxyMock("Step 2a", 1, 1).Object;
-        var step2b = MockHelper.CreateStepProxyMock("Step 2b", 1, 1).Object;
-        var step3 = MockHelper.CreateStepProxyMock("Step 3", 2, 1).Object;
+        IStepProxy step1 = MockHelper.CreateStepProxyMock("Step 1", 1, 1).Object;
+        IStepProxy step2a = MockHelper.CreateStepProxyMock("Step 2a", 1, 1).Object;
+        IStepProxy step2b = MockHelper.CreateStepProxyMock("Step 2b", 1, 1).Object;
+        IStepProxy step3 = MockHelper.CreateStepProxyMock("Step 3", 2, 1).Object;
 
         var linkS1S2a = new PortLink(step1.Ports.First(p => p.Direction == PortDirection.Output), step2a.Ports.First(p => p.Direction == PortDirection.Input));
         var linkS1S2b = new PortLink(step1.Ports.First(p => p.Direction == PortDirection.Output), step2b.Ports.First(p => p.Direction == PortDirection.Input));
@@ -66,7 +66,7 @@ public class PathfinderTests
         var pathfinder = new Pathfinder();
 
         // Act
-        var resultPathItems = await pathfinder.CreatePathAsync(steps, links);
+        IEnumerable<PathItem> resultPathItems = await pathfinder.CreatePathAsync(steps, links);
 
         // Assert
         Assert.Single(pathfinder.StartSteps);
@@ -87,12 +87,12 @@ public class PathfinderTests
     public async Task TestCreateForkWithMultipleStepsPath()
     {
         // Arrange
-        var step1 = MockHelper.CreateStepProxyMock("Step 1", 1, 1).Object;
-        var step2a = MockHelper.CreateStepProxyMock("Step 2a", 1, 1).Object;
-        var step2b = MockHelper.CreateStepProxyMock("Step 2b", 1, 1).Object;
-        var step3a = MockHelper.CreateStepProxyMock("Step 3a", 1, 1).Object;
-        var step3b = MockHelper.CreateStepProxyMock("Step 3b", 1, 1).Object;
-        var step4 = MockHelper.CreateStepProxyMock("Step 4", 2, 1).Object;
+        IStepProxy step1 = MockHelper.CreateStepProxyMock("Step 1", 1, 1).Object;
+        IStepProxy step2a = MockHelper.CreateStepProxyMock("Step 2a", 1, 1).Object;
+        IStepProxy step2b = MockHelper.CreateStepProxyMock("Step 2b", 1, 1).Object;
+        IStepProxy step3a = MockHelper.CreateStepProxyMock("Step 3a", 1, 1).Object;
+        IStepProxy step3b = MockHelper.CreateStepProxyMock("Step 3b", 1, 1).Object;
+        IStepProxy step4 = MockHelper.CreateStepProxyMock("Step 4", 2, 1).Object;
 
         var linkS1S2a = new PortLink(step1.Ports.First(p => p.Direction == PortDirection.Output), step2a.Ports.First(p => p.Direction == PortDirection.Input));
         var linkS1S2b = new PortLink(step1.Ports.First(p => p.Direction == PortDirection.Output), step2b.Ports.First(p => p.Direction == PortDirection.Input));
@@ -119,7 +119,7 @@ public class PathfinderTests
         var pathfinder = new Pathfinder();
 
         // Act
-        var resultPathItems = await pathfinder.CreatePathAsync(steps, links);
+        IEnumerable<PathItem> resultPathItems = await pathfinder.CreatePathAsync(steps, links);
 
         // Assert
         Assert.Single(pathfinder.StartSteps);
@@ -141,11 +141,11 @@ public class PathfinderTests
     public async Task TestCreateForkWithNonLinearStepsPath()
     {
         // Arrange
-        var step1 = MockHelper.CreateStepProxyMock("Step 1", 0, 1).Object;
-        var step2a = MockHelper.CreateStepProxyMock("Step 2a", 1, 1).Object;
-        var step3a = MockHelper.CreateStepProxyMock("Step 3a", 1, 1).Object;
-        var step3b = MockHelper.CreateStepProxyMock("Step 3b", 1, 1).Object;
-        var step4 = MockHelper.CreateStepProxyMock("Step 4", 2, 1).Object;
+        IStepProxy step1 = MockHelper.CreateStepProxyMock("Step 1", 0, 1).Object;
+        IStepProxy step2a = MockHelper.CreateStepProxyMock("Step 2a", 1, 1).Object;
+        IStepProxy step3a = MockHelper.CreateStepProxyMock("Step 3a", 1, 1).Object;
+        IStepProxy step3b = MockHelper.CreateStepProxyMock("Step 3b", 1, 1).Object;
+        IStepProxy step4 = MockHelper.CreateStepProxyMock("Step 4", 2, 1).Object;
 
         var linkS1S2a = new PortLink(step1.Ports.First(p => p.Direction == PortDirection.Output), step2a.Ports.First(p => p.Direction == PortDirection.Input));
         var linkS1S3b = new PortLink(step1.Ports.First(p => p.Direction == PortDirection.Output), step3b.Ports.First(p => p.Direction == PortDirection.Input));
@@ -170,7 +170,7 @@ public class PathfinderTests
         var pathfinder = new Pathfinder();
 
         // Act
-        var resultPathItems = await pathfinder.CreatePathAsync(steps, links);
+        IEnumerable<PathItem> resultPathItems = await pathfinder.CreatePathAsync(steps, links);
 
         // Assert
         Assert.Single(pathfinder.StartSteps);
@@ -182,7 +182,7 @@ public class PathfinderTests
     }
 
 
-    private static void CreateLinearFlow(int numberOfSteps, int numberOfInputPorts, int numberOfOutputPorts, 
+    private static void CreateLinearFlow(int numberOfSteps, int numberOfInputPorts, int numberOfOutputPorts,
                                         out IList<IStepProxy> steps, out IList<PortLink> links, out IStepProxy startStep, out IStepProxy endStep)
     {
         steps = new List<IStepProxy>();
@@ -194,16 +194,16 @@ public class PathfinderTests
 
         for (int index = 0; index < numberOfSteps; index++)
         {
-            var stepMock = MockHelper.CreateStepProxyMock($"Step {index}", numberOfInputPorts, numberOfOutputPorts);
-            var step = stepMock.Object;
+            Moq.Mock<IStepProxy> stepMock = MockHelper.CreateStepProxyMock($"Step {index}", numberOfInputPorts, numberOfOutputPorts);
+            IStepProxy step = stepMock.Object;
             startStep ??= step;
 
             endStep = step;
 
             if (lastStep != null)
             {
-                var sp = lastStep.Ports.First(p => p.Direction == PortDirection.Output);
-                var tp = step.Ports.First(p => p.Direction == PortDirection.Input);
+                IPort sp = lastStep.Ports.First(p => p.Direction == PortDirection.Output);
+                IPort tp = step.Ports.First(p => p.Direction == PortDirection.Input);
                 var link = new PortLink(sp, tp);
                 lastStep.Links.Add(link);
                 step.Links.Add(link);

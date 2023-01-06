@@ -6,6 +6,7 @@ using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.ImageProcessing;
+using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Agent;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
@@ -44,7 +45,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         return Task.Factory.StartNew(() =>
         {
             var result = new GetAvailableStepsResponse();
-            foreach (SDK.Common.IStepProxy step in _pluginsService.Steps)
+            foreach (IStepProxy step in _pluginsService.Steps)
             {
                 Step stepBinding = _runtimeMapper.FromRuntime(step);
                 StepDto rpcStep = _rpcMapper.ToRpc(stepBinding);
@@ -67,7 +68,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
             }
 
-            IEnumerable<SDK.Common.IStepProxy> flowSteps = _flowService.GetSteps();
+            IEnumerable<IStepProxy> flowSteps = _flowService.GetSteps();
             if (request.StepIds.Any())
             {
                 var targetIds = new HashSet<Guid>();
@@ -86,7 +87,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                 flowSteps = flowSteps.Where(x => targetIds.Contains(x.Id));
             }
 
-            foreach (SDK.Common.IStepProxy fs in flowSteps)
+            foreach (IStepProxy fs in flowSteps)
             {
                 if (iterationId != Guid.Empty)
                 {
@@ -184,7 +185,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
         }
 
-        SDK.Common.IStepProxy stepProxy = await _flowService.AddStepAsync(stepId, request.X, request.Y);
+        IStepProxy stepProxy = await _flowService.AddStepAsync(stepId, request.X, request.Y);
         if (stepProxy == null)
         {
             _logger.LogWarning("Step not found: {StepId}", request.StepId);

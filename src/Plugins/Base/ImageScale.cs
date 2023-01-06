@@ -11,9 +11,11 @@ public sealed class ImageScale : IStepBody, IDisposable
     private readonly NumericPort _widthPort = new("Width", PortDirection.Output, 0);
     private readonly NumericPort _heightPort = new("Height", PortDirection.Output, 0);
     private readonly NumericPort _scalePort = new("Scale factor", PortDirection.Input, 0.5d, 0.01d, 2d);
-    private bool disposedValue;
+    private bool _disposedValue;
 
     public string DefaultName => "Image.Scale";
+
+    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
     public IEnumerable<IPort> Ports { get; }
 
@@ -32,7 +34,7 @@ public sealed class ImageScale : IStepBody, IDisposable
     public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _scaledImagePort.Value?.Dispose();
-        var sourceImage = _imagePort.Value;
+        Image sourceImage = _imagePort.Value;
         if (_scalePort.Value.Equals(1m))
         {
             _scaledImagePort.Value = sourceImage;
@@ -55,13 +57,13 @@ public sealed class ImageScale : IStepBody, IDisposable
 
     private void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
                 _scaledImagePort?.Dispose();
             }
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 }

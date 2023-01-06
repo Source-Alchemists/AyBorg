@@ -14,6 +14,8 @@ public abstract class BaseMqttStep : IStepBody
 
     public abstract string DefaultName { get; }
 
+    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.Communication };
+
     public IEnumerable<IPort> Ports => _ports;
 
     public BaseMqttStep(ILogger logger, IMqttClientProvider mqttClientProvider)

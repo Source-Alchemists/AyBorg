@@ -10,9 +10,11 @@ public sealed class ImageMirror : IStepBody, IDisposable
     private readonly BooleanPort _mirrorHorizontal = new("Horizontal", PortDirection.Input, false);
     private readonly ImagePort _inputImage = new("Image", PortDirection.Input, null!);
     private readonly ImagePort _outputImage = new("Mirrored image", PortDirection.Output, null!);
-    private bool disposedValue;
+    private bool _disposedValue;
 
     public string DefaultName => "Image.Mirror";
+
+    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
     public IEnumerable<IPort> Ports { get; }
 
@@ -61,14 +63,14 @@ public sealed class ImageMirror : IStepBody, IDisposable
 
     private void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
                 _inputImage.Dispose();
                 _outputImage.Dispose();
             }
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 }

@@ -88,15 +88,14 @@ public class FlowNodeTests
         flowNode.Update(newStep);
 
         // Assert
+        Assert.True(isCalled);
         if (isNullPort)
         {
-            Assert.False(isCalled);
             Assert.Equal(1, flowNode.Step.ExecutionTimeMs);
             Assert.Equal(step.Ports.First(), ((FlowPort)flowNode.Ports[0]).Port);
         }
         else
         {
-            Assert.True(isCalled);
             Assert.Equal(1, flowNode.Step.ExecutionTimeMs);
             Assert.Equal("456", ((FlowPort)flowNode.Ports[0]).Port.Value);
         }
