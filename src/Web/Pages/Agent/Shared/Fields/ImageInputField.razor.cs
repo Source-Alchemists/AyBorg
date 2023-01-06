@@ -1,6 +1,5 @@
-using System.Text.Json;
-using AyBorg.SDK.Data.DTOs;
-using AyBorg.SDK.ImageProcessing.Encoding;
+using AyBorg.SDK.Common.Models;
+using AyBorg.Web.Shared.Models;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
@@ -17,43 +16,27 @@ public partial class ImageInputField : BaseInputField
         {
             _imageUrl = string.Empty;
         }
-        else if (Port.Value is JsonElement jsonElement)
+        else if (Port.Value is Image image)
         {
-            var imageDto = JsonSerializer.Deserialize<ImageDto>(jsonElement, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-            if (imageDto.Meta != null)
-            {
-                _imageWidth = imageDto.Meta.Width;
-                _imageHeight = imageDto.Meta.Height;
-                SetImageUrl(imageDto);
-            }
-
-            Port.Value = imageDto;
-        }
-        else if (Port.Value is ImageDto imageDto)
-        {
-            if (imageDto.Meta != null)
-            {
-                _imageWidth = imageDto.Meta.Width;
-                _imageHeight = imageDto.Meta.Height;
-                SetImageUrl(imageDto);
-            }
-            
+                _imageWidth = image.Width;
+                _imageHeight = image.Height;
+                SetImageUrl(image);
         }
         base.OnParametersSet();
     }
 
-    private void SetImageUrl(ImageDto imageDto)
+    private void SetImageUrl(Image image)
     {
-        switch (imageDto.Meta.EncoderType)
+        switch (image.EncoderType)
         {
-            case EncoderType.Jpeg:
-                _imageUrl = $"data:image/jpeg;base64,{imageDto.Base64}";
+            case SDK.ImageProcessing.Encoding.EncoderType.Jpeg:
+                _imageUrl = $"data:image/jpeg;base64,{image.Base64}";
                 break;
-            case EncoderType.Png:
-                _imageUrl = $"data:image/png;base64,{imageDto.Base64}";
+            case SDK.ImageProcessing.Encoding.EncoderType.Png:
+                _imageUrl = $"data:image/png;base64,{image.Base64}";
                 break;
-            case EncoderType.Bmp:
-                _imageUrl = $"data:image/bmp;base64,{imageDto.Base64}";
+            case SDK.ImageProcessing.Encoding.EncoderType.Bmp:
+                _imageUrl = $"data:image/bmp;base64,{image.Base64}";
                 break;
         }
     }

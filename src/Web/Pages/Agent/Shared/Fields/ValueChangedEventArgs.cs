@@ -1,4 +1,4 @@
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Common.Models;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
@@ -7,7 +7,7 @@ public class ValueChangedEventArgs : EventArgs
     /// <summary>
     /// Gets the port.
     /// </summary>
-    public PortDto Port { get; }
+    public Port Port { get; }
 
     /// <summary>
     /// Gets the value.
@@ -19,7 +19,7 @@ public class ValueChangedEventArgs : EventArgs
     /// </summary>
     /// <param name="port">The port.</param>
     /// <param name="value">The value.</param>
-    public ValueChangedEventArgs(PortDto port, object? value)
+    public ValueChangedEventArgs(Port port, object? value)
     {
         Port = port;
         Value = value;

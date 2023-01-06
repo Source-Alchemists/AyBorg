@@ -1,4 +1,4 @@
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.Web.Shared.Models.Agent;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -13,12 +13,12 @@ public partial class ConfirmProjectApproveDialog : ComponentBase
     [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
 
     [Parameter] public string BaseUrl { get; set; } = string.Empty;
-    [Parameter] public ProjectMetaDto Project { get; set; } = null!;
+    [Parameter] public ProjectMeta Project { get; set; } = null!;
 
     private MudForm _form = null!;
     private string _password = string.Empty;
     private string[] _errors = Array.Empty<string>();
-    private ProjectMetaDto _tmpProjectMeta = null!;
+    private ProjectMeta _tmpProjectMeta = null!;
 
     protected override void OnParametersSet()
     {

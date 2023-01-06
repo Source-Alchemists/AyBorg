@@ -1,7 +1,3 @@
-@using SDK.Data.DTOs
-@inject AyBorg.Web.Services.IRegistryService registryService
-@inject AyBorg.Web.Services.Agent.PluginsService AgentPluginsService;
-
 <MudCard Style="height: calc(100vh - 148px)" class="d-flex justify-center flex-column">
     <MudCardHeader class="order-0">
         <CardHeaderAvatar>
@@ -26,29 +22,3 @@
         </MudList>
     </MudCardContent>
 </MudCard>
-
-@code {
-    private string _baseUrl = string.Empty;
-    private IEnumerable<StepDto> _availableSteps = new List<StepDto>();
-
-    [Parameter]
-    public string ServiceId { get; set; } = string.Empty;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        var services = await registryService.ReceiveAllAvailableServicesAsync();
-        _baseUrl = registryService.GetUrl(services, ServiceId);
-        if (_baseUrl == string.Empty)
-        {
-            return;
-        }
-        _availableSteps = await AgentPluginsService.ReceiveStepsAsync(_baseUrl);
-        await base.OnParametersSetAsync();
-    }
-
-    private async Task OnDragStart(DragEventArgs args, StepDto step)
-    {
-        DragDropStateHandler.DraggedStep = step;
-        await Task.CompletedTask;
-    }
-}

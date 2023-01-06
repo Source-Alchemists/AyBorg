@@ -1,11 +1,12 @@
 using AyBorg.Web.Shared.Models;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 
 namespace AyBorg.Web.Services.AppState;
 
 public class StateService : IStateService
 {
-    private readonly ILocalStorageService _localStorageService;
+    private readonly ISessionStorageService _sessionStorageService;
 
     public Action OnUpdate { get; set; } = null!;
 
@@ -13,22 +14,17 @@ public class StateService : IStateService
 
     public AutomationFlowState AutomationFlowState { get; private set; } = null!;
 
-    public StateService(ILocalStorageService localStorageService)
+    public StateService(ISessionStorageService sessionStorageService, ILocalStorageService localStorageService)
     {
-        _localStorageService = localStorageService;
-        AutomationFlowState = new AutomationFlowState(_localStorageService);
+        _sessionStorageService = sessionStorageService;
+        AutomationFlowState = new AutomationFlowState(localStorageService);
     }
 
     public async Task UpdateAgentStateFromLocalstorageAsync()
     {
-        var result = await _localStorageService.GetItemAsync<UiAgentState>("Agent_State");
+        UiAgentState result = await _sessionStorageService.GetItemAsync<UiAgentState>("Agent_State");
         if (result != null)
         {
-            var lastUrl = AgentState == null ? string.Empty : AgentState.BaseUrl;
-            if (!string.IsNullOrEmpty(lastUrl))
-            {
-                result.BaseUrl = lastUrl;
-            }
             await SetAgentStateAsync(result);
         }
     }
@@ -36,7 +32,7 @@ public class StateService : IStateService
     public async Task SetAgentStateAsync(UiAgentState agentState)
     {
         AgentState = agentState;
-        await _localStorageService.SetItemAsync("Agent_State", agentState);
+        await _sessionStorageService.SetItemAsync("Agent_State", agentState);
         OnUpdate?.Invoke();
     }
 }

@@ -1,15 +1,16 @@
 using AyBorg.Agent.Guards;
-using AyBorg.Agent.Hubs;
 using AyBorg.Agent.Services;
+using AyBorg.Agent.Services.gRPC;
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
+using AyBorg.SDK.Communication.gRPC;
+using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.System.Agent;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
-using AyBorg.SDK.System.Services;
-using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
@@ -28,19 +29,30 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
     }
 );
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddAuthorization();
+builder.Services.AddGrpc();
 
-builder.Services.AddHttpClient<RegistryService>();
-builder.Services.AddHostedService<RegistryService>();
+builder.Services.AddGrpcClient<Ayborg.Gateway.V1.Register.RegisterClient>(options =>
+{
+    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
+    options.Address = new Uri(gatewayUrl!);
+});
 
-builder.Services.AddMemoryCache();
+builder.Services.AddGrpcClient<Ayborg.Gateway.Agent.V1.Notify.NotifyClient>(options =>
+{
+    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
+    options.Address = new Uri(gatewayUrl!);
+});
+
+builder.Services.AddHostedService<RegistryBackgroundService>();
+
+// Repositories
+builder.Services.AddSingleton<IProjectRepository, ProjectRepository>();
 
 builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
-builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
+builder.Services.AddSingleton<IRuntimeMapper, RuntimeMapper>();
+builder.Services.AddSingleton<IRpcMapper, RpcMapper>();
 builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
 builder.Services.AddSingleton<IRuntimeConverterService, RuntimeConverterService>();
 builder.Services.AddSingleton<IPluginsService, PluginsService>();
@@ -48,38 +60,28 @@ builder.Services.AddSingleton<IProjectManagementService, ProjectManagementServic
 builder.Services.AddSingleton<IEngineHost, EngineHost>();
 builder.Services.AddSingleton<IEngineFactory, EngineFactory>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
-builder.Services.AddSingleton<IFlowHub, FlowHub>();
+builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
 
-builder.Services.AddScoped<IJwtConsumerService, JwtConsumerService>();
+builder.Services.AddScoped<IJwtConsumer, JwtConsumer>();
 builder.Services.AddScoped<IFlowService, FlowService>();
-builder.Services.AddScoped<IStorageService, StorageService>();
 
-builder.Services.AddSignalR();
-
-builder.Services.AddResponseCompression(opts =>
-{
-    opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-        new[] { "application/octet-stream" });
-});
+builder.Services.AddTransient<IProjectSettingsService, ProjectSettingsService>();
+builder.Services.AddTransient<IStorageService, StorageService>();
 
 WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
 app.UseAuthorization();
-
 app.UseJwtMiddleware();
 app.UseProjectStateGuardMiddleware();
 
-app.MapControllers();
-app.MapHub<FlowHubContext>("/hubs/flow");
+app.MapGrpcService<ProjectManagementServiceV1>();
+app.MapGrpcService<ProjectSettingsServiceV1>();
+app.MapGrpcService<EditorServiceV1>();
+app.MapGrpcService<RuntimeServiceV1>();
+app.MapGrpcService<StorageServiceV1>();
+app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists
 app.Services.GetService<IDbContextFactory<ProjectContext>>()!.CreateDbContext().Database.Migrate();

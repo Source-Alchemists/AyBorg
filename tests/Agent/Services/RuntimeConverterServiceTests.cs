@@ -1,27 +1,106 @@
 using System.Globalization;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Tests.Dummies;
-using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Projects;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using AyBorg.SDK.Projects;
-using AyBorg.SDK.Common;
-
-#nullable disable
 
 namespace AyBorg.Agent.Tests.Services;
 
 public class RuntimeConverterServiceTests
 {
-    private static readonly NullLogger<RuntimeConverterService> _logger = new();
+    private static readonly NullLogger<RuntimeConverterService> s_logger = new();
+    private readonly Mock<IServiceProvider> _mockServiceProvider = new();
+    private readonly Mock<IPluginsService> _mockPluginService = new();
+    private readonly RuntimeConverterService _service;
 
-    [Fact]
-    public async Task TestConvertProjectRecordToProject()
+    public RuntimeConverterServiceTests()
+    {
+        _service = new RuntimeConverterService(s_logger, _mockServiceProvider.Object, _mockPluginService.Object);
+    }
+
+    [Theory]
+    [InlineData(true, PortBrand.Boolean, true)]
+    [InlineData(true, PortBrand.String, "abc")]
+    [InlineData(true, PortBrand.Folder, "/abc")]
+    [InlineData(true, PortBrand.Numeric, 456)]
+    [InlineData(true, PortBrand.Enum, PortBrand.Enum)]
+    [InlineData(true, PortBrand.Rectangle, null)]
+    [InlineData(true, PortBrand.Image, null)]
+    public async ValueTask Test_TryUpdatePortValueAsync(bool expectedSuccess, PortBrand portBrand, object value)
     {
         // Arrange
-        var serviceProviderMock = new Mock<IServiceProvider>();
-        var projectRecord = CreateEmptyProjectRecord();
+        if(portBrand == PortBrand.Rectangle)
+        {
+            value = new SDK.ImageProcessing.Shapes.Rectangle { X = 5, Y = 6, Width = 7, Height = 8 };
+        }
+
+        IPort port = null!;
+        switch(portBrand)
+        {
+            case PortBrand.String:
+                port = new StringPort("Port", PortDirection.Input, "123");
+                break;
+            case PortBrand.Folder:
+                port = new FolderPort("Port", PortDirection.Input, "/123");
+                break;
+            case PortBrand.Numeric:
+                port = new NumericPort("Port", PortDirection.Input, 123);
+                break;
+            case PortBrand.Boolean:
+                port = new BooleanPort("Port", PortDirection.Input, false);
+                break;
+            case PortBrand.Enum:
+                port = new EnumPort("Port", PortDirection.Input, PortBrand.Enum);
+                break;
+            case PortBrand.Rectangle:
+                port = new RectanglePort("Port", PortDirection.Input, new SDK.ImageProcessing.Shapes.Rectangle{ X = 1, Y = 2, Width = 3, Height = 4});
+                break;
+            case PortBrand.Image:
+                port = new ImagePort("Port", PortDirection.Input, null!);
+                break;
+        }
+
+        // Act
+        bool result = await _service.TryUpdatePortValueAsync(port, value);
+
+        // Assert
+        Assert.Equal(expectedSuccess, result);
+        switch(portBrand)
+        {
+            case PortBrand.String:
+                Assert.Equal(value, ((StringPort)port).Value);
+                break;
+            case PortBrand.Folder:
+                Assert.Equal(value, ((FolderPort)port).Value);
+                break;
+            case PortBrand.Numeric:
+                Assert.Equal(Convert.ToDouble(value), ((NumericPort)port).Value);
+                break;
+            case PortBrand.Boolean:
+                Assert.Equal(value, ((BooleanPort)port).Value);
+                break;
+            case PortBrand.Enum:
+                Assert.Equal(value, ((EnumPort)port).Value);
+                break;
+            case PortBrand.Rectangle:
+                Assert.Equal(value, ((RectanglePort)port).Value);
+                break;
+            case PortBrand.Image:
+                Assert.Null(((ImagePort)port).Value);
+                break;
+        }
+    }
+
+    [Fact]
+    public async Task Test_ConvertAsync()
+    {
+        // Arrange
+        ProjectRecord projectRecord = CreateEmptyProjectRecord();
         var inputPort1 = new PortRecord
         {
             Id = Guid.NewGuid(),
@@ -59,14 +138,12 @@ public class RuntimeConverterServiceTests
             Ports = new List<PortRecord> { inputPort1, inputPort2, outputPort }
         };
         projectRecord.Steps.Add(stepRecord);
+        projectRecord.Links.Add(new LinkRecord());
 
-        var pluginsServiceMock = new Mock<IPluginsService>();
-        pluginsServiceMock.Setup(x => x.Find(stepRecord)).Returns(new StepProxy(new DummyStep()));
-
-        var service = new RuntimeConverterService(_logger, serviceProviderMock.Object, pluginsServiceMock.Object);
+        _mockPluginService.Setup(x => x.Find(stepRecord)).Returns(new StepProxy(new DummyStep()));
 
         // Act
-        var project = await service.ConvertAsync(projectRecord);
+        Project project = await _service.ConvertAsync(projectRecord);
 
         // Assert
         Assert.NotNull(project);
@@ -74,7 +151,7 @@ public class RuntimeConverterServiceTests
 
         Assert.NotEmpty(project.Steps);
         Assert.Single(project.Steps);
-        var step = project.Steps.First();
+        IStepProxy step = project.Steps.First();
         Assert.Equal(stepRecord.Name, step.Name);
         Assert.Equal(stepRecord.X, step.X);
         Assert.Equal(stepRecord.Y, step.Y);

@@ -1,5 +1,5 @@
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Common.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
@@ -10,7 +10,7 @@ public partial class BaseInputField : ComponentBase
 
     [Parameter]
     [EditorRequired]
-    public PortDto Port { get; set; } = null!;
+    public Port Port { get; set; } = null!;
 
     [Parameter] public bool Disabled { get; set; }
 

@@ -1,7 +1,7 @@
 @page "/admin/services"
 @attribute [Authorize(Roles = Roles.Administrator)]
 @using SDK.Authorization
-@using SDK.Data.DTOs
+@using AyBorg.Web.Shared.Models
 @inject AyBorg.Web.Services.IRegistryService registryService
 
 <PageTitle>AyBorg - Admin/Services</PageTitle>
@@ -50,18 +50,18 @@ else
 }
 
 @code  {
-        private IEnumerable<RegistryEntryDto>? serviceEntries;
+        private IEnumerable<ServiceInfoEntry>? serviceEntries;
         private bool isRefreshing = false;
 
         protected override async Task OnInitializedAsync()
         {
-            serviceEntries = await registryService.ReceiveAllAvailableServicesAsync();
+            serviceEntries = await registryService.ReceiveServicesAsync();
         }
 
         private async Task OnRefreshAsync()
         {
             isRefreshing = true;
-            serviceEntries = await registryService.ReceiveAllAvailableServicesAsync();
+            serviceEntries = await registryService.ReceiveServicesAsync();
             isRefreshing = false;
         }
 }

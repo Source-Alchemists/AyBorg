@@ -1,219 +1,382 @@
-using System.Net;
-using Microsoft.AspNetCore.SignalR.Client;
-using AyBorg.SDK.Data.DTOs;
-using Newtonsoft.Json;
-using System.Text;
+using System.Buffers;
+using System.Runtime.CompilerServices;
+using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Common.Models;
+using AyBorg.SDK.Communication.gRPC;
+using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Shared.Models;
+using Grpc.Core;
 
 namespace AyBorg.Web.Services.Agent;
 
 public class FlowService : IFlowService
 {
     private readonly ILogger<FlowService> _logger;
-    private readonly HttpClient _httpClient;
-    private readonly IAgentCacheService _AgentCacheService;
-    private readonly IAuthorizationHeaderUtilService _authorizationHeaderUtilService;
+    private readonly IStateService _stateService;
+    private readonly IRpcMapper _rpcMapper;
+    private readonly Editor.EditorClient _editorClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FlowService"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
-    /// <param name="httpClient">The HTTP client.</param>
-    /// <param name="agentCacheService">The agent cache service.</param>
-    /// <param name="authorizationHeaderUtilService">The authorization header util service.</param>
-    public FlowService(ILogger<FlowService> logger, 
-                        HttpClient httpClient, 
-                        IAgentCacheService AgentCacheService, 
-                        IAuthorizationHeaderUtilService authorizationHeaderUtilService)
+    /// <param name="stateService">The state service.</param>
+    /// <param name="rpcMapper">The RPC mapper.</param>
+    /// <param name="editorClient">The editor client.</param>
+    public FlowService(ILogger<FlowService> logger,
+                        IStateService stateService,
+                        IRpcMapper rpcMapper,
+                        Editor.EditorClient editorClient)
     {
         _logger = logger;
-        _httpClient = httpClient;
-        _AgentCacheService = AgentCacheService;
-        _authorizationHeaderUtilService = authorizationHeaderUtilService;
-    }
-
-    /// <summary>
-    /// Creates the hub connection.
-    /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
-    /// <returns>The hub connection.</returns>
-    public HubConnection CreateHubConnection(string baseUrl)
-    {
-        var hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{baseUrl}/hubs/flow")
-            .Build();
-        return hubConnection;
+        _stateService = stateService;
+        _rpcMapper = rpcMapper;
+        _editorClient = editorClient;
     }
 
     /// <summary>
     /// Gets the steps.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
     /// <returns>The steps.</returns>
-    public async Task<IEnumerable<StepDto>> GetStepsAsync(string baseUrl)
-    {   
-        var response = await _httpClient.GetFromJsonAsync<IEnumerable<StepDto>>($"{baseUrl}/flow/steps");
-        return response!;
+    public async ValueTask<IEnumerable<Step>> GetStepsAsync()
+    {
+        GetFlowStepsResponse response = await _editorClient.GetFlowStepsAsync(new GetFlowStepsRequest
+        {
+            AgentUniqueName = _stateService.AgentState.UniqueName
+        });
+        var result = new List<Step>();
+        foreach (StepDto? s in response.Steps)
+        {
+            Step stepModel = _rpcMapper.FromRpc(s);
+            foreach (Port portModel in stepModel.Ports!)
+            {
+                await LazyLoadAsync(portModel, null);
+            }
+            result.Add(stepModel);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Gets the step.
+    /// </summary>
+    /// <param name="stepId">The step id.</param>
+    /// <param name="iterationId">The iteration id.</param>
+    /// <param name="updatePorts">if set to <c>true</c> [update ports].</param>
+    /// <param name="skipOutputPorts">if set to <c>true</c> [skip output ports].</param>
+    /// <returns>The step.</returns>
+    public async ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true)
+    {
+        var request = new GetFlowStepsRequest
+        {
+            AgentUniqueName = _stateService.AgentState.UniqueName,
+            IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
+        };
+        request.StepIds.Add(stepId.ToString());
+        GetFlowStepsResponse response = await _editorClient.GetFlowStepsAsync(request);
+        StepDto? resultStep = response.Steps.FirstOrDefault();
+        if (resultStep == null)
+        {
+            _logger.LogWarning("Could not find step with id {StepId} in iteration {IterationId}", stepId, iterationId);
+            return null!;
+        }
+
+        Step stepModel = _rpcMapper.FromRpc(resultStep);
+        if (updatePorts)
+        {
+            foreach (Port portModel in stepModel.Ports!)
+            {
+                if (portModel.Direction == SDK.Common.Ports.PortDirection.Output && skipOutputPorts)
+                {
+                    // Nothing to do as we only need to update input ports
+                    continue;
+                }
+                await LazyLoadAsync(portModel, iterationId);
+            }
+        }
+        return stepModel;
     }
 
     /// <summary>
     /// Gets the links.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
     /// <returns>The links.</returns>
-    public async Task<IEnumerable<LinkDto>> GetLinksAsync(string baseUrl)
+    public async ValueTask<IEnumerable<Link>> GetLinksAsync()
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/flow/links");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request);
-        var content = await response.Content.ReadAsStringAsync();
-        var links = JsonConvert.DeserializeObject<IEnumerable<LinkDto>>(content);
-        return links!;
+        GetFlowLinksResponse response = await _editorClient.GetFlowLinksAsync(new GetFlowLinksRequest
+        {
+            AgentUniqueName = _stateService.AgentState.UniqueName
+        });
+        var result = new List<Link>();
+        foreach (LinkDto? l in response.Links)
+        {
+            result.Add(_rpcMapper.FromRpc(l));
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Gets the link.
+    /// </summary>
+    /// <param name="linkId">The link identifier.</param>
+    /// <returns>The link.</returns>
+    public async ValueTask<Link> GetLinkAsync(Guid linkId)
+    {
+        var request = new GetFlowLinksRequest
+        {
+            AgentUniqueName = _stateService.AgentState.UniqueName
+        };
+        request.LinkIds.Add(linkId.ToString());
+        GetFlowLinksResponse response = await _editorClient.GetFlowLinksAsync(request);
+        LinkDto? resultLink = response.Links.FirstOrDefault();
+        if (resultLink == null)
+        {
+            _logger.LogWarning("Could not find link with id {LinkId}", linkId);
+            return null!;
+        }
+
+        return _rpcMapper.FromRpc(resultLink);
     }
 
     /// <summary>
     /// Adds the step asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
     /// <param name="stepId">The step identifier.</param>
     /// <param name="x">The x.</param>
     /// <param name="y">The y.</param>
     /// <returns></returns>
-    public async Task<StepDto> AddStepAsync(string baseUrl, Guid stepId, int x, int y)
+    public async ValueTask<Step> AddStepAsync(Guid stepId, int x, int y)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/flow/steps/{stepId}/{x}/{y}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request);
-        var step = await response.Content.ReadFromJsonAsync<StepDto>();
-        if (step == null)
+        try
         {
-            _logger.LogWarning("No steps received from Agent.");
+            AddFlowStepResponse response = await _editorClient.AddFlowStepAsync(new AddFlowStepRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                StepId = stepId.ToString(),
+                X = x,
+                Y = y
+            });
+
+            return _rpcMapper.FromRpc(response.Step);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error adding step");
             return null!;
         }
-        return step;
     }
 
     /// <summary>
     /// Removes the step asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
     /// <param name="stepId">The step identifier.</param>
     /// <returns></returns>
-    public async Task<bool> TryRemoveStepAsync(string baseUrl, Guid stepId)
+    public async ValueTask<bool> TryRemoveStepAsync(Guid stepId)
     {
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"{baseUrl}/flow/steps/{stepId}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            _ = await _editorClient.DeleteFlowStepAsync(new DeleteFlowStepRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                StepId = stepId.ToString()
+            });
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error deleting step");
+            return false;
+        }
     }
 
     /// <summary>
     /// Moves the step asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
     /// <param name="stepId">The step identifier.</param>
     /// <param name="x">The x.</param>
     /// <param name="y">The y.</param>
     /// <returns></returns>
-    public async Task<bool> TryMoveStepAsync(string baseUrl, Guid stepId, int x, int y)
+    public async ValueTask<bool> TryMoveStepAsync(Guid stepId, int x, int y)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/flow/steps/{stepId}/{x}/{y}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            _ = await _editorClient.MoveFlowStepAsync(new MoveFlowStepRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                StepId = stepId.ToString(),
+                X = x,
+                Y = y
+            });
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error moving step");
+            return false;
+        }
     }
 
     /// <summary>
     /// Add link between ports asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
     /// <param name="sourcePortId">The source port identifier.</param>
     /// <param name="targetPortId">The target port identifier.</param>
     /// <returns></returns>
-    public async Task<bool> TryAddLinkAsync(string baseUrl, Guid sourcePortId, Guid targetPortId)
+    public async ValueTask<Guid?> AddLinkAsync(Guid sourcePortId, Guid targetPortId)
     {
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{baseUrl}/flow/links/{sourcePortId}/{targetPortId}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
+        try
+        {
+            LinkFlowPortsResponse response = await _editorClient.LinkFlowPortsAsync(new LinkFlowPortsRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                SourceId = sourcePortId.ToString(),
+                TargetId = targetPortId.ToString()
+            });
+            if (Guid.TryParse(response.LinkId, out Guid linkId))
+            {
+                return linkId;
+            }
+            else
+            {
+                return Guid.Empty;
+            }
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error linking ports");
+            return null;
+        }
     }
 
     /// <summary>
     /// Removes the link asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
     /// <param name="linkId">The link identifier.</param>
     /// <returns></returns>
-    public async Task<bool> TryRemoveLinkAsync(string baseUrl, Guid linkId)
+    public async ValueTask<bool> TryRemoveLinkAsync(Guid linkId)
     {
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"{baseUrl}/flow/links/{linkId}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
-    }
-
-    /// <summary>
-    /// Gets the port asynchronous.
-    /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
-    /// <param name="portId">The port identifier.</param>
-    /// <returns></returns>
-    public async Task<PortDto> GetPortAsync(string baseUrl, Guid portId)
-    {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/flow/ports/{portId}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request);
-        if(response.StatusCode == HttpStatusCode.OK) {
-            var port = await response.Content.ReadFromJsonAsync<PortDto>();
-            return port!;
+        try
+        {
+            _ = await _editorClient.LinkFlowPortsAsync(new LinkFlowPortsRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                SourceId = linkId.ToString(),
+                TargetId = string.Empty
+            });
+            return true;
         }
-        return null!;
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error linking ports");
+            return false;
+        }
     }
 
     /// <summary>
     /// Gets the port for the given iteration.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
     /// <param name="portId">The port identifier.</param>
     /// <param name="iterationId">The iteration identifier.</param>
     /// <returns></returns>
-    public async Task<PortDto> GetPortAsync(string baseUrl, Guid portId, Guid iterationId)
+    public async ValueTask<Port> GetPortAsync(Guid portId, Guid? iterationId = null)
     {
-        return await _AgentCacheService.GetOrCreatePortEntryAsync(baseUrl, portId, iterationId);
+        var request = new GetFlowPortsRequest
+        {
+            AgentUniqueName = _stateService.AgentState.UniqueName,
+            IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
+        };
+        request.PortIds.Add(portId.ToString());
+        GetFlowPortsResponse response = await _editorClient.GetFlowPortsAsync(request);
+        PortDto? resultPort = response.Ports.FirstOrDefault();
+        if (resultPort == null)
+        {
+            return null!;
+        }
+
+        Port portModel = _rpcMapper.FromRpc(resultPort);
+        await LazyLoadAsync(portModel, iterationId);
+        return portModel;
     }
 
     /// <summary>
     /// Try to set the port value asynchronous.
     /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
     /// <param name="port">The port.</param>
     /// <returns></returns>
-    public async Task<bool> TrySetPortValueAsync(string baseUrl, PortDto port)
+    public async ValueTask<bool> TrySetPortValueAsync(Port port)
     {
-        var request = new HttpRequestMessage(HttpMethod.Put, $"{baseUrl}/flow/ports")
+        try
         {
-            Content = new StringContent(JsonConvert.SerializeObject(port), Encoding.UTF8, "application/json")
-        };
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request);
-        return response.IsSuccessStatusCode;
+            _ = await _editorClient.UpdateFlowPortAsync(new UpdateFlowPortRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                Port = _rpcMapper.ToRpc(port)
+            });
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Error setting port value");
+            return false;
+        }
     }
 
-    /// <summary>
-    /// Gets the step execution time asynchronous.
-    /// </summary>
-    /// <param name="baseUrl">The base URL.</param>
-    /// <param name="stepId">The step identifier.</param>
-    /// <param name="iterationId">The iteration identifier.</param>
-    /// <returns></returns>
-    public async Task<long> GetStepExecutionTimeAsync(string baseUrl, Guid stepId, Guid iterationId)
+    private async ValueTask LazyLoadAsync(Port portModel, Guid? iterationId)
     {
-        var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}/flow/steps/{stepId}/{iterationId}");
-        request.Headers.Authorization = await _authorizationHeaderUtilService.GenerateAsync();
-        var response = await _httpClient.SendAsync(request);
-        if(response.StatusCode == HttpStatusCode.OK) {
-            var executionTime = await response.Content.ReadFromJsonAsync<long>();
-            return executionTime;
+        if (portModel.Brand == SDK.Common.Ports.PortBrand.Image && portModel.Direction == SDK.Common.Ports.PortDirection.Input)
+        {
+            // Need to transfer the image
+            AsyncServerStreamingCall<ImageChunkDto> imageResponse = _editorClient.GetImageStream(new GetImageStreamRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                PortId = portModel.Id.ToString(),
+                IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString(),
+                AsThumbnail = true
+
+            });
+
+            portModel.Value = await CreateImageFromChunksAsync(imageResponse, true);
         }
-        return 0;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static async ValueTask<Image> CreateImageFromChunksAsync(AsyncServerStreamingCall<ImageChunkDto> imageResponse, bool isThumbnail)
+    {
+        IMemoryOwner<byte> memoryOwner = null!;
+        var resultImage = new Image
+        {
+            EncoderType = isThumbnail ? SDK.ImageProcessing.Encoding.EncoderType.Jpeg : SDK.ImageProcessing.Encoding.EncoderType.Png
+        };
+
+        try
+        {
+            int offset = 0;
+            await foreach (ImageChunkDto? chunk in imageResponse.ResponseStream.ReadAllAsync())
+            {
+                if (memoryOwner == null)
+                {
+                    memoryOwner = MemoryPool<byte>.Shared.Rent((int)chunk.FullStreamLength);
+                    resultImage.Width = chunk.FullWidth;
+                    resultImage.Height = chunk.FullHeight;
+                }
+
+                Memory<byte> targetMemorySlice = memoryOwner.Memory.Slice(offset, chunk.Data.Length);
+                offset += chunk.Data.Length;
+                chunk.Data.Memory.CopyTo(targetMemorySlice);
+            }
+
+            if (memoryOwner != null)
+            {
+                resultImage.Base64 = Convert.ToBase64String(memoryOwner.Memory.Span);
+            }
+        }
+        finally
+        {
+            memoryOwner?.Dispose();
+        }
+
+        return resultImage;
     }
 }

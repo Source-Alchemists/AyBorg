@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Microsoft.AspNetCore.Components.Web;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
@@ -11,11 +10,7 @@ public partial class NumericInputField : BaseInputField
     {
         base.OnInitializedAsync();
         if (Port.Value == null) throw new ArgumentNullException(nameof(Port.Value));
-        if(Port.Value is JsonElement jsonElement)
-        {
-            _value = JsonSerializer.Deserialize<double>(jsonElement)!;
-        }
-        else if(Port.Value is double value)
+        if(Port.Value is double value)
         {
             _value = value;
         }

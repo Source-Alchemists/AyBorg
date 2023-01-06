@@ -1,29 +1,24 @@
-using System.Text;
-using System.Text.Json;
-using Microsoft.AspNetCore.Components;
-using MQTTnet;
-using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.System.Runtime;
+using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
-
+using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace AyBorg.Web.Pages.Agent.Shared;
 
 #nullable disable
 
-public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
+public partial class RuntimeToolbar : ComponentBase, IDisposable
 {
-    [Parameter]
-    [EditorRequired]
-    public string BaseUrl { get; set; }
-
     [Parameter]
     [EditorRequired]
     public string ServiceUniqueName { get; set; }
 
     [Inject] IRuntimeService RuntimeService { get; set; }
 
-    [Inject] IMqttClientProvider MqttClientProvider { get; set; }
+    [Inject] INotifyService NotifyService { get; set; }
+
+    [Inject] ISnackbar Snackbar { get; set; }
 
     private string StopClass => _isAbortVisible ? "w50" : "mud-full-width";
 
@@ -33,30 +28,20 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
     private bool _isAbortVisible = false;
     private bool _areButtonsDisabled = false;
     private bool _isButtonLoading = false;
-    private MqttSubscription _statusSubscription;
-
-    public async ValueTask DisposeAsync()
-    {
-        if (_statusSubscription != null)
-        {
-            _statusSubscription.MessageReceived -= OnMqttMessageReceived;
-            await MqttClientProvider.UnsubscribeAsync(_statusSubscription);
-        }
-    }
+    private NotifyService.Subscription _statusSubscription;
+    private bool _disposedValue;
 
     protected override async Task OnParametersSetAsync()
     {
-        if (string.IsNullOrEmpty(BaseUrl)) return;
         _status = await RuntimeService.GetStatusAsync();
         UpdateButtonsState();
-        if(_statusSubscription != null)
+        if (_statusSubscription != null)
         {
-            _statusSubscription.MessageReceived -= OnMqttMessageReceived;
-            await MqttClientProvider.UnsubscribeAsync(_statusSubscription);
+            _statusSubscription.Callback -= StatusCallbackReceived;
+            NotifyService.Unsubscribe(_statusSubscription);
         }
-        _statusSubscription = await MqttClientProvider.SubscribeAsync($"AyBorg/agents/{ServiceUniqueName}/engine/status");
-        _statusSubscription.MessageReceived += OnMqttMessageReceived;
-
+        _statusSubscription = NotifyService.Subscribe(ServiceUniqueName, SDK.Communication.gRPC.NotifyType.AgentEngineStateChanged);
+        _statusSubscription.Callback += StatusCallbackReceived;
         await base.OnParametersSetAsync();
     }
 
@@ -65,13 +50,14 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
         await InvokeAsync(StateHasChanged);
     }
 
-    private async void OnMqttMessageReceived(MqttApplicationMessage message)
+    private async void StatusCallbackReceived(object obj)
     {
-        if(message.Payload is null) return;
-            var status = JsonSerializer.Deserialize<EngineMeta>(Encoding.UTF8.GetString(message.Payload));
-            _status = status;
+        if (obj is EngineMeta engineMeta)
+        {
+            _status = engineMeta;
             UpdateButtonsState();
             await InvokeAsync(StateHasChanged);
+        }
     }
 
     private void UpdateButtonsState()
@@ -117,21 +103,36 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        await RuntimeService.StartRunAsync(EngineExecutionType.SingleRun);
+        if (await RuntimeService.StartRunAsync(EngineExecutionType.SingleRun) == null)
+        {
+            _status.State = EngineState.Idle;
+            UpdateButtonsState();
+            Snackbar.Add("Failed to start run", Severity.Warning);
+        }
     }
 
     private async Task OnContinuousRunClicked()
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        await RuntimeService.StartRunAsync(EngineExecutionType.ContinuousRun);
+        if (await RuntimeService.StartRunAsync(EngineExecutionType.ContinuousRun) == null)
+        {
+            _status.State = EngineState.Idle;
+            UpdateButtonsState();
+            Snackbar.Add("Failed to start run", Severity.Warning);
+        }
     }
 
     private async Task OnStopClicked()
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        await RuntimeService.StopRunAsync();
+        if (await RuntimeService.StopRunAsync() == null)
+        {
+            _status.State = EngineState.Idle;
+            UpdateButtonsState();
+            Snackbar.Add("Failed to stop run", Severity.Warning);
+        }
     }
 
     private async Task OnAbortClicked()
@@ -142,6 +143,25 @@ public partial class RuntimeToolbar : ComponentBase, IAsyncDisposable
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
+            Snackbar.Add("Failed to abort run", Severity.Warning);
         }
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue
+            && disposing
+            && _statusSubscription != null)
+        {
+            _statusSubscription.Callback -= StatusCallbackReceived;
+            NotifyService.Unsubscribe(_statusSubscription);
+        }
+        _disposedValue = true;
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

@@ -65,7 +65,7 @@ else
         <MudSpacer />
         @if (!_areSubComponentsHidden)
         {
-            <RuntimeToolbar ServiceUniqueName="@_serviceUniqueName" BaseUrl="@_baseUrl" />
+            <RuntimeToolbar ServiceUniqueName="@_serviceUniqueName" />
         }
         <MudSpacer />
         <MudTooltip Text="Save as draft">
@@ -89,7 +89,7 @@ else
                     <MudItem md="5" lg="3" xl="2">
                         @if (!_areSubComponentsHidden)
                         {
-                            <StepsSelection ServiceId="@ServiceId" />
+                            <StepsSelection ServiceUniqueName="@_serviceUniqueName" />
                         }
                     </MudItem>
                 </MudHidden>
