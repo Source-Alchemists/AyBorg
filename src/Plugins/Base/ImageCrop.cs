@@ -12,9 +12,11 @@ public sealed class ImageCrop : IStepBody, IDisposable
     private readonly ImagePort _inputImagePort = new("Image", PortDirection.Input, null!);
     private readonly RectanglePort _cropRectanglePort = new("Region", PortDirection.Input, new Rectangle());
     private readonly ImagePort _outputImagePort = new("Cropped image", PortDirection.Output, null!);
-    private bool disposedValue;
+    private bool _disposedValue;
 
     public string DefaultName => "Image.Crop";
+
+    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
     public IEnumerable<IPort> Ports { get; }
 
@@ -44,13 +46,13 @@ public sealed class ImageCrop : IStepBody, IDisposable
 
     private void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
                 _outputImagePort.Value?.Dispose();
             }
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 

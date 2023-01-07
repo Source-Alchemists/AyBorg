@@ -2,7 +2,6 @@ using System.Runtime.CompilerServices;
 using AyBorg.Plugins.ZXing.Models;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
 using AyBorg.SDK.ImageProcessing.Pixels;
 using Microsoft.Extensions.Logging;
 using ZXing;
@@ -23,6 +22,8 @@ namespace AyBorg.Plugins.ZXing
         private byte[] _tmpBuffer = null!;
 
         public string DefaultName => "Barcode.Read";
+
+        public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
         public BarcodeRead(ILogger<BarcodeRead> logger)
         {

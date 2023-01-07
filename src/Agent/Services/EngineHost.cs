@@ -69,7 +69,7 @@ internal sealed class EngineHost : IEngineHost
             _engine = null;
         }
 
-        foreach (SDK.Common.IStepProxy step in ActiveProject.Steps)
+        foreach (IStepProxy step in ActiveProject.Steps)
         {
             step.Dispose();
         }
