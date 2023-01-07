@@ -22,6 +22,7 @@ public sealed class StepProxy : IStepProxy
         StepBody = stepBody;
         Ports = stepBody.Ports;
         Name = stepBody.DefaultName;
+        Categories = stepBody.Categories;
         X = x;
         Y = y;
 
@@ -51,6 +52,11 @@ public sealed class StepProxy : IStepProxy
     /// Gets or sets the name.
     /// </summary>
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets the categories.
+    /// </summary>
+    public IEnumerable<string> Categories { get; }
 
     /// <summary>
     /// Gets the links.
