@@ -40,7 +40,7 @@ public sealed class ImageMirror : IStepBody, IDisposable
             return ValueTask.FromResult(true);
         }
 
-        var mirrorMode = MirrorMode.Horizontal;
+        MirrorMode mirrorMode = MirrorMode.Horizontal;
         if (_mirrorHorizontal.Value && _mirrorVertical.Value)
         {
             mirrorMode = MirrorMode.VerticalHorizontal;

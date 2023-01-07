@@ -35,7 +35,7 @@ public sealed class ImageScale : IStepBody, IDisposable
     {
         _scaledImagePort.Value?.Dispose();
         Image sourceImage = _imagePort.Value;
-        if (_scalePort.Value.Equals(1m))
+        if (_scalePort.Value.Equals(1d))
         {
             _scaledImagePort.Value = sourceImage;
             return ValueTask.FromResult(true);
