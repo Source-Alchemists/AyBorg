@@ -50,6 +50,7 @@ public class FlowService : IFlowService
             Step stepModel = _rpcMapper.FromRpc(s);
             foreach (Port portModel in stepModel.Ports!)
             {
+                Console.WriteLine(portModel.Value);
                 await LazyLoadAsync(portModel, null);
             }
             result.Add(stepModel);
