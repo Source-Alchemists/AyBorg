@@ -1,7 +1,7 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
-using AyBorg.SDK.ImageProcessing.Encoding;
+using ImageTorque;
+using ImageTorque.Processing;
 using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.Base;
@@ -43,7 +43,7 @@ public sealed class ImageSave : IStepBody
         string resultFileName = $"{ReplacePlaceHolder(_fileNamePrefixPort.Value)}{ReplacePlaceHolder(_inputFileNamePort.Value)}{ReplacePlaceHolder(_fileNameSuffixPort.Value)}.png";
         string resultFilePath = Path.Combine($"{_environment.StorageLocation}{_folderPort.Value}", resultFileName);
         _logger.LogTrace("Saving image to {resultFilePath}", resultFilePath);
-        Image.Save(_imagePort.Value, resultFilePath, EncoderType.Png);
+        _imagePort.Value.Save(resultFilePath, EncoderType.Png);
         _outputFileNamePort.Value = resultFileName;
         return ValueTask.FromResult(true);
     }

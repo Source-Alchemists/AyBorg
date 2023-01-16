@@ -2,7 +2,7 @@ using System.Runtime.CompilerServices;
 using AyBorg.Plugins.ZXing.Models;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing.Pixels;
+using ImageTorque.Pixels;
 using Microsoft.Extensions.Logging;
 using ZXing;
 

@@ -347,7 +347,7 @@ public class FlowService : IFlowService
         IMemoryOwner<byte> memoryOwner = null!;
         var resultImage = new Image
         {
-            EncoderType = isThumbnail ? SDK.ImageProcessing.Encoding.EncoderType.Jpeg : SDK.ImageProcessing.Encoding.EncoderType.Png
+            EncoderType = isThumbnail ? ImageTorque.Processing.EncoderType.Jpeg : ImageTorque.Processing.EncoderType.Png
         };
 
         try

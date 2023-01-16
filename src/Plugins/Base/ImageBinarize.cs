@@ -1,7 +1,7 @@
 using System.Globalization;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
+using ImageTorque;
 
 namespace AyBorg.Plugins.Base;
 

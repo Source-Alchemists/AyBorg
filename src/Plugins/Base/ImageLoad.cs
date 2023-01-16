@@ -1,6 +1,6 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
+using ImageTorque;
 using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.Base;

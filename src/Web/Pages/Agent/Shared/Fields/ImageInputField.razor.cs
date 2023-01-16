@@ -29,13 +29,13 @@ public partial class ImageInputField : BaseInputField
     {
         switch (image.EncoderType)
         {
-            case SDK.ImageProcessing.Encoding.EncoderType.Jpeg:
+            case ImageTorque.Processing.EncoderType.Jpeg:
                 _imageUrl = $"data:image/jpeg;base64,{image.Base64}";
                 break;
-            case SDK.ImageProcessing.Encoding.EncoderType.Png:
+            case ImageTorque.Processing.EncoderType.Png:
                 _imageUrl = $"data:image/png;base64,{image.Base64}";
                 break;
-            case SDK.ImageProcessing.Encoding.EncoderType.Bmp:
+            case ImageTorque.Processing.EncoderType.Bmp:
                 _imageUrl = $"data:image/bmp;base64,{image.Base64}";
                 break;
         }

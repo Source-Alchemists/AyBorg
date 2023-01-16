@@ -4,8 +4,8 @@ using System.Text.Json;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Data.DAL;
-using AyBorg.SDK.ImageProcessing.Shapes;
 using AyBorg.SDK.Projects;
+using ImageTorque;
 
 [assembly: InternalsVisibleTo("AyBorg.Agent.Tests")]
 namespace AyBorg.Agent.Services;

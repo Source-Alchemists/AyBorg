@@ -1,5 +1,5 @@
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
+using ImageTorque;
 using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AyBorg.Plugins.Base.Tests;
@@ -17,19 +17,19 @@ public class ImageCropTests : IDisposable
     public async ValueTask Test_TryRunAsync(bool expectedResult, int width, int height)
     {
         // Arrange
-        using Image testImage  = Image.Load("./resources/luna.jpg");
+        using Image testImage = Image.Load("./resources/luna.jpg");
         var imageInputPort = (ImagePort)_plugin.Ports.First(p => p.Name.Equals("Image"));
         imageInputPort.Value = testImage;
         var imageOutputPort = (ImagePort)_plugin.Ports.First(p => p.Name.Equals("Cropped image"));
         var regionPort = (RectanglePort)_plugin.Ports.First(p => p.Name.Equals("Region"));
-        regionPort.Value = new SDK.ImageProcessing.Shapes.Rectangle(0, 0, width, height);
+        regionPort.Value = new Rectangle(0, 0, width, height);
 
         // Act
         bool result = await _plugin.TryRunAsync(default);
 
         // Assert
         Assert.Equal(expectedResult, result);
-        if(expectedResult)
+        if (expectedResult)
         {
             Assert.Equal(width, imageOutputPort.Value.Width);
             Assert.Equal(height, imageOutputPort.Value.Height);

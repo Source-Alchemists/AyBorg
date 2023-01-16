@@ -5,12 +5,12 @@ using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
-using AyBorg.SDK.ImageProcessing;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Agent;
 using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using ImageTorque;
 using Microsoft.IO;
 
 namespace AyBorg.Agent.Services.gRPC;
@@ -348,12 +348,12 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             }
             else
             {
-                Image.CalculateClampSize(originalImage, maxSize, out int w, out int h);
+                originalImage.CalculateClampSize(maxSize, out int w, out int h);
                 targetImage = originalImage.Resize(w, h, ResizeMode.NearestNeighbor);
             }
 
             using MemoryStream stream = s_memoryManager.GetStream();
-            Image.Save(targetImage, stream, asThumbnail ? SDK.ImageProcessing.Encoding.EncoderType.Jpeg : SDK.ImageProcessing.Encoding.EncoderType.Png);
+            targetImage.Save(stream, asThumbnail ? ImageTorque.Processing.EncoderType.Jpeg : ImageTorque.Processing.EncoderType.Png);
             stream.Position = 0;
             long fullStreamLength = stream.Length;
             long bytesToSend = fullStreamLength;

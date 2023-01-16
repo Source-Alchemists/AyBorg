@@ -1,7 +1,7 @@
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.ImageProcessing.Encoding;
 using AyBorg.SDK.System.Runtime;
+using ImageTorque.Processing;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
 
