@@ -1,6 +1,3 @@
 [submodule "src/SDK"]
 	path = src/SDK
 	url = git@github.com:Source-Alchemists/AyBorg.SDK.git
-[submodule "src/AyBorg.Diagrams"]
-	path = src/AyBorg.Diagrams
-	url = git@github.com:Source-Alchemists/AyBorg.Diagrams.git

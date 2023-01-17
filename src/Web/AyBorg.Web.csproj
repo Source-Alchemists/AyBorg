@@ -9,6 +9,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="AyBorg.Diagrams" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="app.db" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
 
@@ -29,12 +32,12 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="AyBorg.Diagrams" Version="0.1.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.SqlLite\AyBorg.Database.Migrations.SqlLite.csproj" />
     <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.PostgreSql\AyBorg.Database.Migrations.PostgreSql.csproj" />
-    <ProjectReference Include="..\AyBorg.Diagrams\src\AyBorg.Diagrams\AyBorg.Diagrams.csproj" />
     <ProjectReference Include="..\SDK\src\System\AyBorg.SDK.System.csproj" />
     <ProjectReference Include="..\SDK\src\Data\Mapper\AyBorg.SDK.Data.Mapper.csproj" />
     <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
