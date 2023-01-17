@@ -1,10 +1,9 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
-using AyBorg.SDK.ImageProcessing.Shapes;
+using ImageTorque;
 using Microsoft.Extensions.Logging;
 
-namespace AyBorg.Plugins.Base;
+namespace AyBorg.Plugins.ImageTorque;
 
 public sealed class ImageCrop : IStepBody, IDisposable
 {
@@ -46,12 +45,9 @@ public sealed class ImageCrop : IStepBody, IDisposable
 
     private void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_disposedValue && disposing)
         {
-            if (disposing)
-            {
-                _outputImagePort.Value?.Dispose();
-            }
+            _outputImagePort.Value?.Dispose();
             _disposedValue = true;
         }
     }

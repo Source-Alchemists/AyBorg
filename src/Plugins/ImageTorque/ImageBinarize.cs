@@ -1,9 +1,9 @@
 using System.Globalization;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
+using ImageTorque;
 
-namespace AyBorg.Plugins.Base;
+namespace AyBorg.Plugins.ImageTorque;
 
 public sealed class ImageBinarize : IStepBody, IDisposable
 {

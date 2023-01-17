@@ -1,8 +1,8 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
+using ImageTorque;
 
-namespace AyBorg.Plugins.Base;
+namespace AyBorg.Plugins.ImageTorque;
 
 public sealed class ImageGrayscale : IStepBody, IDisposable
 {
@@ -40,12 +40,9 @@ public sealed class ImageGrayscale : IStepBody, IDisposable
 
     private void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_disposedValue && disposing)
         {
-            if (disposing)
-            {
-                _grayscaleImagePort?.Dispose();
-            }
+            _grayscaleImagePort?.Dispose();
             _disposedValue = true;
         }
     }

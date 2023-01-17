@@ -1,11 +1,11 @@
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.ImageProcessing;
+using ImageTorque;
 using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using MQTTnet;
 
-namespace AyBorg.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.MQTT;
 
 public sealed class MqttImageReceive : BaseMqttReceiveStep
 {
@@ -29,7 +29,7 @@ public sealed class MqttImageReceive : BaseMqttReceiveStep
         }
 
         _logger.LogTrace("Received message from topic {topic}", message.Topic);
-        using var stream = _memoryStreamManager.GetStream(message.Payload);
+        using MemoryStream stream = _memoryStreamManager.GetStream(message.Payload);
 
         var image = Image.Load(stream);
         _imagePort.Value?.Dispose();

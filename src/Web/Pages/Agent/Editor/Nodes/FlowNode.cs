@@ -1,6 +1,6 @@
 ﻿using AyBorg.SDK.Common.Models;
-using Blazor.Diagrams.Core.Geometry;
-using Blazor.Diagrams.Core.Models;
+using AyBorg.Diagrams.Core.Geometry;
+using AyBorg.Diagrams.Core.Models;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 

@@ -3,7 +3,7 @@ using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
 using Microsoft.Extensions.Logging;
 
-namespace AyBorg.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.MQTT;
 
 public abstract class BaseMqttStep : IStepBody
 {
@@ -18,7 +18,7 @@ public abstract class BaseMqttStep : IStepBody
 
     public IEnumerable<IPort> Ports => _ports;
 
-    public BaseMqttStep(ILogger logger, IMqttClientProvider mqttClientProvider)
+    protected BaseMqttStep(ILogger logger, IMqttClientProvider mqttClientProvider)
     {
         _logger = logger;
         _mqttClientProvider = mqttClientProvider;

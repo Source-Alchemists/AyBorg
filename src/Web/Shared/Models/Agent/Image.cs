@@ -1,5 +1,5 @@
 using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.ImageProcessing.Encoding;
+using ImageTorque.Processing;
 
 namespace AyBorg.Web.Shared.Models;
 

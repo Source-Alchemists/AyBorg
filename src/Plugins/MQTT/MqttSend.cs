@@ -5,7 +5,7 @@ using AyBorg.SDK.System.Runtime;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
 
-namespace AyBorg.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.MQTT;
 
 public sealed class MqttSend : BaseMqttSendStep, IStepBody
 {

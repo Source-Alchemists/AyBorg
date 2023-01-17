@@ -6,13 +6,13 @@ using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
-using AyBorg.SDK.ImageProcessing;
-using AyBorg.SDK.ImageProcessing.Buffers;
-using AyBorg.SDK.ImageProcessing.Pixels;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Agent;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
+using ImageTorque;
+using ImageTorque.Buffers;
+using ImageTorque.Pixels;
 using Moq;
 
 namespace AyBorg.Agent.Tests.Services.gRPC;
@@ -369,7 +369,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
             PortId = hasInvalidPortId ? "42" : Guid.NewGuid().ToString()
         };
 
-        var planarPixelBuffer = new PackedPixelBuffer<Mono8>(imageWidth, imageHeight);
+        var planarPixelBuffer = new PixelBuffer<L8>(imageWidth, imageHeight);
         var cachedImage = new CacheImage
         {
             OriginalImage = new Image(planarPixelBuffer)
@@ -382,7 +382,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
         var mockServerStreamWriter = new Mock<IServerStreamWriter<ImageChunkDto>>();
 
         // Act
-        if(hasInvalidIterationId || hasInvalidPortId || hasWrongPortId)
+        if (hasInvalidIterationId || hasInvalidPortId || hasWrongPortId)
         {
             await Assert.ThrowsAsync<RpcException>(() => _service.GetImageStream(request, mockServerStreamWriter.Object, _serverCallContext));
             return;

@@ -5,9 +5,9 @@ using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Modals;
-using Blazor.Diagrams.Core;
-using Blazor.Diagrams.Core.Models;
-using Blazor.Diagrams.Core.Models.Base;
+using AyBorg.Diagrams.Core;
+using AyBorg.Diagrams.Core.Models;
+using AyBorg.Diagrams.Core.Models.Base;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -362,7 +362,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         if (_diagram == null) return;
         Step step = DragDropStateHandler.DraggedStep;
         if (step == null) return;
-        Blazor.Diagrams.Core.Geometry.Point relativePosition = _diagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
+        AyBorg.Diagrams.Core.Geometry.Point relativePosition = _diagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
         step.X = (int)relativePosition.X;
         step.Y = (int)relativePosition.Y;
 

@@ -1,8 +1,6 @@
 using System.Globalization;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Tests.Dummies;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Data.DAL;
 using AyBorg.SDK.Projects;
@@ -34,13 +32,13 @@ public class RuntimeConverterServiceTests
     public async ValueTask Test_TryUpdatePortValueAsync(bool expectedSuccess, PortBrand portBrand, object value)
     {
         // Arrange
-        if(portBrand == PortBrand.Rectangle)
+        if (portBrand == PortBrand.Rectangle)
         {
-            value = new SDK.ImageProcessing.Shapes.Rectangle { X = 5, Y = 6, Width = 7, Height = 8 };
+            value = new ImageTorque.Rectangle { X = 5, Y = 6, Width = 7, Height = 8 };
         }
 
         IPort port = null!;
-        switch(portBrand)
+        switch (portBrand)
         {
             case PortBrand.String:
                 port = new StringPort("Port", PortDirection.Input, "123");
@@ -58,7 +56,7 @@ public class RuntimeConverterServiceTests
                 port = new EnumPort("Port", PortDirection.Input, PortBrand.Enum);
                 break;
             case PortBrand.Rectangle:
-                port = new RectanglePort("Port", PortDirection.Input, new SDK.ImageProcessing.Shapes.Rectangle{ X = 1, Y = 2, Width = 3, Height = 4});
+                port = new RectanglePort("Port", PortDirection.Input, new ImageTorque.Rectangle { X = 1, Y = 2, Width = 3, Height = 4 });
                 break;
             case PortBrand.Image:
                 port = new ImagePort("Port", PortDirection.Input, null!);
@@ -70,7 +68,7 @@ public class RuntimeConverterServiceTests
 
         // Assert
         Assert.Equal(expectedSuccess, result);
-        switch(portBrand)
+        switch (portBrand)
         {
             case PortBrand.String:
                 Assert.Equal(value, ((StringPort)port).Value);

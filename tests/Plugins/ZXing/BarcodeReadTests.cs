@@ -1,6 +1,6 @@
 using AyBorg.Plugins.ZXing.Models;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
+using ImageTorque;
 using Microsoft.Extensions.Logging.Abstractions;
 using Xunit;
 

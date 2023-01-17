@@ -197,6 +197,12 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "More than one active project found.");
         }
 
+        if (!projectMetas.Any())
+        {
+            _logger.LogWarning("Failed to load active project.");
+            return new ProjectManagementResult(false, "Failed to load active project.");
+        }
+
         ProjectMetaRecord projectMeta = projectMetas.First();
 
         bool result = (await TryChangeActivationStateAsync(projectMeta.DbId, true)).IsSuccessful;

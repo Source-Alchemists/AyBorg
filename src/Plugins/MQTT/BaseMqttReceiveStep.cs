@@ -4,7 +4,7 @@ using AyBorg.SDK.Communication.MQTT;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 
-namespace AyBorg.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.MQTT;
 
 public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
 {
@@ -13,7 +13,7 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
     protected MqttSubscription _subscription = null!;
     protected bool _hasNewMessage = false;
 
-    public BaseMqttReceiveStep(ILogger logger, IMqttClientProvider mqttClientProvider) : base(logger, mqttClientProvider)
+    protected BaseMqttReceiveStep(ILogger logger, IMqttClientProvider mqttClientProvider) : base(logger, mqttClientProvider)
     {
         _ports.Add(_topicPort);
         _ports.Add(_timeoutMsPort);
@@ -35,7 +35,7 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
         {
             // Dont add the cancellation token here, because we want to wait for the timeout
             // Else the MQTT client will be disposed
-            await Task.Delay(1);
+            await Task.Delay(1, default);
             count++;
             if (count > _timeoutMsPort.Value && _timeoutMsPort.Value != -1)
             {

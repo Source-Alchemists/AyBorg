@@ -1,8 +1,8 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
+using ImageTorque;
 
-namespace AyBorg.Plugins.Base;
+namespace AyBorg.Plugins.ImageTorque;
 
 public sealed class ImageMirror : IStepBody, IDisposable
 {
@@ -67,7 +67,6 @@ public sealed class ImageMirror : IStepBody, IDisposable
         {
             if (disposing)
             {
-                _inputImage.Dispose();
                 _outputImage.Dispose();
             }
             _disposedValue = true;

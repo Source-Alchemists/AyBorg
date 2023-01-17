@@ -1,11 +1,10 @@
-using AyBorg.Plugins.Base.MQTT;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.System.Runtime;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace AyBorg.Plugins.Base.Tests.MQTT;
+namespace AyBorg.Plugins.MQTT.Tests;
 
 
 public sealed class MqttImageSendTests

@@ -1,7 +1,7 @@
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing;
+using ImageTorque;
 
-namespace AyBorg.Plugins.Base.Tests;
+namespace AyBorg.Plugins.ImageTorque.Tests;
 
 public class ImageScaleTests : IDisposable
 {
@@ -14,7 +14,7 @@ public class ImageScaleTests : IDisposable
     public async ValueTask Test_TryRunAsync(int expectedWidth, int expectedHeight, double scaleFactor)
     {
         // Arrange
-        using Image testImage  = Image.Load("./resources/luna.jpg");
+        using Image testImage = Image.Load("./resources/luna.jpg");
         var imageInputPort = (ImagePort)_plugin.Ports.First(p => p.Name.Equals("Image"));
         imageInputPort.Value = testImage;
         var imageOutputPort = (ImagePort)_plugin.Ports.First(p => p.Name.Equals("Scaled image"));

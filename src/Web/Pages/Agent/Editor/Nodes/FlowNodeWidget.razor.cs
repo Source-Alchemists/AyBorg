@@ -1,7 +1,7 @@
 using AyBorg.SDK.Common.Ports;
 using AyBorg.Web.Pages.Agent.Shared.Fields;
 using AyBorg.Web.Services.Agent;
-using Blazor.Diagrams.Core.Models;
+using AyBorg.Diagrams.Core.Models;
 using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
