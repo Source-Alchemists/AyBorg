@@ -18,7 +18,7 @@ public abstract class BaseMqttStep : IStepBody
 
     public IEnumerable<IPort> Ports => _ports;
 
-    public BaseMqttStep(ILogger logger, IMqttClientProvider mqttClientProvider)
+    protected BaseMqttStep(ILogger logger, IMqttClientProvider mqttClientProvider)
     {
         _logger = logger;
         _mqttClientProvider = mqttClientProvider;

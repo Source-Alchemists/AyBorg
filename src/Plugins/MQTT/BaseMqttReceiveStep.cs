@@ -13,7 +13,7 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
     protected MqttSubscription _subscription = null!;
     protected bool _hasNewMessage = false;
 
-    public BaseMqttReceiveStep(ILogger logger, IMqttClientProvider mqttClientProvider) : base(logger, mqttClientProvider)
+    protected BaseMqttReceiveStep(ILogger logger, IMqttClientProvider mqttClientProvider) : base(logger, mqttClientProvider)
     {
         _ports.Add(_topicPort);
         _ports.Add(_timeoutMsPort);

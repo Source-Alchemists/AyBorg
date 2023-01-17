@@ -58,15 +58,12 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_disposedValue && disposing)
         {
-            if (disposing)
+            if (_parallelTask != null)
             {
-                if (_parallelTask != null)
-                {
-                    _parallelTask.Wait(1000); // Wait for 1 second
-                    _parallelTask.Dispose();
-                }
+                _parallelTask.Wait(1000); // Wait for 1 second
+                _parallelTask.Dispose();
             }
             _disposedValue = true;
         }
