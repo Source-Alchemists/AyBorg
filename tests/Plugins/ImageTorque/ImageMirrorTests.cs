@@ -1,7 +1,7 @@
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
 
-namespace AyBorg.Plugins.Base.Tests;
+namespace AyBorg.Plugins.ImageTorque.Tests;
 
 public class ImageMirrorTests : IDisposable
 {

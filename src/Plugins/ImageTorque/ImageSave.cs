@@ -4,7 +4,7 @@ using ImageTorque;
 using ImageTorque.Processing;
 using Microsoft.Extensions.Logging;
 
-namespace AyBorg.Plugins.Base;
+namespace AyBorg.Plugins.ImageTorque;
 
 public sealed class ImageSave : IStepBody
 {

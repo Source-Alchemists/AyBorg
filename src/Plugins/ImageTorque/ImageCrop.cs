@@ -3,7 +3,7 @@ using AyBorg.SDK.Common.Ports;
 using ImageTorque;
 using Microsoft.Extensions.Logging;
 
-namespace AyBorg.Plugins.Base;
+namespace AyBorg.Plugins.ImageTorque;
 
 public sealed class ImageCrop : IStepBody, IDisposable
 {

@@ -2,7 +2,7 @@ using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
 
-namespace AyBorg.Plugins.Base;
+namespace AyBorg.Plugins.ImageTorque;
 
 public sealed class ImageGrayscale : IStepBody, IDisposable
 {

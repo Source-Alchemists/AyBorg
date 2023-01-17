@@ -2,7 +2,7 @@ using AyBorg.SDK.Common.Ports;
 using ImageTorque;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace AyBorg.Plugins.Base.Tests;
+namespace AyBorg.Plugins.ImageTorque.Tests;
 
 public class ImageCropTests : IDisposable
 {

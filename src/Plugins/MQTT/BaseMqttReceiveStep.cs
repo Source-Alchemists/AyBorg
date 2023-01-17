@@ -4,7 +4,7 @@ using AyBorg.SDK.Communication.MQTT;
 using Microsoft.Extensions.Logging;
 using MQTTnet;
 
-namespace AyBorg.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.MQTT;
 
 public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
 {

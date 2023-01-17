@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <Version>0.3.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <OutputPath>bin\debug\plugins\AyBorg.Plugins.MQTT</OutputPath>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <OutputPath>bin\release\plugins\AyBorg.Plugins.MQTT</OutputPath>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SDK\src\Common\AyBorg.SDK.Common.csproj" />
+    <ProjectReference Include="..\..\SDK\src\Communication\MQTT\AyBorg.SDK.Communication.MQTT.csproj" />
+  </ItemGroup>
+
+</Project>

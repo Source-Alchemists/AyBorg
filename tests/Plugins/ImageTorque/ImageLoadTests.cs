@@ -3,7 +3,7 @@ using AyBorg.SDK.Common.Ports;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace AyBorg.Plugins.Base.Tests;
+namespace AyBorg.Plugins.ImageTorque.Tests;
 
 public class ImageLoadTests : IDisposable
 {

@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IO;
 using MQTTnet;
 
-namespace AyBorg.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.MQTT;
 
 public sealed class MqttImageReceive : BaseMqttReceiveStep
 {

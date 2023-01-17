@@ -170,8 +170,15 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         var steps = new List<IStepProxy>();
         foreach (StepRecord stepRecord in stepRecords)
         {
-            IStepProxy step = await ConvertStepAsync(stepRecord);
-            steps.Add(step);
+            try
+            {
+                IStepProxy step = await ConvertStepAsync(stepRecord);
+                steps.Add(step);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Step {StepName} with type {TypeName} not found", stepRecord.Name, stepRecord.MetaInfo.TypeName);
+            }
         }
 
         return steps;

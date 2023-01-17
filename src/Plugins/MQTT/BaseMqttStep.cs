@@ -3,7 +3,7 @@ using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
 using Microsoft.Extensions.Logging;
 
-namespace AyBorg.Plugins.Base.MQTT;
+namespace AyBorg.Plugins.MQTT;
 
 public abstract class BaseMqttStep : IStepBody
 {
