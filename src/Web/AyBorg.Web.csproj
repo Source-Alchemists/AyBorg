@@ -34,7 +34,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.SqlLite\AyBorg.Database.Migrations.SqlLite.csproj" />
     <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.PostgreSql\AyBorg.Database.Migrations.PostgreSql.csproj" />
-    <ProjectReference Include="..\Blazor.Diagrams\src\Blazor.Diagrams\Blazor.Diagrams.csproj" />
+    <ProjectReference Include="..\AyBorg.Diagrams\src\AyBorg.Diagrams\AyBorg.Diagrams.csproj" />
     <ProjectReference Include="..\SDK\src\System\AyBorg.SDK.System.csproj" />
     <ProjectReference Include="..\SDK\src\Data\Mapper\AyBorg.SDK.Data.Mapper.csproj" />
     <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
