@@ -67,7 +67,6 @@ public sealed class ImageMirror : IStepBody, IDisposable
         {
             if (disposing)
             {
-                _inputImage.Dispose();
                 _outputImage.Dispose();
             }
             _disposedValue = true;

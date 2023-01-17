@@ -90,14 +90,11 @@ public sealed class ImageLoad : IStepBody, IDisposable
 
     private void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_disposedValue && disposing)
         {
-            if (disposing)
-            {
-                _imagePort.Value?.Dispose();
-                _preloadTask?.Wait();
-                _preloadTask?.Dispose();
-            }
+            _imagePort.Value?.Dispose();
+            _preloadTask?.Wait();
+            _preloadTask?.Dispose();
             _disposedValue = true;
         }
     }

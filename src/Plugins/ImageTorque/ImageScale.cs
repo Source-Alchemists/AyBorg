@@ -57,12 +57,9 @@ public sealed class ImageScale : IStepBody, IDisposable
 
     private void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (!_disposedValue && disposing)
         {
-            if (disposing)
-            {
-                _scaledImagePort?.Dispose();
-            }
+            _scaledImagePort?.Dispose();
             _disposedValue = true;
         }
     }
