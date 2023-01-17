@@ -35,7 +35,7 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
         {
             // Dont add the cancellation token here, because we want to wait for the timeout
             // Else the MQTT client will be disposed
-            await Task.Delay(1);
+            await Task.Delay(1, default);
             count++;
             if (count > _timeoutMsPort.Value && _timeoutMsPort.Value != -1)
             {
