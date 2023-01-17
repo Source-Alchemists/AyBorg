@@ -29,11 +29,12 @@ public class MqttReceiveTests
 
         // Act
         await _mqttReceive.OnInitializeAsync();
+        ValueTask<bool> runTask = _mqttReceive.TryRunAsync(default);
         subscription.MessageReceived!.Invoke(new MQTTnet.MqttApplicationMessage
         {
             Payload = payload != null ? System.Text.Encoding.UTF8.GetBytes(payload) : null
         });
-        bool result = await _mqttReceive.TryRunAsync(default);
+        bool result = await runTask;
 
         // Assert
         Assert.True(result);
