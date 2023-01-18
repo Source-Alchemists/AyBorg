@@ -1,14 +1,22 @@
+using AyBorg.SDK.Communication.gRPC.Registry;
+using AyBorg.SDK.System.Configuration;
 
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Additional configuration is required to successfully run gRPC on macOS.
-// For instructions on how to configure Kestrel and gRPC clients on macOS, visit https://go.microsoft.com/fwlink/?linkid=2099682
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc();
 
-var app = builder.Build();
+builder.Services.AddGrpcClient<Ayborg.Gateway.V1.Register.RegisterClient>(options =>
+{
+    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
+    options.Address = new Uri(gatewayUrl!);
+});
+
+builder.Services.AddHostedService<RegistryBackgroundService>();
+
+builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
+
+WebApplication app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
