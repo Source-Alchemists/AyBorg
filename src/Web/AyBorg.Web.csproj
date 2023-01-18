@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Version>0.3.0</Version>
     <UserSecretsId>aspnet-AyBorg.Web-bcaead62-bf10-4a90-9b18-201f697037ae</UserSecretsId>
   </PropertyGroup>
 
