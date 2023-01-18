@@ -4,8 +4,8 @@ using System.Text.Json;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Data.DAL;
-using AyBorg.SDK.ImageProcessing.Shapes;
 using AyBorg.SDK.Projects;
+using ImageTorque;
 
 [assembly: InternalsVisibleTo("AyBorg.Agent.Tests")]
 namespace AyBorg.Agent.Services;
@@ -46,8 +46,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
             },
             Settings = new ProjectSettings
             {
-                IsForceResultCommunicationEnabled = projectRecord.Settings.IsForceResultCommunicationEnabled,
-                IsForceWebUiCommunicationEnabled = projectRecord.Settings.IsForceWebUiCommunicationEnabled
+                IsForceResultCommunicationEnabled = projectRecord.Settings.IsForceResultCommunicationEnabled
             },
             // First, we need to convert all the steps
             Steps = await ConvertStepsAsync(projectRecord.Steps)
@@ -87,49 +86,46 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
     private static bool UpdateNumericPortValue(NumericPort port, object value)
     {
-        if (value is JsonElement jsonElement)
-        {
-            port.Value = jsonElement.GetDouble();
-        }
-        else
-        {
-            port.Value = Convert.ToDouble(value, CultureInfo.InvariantCulture);
-        }
-
+        port.Value = Convert.ToDouble(value, CultureInfo.InvariantCulture);
         return true;
     }
 
     private static bool UpdateStringPortValue(StringPort port, object value)
     {
-        if (value is JsonElement jsonElement)
-        {
-            port.Value = jsonElement.GetString() ?? string.Empty;
-        }
-        else
-        {
-            port.Value = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
-        }
-
+        port.Value = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
         return true;
     }
 
     private static bool UpdateBooleanPortValue(BooleanPort port, object value)
     {
-        if (value is JsonElement jsonElement)
-        {
-            port.Value = jsonElement.GetBoolean();
-        }
-        else
-        {
-            port.Value = Convert.ToBoolean(value, CultureInfo.InvariantCulture);
-        }
-
+        port.Value = Convert.ToBoolean(value, CultureInfo.InvariantCulture);
         return true;
     }
 
     private static bool UpdateEnumPortValue(EnumPort port, object value)
     {
-        EnumRecord record = JsonSerializer.Deserialize<EnumRecord>(value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+        EnumRecord record;
+        if (value is Enum enumValue)
+        {
+            record = new EnumRecord
+            {
+                Name = enumValue.ToString(),
+                Names = Enum.GetNames(enumValue.GetType())
+            };
+        }
+        else if (value is SDK.Common.Models.Enum enumBinding)
+        {
+            record = new EnumRecord
+            {
+                Name = enumBinding.Name!,
+                Names = enumBinding.Names!
+            };
+        }
+        else
+        {
+            record = JsonSerializer.Deserialize<EnumRecord>(value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
+        }
+
         port.Value = (Enum)Enum.Parse(port.Value.GetType(), record.Name);
 
         return true;
@@ -143,6 +139,18 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
     private static bool UpdateRectanglePortValue(RectanglePort port, object value)
     {
+        if (value is Rectangle rectangle)
+        {
+            port.Value = rectangle;
+            return true;
+        }
+
+        if (value is SDK.Common.Models.Rectangle rectangleModel)
+        {
+            port.Value = new Rectangle(rectangleModel.X, rectangleModel.Y, rectangleModel.Width, rectangleModel.Height);
+            return true;
+        }
+
         var options = new JsonSerializerOptions
         {
             PropertyNameCaseInsensitive = true
@@ -162,8 +170,15 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         var steps = new List<IStepProxy>();
         foreach (StepRecord stepRecord in stepRecords)
         {
-            IStepProxy step = await ConvertStepAsync(stepRecord);
-            steps.Add(step);
+            try
+            {
+                IStepProxy step = await ConvertStepAsync(stepRecord);
+                steps.Add(step);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                _logger.LogWarning(ex, "Step {StepName} with type {TypeName} not found", stepRecord.Name, stepRecord.MetaInfo.TypeName);
+            }
         }
 
         return steps;

@@ -1,9 +1,9 @@
-using AyBorg.SDK.Data.DTOs;
 using AyBorg.Web.Pages.Agent.Shared;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Models;
+using AyBorg.Web.Shared.Models.Agent;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -11,11 +11,10 @@ namespace AyBorg.Web.Pages.Agent.Editor;
 
 public partial class Editor : ComponentBase
 {
-    private string _baseUrl = string.Empty;
     private string _serviceUniqueName = string.Empty;
     private string _serviceName = string.Empty;
     private bool _hasServiceError = false;
-    private ProjectMetaDto? _projectMeta;
+    private ProjectMeta? _projectMeta;
     private bool _isProjectServerWaiting = false;
 
     private bool _areSubComponentsHidden = true; // Workaround to update the flow with the correct Agent instance.
@@ -38,9 +37,9 @@ public partial class Editor : ComponentBase
         {
             _isProjectServerWaiting = true;
             _areSubComponentsHidden = true;
-            IEnumerable<RegistryEntryDto> services = await RegistryService!.ReceiveAllAvailableServicesAsync();
+            IEnumerable<ServiceInfoEntry> services = await RegistryService!.ReceiveServicesAsync();
 
-            RegistryEntryDto? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
+            ServiceInfoEntry? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
             if (service == null)
             {
                 _hasServiceError = true;
@@ -50,16 +49,9 @@ public partial class Editor : ComponentBase
             _serviceUniqueName = service.UniqueName;
             _serviceName = service.Name;
 
-            _baseUrl = RegistryService.GetUrl(services, ServiceId);
-            if (_baseUrl == string.Empty)
-            {
-                _hasServiceError = true;
-                return;
-            }
-
             await StateService.SetAgentStateAsync(new UiAgentState(service));
 
-            _projectMeta = await ProjectManagementService!.GetActiveMetaAsync(_baseUrl);
+            _projectMeta = await ProjectManagementService!.GetActiveMetaAsync();
 
             _areSubComponentsHidden = false;
             _isProjectServerWaiting = false;
@@ -70,7 +62,12 @@ public partial class Editor : ComponentBase
     private async void OnProjectSaveClicked()
     {
         _isProjectServerWaiting = true;
-        await ProjectManagementService!.TrySaveAsync(_baseUrl, _projectMeta!);
+        await ProjectManagementService!.TrySaveAsync(_projectMeta!, new ProjectSaveInfo
+        {
+            State = SDK.Projects.ProjectState.Draft,
+            VersionName = _projectMeta!.VersionName,
+            Comment = string.Empty
+        });
         _isProjectServerWaiting = false;
         await InvokeAsync(StateHasChanged);
     }

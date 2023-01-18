@@ -10,6 +10,8 @@ public sealed class TimeDelay : IStepBody
     /// <inheritdoc />
     public string DefaultName => "Time.Delay";
 
+    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.Time };
+
     /// <summary>
     /// Initializes a new instance of the <see cref="Delay"/> class.
     /// </summary>
@@ -26,7 +28,7 @@ public sealed class TimeDelay : IStepBody
     {
         try
         {
-            int targetDelay = System.Convert.ToInt32(_milliseconds.Value);
+            int targetDelay = Convert.ToInt32(_milliseconds.Value);
             await Task.Delay(targetDelay, cancellationToken);
         }
         catch (TaskCanceledException)

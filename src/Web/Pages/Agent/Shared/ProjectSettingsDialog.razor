@@ -1,5 +1,4 @@
 @using SDK.Authorization
-@using SDK.Projects
 
 <MudDialog>
     <DialogContent>
@@ -9,40 +8,6 @@
         </MudStack>
         <MudCard Outlined="true">
             <MudCardContent>
-                <MudGrid>
-                    <MudItem xs="7">
-                        <MudText Typo="Typo.body1">Force UI communication</MudText>
-                        <MudText Typo="Typo.caption">UI communication is disabled for projects in 'ready' state by
-                            default.</MudText>
-                        <MudAlert Severity="Severity.Info">Enabling UI communication while the system is in productive
-                            use may result in reduced system performance.</MudAlert>
-                    </MudItem>
-                    <MudItem xs="5">
-                        <AuthorizeView Roles="@Roles.Administrator">
-                            <Authorized>
-                                <MudButton Color="Color.Error" Variant="Variant.Outlined" Class="mud-width-full"
-                                    OnClick="@ChangeUiCommunicationClicked">
-                                    @if (ProjectMeta != null && _projectSettings != null)
-                                    {
-                                        if (_projectSettings.IsForceWebUiCommunicationEnabled)
-                                        {
-                                            <MudText>Disable UI force mode change</MudText>
-                                        }
-                                        else
-                                        {
-                                            <MudText>Enable UI force mode change</MudText>
-                                        }
-                                    }
-                                </MudButton>
-                            </Authorized>
-                            <NotAuthorized>
-                                <MudButton Color="Color.Error" Variant="Variant.Outlined" Class="mud-width-full"
-                                    Disabled>
-                                    Administration role required</MudButton>
-                            </NotAuthorized>
-                        </AuthorizeView>
-                    </MudItem>
-                </MudGrid>
                 <MudGrid>
                     <MudItem xs="7">
                         <MudText Typo="Typo.body1">Force result communication</MudText>

@@ -15,14 +15,9 @@ public interface IEngine : IDisposable
     event EventHandler<EngineState>? StateChanged;
 
     /// <summary>
-    /// Gets the identifier.
+    /// Gets the meta information.
     /// </summary>
-    Guid Id { get; }
-
-    /// <summary>
-    /// Gets the state.
-    /// </summary>
-    EngineState State { get; }
+    EngineMeta Meta { get; }
 
     /// <summary>
     /// Gets the execution type.

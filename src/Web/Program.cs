@@ -1,14 +1,16 @@
 using AyBorg.Database.Data;
 using AyBorg.SDK.Authorization;
-using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.Communication.gRPC;
+using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.Web;
 using AyBorg.Web.Areas.Identity;
+using AyBorg.Web.BuilderTools;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
 using Blazored.LocalStorage;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -63,31 +65,29 @@ builder.Services.AddMudServices(config =>
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
 });
 builder.Services.AddBlazoredLocalStorage();
+builder.Services.AddBlazoredSessionStorage();
 
-builder.Services.AddHttpClient("AyBorg.Web.GatewayService");
-builder.Services.AddHttpClient("AyBorg.Web.Services.GatewayService>");
-builder.Services.AddHttpClient<ProjectManagementService>();
-builder.Services.AddHttpClient<PluginsService>();
-builder.Services.AddHttpClient<IFlowService, FlowService>();
-builder.Services.AddHttpClient<IRuntimeService>();
+GrpcClientRegisterTool.Register(builder);
 
-builder.Services.AddHostedService<AyBorg.SDK.System.Services.RegistryService>();
+builder.Services.AddHostedService<RegistryBackgroundService>();
+builder.Services.AddHostedService<NotifyBackgroundService>();
 
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IRegistryService, RegistryService>();
-builder.Services.AddSingleton<IAgentCacheService, AgentCacheService>();
-builder.Services.AddSingleton<IDtoMapper, DtoMapper>();
-builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
+builder.Services.AddSingleton<INotifyService, NotifyService>();
+builder.Services.AddSingleton<IRpcMapper, RpcMapper>();
 
-builder.Services.AddScoped<IAuthorizationHeaderUtilService, AuthorizationHeaderUtilService>();
-builder.Services.AddScoped<IJwtProviderService, JwtProviderService>();
+builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
 builder.Services.AddScoped<IProjectManagementService, ProjectManagementService>();
+builder.Services.AddScoped<IProjectSettingsService, ProjectSettingsService>();
 builder.Services.AddScoped<PluginsService>();
 builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IRuntimeService, RuntimeService>();
-builder.Services.AddScoped<IAgentOverviewService, AgentOverviewService>();
-builder.Services.AddScoped<IStorageService, StorageService>();
+builder.Services.AddScoped<IAgentOverviewService, AgentsOverviewService>();
 builder.Services.AddScoped<IStateService, StateService>();
+
+builder.Services.AddTransient<ITokenProvider, TokenProvider>();
+builder.Services.AddTransient<IStorageService, StorageService>();
 
 WebApplication app = builder.Build();
 
@@ -122,6 +122,5 @@ app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbCont
 // Initialize identity
 IServiceProvider scopedServiceProvider = app.Services.CreateScope().ServiceProvider;
 await IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).AsTask();
-await app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().AsTask()!;
 
 app.Run();

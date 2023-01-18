@@ -23,7 +23,7 @@ public class AutomationFlowState
 
     public async ValueTask<double> UpdateZoomAsync()
     {
-        var result = await _localStorageService.GetItemAsync<double>("Agent_AF_Zoom");
+        double result = await _localStorageService.GetItemAsync<double>("Agent_AF_Zoom");
         if (result != 0)
         {
             Zoom = result;
@@ -43,8 +43,8 @@ public class AutomationFlowState
 
     public async ValueTask<(double offsetX, double offsetY)> UpdateOffsetAsync()
     {
-        var offsetX = await _localStorageService.GetItemAsync<double>("Agent_AF_OffsetX");
-        var offsetY = await _localStorageService.GetItemAsync<double>("Agent_AF_OffsetY");
+        double offsetX = await _localStorageService.GetItemAsync<double>("Agent_AF_OffsetX");
+        double offsetY = await _localStorageService.GetItemAsync<double>("Agent_AF_OffsetY");
         OffsetX = offsetX;
         OffsetY = offsetY;
         return (offsetX, offsetY);

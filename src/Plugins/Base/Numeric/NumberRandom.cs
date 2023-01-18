@@ -15,6 +15,8 @@ public sealed class NumberRandom : IStepBody
 
     public string DefaultName => "Number.Random";
 
+    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.Math };
+
     public IEnumerable<IPort> Ports { get; }
 
     public NumberRandom()

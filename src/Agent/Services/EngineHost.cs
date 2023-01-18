@@ -1,8 +1,7 @@
-using System.Text.Json;
 using AyBorg.Agent.Runtime;
-using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Runtime;
+using Grpc.Core;
 
 namespace AyBorg.Agent.Services;
 
@@ -10,11 +9,10 @@ internal sealed class EngineHost : IEngineHost
 {
     private readonly ILogger<EngineHost> _logger;
     private readonly IEngineFactory _engineFactory;
-    private readonly IMqttClientProvider _mqttClientProvider;
     private readonly ICacheService _cacheService;
     private readonly CommunicationStateProvider _communicationStateProvider;
+    private readonly INotifyService _notifyService;
     private IEngine? _engine;
-    private EngineMeta? _engineMeta;
     private bool _isDisposed = false;
 
     /// <summary>
@@ -22,18 +20,20 @@ internal sealed class EngineHost : IEngineHost
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="engineFactory">The engine factory.</param>
-    /// <param name="mqttClientProvider">The MQTT client provider.</param>
+    /// <param name="cacheService">The cache service.</param>
+    /// <param name="communicationStateProvider">The communication state provider.</param>
+    /// <param name="notifyService">The notify service.</param>
     public EngineHost(ILogger<EngineHost> logger,
                         IEngineFactory engineFactory,
-                        IMqttClientProvider mqttClientProvider,
                         ICacheService cacheService,
-                        ICommunicationStateProvider communicationStateProvider)
+                        ICommunicationStateProvider communicationStateProvider,
+                        INotifyService notifyService)
     {
         _logger = logger;
         _engineFactory = engineFactory;
-        _mqttClientProvider = mqttClientProvider;
         _cacheService = cacheService;
         _communicationStateProvider = (CommunicationStateProvider)communicationStateProvider;
+        _notifyService = notifyService;
     }
 
     /// <summary>
@@ -69,7 +69,7 @@ internal sealed class EngineHost : IEngineHost
             _engine = null;
         }
 
-        foreach (SDK.Common.IStepProxy step in ActiveProject.Steps)
+        foreach (IStepProxy step in ActiveProject.Steps)
         {
             step.Dispose();
         }
@@ -79,27 +79,18 @@ internal sealed class EngineHost : IEngineHost
     }
 
     /// <summary>
-    /// Gets the engine status asynchronous.
+    /// Gets the engine status.
     /// </summary>
     /// <returns></returns>
-    public async ValueTask<EngineMeta> GetEngineStatusAsync()
+    public EngineMeta GetEngineStatus()
     {
         if (_engine == null)
         {
             _logger.LogTrace("No active engine.");
-            return null!;
+            return new EngineMeta();
         }
 
-        if (_engineMeta == null)
-        {
-            _logger.LogWarning("Engine meta is null.");
-            return null!;
-        }
-
-        _engineMeta.State = _engine.State;
-
-        _logger.LogTrace("Engine status: {_engine.State}, {_engine.ExecutionType}", _engine.State, _engine.ExecutionType);
-        return await ValueTask.FromResult(_engineMeta);
+        return _engine.Meta;
     }
 
     /// <summary>
@@ -112,16 +103,16 @@ internal sealed class EngineHost : IEngineHost
         if (ActiveProject == null)
         {
             _logger.LogWarning("No active project.");
-            return null!;
+            return new EngineMeta();
         }
 
         if (_engine != null
-            && (_engine.State == EngineState.Running
-                || _engine.State == EngineState.Stopping
-                || _engine.State == EngineState.Aborting))
+            && (_engine.Meta.State == EngineState.Running
+                || _engine.Meta.State == EngineState.Stopping
+                || _engine.Meta.State == EngineState.Aborting))
         {
             _logger.LogWarning("Engine is already running.");
-            return null!;
+            return _engine.Meta;
         }
 
         // Dispose previous engine.
@@ -130,22 +121,15 @@ internal sealed class EngineHost : IEngineHost
         _communicationStateProvider.Update(ActiveProject);
 
         _engine = _engineFactory.CreateEngine(ActiveProject, executionType);
-        _engineMeta = new EngineMeta
-        {
-            Id = _engine.Id,
-            State = EngineState.Idle,
-            ExecutionType = executionType
-        };
         _engine.StateChanged += EngineStateChanged;
         _engine.IterationFinished += EngineIterationFinished;
         bool startResult = await _engine.TryStartAsync();
         if (!startResult)
         {
             _logger.LogWarning("Engine start failed.");
-            return null!;
         }
-        _engineMeta.State = EngineState.Starting;
-        return _engineMeta;
+
+        return _engine.Meta;
     }
 
     /// <summary>
@@ -157,30 +141,22 @@ internal sealed class EngineHost : IEngineHost
         if (_engine == null)
         {
             _logger.LogWarning("No active engine.");
-            return null!;
+            return new EngineMeta();
         }
 
-        if (_engine.State != EngineState.Running)
+        if (_engine.Meta.State != EngineState.Running)
         {
-            _logger.LogWarning("Engine is not running.");
-            return null!;
-        }
-
-        if (_engineMeta == null)
-        {
-            _logger.LogWarning("Engine meta is null.");
-            return null!;
+            _logger.LogWarning("Engine is not running. ({State})", _engine.Meta.State);
+            return _engine.Meta;
         }
 
         bool stopResult = await _engine.TryStopAsync();
         if (!stopResult)
         {
             _logger.LogWarning("Engine stop failed.");
-            return null!;
         }
 
-        _engineMeta.State = EngineState.Stopping;
-        return _engineMeta;
+        return _engine.Meta;
     }
 
     /// <summary>
@@ -192,30 +168,22 @@ internal sealed class EngineHost : IEngineHost
         if (_engine == null)
         {
             _logger.LogWarning("No active engine.");
-            return null!;
+            return new EngineMeta();
         }
 
-        if (_engine.State == EngineState.Aborting)
+        if (_engine.Meta.State == EngineState.Aborting)
         {
             _logger.LogWarning("Engine is already aborting.");
-            return null!;
-        }
-
-        if (_engineMeta == null)
-        {
-            _logger.LogWarning("Engine meta is null.");
-            return null!;
+            return _engine.Meta;
         }
 
         bool abortResult = await _engine.TryAbortAsync();
         if (!abortResult)
         {
             _logger.LogWarning("Engine abort failed.");
-            return null!;
         }
 
-        _engineMeta.State = EngineState.Aborting;
-        return _engineMeta;
+        return _engine.Meta;
     }
 
     /// <summary>
@@ -237,40 +205,13 @@ internal sealed class EngineHost : IEngineHost
 
     private async void EngineStateChanged(object? sender, EngineState state)
     {
-        if (_engineMeta == null)
+        if (_engine == null)
         {
-            _logger.LogWarning("Engine meta is null.");
+            _logger.LogWarning("No engine");
             return;
         }
 
-        _engineMeta.State = state;
-
-        _logger.LogTrace("Engine state changed to '{state}'.", state);
-
-        if (state == EngineState.Stopped)
-        {
-            _logger.LogInformation("Engine stopped at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
-        }
-        else if (state == EngineState.Aborted)
-        {
-            _logger.LogInformation("Engine aborted at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
-        }
-        else if (state == EngineState.Finished)
-        {
-            _logger.LogInformation("Engine finished single run at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
-        }
-        else if (state == EngineState.Running)
-        {
-            _logger.LogInformation("Engine started at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
-        }
-
-        if (state == EngineState.Stopped || state == EngineState.Aborted || state == EngineState.Finished)
-        {
-            _engineMeta.StoppedAt = DateTime.UtcNow;
-            _logger.LogTrace($"Engine is done. Removing engine.");
-        }
-
-        await _mqttClientProvider.PublishAsync($"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/status", JsonSerializer.Serialize(_engineMeta), new MqttPublishOptions());
+        await _notifyService.SendEngineStateAsync(_engine.Meta);
     }
 
     private void DisposeEngine()
@@ -291,6 +232,13 @@ internal sealed class EngineHost : IEngineHost
         }
 
         _cacheService.CreateCache(e.IterationId, ActiveProject);
-        await ValueTask.CompletedTask;
+        try
+        {
+            await _notifyService.SendIterationFinishedAsync(e.IterationId);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(ex, "Failed to notify engine iteration finished.");
+        }
     }
 }

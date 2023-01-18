@@ -1,5 +1,5 @@
-@using SDK.Data.DTOs
-@using SDK.Projects
+@using AyBorg.Web.Shared.Models.Agent
+
 <MudTable Items="@Projects" Hover="true" Elevation="0">
     <HeaderContent>
         <MudTh Style="width:20px">Active</MudTh>
@@ -16,8 +16,8 @@
             }
         </MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
-        <MudTd DataLabel="Change date">@context.UpdatedDate</MudTd>
-        <MudTd DataLabel="Creation date">@context.CreatedDate</MudTd>
+        <MudTd DataLabel="Change date">@context.ChangeDate</MudTd>
+        <MudTd DataLabel="Creation date">@context.CreationDate</MudTd>
         <MudTd DataLabel="Actions">
             @if (@context.IsActive)
             {
@@ -30,12 +30,12 @@
             }
 
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
-                @if (@context.State == ProjectState.Draft) {
+                @if (@context.State == SDK.Projects.ProjectState.Draft) {
                     <MudMenuItem Icon="@Icons.Filled.SafetyCheck" IconColor="Color.Info" @onclick="(args) => OnSaveAsReview(args, context)">
                             Create review
                     </MudMenuItem>
                 }
-                @if (@context.State == ProjectState.Review) {
+                @if (@context.State == SDK.Projects.ProjectState.Review) {
                     <MudMenuItem Icon="@Icons.Filled.Cancel" IconColor="Color.Secondary" @onclick="(args) => OnAbandonClicked(args, context)">
                             Abandon
                     </MudMenuItem>
@@ -59,46 +59,46 @@
 @code {
     [Parameter]
     [EditorRequired]
-    public IEnumerable<ProjectMetaDto> Projects { get; set; } = new List<ProjectMetaDto>();
+    public IEnumerable<ProjectMeta> Projects { get; set; } = new List<ProjectMeta>();
 
     [Parameter]
     [EditorRequired]
-    public EventCallback<ProjectMetaDto> OnProjectActivateClicked { get; set; }
+    public EventCallback<ProjectMeta> OnProjectActivateClicked { get; set; }
 
     [Parameter]
     [EditorRequired]
-    public EventCallback<ProjectMetaDto> OnProjectDeleteClicked { get; set; }
+    public EventCallback<ProjectMeta> OnProjectDeleteClicked { get; set; }
 
     [Parameter]
-    public EventCallback<ProjectMetaDto> OnProjectSaveAsReviewClicked { get; set; }
+    public EventCallback<ProjectMeta> OnProjectSaveAsReviewClicked { get; set; }
 
     [Parameter]
-    public EventCallback<ProjectMetaDto> OnProjectSaveAsReadyClicked { get; set; }
+    public EventCallback<ProjectMeta> OnProjectSaveAsReadyClicked { get; set; }
 
     [Parameter]
-    public EventCallback<ProjectMetaDto> OnProjectAbandonClicked { get; set; }
+    public EventCallback<ProjectMeta> OnProjectAbandonClicked { get; set; }
 
-    private async Task OnActivateClicked(EventArgs args, ProjectMetaDto projectDto)
+    private async Task OnActivateClicked(EventArgs args, ProjectMeta projectDto)
     {
         await OnProjectActivateClicked.InvokeAsync(projectDto);
     }
 
-    private async Task OnDeleteClicked(EventArgs args, ProjectMetaDto projectDto)
+    private async Task OnDeleteClicked(EventArgs args, ProjectMeta projectDto)
     {
         await OnProjectDeleteClicked.InvokeAsync(projectDto);
     }
 
-    private async Task OnSaveAsReview(EventArgs args, ProjectMetaDto projectDto)
+    private async Task OnSaveAsReview(EventArgs args, ProjectMeta projectDto)
     {
         await OnProjectSaveAsReviewClicked.InvokeAsync(projectDto);
     }
 
-    private async Task OnSaveAsReady(EventArgs args, ProjectMetaDto projectDto)
+    private async Task OnSaveAsReady(EventArgs args, ProjectMeta projectDto)
     {
         await OnProjectSaveAsReadyClicked.InvokeAsync(projectDto);
     }
 
-    private async Task OnAbandonClicked(EventArgs args, ProjectMetaDto projectDto)
+    private async Task OnAbandonClicked(EventArgs args, ProjectMeta projectDto)
     {
         await OnProjectAbandonClicked.InvokeAsync(projectDto);
     }

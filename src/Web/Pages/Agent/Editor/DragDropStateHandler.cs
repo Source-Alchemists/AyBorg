@@ -1,4 +1,4 @@
-using AyBorg.SDK.Data.DTOs;
+using AyBorg.SDK.Common.Models;
 
 namespace AyBorg.Web.Pages.Agent.Editor;
 
@@ -7,5 +7,5 @@ namespace AyBorg.Web.Pages.Agent.Editor;
 /// </summary>
 internal static class DragDropStateHandler
 {
-    public static StepDto? DraggedStep { get; set; }
+    public static Step? DraggedStep { get; set; }
 }
