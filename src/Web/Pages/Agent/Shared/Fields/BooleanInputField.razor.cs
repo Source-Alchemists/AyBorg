@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class BooleanInputField : BaseInputField
@@ -8,19 +6,9 @@ public partial class BooleanInputField : BaseInputField
 
     protected override Task OnParametersSetAsync()
     {
-        if (Port.Value == null)
-        {
-            _value = false;
-        }
-        else if (Port.Value is bool value)
+        if (Port.Value is bool value)
         {
             _value = value;
-        }
-        else
-        {
-            var valueKind = (JsonElement)Port.Value;
-            _value = JsonSerializer.Deserialize<bool>(valueKind);
-            Port.Value = _value;
         }
         return base.OnParametersSetAsync();
     }

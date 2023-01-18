@@ -1,30 +1,22 @@
-using Blazor.Diagrams.Core.Models;
-using Microsoft.AspNetCore.Components;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.Web.Pages.Agent.Shared.Fields;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Diagrams.Core.Models;
+using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
-public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
+#nullable disable
+
+public partial class FlowNodeWidget : ComponentBase, IDisposable
 {
-    [Parameter]
-    public FlowNode Node { get; set; } = null!;
+    [Parameter] public FlowNode Node { get; set; } = null!;
+    [Inject] IFlowService FlowService { get; set; } = null!;
     private string NodeClass => Node.Selected ? "flow node box selected" : "flow node box";
 
     private IEnumerable<PortModel> _outputPorts = new List<PortModel>();
     private IEnumerable<PortModel> _inputPorts = new List<PortModel>();
-
-    public ValueTask DisposeAsync()
-    {
-        Node.StepChanged -= OnChangedAsync;
-        foreach(var ip in _inputPorts.Cast<FlowPort>())
-        {
-            ip.PortChanged -= OnChangedAsync;
-            ip.Dispose();
-        }
-        Node.Dispose();
-        return ValueTask.CompletedTask;
-    }
+    private bool _disposedValue;
 
     protected override Task OnInitializedAsync()
     {
@@ -32,7 +24,7 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
         _outputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Right); // Right for output
 
         Node.StepChanged += OnChangedAsync;
-        foreach (var ip in _inputPorts.Cast<FlowPort>())
+        foreach (FlowPort ip in _inputPorts.Cast<FlowPort>())
         {
             ip.PortChanged += OnChangedAsync;
         }
@@ -45,17 +37,17 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
         await InvokeAsync(StateHasChanged);
     }
 
-     private async Task OnPortValueChangedAsync(ValueChangedEventArgs e)
-     {
-        var port = Node.Ports.Cast<FlowPort>().First(p => p.Port.Id == e.Port.Id);
+    private async Task OnPortValueChangedAsync(ValueChangedEventArgs e)
+    {
+        FlowPort port = Node.Ports.Cast<FlowPort>().First(p => p.Port.Id == e.Port.Id);
         port.Port.Value = e.Value;
-        await port.SendValueAsync();
-     }
+        await FlowService.TrySetPortValueAsync(port.Port);
+    }
 
-     private static string GetPortClass(PortModel port)
-     {
+    private static string GetPortClass(PortModel port)
+    {
         var fp = (FlowPort)port;
-        var directionClass = fp.Direction == PortDirection.Input ? " input" : " output";
+        string directionClass = fp.Direction == PortDirection.Input ? " input" : " output";
         string typeClass = string.Empty;
         switch (fp.Brand)
         {
@@ -71,12 +63,34 @@ public partial class FlowNodeWidget : ComponentBase, IAsyncDisposable
                 typeClass = "shape";
                 break;
         }
-        ;
+       ;
         return $"flow {directionClass} {typeClass}";
-     }
+    }
 
-     private void OnRemoveNode()
-     {
+    private void OnRemoveNode()
+    {
         Node.Delete();
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!_disposedValue)
+        {
+            if (disposing)
+            {
+                Node.StepChanged -= OnChangedAsync;
+                foreach (FlowPort ip in _inputPorts.Cast<FlowPort>())
+                {
+                    ip.PortChanged -= OnChangedAsync;
+                }
+            }
+            _disposedValue = true;
+        }
+    }
+
+    public void Dispose()
+    {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
     }
 }

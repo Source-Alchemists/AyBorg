@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent;
 
@@ -8,7 +9,7 @@ public sealed class StepProxy : IStepProxy
 {
     private readonly Stopwatch _stopwatch = new();
     private bool _lastResult = false;
-    private bool disposedValue;
+    private bool _disposedValue;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StepProxy"/> class.
@@ -21,12 +22,13 @@ public sealed class StepProxy : IStepProxy
         StepBody = stepBody;
         Ports = stepBody.Ports;
         Name = stepBody.DefaultName;
+        Categories = stepBody.Categories;
         X = x;
         Y = y;
 
-        var typeName = stepBody.GetType().Name;
-        var assembly = stepBody.GetType().Assembly;
-        var assemblyName = assembly?.GetName();
+        string typeName = stepBody.GetType().Name;
+        System.Reflection.Assembly assembly = stepBody.GetType().Assembly;
+        System.Reflection.AssemblyName? assemblyName = assembly?.GetName();
 
         MetaInfo = new PluginMetaInfo
         {
@@ -50,6 +52,11 @@ public sealed class StepProxy : IStepProxy
     /// Gets or sets the name.
     /// </summary>
     public string Name { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Gets the categories.
+    /// </summary>
+    public IEnumerable<string> Categories { get; }
 
     /// <summary>
     /// Gets the links.
@@ -137,7 +144,7 @@ public sealed class StepProxy : IStepProxy
 
     public void Dispose(bool disposing)
     {
-        if (!disposedValue)
+        if (!_disposedValue)
         {
             if (disposing)
             {
@@ -146,7 +153,7 @@ public sealed class StepProxy : IStepProxy
                     disposable.Dispose();
                 }
             }
-            disposedValue = true;
+            _disposedValue = true;
         }
     }
 

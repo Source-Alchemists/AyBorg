@@ -1,6 +1,6 @@
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.ImageProcessing.Shapes;
+using ImageTorque;
 
 namespace AyBorg.Plugins.Base;
 
@@ -11,7 +11,10 @@ public sealed class ShapeRectangleCreate : IStepBody
     private readonly NumericPort _widthPort = new("Width", PortDirection.Input, 1d, 1d);
     private readonly NumericPort _heightPort = new("Height", PortDirection.Input, 1d, 1d);
     private readonly RectanglePort _rectanglePort = new("Rectangle", PortDirection.Output, new Rectangle());
+
     public string DefaultName => "Shape.Rectangle.Create";
+
+    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.ImageShapes };
 
     public IEnumerable<IPort> Ports { get; }
 
@@ -29,10 +32,10 @@ public sealed class ShapeRectangleCreate : IStepBody
 
     public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
-        _rectanglePort.Value = new Rectangle(System.Convert.ToInt32(_xPort.Value),
-                                                System.Convert.ToInt32(_yPort.Value),
-                                                System.Convert.ToInt32(_widthPort.Value),
-                                                System.Convert.ToInt32(_heightPort.Value));
+        _rectanglePort.Value = new Rectangle(Convert.ToInt32(_xPort.Value),
+                                                Convert.ToInt32(_yPort.Value),
+                                                Convert.ToInt32(_widthPort.Value),
+                                                Convert.ToInt32(_heightPort.Value));
         return ValueTask.FromResult(true);
     }
 }

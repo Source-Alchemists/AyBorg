@@ -1,6 +1,6 @@
 <div Class="mud-full-width py-1 m-0">
     <MudButton Color="Color.Default" DisableElevation="true" Variant="Variant.Filled" Class="mud-width-full m-0"
-            OnClick="OnEditFiedClicked" Disabled="IsLinkConvertable">
+            OnClick="OnEditFiedClicked" Disabled="Disabled">
         <div Class="w50 ta-start">
             <MudText>@Label</MudText>
         </div>
@@ -24,7 +24,7 @@
     public object Value { get; set; } = new object();
 
     [Parameter]
-    public bool IsLinkConvertable { get; set; }
+    public bool Disabled { get; set; }
 
     [Parameter]
     public EventCallback Clicked { get; set; }

@@ -2,7 +2,14 @@
 @using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 
-<PageTitle>AyBorg - Projects</PageTitle>
+@if (string.IsNullOrEmpty(_serviceName))
+{
+    <PageTitle>AyBorg - Projects</PageTitle>
+}
+else
+{
+    <PageTitle>AyBorg - Projects (@_serviceName)</PageTitle>
+}
 
 <AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
 <MudGrid class="pt-6">
@@ -10,7 +17,7 @@
         <MudCard>
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudIcon Icon="@Icons.Filled.Circle" Size="Size.Large" Color="Color.Secondary" />
+                    <MudIcon Icon="@Icons.Filled.GppBad" Size="Size.Large" Color="Color.Secondary" />
                 </CardHeaderAvatar>
                 <CardHeaderContent>
 				    <MudText Typo="Typo.h6">Draft</MudText>

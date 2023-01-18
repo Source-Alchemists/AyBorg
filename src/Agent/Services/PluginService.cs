@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Data.DAL;
+using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Services;
 internal sealed class PluginsService : IPluginsService
@@ -39,26 +40,27 @@ internal sealed class PluginsService : IPluginsService
         _stepPlugins.Clear();
         try
         {
-            var configFolder = _configuration.GetValue<string>("AyBorg:Plugins:Folder");
+            string? configFolder = _configuration.GetValue<string>("AyBorg:Plugins:Folder");
             if (configFolder == null)
             {
                 _logger.LogWarning("No plugin folder specified in configuration. (Hint: AyBorg:Plugins:Folder)");
                 return;
             }
 
-            var pluginsDir = Path.GetFullPath(configFolder);
+            string pluginsDir = Path.GetFullPath(configFolder);
 
             _logger.LogTrace("Loading plugins in '{pluginsDir}' ...", pluginsDir);
 
-            foreach (var pd in Directory.EnumerateDirectories(pluginsDir))
+            foreach (string pd in Directory.EnumerateDirectories(pluginsDir))
             {
-                var dir = Path.GetFileName(pd);
-                var dllName = $"{dir}.dll";
+                string dir = Path.GetFileName(pd);
+                string dllName = $"{dir}.dll";
 
                 if (Directory.EnumerateFiles(pd).Where(x => Path.GetFileName(x).Equals(dllName)).Count() == 1)
                 {
                     _logger.LogTrace("Detected directory '{pd}'.", pd);
-                    var assembly = Assembly.LoadFile($"{Path.Combine(pd, dllName)}");
+                    // use load from assembly to load other dependencies from same folder
+                    var assembly = Assembly.LoadFrom($"{Path.Combine(pd, dllName)}");
                     if (!TryLoadPlugins(assembly))
                     {
                         _logger.LogTrace("No plugins detected.");
@@ -104,12 +106,12 @@ internal sealed class PluginsService : IPluginsService
 
     private bool TryLoadPlugins(Assembly assembly)
     {
-        var stepBodyType = typeof(IStepBody);
+        Type stepBodyType = typeof(IStepBody);
 
-        var stepPlugins = assembly.GetTypes().Where(p => stepBodyType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
+        IEnumerable<Type> stepPlugins = assembly.GetTypes().Where(p => stepBodyType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
         if (stepPlugins.Any())
         {
-            foreach (var sp in stepPlugins)
+            foreach (Type sp in stepPlugins)
             {
                 if (ActivatorUtilities.CreateInstance(_serviceProvider, sp) is IStepBody si)
                 {

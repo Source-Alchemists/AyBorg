@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
-using AyBorg.SDK.Data.DTOs;
 using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Shared.Models.Agent;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 
@@ -10,11 +10,9 @@ public partial class CreateNewProjectDialog : ComponentBase
 {
 
     [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [Inject] IProjectManagementService ProjectManagementService { get; set; } = null!;
 
-    [Inject] ProjectManagementService ProjectManagementService { get; set; } = null!;
-
-    [Parameter] public string BaseUrl { get; set; } = string.Empty;
-    private readonly ProjectMetaDto _newProject = new() { VersionName = "__DRAFT__" };
+    private readonly ProjectMeta _newProject = new() { VersionName = "__DRAFT__" };
     private readonly IList<string> _errors = new List<string>();
 
 
@@ -32,7 +30,7 @@ public partial class CreateNewProjectDialog : ComponentBase
             return;
         }
 
-        ProjectMetaDto createdProject = await ProjectManagementService.CreateAsync(BaseUrl, _newProject.Name);
+        ProjectMeta createdProject = await ProjectManagementService.CreateAsync(_newProject.Name);
         if (createdProject != null)
         {
             MudDialog.Close(DialogResult.Ok(createdProject));

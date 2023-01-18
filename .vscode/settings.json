@@ -1,0 +1,6 @@
+{
+    "sonarlint.connectedMode.project": {
+      "connectionId": "source-alchemists",
+      "projectKey": "Source-Alchemists_AyBorg"
+    }
+}

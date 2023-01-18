@@ -1,5 +1,5 @@
 ﻿@using AyBorg.Web.Pages.Agent.Shared.Fields
-@using Blazor.Diagrams.Components.Renderers
+@using AyBorg.Diagrams.Components.Renderers
 @using SDK.Common.Ports
 
 <MudCard Class="@NodeClass">
@@ -17,7 +17,7 @@
 				</div>
 				<span Style="float: right" Class="pt-1">@port.Name</span>
 			</div>
-			
+
 		}
 		@foreach (var port in _inputPorts.Cast<FlowPort>())
 		{
@@ -26,28 +26,28 @@
 					<PortRenderer Port="port" class="@GetPortClass(port)"></PortRenderer>
 				</MudTooltip>
 			</div>
-			@switch (port.Brand)	
+			@switch (port.Brand)
 			{
 				case PortBrand.Numeric:
-					<NumericInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					<NumericInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
 					break;
 				case PortBrand.Boolean:
-					<BooleanInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					<BooleanInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
 					break;
 				case PortBrand.String:
-					<StringInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					<StringInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
 					break;
 				case PortBrand.Folder:
-					<DirectoryInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					<DirectoryInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
 					break;
 				case PortBrand.Image:
-					<ImageInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					<ImageInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
 					break;
 				case PortBrand.Rectangle:
-					<RectangleInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					<RectangleInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
 					break;
 				case PortBrand.Enum:
-					<EnumInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" />
+					<EnumInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
 					break;
 				default:
 					break;
@@ -56,7 +56,7 @@
 	</MudCardContent>
 	<MudCardActions>
 		<div Class="mud-full-width" Style="height: 42px">
-			<MudIconButton Icon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@(OnRemoveNode)" Style="float: left" hidden="@(!Node.Selected)" />
+			<MudIconButton Icon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@(OnRemoveNode)" Style="float: left" hidden="@(!Node.Selected || Node.Locked)" />
 			<span Style="float: right" Class="pr-3 pt-4">@Node!.Step!.ExecutionTimeMs ms</span>
 		</div>
 	</MudCardActions>

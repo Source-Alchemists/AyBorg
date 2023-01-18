@@ -1,8 +1,8 @@
-using AyBorg.SDK.Common;
+using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Runtime;
 
-internal sealed record PathItem 
+internal sealed record PathItem
 {
     /// <summary>
     // Gets the identifier of the path item.

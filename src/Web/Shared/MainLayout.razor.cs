@@ -6,20 +6,21 @@ using MudBlazor;
 
 namespace AyBorg.Web.Shared;
 
-public partial class MainLayout : LayoutComponentBase
+public sealed partial class MainLayout : LayoutComponentBase, IDisposable
 {
-    [Inject]
-    protected NavigationManager NavigationManager { get; set; } = null!;
-    [Inject]
-    protected IJSRuntime JsRuntime { get; set; } = null!;
-    [Inject]
-    protected ILocalStorageService LocalStorageService { get; set; } = null!;
+    [Inject] NavigationManager NavigationManager { get; set; } = null!;
+    [Inject] IJSRuntime JsRuntime { get; set; } = null!;
+    [Inject] ILocalStorageService LocalStorageService { get; set; } = null!;
     public string RouteName = string.Empty;
 
     private bool _isDarkMode = true;
     private bool _isDrawerOpen = true;
-    private readonly MudTheme _theme = new() { 
-        Palette = new Palette() { 
+    private bool _isDisposed = false;
+
+    private readonly MudTheme _theme = new()
+    {
+        Palette = new Palette()
+        {
             Info = "#00BCD4",
         }
     };
@@ -42,7 +43,17 @@ public partial class MainLayout : LayoutComponentBase
 
     public void Dispose()
     {
-        NavigationManager.LocationChanged -= HandleLocationChanged;
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (disposing && !_isDisposed)
+        {
+            NavigationManager.LocationChanged -= HandleLocationChanged;
+            _isDisposed = true;
+        }
     }
 
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)

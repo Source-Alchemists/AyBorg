@@ -1,0 +1,52 @@
+@using SDK.Authorization
+
+<MudDialog>
+    <DialogContent>
+        <MudStack Row="true">
+            <MudIcon Icon="@Icons.Filled.Warning" Color="Color.Error" Class="mt-1" />
+            <MudText Typo="Typo.h6" Color="Color.Error" Class="pb-2">Danger zone</MudText>
+        </MudStack>
+        <MudCard Outlined="true">
+            <MudCardContent>
+                <MudGrid>
+                    <MudItem xs="7">
+                        <MudText Typo="Typo.body1">Force result communication</MudText>
+                        <MudText Typo="Typo.caption">Result communication is enabled for projects in 'ready' state by
+                            default.</MudText>
+                        <MudAlert Severity="Severity.Warning">Activating the result communication before the project has
+                            been reviewed can lead to personal injury and property damage.</MudAlert>
+                    </MudItem>
+                    <MudItem xs="5">
+                        <AuthorizeView Roles="@Roles.Administrator">
+                            <Authorized>
+                                <MudButton Color="Color.Error" Variant="Variant.Outlined" Class="mud-width-full"
+                                    OnClick="@ChangeResultCommunicationClicked">
+                                    @if (ProjectMeta != null && _projectSettings != null)
+                                    {
+                                        @if (_projectSettings.IsForceResultCommunicationEnabled)
+                                        {
+                                            <MudText>Disable result force mode change</MudText>
+                                        }
+                                        else
+                                        {
+                                            <MudText>Enable result force mode change</MudText>
+                                        }
+                                    }
+                                </MudButton>
+                            </Authorized>
+                            <NotAuthorized>
+                                <MudButton Color="Color.Error" Variant="Variant.Outlined" Class="mud-width-full"
+                                    Disabled>
+                                    Administration role required
+                                </MudButton>
+                            </NotAuthorized>
+                        </AuthorizeView>
+                    </MudItem>
+                </MudGrid>
+            </MudCardContent>
+        </MudCard>
+    </DialogContent>
+    <DialogActions>
+
+    </DialogActions>
+</MudDialog>

@@ -2,6 +2,7 @@
 using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Services;
+
 public interface IProjectManagementService
 {
     /// <summary>
@@ -10,47 +11,39 @@ public interface IProjectManagementService
     Guid ActiveProjectId { get; }
 
     /// <summary>
-    /// Activates asynchronous.
+    /// Changes the activation state.
     /// </summary>
-    /// <param name="projectId">The project identifier.</param>
+    /// <param name="projectMetaDbId">The project database identifier.</param>
     /// <param name="isActive">if set to <c>true</c> [is active].</param>
     /// <returns></returns>
-    ValueTask<ProjectManagementResult> TryActivateAsync(Guid projectId, bool isActive);
+    ValueTask<ProjectManagementResult> TryChangeActivationStateAsync(Guid projectMetaDbId, bool isActive);
 
     /// <summary>
-    /// Creates the asynchronous.
+    /// Creates the project.
     /// </summary>
     /// <param name="name">The name.</param>
     /// <returns></returns>
     ValueTask<ProjectRecord> CreateAsync(string name);
 
     /// <summary>
-    /// Deletes asynchronous.
+    /// Deletes the project.
     /// </summary>
-    /// <param name="projectId">The project id.</param>
+    /// <param name="projectMetaId">The project meta id.</param>
     /// <returns></returns>
-    ValueTask<ProjectManagementResult> TryDeleteAsync(Guid projectId);
-
-    // /// <summary>
-    // /// Change project state asynchronous.
-    // /// </summary>
-    // /// <param name="projectId">The project identifier.</param>
-    // /// <param name="state">The state.</param>
-    // /// <returns></returns>
-    // ValueTask<ProjectManagementResult> TryChangeStateAsync(Guid projectId, ProjectState state);
+    ValueTask<ProjectManagementResult> TryDeleteAsync(Guid projectMetaId);
 
     /// <summary>
-    /// Gets all project metas asynchronous.
+    /// Gets all project metas.
     /// </summary>
     ValueTask<IEnumerable<ProjectMetaRecord>> GetAllMetasAsync();
 
     /// <summary>
-    /// Load active project asynchronous.
+    /// Load active project.
     /// </summary>
     ValueTask<ProjectManagementResult> TryLoadActiveAsync();
 
     /// <summary>
-    /// Save active project asynchronous.
+    /// Save active project.
     /// </summary>
     /// <returns></returns>
     ValueTask<ProjectManagementResult> TrySaveActiveAsync();

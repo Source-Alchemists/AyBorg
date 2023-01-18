@@ -2,7 +2,7 @@ using AyBorg.SDK.System.Runtime;
 
 namespace AyBorg.Agent.Runtime;
 
-internal interface IEngine : IDisposable
+public interface IEngine : IDisposable
 {
     /// <summary>
     /// Called when the iteration is finished.
@@ -15,14 +15,9 @@ internal interface IEngine : IDisposable
     event EventHandler<EngineState>? StateChanged;
 
     /// <summary>
-    /// Gets the identifier.
+    /// Gets the meta information.
     /// </summary>
-    Guid Id { get; }
-
-    /// <summary>
-    /// Gets the state.
-    /// </summary>
-    EngineState State { get; }
+    EngineMeta Meta { get; }
 
     /// <summary>
     /// Gets the execution type.

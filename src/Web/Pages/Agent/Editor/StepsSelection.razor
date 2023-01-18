@@ -1,7 +1,3 @@
-@using SDK.Data.DTOs
-@inject AyBorg.Web.Services.IRegistryService registryService
-@inject AyBorg.Web.Services.Agent.PluginsService AgentPluginsService;
-
 <MudCard Style="height: calc(100vh - 148px)" class="d-flex justify-center flex-column">
     <MudCardHeader class="order-0">
         <CardHeaderAvatar>
@@ -12,11 +8,28 @@
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent style="height: calc(100% - 60px)" class="pt-0 mt-0 order-1">
-        <MudList Clickable="true" style="height: 100%" class="overflow-auto">
+        <MudTextField T="string" Label="Search" TextChanged="@OnSearchTextChanged"
+                        Variant="Variant.Filled" Adornment="Adornment.End"
+                        AdornmentIcon="@Icons.Material.Filled.Search" Clearable="true"
+                        Immediate="true" Class="mt-0" />
+        <MudSelect T ="string" Label="Category" SelectedValues="_selectedCategories"
+                    SelectedValuesChanged="@OnSelectedCategoryChanged">
+            @foreach (var category in _availableCategories)
+            {
+                <MudSelectItem T="string" value="@category.Key">
+                    <MudBadge Content="@category.Value" Origin="Origin.CenterRight" Color="Color.Primary">
+                        <MudText Class="mr-4">
+                            @category.Key
+                        </MudText>
+                    </MudBadge>
+                </MudSelectItem>
+            }
+        </MudSelect>
+        <MudList Clickable="true" style="height: calc(100% - 105px)" class="overflow-auto">
             <MudListSubheader>
                 Drag & drop to the automation flow
             </MudListSubheader>
-            @foreach (var step in _availableSteps)
+            @foreach (var step in @_filteredSteps)
             {
                 <MudListItem Icon="@Icons.Filled.DragIndicator" IconColor="Color.Primary" draggable="true"
                 @ondragstart="(args) => OnDragStart(args, step)">
@@ -26,29 +39,3 @@
         </MudList>
     </MudCardContent>
 </MudCard>
-
-@code {
-    private string _baseUrl = string.Empty;
-    private IEnumerable<StepDto> _availableSteps = new List<StepDto>();
-
-    [Parameter]
-    public string ServiceId { get; set; } = string.Empty;
-
-    protected override async Task OnParametersSetAsync()
-    {
-        var services = await registryService.ReceiveAllAvailableServicesAsync();
-        _baseUrl = registryService.GetUrl(services, ServiceId);
-        if (_baseUrl == string.Empty)
-        {
-            return;
-        }
-        _availableSteps = await AgentPluginsService.ReceiveStepsAsync(_baseUrl);
-        await base.OnParametersSetAsync();
-    }
-
-    private async Task OnDragStart(DragEventArgs args, StepDto step)
-    {
-        DragDropStateHandler.DraggedStep = step;
-        await Task.CompletedTask;
-    }
-}

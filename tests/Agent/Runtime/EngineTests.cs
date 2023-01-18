@@ -1,9 +1,7 @@
 using Microsoft.Extensions.Logging.Abstractions;
-using Moq;
 using AyBorg.Agent.Runtime;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.System.Runtime;
-using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Projects;
 
@@ -13,12 +11,6 @@ public class EngineTests
 {
     private readonly NullLogger<Engine> _logger = new();
     private readonly NullLoggerFactory _loggerFactory = new();
-    private readonly Mock<IMqttClientProvider> _mqttClientProviderMock;
-
-    public EngineTests()
-    {
-        _mqttClientProviderMock = new Mock<IMqttClientProvider>();
-    }
 
     /// <summary>
     /// Start -> Step1 -> Step2 -> End
@@ -51,14 +43,14 @@ public class EngineTests
         project.Links = links;
         project.Steps = steps;
 
-        using var engine = new Engine(_logger, _loggerFactory, _mqttClientProviderMock.Object, project, EngineExecutionType.SingleRun);
-        var done = false;
-        var lastIterationId = Guid.Empty;
-        var successful = false;
+        using var engine = new Engine(_logger, _loggerFactory, project, EngineExecutionType.SingleRun);
+        bool done = false;
+        Guid lastIterationId = Guid.Empty;
+        bool successful = false;
         engine.IterationFinished += (s, e) => { done = true; lastIterationId = e.IterationId; successful = e.Success; };
 
         // Act
-        var startResult = await engine.TryStartAsync();
+        bool startResult = await engine.TryStartAsync();
         while(!done)
         {
             await Task.Delay(10);
@@ -72,7 +64,7 @@ public class EngineTests
 
     /// <summary>
     /// Start -> Step1 -> Step2a -> End
-    ///        |--------> Step2b -^ 
+    ///        |--------> Step2b -^
     /// </summary>
     [Fact]
     public async Task TestStartSingleRunParallel()
@@ -109,14 +101,14 @@ public class EngineTests
         project.Links = links;
         project.Steps = steps;
 
-        using var engine = new Engine(_logger, _loggerFactory, _mqttClientProviderMock.Object, project, EngineExecutionType.SingleRun);
-        var done = false;
-        var lastIterationId = Guid.Empty;
-        var successful = false;
+        using var engine = new Engine(_logger, _loggerFactory, project, EngineExecutionType.SingleRun);
+        bool done = false;
+        Guid lastIterationId = Guid.Empty;
+        bool successful = false;
         engine.IterationFinished += (s, e) => { done = true; lastIterationId = e.IterationId; successful = e.Success; };
 
         // Act
-        var startResult = await engine.TryStartAsync();
+        bool startResult = await engine.TryStartAsync();
 
         while(!done)
         {

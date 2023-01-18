@@ -1,332 +1,216 @@
 using AyBorg.Agent.Services;
 using AyBorg.Database.Data;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Data.DAL;
 using AyBorg.SDK.Data.Mapper;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Configuration;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace AyBorg.Agent.Tests;
 
-#nullable disable
-
-public sealed class ProjectManagementServiceTests : IDisposable
+public sealed class ProjectManagementServiceTests
 {
+    private const string TestServiceUniqueName = "AyBorg.Agent";
     private static readonly NullLogger<ProjectManagementService> s_projLogger = new();
     private static readonly NullLogger<IServiceConfiguration> s_serviceLogger = new();
-    private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
-    private readonly DbContextOptions<ProjectContext> _contextOptions;
     private readonly IServiceConfiguration _serviceConfiguration;
-    private bool _disposed = false;
+    private readonly Mock<IEngineHost> _mockEngineHost = new();
+    private readonly Mock<IRuntimeToStorageMapper> _mockRuntimeToStorageMapper = new();
+    private readonly Mock<IRuntimeConverterService> _mockRuntimeConverterService = new();
+    private readonly Mock<IProjectRepository> _mockProjectRepository = new();
+    private readonly ProjectManagementService _service;
 
     public ProjectManagementServiceTests()
     {
-        _connection = new Microsoft.Data.Sqlite.SqliteConnection("Filename=:memory:");
-        _connection.Open();
-        _contextOptions = new DbContextOptionsBuilder<ProjectContext>()
-            .UseSqlite(_connection)
-            .Options;
-
-        using var context = new ProjectContext(_contextOptions);
-        context.Database.EnsureCreated();
-
         var settings = new Dictionary<string, string> {
-            {"AyBorg:Service:UniqueName", "TestAgent"}
+            {"AyBorg:Service:UniqueName", TestServiceUniqueName}
         };
 
         IConfigurationRoot configuration = new ConfigurationBuilder()
-            .AddInMemoryCollection(settings)
+            .AddInMemoryCollection(settings!)
             .Build();
         _serviceConfiguration = new ServiceConfiguration(s_serviceLogger, configuration);
-    }
 
-    [Fact]
-    public async Task TestCreateFirstProject()
-    {
-        // Arrange
-        var runtimeHostMock = new Mock<IEngineHost>();
-        var runtimeStorageMapperMock = new Mock<IRuntimeToStorageMapper>();
-        var runtimeConverterServiceMock = new Mock<IRuntimeConverterService>();
-
-        runtimeHostMock.Setup(x => x.TryActivateProjectAsync(It.IsAny<Project>())).ReturnsAsync(true);
-
-        var service = new ProjectManagementService(s_projLogger,
+        _service = new ProjectManagementService(s_projLogger,
                                                     _serviceConfiguration,
-                                                    CreateContextFactoryMock().Object,
-                                                    runtimeHostMock.Object,
-                                                    runtimeStorageMapperMock.Object,
-                                                    runtimeConverterServiceMock.Object);
-
-        // Act
-        ProjectRecord result = await service.CreateAsync("test");
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.Equal("test", result.Meta.Name);
-        Assert.True(result.Meta.IsActive);
+                                                    _mockProjectRepository.Object,
+                                                    _mockEngineHost.Object,
+                                                    _mockRuntimeToStorageMapper.Object,
+                                                    _mockRuntimeConverterService.Object);
     }
 
     [Theory]
-    [InlineData(false, ProjectState.Draft)]
-    [InlineData(true, ProjectState.Draft)]
-    [InlineData(false, ProjectState.Ready)]
-    [InlineData(true, ProjectState.Ready)]
-    public async Task TestDeleteProject(bool isActive, ProjectState state)
+    [InlineData(true, true)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    public async ValueTask Test_CreateAsync(bool hasActiveProject, bool isActivateSuccessful)
     {
         // Arrange
-        var runtimeHostMock = new Mock<IEngineHost>();
-        var runtimeStorageMapperMock = new Mock<IRuntimeToStorageMapper>();
-        var runtimeConverterServiceMock = new Mock<IRuntimeConverterService>();
-
-        ProjectRecord databaseProjectRecord = await CreateDatabaseProject("test", isActive, state);
-
-        if (isActive)
-        {
-            runtimeHostMock.Setup(x => x.ActiveProject).Returns(new Project
-            {
-                Meta = new ProjectMeta
-                {
-                    Id = databaseProjectRecord.Meta.Id,
-                    Name = databaseProjectRecord.Meta.Name
-                }
-            });
-        }
-
-        runtimeHostMock.Setup(x => x.TryDeactivateProjectAsync()).ReturnsAsync(true);
-
-        var service = new ProjectManagementService(s_projLogger,
-                                                    _serviceConfiguration,
-                                                    CreateContextFactoryMock().Object,
-                                                    runtimeHostMock.Object,
-                                                    runtimeStorageMapperMock.Object,
-                                                    runtimeConverterServiceMock.Object);
-
-        // Act
-        ProjectManagementResult result = await service.TryDeleteAsync(databaseProjectRecord.Meta.Id);
-
-        // Assert
-        Assert.True(result.IsSuccessful);
-        using var context = new ProjectContext(_contextOptions);
-        Assert.Empty(context.AyBorgProjects);
-    }
-
-    [Fact]
-    public async Task TestSaveActiveProject()
-    {
-        // Arrange
-        var runtimeHostMock = new Mock<IEngineHost>();
-        var runtimeConverterServiceMock = new Mock<IRuntimeConverterService>();
-        IDbContextFactory<ProjectContext> contextFactory = CreateContextFactoryMock().Object;
-
-        ProjectRecord newDatabaseProjectRecord = await CreateDatabaseProject("test", true, ProjectState.Draft);
-
-        StepProxy stepProxy1 = CreateStepProxy("Step 1");
-        StepProxy stepProxy2 = CreateStepProxy("Step 2");
-        var runtimeProject = new Project
-        {
-            Meta = new ProjectMeta
-            {
-                Id = newDatabaseProjectRecord.Meta.Id,
-                Name = newDatabaseProjectRecord.Meta.Name
-            },
-            Steps = new List<IStepProxy>
-            {
-                stepProxy1,
-                stepProxy2
-            }
-        };
-
-        runtimeHostMock.Setup(x => x.ActiveProject).Returns(runtimeProject);
-
-        var service = new ProjectManagementService(s_projLogger,
-                                                    _serviceConfiguration,
-                                                    contextFactory,
-                                                    runtimeHostMock.Object,
-                                                    new RuntimeToStorageMapper(),
-                                                    runtimeConverterServiceMock.Object);
-
-        // Act
-        ProjectManagementResult result = await service.TrySaveActiveAsync();
-
-        // Assert
-        Assert.True(result.IsSuccessful);
-        Assert.Null(result.Message);
-        Assert.NotEqual(Guid.Empty, result.ProjectMetaDbId);
-        Assert.NotNull(result.ProjectMetaDbId);
-        using ProjectContext context = await contextFactory.CreateDbContextAsync();
-        Assert.Equal(2, context.AyBorgProjectMetas.Count());
-        Assert.Equal(2, context.AyBorgProjects.Count());
-        ProjectMetaRecord resultProjectMetaRecord = context.AyBorgProjectMetas.Single(pm => pm.DbId.Equals(result.ProjectMetaDbId));
-        ProjectRecord resultProjectRecord = CreateCompleteProjectRecordQuery(context).Single(x => x.DbId.Equals(resultProjectMetaRecord.ProjectRecordId));
-        ProjectMetaRecord previousProjectMetaRecord = context.AyBorgProjectMetas.Single(pm => pm.DbId.Equals(newDatabaseProjectRecord.Meta.DbId));
-        Assert.NotEqual(newDatabaseProjectRecord.Meta.DbId, resultProjectMetaRecord.DbId);
-        Assert.NotEqual(newDatabaseProjectRecord.DbId, resultProjectRecord.DbId);
-        Assert.Equal(newDatabaseProjectRecord.Meta.Name, resultProjectRecord.Meta.Name);
-        Assert.Equal(newDatabaseProjectRecord.Meta.Id, resultProjectMetaRecord.Id);
-        Assert.False(previousProjectMetaRecord.IsActive);
-        Assert.True(resultProjectRecord.Meta.IsActive);
-        Assert.Equal(ProjectState.Draft, resultProjectRecord.Meta.State);
-        Assert.Equal(2, resultProjectRecord.Steps.Count);
-        Assert.Single(resultProjectRecord.Steps.Where(x => x.Name.Equals(stepProxy1.Name)));
-        Assert.Single(resultProjectRecord.Steps.Where(x => x.Name.Equals(stepProxy2.Name)));
-        StepRecord resultStep1 = resultProjectRecord.Steps.Single(x => x.Name.Equals(stepProxy1.Name));
-        AssertStepProxy(stepProxy1, resultStep1);
-        StepRecord resultStep2 = resultProjectRecord.Steps.Single(x => x.Name.Equals(stepProxy2.Name));
-        AssertStepProxy(stepProxy2, resultStep2);
-    }
-
-    [Theory]
-    [InlineData(ProjectState.Draft, null, true, ProjectState.Review, "test_1.2.3")]
-    [InlineData(ProjectState.Draft, null, false, ProjectState.Review, "test_1.2.3")]
-    [InlineData(ProjectState.Review, "auditor", true, ProjectState.Ready, "test_1.2.3")]
-    [InlineData(ProjectState.Review, "auditor", false, ProjectState.Ready, "test_1.2.3")]
-    public async Task TestSaveNewVersionOfProject(ProjectState projectState, string auditor,
-                                                    bool expectedActive, ProjectState expectedProjectState, string expectedVersioName)
-    {
-        // Arrange
-        var runtimeHostMock = new Mock<IEngineHost>();
-        var runtimeConverterServiceMock = new Mock<IRuntimeConverterService>();
-        IDbContextFactory<ProjectContext> contextFactory = CreateContextFactoryMock().Object;
-
-        ProjectRecord initialDbProject = await CreateDatabaseProject("test", expectedActive, projectState);
-
-        var service = new ProjectManagementService(s_projLogger,
-                                                    _serviceConfiguration,
-                                                    contextFactory,
-                                                    runtimeHostMock.Object,
-                                                    new RuntimeToStorageMapper(),
-                                                    runtimeConverterServiceMock.Object);
-
-        // Act
-        ProjectManagementResult result = await service.TrySaveNewVersionAsync(initialDbProject.Meta.DbId, expectedProjectState, expectedVersioName, string.Empty, auditor);
-
-        // Assert
-        Assert.True(result.IsSuccessful);
-        Assert.Null(result.Message);
-        Assert.NotEqual(Guid.Empty, result.ProjectMetaDbId);
-        Assert.NotNull(result.ProjectMetaDbId);
-        using ProjectContext context = await contextFactory.CreateDbContextAsync();
-        if (projectState == ProjectState.Draft)
-        {
-            Assert.Single(context.AyBorgProjectMetas.Where(x => x.DbId.Equals(initialDbProject.Meta.DbId)));
-            Assert.Single(context.AyBorgProjects.Where(x => x.DbId.Equals(initialDbProject.DbId)));
-            Assert.Equal(1, context.AyBorgProjectMetas.Count());
-            Assert.Equal(1, context.AyBorgProjects.Count());
-        }
-        ProjectMetaRecord resultProjectMeta = await context.AyBorgProjectMetas.FirstAsync(x => x.DbId.Equals(result.ProjectMetaDbId));
-        Assert.Equal(initialDbProject.Meta.VersionIteration + 1, resultProjectMeta.VersionIteration);
-        Assert.Equal(expectedVersioName, resultProjectMeta.VersionName);
-        Assert.Equal(expectedProjectState, resultProjectMeta.State);
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private void Dispose(bool disposing)
-    {
-        if (disposing && !_disposed)
-        {
-            _connection.Dispose();
-            _disposed = true;
-        }
-    }
-
-    private async Task<ProjectRecord> CreateDatabaseProject(string name, bool isActive, ProjectState state)
-    {
-        using var context = new ProjectContext(_contextOptions);
-        var project = new ProjectRecord
+        var expectedProject = new ProjectRecord
         {
             Meta = new ProjectMetaRecord
             {
-                Id = Guid.NewGuid(),
-                Name = name,
-                IsActive = isActive,
-                State = state
+                Name = "Test_Project",
+                ServiceUniqueName = TestServiceUniqueName
             }
         };
-        context.AyBorgProjects.Add(project);
-        context.AyBorgProjectMetas.Add(project.Meta);
-        await context.SaveChangesAsync();
+        _mockProjectRepository.Setup(r => r.CreateAsync(It.IsAny<string>(), It.IsAny<string>())).ReturnsAsync(expectedProject);
+        _mockProjectRepository.Setup(r => r.FindAsync(It.IsAny<Guid>())).ReturnsAsync(expectedProject);
+        _mockProjectRepository.Setup(r => r.FindMetaAsync(It.IsAny<Guid>())).ReturnsAsync(expectedProject.Meta);
+        _mockProjectRepository.Setup(r => r.GetAllMetasAsync(It.IsAny<string>())).ReturnsAsync(new List<ProjectMetaRecord> { new ProjectMetaRecord { IsActive = hasActiveProject } });
+        _mockProjectRepository.Setup(r => r.TryUpdateAsync(It.IsAny<ProjectMetaRecord>())).ReturnsAsync(isActivateSuccessful);
+        _mockEngineHost.Setup(e => e.TryActivateProjectAsync(It.IsAny<Project>())).ReturnsAsync(true);
 
-        return await context.AyBorgProjects.FirstOrDefaultAsync(x => x.Meta.Name == "test");
+        // Act
+        ProjectRecord result = await _service.CreateAsync("Test_Project");
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.Equal(!hasActiveProject, result.Meta.IsActive);
     }
 
-    private static StepProxy CreateStepProxy(string name, int x = 0, int y = 0)
+    [Theory]
+    [InlineData(true, true, true, true, true)]
+    [InlineData(false, true, true, true, false)]
+    [InlineData(false, false, true, true, false)]
+    [InlineData(false, true, true, false, true)]
+    [InlineData(true, true, false, true, true)]
+    public async ValueTask Test_TryDeleteAsync(bool expectedSuccess, bool containsProject, bool isActiveProject, bool isDeactivationSuccessful, bool isDeleteSuccessful)
     {
-        var stepBodyMock = new Mock<IStepBody>();
-        stepBodyMock.Setup(x => x.DefaultName).Returns("TestStepBody");
-        stepBodyMock.Setup(x => x.Ports).Returns(new List<IPort>
+        // Arrange
+        var projectId = Guid.NewGuid();
+        _mockProjectRepository.Setup(r => r.GetAllMetasAsync(It.IsAny<Guid>())).ReturnsAsync(containsProject ? new List<ProjectMetaRecord> { new ProjectMetaRecord { Id = projectId, IsActive = isActiveProject } } : new List<ProjectMetaRecord>());
+        _mockProjectRepository.Setup(r => r.TryDeleteAsync(It.IsAny<Guid>())).ReturnsAsync(isDeleteSuccessful);
+        _mockEngineHost.Setup(e => e.ActiveProject).Returns(new Project
         {
-            new StringPort("TestPort", PortDirection.Input, "test"),
-            new NumericPort("Input 1", PortDirection.Input, 123),
-            new NumericPort("Input 2", PortDirection.Input, 456),
-            new NumericPort("Output", PortDirection.Output, 579)
-
-        });
-
-        var stepProxy = new StepProxy(stepBodyMock.Object, x, y)
-        {
-            Name = name
-        };
-        return stepProxy;
-    }
-
-    private static IQueryable<ProjectRecord> CreateCompleteProjectRecordQuery(ProjectContext context)
-    {
-        return context.AyBorgProjects.Include(x => x.Meta)
-                                .Include(x => x.Steps)
-                                .ThenInclude(x => x.MetaInfo)
-                                .Include(x => x.Steps)
-                                .ThenInclude(x => x.Ports);
-    }
-
-    private static void AssertStepProxy(IStepProxy expected, StepRecord actual)
-    {
-        Assert.NotEqual(Guid.Empty, actual.DbId);
-        Assert.Equal(expected.Id, actual.Id);
-        Assert.Equal(expected.Name, actual.Name);
-        Assert.Equal(expected.X, actual.X);
-        Assert.Equal(expected.Y, actual.Y);
-        Assert.Equal(expected.Ports.Count(), actual.Ports.Count);
-
-        foreach (IPort expectedPort in expected.Ports)
-        {
-            PortRecord actualPort = actual.Ports.Single(x => x.Id.Equals(expectedPort.Id));
-            Assert.Equal(expectedPort.Name, actualPort.Name);
-            Assert.Equal(expectedPort.Direction, actualPort.Direction);
-            Assert.Equal(expectedPort.Brand, actualPort.Brand);
-
-            switch (expectedPort.Brand)
+            Meta = new ProjectMeta
             {
-                case PortBrand.String:
-                    if (expectedPort is StringPort stringPort)
-                    {
-                        Assert.Equal(stringPort.Value, actualPort.Value);
-                    }
-                    break;
-                case PortBrand.Numeric:
-                    if (expectedPort is NumericPort numericPort)
-                    {
-                        Assert.Equal(numericPort.Value.ToString(), actualPort.Value);
-                    }
-                    break;
+                Id = isActiveProject ? projectId : Guid.NewGuid()
             }
-        }
+        });
+        _mockEngineHost.Setup(e => e.TryDeactivateProjectAsync()).ReturnsAsync(isDeactivationSuccessful);
+
+        // Act
+        ProjectManagementResult result = await _service.TryDeleteAsync(projectId);
+
+        // Assert
+        Assert.Equal(expectedSuccess, result.IsSuccessful);
     }
 
-    private Mock<IDbContextFactory<ProjectContext>> CreateContextFactoryMock()
+    [Theory]
+    [InlineData(true, true, true, true, true, true, true, true)]
+    [InlineData(false, true, true, false, true, true, true, true)]
+    [InlineData(false, true, true, true, false, true, true, true)]
+    [InlineData(false, true, true, true, true, false, true, true)]
+    [InlineData(false, true, true, true, true, true, false, true)]
+    [InlineData(false, true, true, true, true, true, true, false)]
+    public async ValueTask Test_TryChangeActivationStateAsync(bool expectedSuccess, bool activate, bool hasActiveProject, bool containsProject, bool isValidService, bool isDeactivationSuccessful, bool isUpdateSuccessful, bool isActivateSuccessful)
     {
-        var contextFactoryMock = new Mock<IDbContextFactory<ProjectContext>>();
-        contextFactoryMock.Setup(x => x.CreateDbContext()).Returns(() => new ProjectContext(_contextOptions));
-        contextFactoryMock.Setup(x => x.CreateDbContextAsync(It.IsAny<CancellationToken>())).ReturnsAsync(() => new ProjectContext(_contextOptions));
-        return contextFactoryMock;
+        // Arrange
+        var projectId = Guid.NewGuid();
+        _mockProjectRepository.Setup(r => r.FindAsync(It.IsAny<Guid>())).ReturnsAsync(new ProjectRecord());
+        _mockProjectRepository.Setup(r => r.FindMetaAsync(It.IsAny<Guid>())).ReturnsAsync(containsProject ? new ProjectMetaRecord
+        {
+            Id = projectId,
+            ServiceUniqueName = isValidService ? TestServiceUniqueName : "Test123"
+        } : null!);
+        _mockProjectRepository.Setup(r => r.GetAllMetasAsync(It.IsAny<string>())).ReturnsAsync(new List<ProjectMetaRecord> { new ProjectMetaRecord { IsActive = hasActiveProject } });
+        _mockProjectRepository.Setup(r => r.TryUpdateAsync(It.IsAny<ProjectMetaRecord>())).ReturnsAsync(isUpdateSuccessful);
+        _mockEngineHost.Setup(e => e.TryDeactivateProjectAsync()).ReturnsAsync(isDeactivationSuccessful);
+        _mockEngineHost.Setup(e => e.TryActivateProjectAsync(It.IsAny<Project>())).ReturnsAsync(isActivateSuccessful);
+        _mockRuntimeConverterService.Setup(r => r.ConvertAsync(It.IsAny<ProjectRecord>())).ReturnsAsync(new Project());
+
+        // Act
+        ProjectManagementResult result = await _service.TryChangeActivationStateAsync(projectId, activate);
+
+        // Assert
+        Assert.Equal(expectedSuccess, result.IsSuccessful);
+    }
+
+    [Theory]
+    [InlineData(true, true, true, true)]
+    [InlineData(false, true, true, false)]
+    [InlineData(false, true, false, true)]
+    [InlineData(false, false, true, true)]
+    public async ValueTask Test_TryLoadActiveAsync(bool expectedSuccess, bool hasActiveProject, bool isUpdateSuccessful, bool isChangeActivationSuccessful)
+    {
+        // Arrange
+        var projectId = Guid.NewGuid();
+        _mockProjectRepository.Setup(r => r.GetAllMetasAsync(It.IsAny<string>())).ReturnsAsync(new List<ProjectMetaRecord> { new ProjectMetaRecord { IsActive = hasActiveProject } });
+        _mockProjectRepository.Setup(r => r.TryUpdateAsync(It.IsAny<ProjectMetaRecord>())).ReturnsAsync(isUpdateSuccessful);
+        _mockProjectRepository.Setup(r => r.FindMetaAsync(It.IsAny<Guid>())).ReturnsAsync(isChangeActivationSuccessful ? new ProjectMetaRecord
+        {
+            Id = projectId,
+            ServiceUniqueName = TestServiceUniqueName
+        } : null!);
+        _mockProjectRepository.Setup(r => r.FindAsync(It.IsAny<Guid>())).ReturnsAsync(new ProjectRecord());
+        _mockEngineHost.Setup(e => e.TryActivateProjectAsync(It.IsAny<Project>())).ReturnsAsync(isChangeActivationSuccessful);
+        _mockEngineHost.Setup(e => e.TryDeactivateProjectAsync()).ReturnsAsync(isChangeActivationSuccessful);
+        _mockRuntimeConverterService.Setup(r => r.ConvertAsync(It.IsAny<ProjectRecord>())).ReturnsAsync(new Project());
+
+        // Act
+        ProjectManagementResult result = await _service.TryLoadActiveAsync();
+
+        // Assert
+        Assert.Equal(expectedSuccess, result.IsSuccessful);
+    }
+
+    [Theory]
+    [InlineData(true, true, true, true, true)]
+    [InlineData(false, true, true, true, false)]
+    [InlineData(false, true, true, false, true)]
+    [InlineData(false, true, false, true, true)]
+    [InlineData(false, false, true, true, true)]
+    public async ValueTask Test_TrySaveActiveAsync(bool expectedSuccess, bool hasEngineActiveProject, bool hasActiveProject, bool isUpdateSuccessful, bool isSaveSuccessful)
+    {
+        // Arrange
+        _mockEngineHost.Setup(e => e.ActiveProject).Returns(hasEngineActiveProject ? new Project() : null!);
+        _mockProjectRepository.Setup(r => r.GetAllMetasAsync(It.IsAny<string>())).ReturnsAsync(new List<ProjectMetaRecord> { new ProjectMetaRecord { IsActive = hasActiveProject } });
+        _mockProjectRepository.Setup(r => r.TryUpdateAsync(It.IsAny<ProjectMetaRecord>())).ReturnsAsync(isUpdateSuccessful);
+        _mockProjectRepository.Setup(r => r.TrySave(It.IsAny<ProjectRecord>())).ReturnsAsync(isSaveSuccessful);
+        _mockRuntimeToStorageMapper.Setup(r => r.Map(It.IsAny<Project>())).Returns(new ProjectRecord());
+
+        // Act
+        ProjectManagementResult result = await _service.TrySaveActiveAsync();
+
+        // Assert
+        Assert.Equal(expectedSuccess, result.IsSuccessful);
+    }
+
+    [Theory]
+    [InlineData(true, ProjectState.Draft, ProjectState.Draft, null, true, true, true)]
+    [InlineData(false, ProjectState.Draft, ProjectState.Draft, null, true, true, false)]
+    [InlineData(false, ProjectState.Draft, ProjectState.Draft, null, true, false, true)]
+    [InlineData(true, ProjectState.Review, ProjectState.Draft, null, true, true, true)]
+    [InlineData(false, ProjectState.Review, ProjectState.Draft, null, true, false, true)]
+    [InlineData(true, ProjectState.Review, ProjectState.Ready, "Test_approver", true, true, true)]
+    [InlineData(false, ProjectState.Review, ProjectState.Ready, null, true, true, true)]
+    public async ValueTask Test_TrySaveNewVersionAsync(bool expectedSuccess, ProjectState oldProjectState, ProjectState newProjectState, string? approver, bool containsProject, bool isUpdateSuccessful, bool isRemoveSuccessful)
+    {
+        // Arrange
+        var projectId = Guid.NewGuid();
+        _mockProjectRepository.Setup(r => r.FindAsync(It.IsAny<Guid>())).ReturnsAsync(new ProjectRecord
+        {
+            Steps = new List<StepRecord> { new StepRecord {
+                Ports = new List<PortRecord> { new PortRecord() }
+            } },
+            Links = new List<LinkRecord> { new LinkRecord() }
+        });
+        _mockProjectRepository.Setup(r => r.FindMetaAsync(It.IsAny<Guid>())).ReturnsAsync(containsProject ? new ProjectMetaRecord
+        {
+            Id = projectId,
+            ServiceUniqueName = TestServiceUniqueName,
+            State = oldProjectState
+        } : null!);
+        _mockProjectRepository.Setup(r => r.TryUpdateAsync(It.IsAny<ProjectMetaRecord>())).ReturnsAsync(isUpdateSuccessful);
+        _mockProjectRepository.Setup(r => r.TryRemoveRangeAsync(It.IsAny<IEnumerable<ProjectMetaRecord>>())).ReturnsAsync(isRemoveSuccessful);
+
+        // Act
+        ProjectManagementResult result = await _service.TrySaveNewVersionAsync(projectId, newProjectState, "1.2.3", "Test_comment", approver);
+
+        // Assert
+        Assert.Equal(expectedSuccess, result.IsSuccessful);
     }
 }

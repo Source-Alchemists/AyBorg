@@ -6,7 +6,7 @@
     {
         @if (!_isXEditing)
         {
-            <EditFieldButton Label="X" Value="@_value.X" IsLinkConvertable="@Port.IsLinkConvertable"
+            <EditFieldButton Label="X" Value="@_value.X" Disabled="@(Port.IsLinkConvertable || Disabled)"
         Clicked="@OnXClicked" />
         }
         <div Class="mud-full-width"  hidden="@(!_isXEditing)">
@@ -14,7 +14,7 @@
         </div>
         @if (!_isYEditing)
         {
-            <EditFieldButton Label="Y" Value="@_value.Y" IsLinkConvertable="@Port.IsLinkConvertable"
+            <EditFieldButton Label="Y" Value="@_value.Y" Disabled="@(Port.IsLinkConvertable || Disabled)"
         Clicked="@OnYClicked" />
         }
         <div Class="mud-full-width"  hidden="@(!_isYEditing)">
@@ -22,7 +22,7 @@
         </div>
         @if (!_isWidthEditing)
         {
-            <EditFieldButton Label="Width" Value="@_value.Width" IsLinkConvertable="@Port.IsLinkConvertable"
+            <EditFieldButton Label="Width" Value="@_value.Width" Disabled="@(Port.IsLinkConvertable || Disabled)"
         Clicked="@OnWidthClicked" />
         }
         <div Class="mud-full-width"  hidden="@(!_isWidthEditing)">
@@ -31,7 +31,7 @@
         </div>
         @if (!_isHeightEditing)
         {
-            <EditFieldButton Label="Height" Value="@_value.Height" IsLinkConvertable="@Port.IsLinkConvertable"
+            <EditFieldButton Label="Height" Value="@_value.Height" Disabled="@(Port.IsLinkConvertable || Disabled)"
         Clicked="@OnHeightClicked" />
         }
         <div lass="mud-full-width"  hidden="@(!_isHeightEditing)">

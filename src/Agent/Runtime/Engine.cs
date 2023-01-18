@@ -1,6 +1,5 @@
+using System.Runtime.CompilerServices;
 using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Runtime;
 
@@ -9,14 +8,13 @@ namespace AyBorg.Agent.Runtime;
 /// <summary>
 /// Represents the engine.
 /// </summary>
-/// <remarks>To keep things simple, the engine is always running once and is not beeing reused. 
+/// <remarks>To keep things simple, the engine is always running once and is not beeing reused.
 /// Each single/continuous run will create a new engine, with a new ID starting from idle state.</remarks>
 internal sealed class Engine : IEngine
 {
     private readonly ILogger<Engine> _logger;
     private readonly ILogger<PathExecuter> _pathExecuterLogger;
     private readonly ILoggerFactory _loggerFactory;
-    private readonly IMqttClientProvider _mqttClientProvider;
     private readonly Project _project;
     private readonly CancellationTokenSource _abortTokenSource = new();
     private readonly CancellationTokenSource _stopTokenSource = new();
@@ -35,14 +33,9 @@ internal sealed class Engine : IEngine
     public event EventHandler<EngineState>? StateChanged;
 
     /// <summary>
-    /// Gets the identifier.
+    /// Gets the meta information.
     /// </summary>
-    public Guid Id { get; } = Guid.NewGuid();
-
-    /// <summary>
-    /// Gets the state.
-    /// </summary>
-    public EngineState State { get; private set; } = EngineState.Idle;
+    public EngineMeta Meta { get; }
 
     /// <summary>
     /// Gets the execution type.
@@ -54,24 +47,30 @@ internal sealed class Engine : IEngine
     /// </summary>
     /// <param name="logger">The logger.</param>
     /// <param name="loggerFactory">The logger factory.</param>
-    /// <param name="mqttClientProvider">The MQTT client provider.</param>
     /// <param name="project">The project.</param>
     /// <param name="executionType">Type of the execution.</param>
-    public Engine(ILogger<Engine> logger, ILoggerFactory loggerFactory, IMqttClientProvider mqttClientProvider, Project project, EngineExecutionType executionType)
+    public Engine(ILogger<Engine> logger, ILoggerFactory loggerFactory, Project project, EngineExecutionType executionType)
     {
         _logger = logger;
         _loggerFactory = loggerFactory;
-        _mqttClientProvider = mqttClientProvider;
         _project = project;
         _pathExecuterLogger = _loggerFactory.CreateLogger<PathExecuter>();
         ExecutionType = executionType;
+        Meta = new EngineMeta
+        {
+            Id = Guid.NewGuid(),
+            State = EngineState.Idle,
+            ExecutionType = executionType
+        };
 
-        foreach (var step in _project.Steps)
+        foreach (IStepProxy step in _project.Steps)
         {
             step.Completed += StepCompleted;
         }
 
-        _logger.LogTrace("Engine [{Id}] with execution type [{executionType}] created.", Id, executionType);
+        StateChanged += StateChangedCallback;
+
+        _logger.LogTrace("Engine [{Id}] with execution type [{executionType}] created.", Meta.Id, executionType);
     }
 
     /// <summary>
@@ -80,25 +79,25 @@ internal sealed class Engine : IEngine
     /// <returns></returns>
     public async ValueTask<bool> TryStartAsync()
     {
-        if (State != EngineState.Idle)
+        if (Meta.State != EngineState.Idle)
         {
             _logger.LogWarning($"Engine is not in idle state. Cannot start.");
             return false;
         }
 
-        _logger.LogTrace("Engine [{Id}] starting.", Id);
-        State = EngineState.Starting;
-        StateChanged?.Invoke(this, State);
+        _logger.LogTrace("Engine [{Id}] starting.", Meta.Id);
+        Meta.State = EngineState.Starting;
+        StateChanged?.Invoke(this, Meta.State);
 
         var pathfinder = new Pathfinder();
-        var pathItems = await pathfinder.CreatePathAsync(_project.Steps, _project.Links);
-        _logger.LogTrace("Engine [{Id}] path created.", Id);
+        IEnumerable<PathItem> pathItems = await pathfinder.CreatePathAsync(_project.Steps, _project.Links);
+        _logger.LogTrace("Engine [{Id}] path created.", Meta.Id);
 
         _executionTask = Task.Factory.StartNew(async () => await ExecutePathAsync(pathItems, _stopTokenSource.Token, _abortTokenSource.Token), TaskCreationOptions.LongRunning);
-        _logger.LogTrace("Engine [{Id}] execution started.", Id);
+        _logger.LogTrace("Engine [{Id}] execution started.", Meta.Id);
 
-        State = EngineState.Running;
-        StateChanged?.Invoke(this, State);
+        Meta.State = EngineState.Running;
+        StateChanged?.Invoke(this, Meta.State);
         return true;
     }
 
@@ -113,15 +112,15 @@ internal sealed class Engine : IEngine
             _logger.LogWarning($"Engine is a single run engine. Cannot stop.");
             return false;
         }
-        if (State != EngineState.Running)
+        if (Meta.State != EngineState.Running)
         {
             _logger.LogWarning($"Engine is not in running state. Cannot stop.");
             return false;
         }
 
-        _logger.LogTrace("Engine [{Id}] stopping.", Id);
-        State = EngineState.Stopping;
-        StateChanged?.Invoke(this, State);
+        _logger.LogTrace("Engine [{Id}] stopping.", Meta.Id);
+        Meta.State = EngineState.Stopping;
+        StateChanged?.Invoke(this, Meta.State);
         _stopTokenSource.Cancel();
         return await ValueTask.FromResult(true);
     }
@@ -132,15 +131,15 @@ internal sealed class Engine : IEngine
     /// <returns></returns>
     public async ValueTask<bool> TryAbortAsync()
     {
-        if (State != EngineState.Running && State != EngineState.Stopping)
+        if (Meta.State != EngineState.Running && Meta.State != EngineState.Stopping)
         {
             _logger.LogWarning($"Engine is not in running or stopping state. Cannot abort.");
             return false;
         }
 
-        _logger.LogTrace("Engine [{Id}] aborting.", Id);
-        State = EngineState.Aborting;
-        StateChanged?.Invoke(this, State);
+        _logger.LogTrace("Engine [{Id}] aborting.", Meta.Id);
+        Meta.State = EngineState.Aborting;
+        StateChanged?.Invoke(this, Meta.State);
         _abortTokenSource.Cancel();
         return await ValueTask.FromResult(true);
     }
@@ -160,7 +159,7 @@ internal sealed class Engine : IEngine
         {
             if (_executionTask != null && !_executionTask.IsCompleted)
             {
-                _logger.LogWarning("Engine [{Id}] is still running while disposing. Aborting.", Id);
+                _logger.LogWarning("Engine [{Id}] is still running while disposing. Aborting.", Meta.Id);
                 _abortTokenSource.Cancel();
                 _executionTask.Wait();
                 _executionTask.Dispose();
@@ -168,11 +167,12 @@ internal sealed class Engine : IEngine
 
             _abortTokenSource.Dispose();
             _stopTokenSource.Dispose();
-            foreach (var step in _project.Steps)
+            foreach (IStepProxy step in _project.Steps)
             {
                 step.Completed -= StepCompleted;
             }
 
+            StateChanged -= StateChangedCallback;
             _isDisposed = true;
         }
     }
@@ -185,39 +185,15 @@ internal sealed class Engine : IEngine
         while (!stopToken.IsCancellationRequested && !abortToken.IsCancellationRequested)
         {
             _iterationId = Guid.NewGuid();
-            _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] started.", Id, _iterationId);
+            _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] started.", Meta.Id, _iterationId);
 
-            // Create a new executer for each path item.
-            foreach (var pathItem in pathItems)
-            {
-                // If the same step is used multiple times in the path, we only need to create one executer for it.
-                if (executers.Any(e => e.PathItem.Step.Id.Equals(pathItem.Step.Id)))
-                {
-                    continue;
-                }
-
-                executers.Add(new PathExecuter(_pathExecuterLogger, pathItem, _iterationId, abortToken));
-            }
-
-            // Wait till all path items are done with there work.
-            // Done could be completed successfully or failed.
-            while (!executers.All(e => e.Done))
-            {
-                foreach (var executer in executers.Where(e => e.State == PathExecutionState.Ready && e.State != PathExecutionState.Running))
-                {
-                    executingTasks.Add(executer.TryExecuteAsync());
-                }
-
-                // ToDo: Potentiall performance issue. Task delay could have a jitter of few milliseconds.
-                await Task.Delay(1);
-            }
-
+            await StartExecuteAllPathItemsAsync(executers, pathItems, executingTasks, abortToken);
             await WaitAndClearExecutors(executers, executingTasks);
 
             // All steps are executed and the iteration is finished.
             IterationFinished?.Invoke(this, new IterationFinishedEventArgs(_iterationId, executers.All(e => e.State == PathExecutionState.Completed)));
 
-            _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] finished.", Id, _iterationId);
+            _logger.LogTrace("Engine [{Id}] iteration [{_iterationId}] finished.", Meta.Id, _iterationId);
 
             // If the execution type is single run, stop the engine.
             if (ExecutionType == EngineExecutionType.SingleRun)
@@ -231,23 +207,53 @@ internal sealed class Engine : IEngine
         // Else set the state to idle.
         if (_abortTokenSource.IsCancellationRequested)
         {
-            State = EngineState.Aborted;
-            _logger.LogTrace("Engine [{Id}] aborted.", Id);
+            Meta.State = EngineState.Aborted;
+            _logger.LogTrace("Engine [{Id}] aborted.", Meta.Id);
         }
         else if (_stopTokenSource.IsCancellationRequested)
         {
-            State = EngineState.Stopped;
-            _logger.LogTrace("Engine [{Id}] stopped.", Id);
+            Meta.State = EngineState.Stopped;
+            _logger.LogTrace("Engine [{Id}] stopped.", Meta.Id);
         }
         else
         {
-            State = EngineState.Finished;
-            _logger.LogTrace("Engine [{Id}] single run finished.", Id);
+            Meta.State = EngineState.Finished;
+            _logger.LogTrace("Engine [{Id}] single run finished.", Meta.Id);
         }
-        StateChanged?.Invoke(this, State);
+
+        StateChanged?.Invoke(this, Meta.State);
     }
 
-    private async void StepCompleted(object? sender, bool success)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private async ValueTask StartExecuteAllPathItemsAsync(HashSet<PathExecuter> executers, IEnumerable<PathItem> pathItems, List<Task<bool>> executingTasks, CancellationToken abortToken)
+    {
+        // Create a new executer for each path item.
+        foreach (PathItem pathItem in pathItems)
+        {
+            // If the same step is used multiple times in the path, we only need to create one executer for it.
+            if (executers.Any(e => e.PathItem.Step.Id.Equals(pathItem.Step.Id)))
+            {
+                continue;
+            }
+
+            executers.Add(new PathExecuter(_pathExecuterLogger, pathItem, _iterationId, abortToken));
+        }
+
+        // Wait till all path items are done with there work.
+        // Done could be completed successfully or failed.
+        while (!executers.All(e => e.Done))
+        {
+            foreach (PathExecuter? executer in executers.Where(e => e.State == PathExecutionState.Ready && e.State != PathExecutionState.Running))
+            {
+                executingTasks.Add(executer.TryExecuteAsync());
+            }
+
+            // ToDo: Potentiall performance issue. Task delay could have a jitter of few milliseconds.
+            await Task.Delay(1, CancellationToken.None);
+        }
+    }
+
+    private void StepCompleted(object? sender, bool success)
     {
         if (sender is not IStepProxy stepProxy) return;
 
@@ -256,40 +262,46 @@ internal sealed class Engine : IEngine
         {
             _logger.LogWarning("Step [{stepProxy.Name}] failed.", stepProxy.Name);
         }
-
-        await SendStepInfoAsync(stepProxy);
     }
 
-    private async ValueTask SendStepInfoAsync(IStepProxy stepProxy)
+    private void StateChangedCallback(object? sender, EngineState state)
     {
-        await SendStepInputPortsAsync(stepProxy);
+        _logger.LogTrace("Engine state changed to '{state}'.", state);
 
-        var baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/";
-        await _mqttClientProvider.PublishAsync($"{baseTopic}executionTimeMs", stepProxy.ExecutionTimeMs.ToString(), new MqttPublishOptions());
-    }
-
-    private async ValueTask SendStepInputPortsAsync(IStepProxy stepProxy)
-    {
-        var baseTopic = $"AyBorg/agents/{_mqttClientProvider.ServiceUniqueName}/engine/steps/{stepProxy.Id}/ports/";
-
-        var inputPorts = stepProxy.StepBody.Ports.Where(p => p.Direction == PortDirection.Input);
-        var token = CancellationToken.None;
-        await Parallel.ForEachAsync(inputPorts, async (port, token) =>
+        if (state == EngineState.Stopped)
         {
-            await _mqttClientProvider.PublishAsync($"{baseTopic}{port.Id}", port, new MqttPublishOptions { Resize = true });
-        });
+            _logger.LogInformation("Engine stopped at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+        }
+        else if (state == EngineState.Aborted)
+        {
+            _logger.LogInformation("Engine aborted at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+        }
+        else if (state == EngineState.Finished)
+        {
+            _logger.LogInformation("Engine finished single run at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+        }
+        else if (state == EngineState.Running)
+        {
+            _logger.LogInformation("Engine started at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+        }
+
+        if (state == EngineState.Stopped || state == EngineState.Aborted || state == EngineState.Finished)
+        {
+            Meta.StoppedAt = DateTime.UtcNow;
+            _logger.LogTrace($"Engine is done. Removing engine.");
+        }
     }
 
     private static async ValueTask WaitAndClearExecutors(HashSet<PathExecuter> executers, List<Task<bool>> executingTasks)
     {
         await Task.WhenAll(executingTasks);
-        foreach (var t in executingTasks)
+        foreach (Task<bool> t in executingTasks)
         {
             t.Dispose();
         }
 
         // Clear the executer list.
-        foreach (var executer in executers)
+        foreach (PathExecuter executer in executers)
         {
             executer.Dispose();
         }

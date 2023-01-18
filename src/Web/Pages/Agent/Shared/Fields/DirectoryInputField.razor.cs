@@ -28,8 +28,8 @@ public partial class DirectoryInputField : BaseInputField
         {
             { "RootPath", _value }
         };
-        var dialog = DialogService.Show<DirectoryBrowser>("Directory browser", parameters, options);
-        var result = await dialog.Result;
+        IDialogReference dialog = DialogService.Show<DirectoryBrowser>("Directory browser", parameters, options);
+        DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
             _value = result.Data.ToString()!;
