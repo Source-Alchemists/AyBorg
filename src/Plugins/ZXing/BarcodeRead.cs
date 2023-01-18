@@ -49,7 +49,7 @@ namespace AyBorg.Plugins.ZXing
                 _tmpBuffer = new byte[imageBuffer.Length];
             }
             imageBuffer.CopyTo(_tmpBuffer.AsSpan());
-            _nativBarcodeReader.Options.PureBarcode = true; // if no format is given lib will still search for QR code
+            _nativBarcodeReader.Options.PureBarcode = true;
             var rgbLumSrc = new RGBLuminanceSource(_tmpBuffer, _imagePort.Value.Width, _imagePort.Value.Height);
 
             _nativBarcodeReader.Options.PossibleFormats = GetBarcodeFormats(_barcodeFormatPort.Value);
@@ -76,15 +76,24 @@ namespace AyBorg.Plugins.ZXing
             // possible improvements: input of a list of possible formats
             if (enumObj.Equals(BarcodeFormats.All))
             {
-                return Enum.GetValues<BarcodeFormat>();
-            }
-            else if (enumObj.Equals(BarcodeFormats.All_1D))
-            {
-                return new List<BarcodeFormat> { BarcodeFormat.All_1D };
-            }
-            else if (enumObj.Equals(BarcodeFormats.All_2D))
-            {
-                return new List<BarcodeFormat> { BarcodeFormat.DATA_MATRIX, BarcodeFormat.QR_CODE };
+                // Warning: Mistake in zxing - ALL_1D value from native BarcodeFormat from zxing does not select all 1d barcode formats that are available 
+                return new List<BarcodeFormat>(){
+                    BarcodeFormat.CODABAR,
+                    BarcodeFormat.CODE_39,
+                    BarcodeFormat.CODE_93,
+                    BarcodeFormat.CODE_128,
+                    BarcodeFormat.EAN_8,
+                    BarcodeFormat.EAN_13,
+                    BarcodeFormat.ITF,
+                    BarcodeFormat.RSS_14,
+                    BarcodeFormat.UPC_A,
+                    BarcodeFormat.UPC_E,
+                    BarcodeFormat.UPC_EAN_EXTENSION,
+                    BarcodeFormat.MSI,
+                    BarcodeFormat.PLESSEY,
+                    BarcodeFormat.IMB,
+                    BarcodeFormat.PHARMA_CODE
+                };
             }
             else
             {

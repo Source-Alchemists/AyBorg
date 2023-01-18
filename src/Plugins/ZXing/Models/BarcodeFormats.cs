@@ -3,8 +3,6 @@ namespace AyBorg.Plugins.ZXing.Models
         public enum BarcodeFormats
         {
                 All,
-                All_1D,
-                All_2D,
                 CODABAR,
                 CODE_39,
                 CODE_93,

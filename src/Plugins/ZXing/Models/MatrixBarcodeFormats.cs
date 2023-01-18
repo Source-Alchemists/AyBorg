@@ -2,7 +2,7 @@ namespace AyBorg.Plugins.ZXing.Models
 {
     public enum MatrixBarcodeFormats
     {
-        Undefined,
+        All,
         AZTEC,
         DATA_MATRIX,
         MAXICODE,
