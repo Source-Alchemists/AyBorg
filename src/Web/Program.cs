@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
+using AyBorg.SDK.Logging.Analytics;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -68,6 +69,8 @@ builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredSessionStorage();
 
 GrpcClientRegisterTool.Register(builder);
+
+builder.AddAyBorgAnalyticsLogger();
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
 builder.Services.AddHostedService<NotifyBackgroundService>();

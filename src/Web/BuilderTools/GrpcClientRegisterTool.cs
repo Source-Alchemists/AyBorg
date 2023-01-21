@@ -1,4 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
+using Ayborg.Gateway.Analytics.V1;
 using Ayborg.Gateway.V1;
 using AyBorg.Web.Services;
 using Grpc.Core;
@@ -16,6 +17,7 @@ internal static class GrpcClientRegisterTool
         // Open endpoints
         CreateClientFactory<Register.RegisterClient>(builder, gatewayUrl, false);
         CreateClientFactory<Notify.NotifyClient>(builder, gatewayUrl, false);
+        CreateClientFactory<EventLog.EventLogClient>(builder, gatewayUrl, false);
         // Secured endpoints
         CreateClientFactory<ProjectManagement.ProjectManagementClient>(builder, gatewayUrl);
         CreateClientFactory<ProjectSettings.ProjectSettingsClient>(builder, gatewayUrl);

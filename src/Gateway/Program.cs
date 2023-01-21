@@ -1,6 +1,7 @@
 using AyBorg.Data.Gateway;
 using AyBorg.Gateway.Services;
 using AyBorg.Gateway.Services.Agent;
+using AyBorg.Gateway.Services.Analytics;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -42,6 +43,7 @@ app.MapGrpcService<EditorPassthroughServiceV1>();
 app.MapGrpcService<RuntimePassthroughServiceV1>();
 app.MapGrpcService<StoragePassthroughServiceV1>();
 app.MapGrpcService<NotifyPassthroughServiceV1>();
+app.MapGrpcService<EventLogPassthroughServiceV1>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists
