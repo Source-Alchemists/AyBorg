@@ -14,9 +14,9 @@ builder.Services.AddDbContextFactory<RegistryContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.SqlLite")),
+                        x => x.MigrationsAssembly("AyBorg.Data.Gateway.Migrations.SqlLite")),
         "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
-                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("AyBorg.Data.Gateway.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );
