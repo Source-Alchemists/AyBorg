@@ -4,14 +4,14 @@ using Ayborg.Gateway.V1;
 using AyBorg.Web.Services;
 using Grpc.Core;
 
-namespace AyBorg.Web.BuilderTools;
+namespace AyBorg.Web;
 
-internal static class GrpcClientRegisterTool
+internal static class GrpcClientMiddleware
 {
     private const string FallbackUrl = "http://localhost:5000";
     private const string GatewayUrlConfig = "AyBorg:Gateway:Url";
 
-    public static void Register(WebApplicationBuilder builder)
+    public static WebApplicationBuilder RegisterGrpcClients(this WebApplicationBuilder builder)
     {
         Uri? gatewayUrl = new(builder.Configuration.GetValue(GatewayUrlConfig, FallbackUrl)!);
         // Open endpoints
@@ -24,6 +24,7 @@ internal static class GrpcClientRegisterTool
         CreateClientFactory<Editor.EditorClient>(builder, gatewayUrl);
         CreateClientFactory<Runtime.RuntimeClient>(builder, gatewayUrl);
         CreateClientFactory<Storage.StorageClient>(builder, gatewayUrl);
+        return builder;
     }
 
     private static void CreateClientFactory<T>(WebApplicationBuilder builder, Uri uri, bool tokenRequired = true) where T : ClientBase

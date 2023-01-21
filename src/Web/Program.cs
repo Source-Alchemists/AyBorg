@@ -2,10 +2,10 @@ using AyBorg.Data.Identity;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Communication.gRPC.Registry;
+using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.Web;
 using AyBorg.Web.Areas.Identity;
-using AyBorg.Web.BuilderTools;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.AppState;
@@ -16,7 +16,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
-using AyBorg.SDK.Logging.Analytics;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -68,7 +67,7 @@ builder.Services.AddMudServices(config =>
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredSessionStorage();
 
-GrpcClientRegisterTool.Register(builder);
+builder.RegisterGrpcClients();
 
 builder.AddAyBorgAnalyticsLogger();
 
