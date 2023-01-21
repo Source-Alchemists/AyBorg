@@ -25,7 +25,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Agent\AyBorg.Agent.csproj" />
-    <ProjectReference Include="..\..\src\SDK\database\AyBorg.Database.Data\AyBorg.Database.Data.csproj" />
   </ItemGroup>
 
 </Project>

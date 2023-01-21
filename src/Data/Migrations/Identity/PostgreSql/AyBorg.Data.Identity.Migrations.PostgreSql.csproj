@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Identity\AyBorg.Data.Identity.csproj" />
+  </ItemGroup>
+
+</Project>

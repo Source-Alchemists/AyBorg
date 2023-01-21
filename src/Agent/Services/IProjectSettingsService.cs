@@ -1,4 +1,4 @@
-using AyBorg.SDK.Data.DAL;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Services;

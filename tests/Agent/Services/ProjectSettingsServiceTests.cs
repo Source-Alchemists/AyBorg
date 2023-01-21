@@ -1,6 +1,5 @@
 using AyBorg.Agent.Services;
-using AyBorg.Database.Data;
-using AyBorg.SDK.Data.DAL;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Projects;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -47,7 +46,8 @@ public class ProjectSettingsServiceTests
             new ProjectMetaRecord { DbId = expectedId }
         });
         _mockProjectManagementService.Setup(s => s.ActiveProjectId).Returns(isActive ? expectedId : Guid.NewGuid());
-        var newProjectSettings = new ProjectSettings {
+        var newProjectSettings = new ProjectSettings
+        {
             IsForceResultCommunicationEnabled = true
         };
 

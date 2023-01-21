@@ -1,7 +1,5 @@
 using AyBorg.Agent.Services;
-using AyBorg.Database.Data;
-using AyBorg.SDK.Data.DAL;
-using AyBorg.SDK.Data.Mapper;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.Extensions.Configuration;

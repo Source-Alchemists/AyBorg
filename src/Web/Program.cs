@@ -1,4 +1,4 @@
-using AyBorg.Database.Data;
+using AyBorg.Data.Identity;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Communication.gRPC.Registry;

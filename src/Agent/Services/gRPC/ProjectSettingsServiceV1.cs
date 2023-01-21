@@ -1,4 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Authorization;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -21,7 +22,7 @@ public sealed class ProjectSettingsServiceV1 : ProjectSettings.ProjectSettingsBa
             throw new RpcException(new Status(StatusCode.InvalidArgument, "ProjectDbId is not a valid GUID"));
 
         }
-        SDK.Data.DAL.ProjectSettingsRecord projectSettingsRecord = await _projectSettingsService.GetSettingsRecordAsync(dbId);
+        ProjectSettingsRecord projectSettingsRecord = await _projectSettingsService.GetSettingsRecordAsync(dbId);
 
         return new GetProjectSettingsResponse
         {

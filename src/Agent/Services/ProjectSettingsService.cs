@@ -1,5 +1,4 @@
-using AyBorg.Database.Data;
-using AyBorg.SDK.Data.DAL;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Services;
@@ -37,7 +36,7 @@ public sealed class ProjectSettingsService : IProjectSettingsService
     /// <returns></returns>
     public async ValueTask<bool> TryUpdateActiveProjectSettingsAsync(Guid projectMetaDbId, ProjectSettings projectSettings)
     {
-        IEnumerable<ProjectMetaRecord> projectMetas = await  _projectRepository.GetAllMetasAsync();
+        IEnumerable<ProjectMetaRecord> projectMetas = await _projectRepository.GetAllMetasAsync();
         ProjectMetaRecord? projectMeta = projectMetas.FirstOrDefault(p => p.DbId == projectMetaDbId);
         if (projectMeta == null)
         {

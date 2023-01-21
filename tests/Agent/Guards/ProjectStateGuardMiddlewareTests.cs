@@ -1,6 +1,6 @@
 using AyBorg.Agent.Guards;
 using AyBorg.Agent.Services;
-using AyBorg.SDK.Data.DAL;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Projects;
 using Microsoft.AspNetCore.Http;
 using Moq;
@@ -66,7 +66,7 @@ public class ProjectStateGuardMiddlewareTests
         await _middleware.InvokeAsync(context);
 
         // Assert
-        if(method != "GET" && path.StartsWith("/flow") && projectState != ProjectState.Draft)
+        if (method != "GET" && path.StartsWith("/flow") && projectState != ProjectState.Draft)
         {
             _nextMock.Verify(next => next(context), Times.Never);
             Assert.Equal(StatusCodes.Status403Forbidden, context.Response.StatusCode);

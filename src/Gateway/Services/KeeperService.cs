@@ -1,5 +1,5 @@
 using System.Collections.Concurrent;
-using AyBorg.Database.Data;
+using AyBorg.Data.Gateway;
 using AyBorg.Gateway.Models;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
@@ -127,7 +127,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
         }
 
         using RegistryContext context = await _registryContextFactory.CreateDbContextAsync();
-        SDK.Data.DAL.ServiceEntryRecord? knownService = await context.ServiceEntries!.FirstOrDefaultAsync(x => x.UniqueName == serviceEntry.UniqueName && x.Type == serviceEntry.Type);
+        ServiceEntryRecord? knownService = await context.ServiceEntries!.FirstOrDefaultAsync(x => x.UniqueName == serviceEntry.UniqueName && x.Type == serviceEntry.Type);
         if (knownService != null)
         {
             // Identified existing service by unique name and type.

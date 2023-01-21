@@ -1,4 +1,4 @@
-using AyBorg.SDK.Data.DAL;
+using AyBorg.Data.Gateway;
 
 namespace AyBorg.Gateway.Models;
 
