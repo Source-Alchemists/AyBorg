@@ -3,7 +3,7 @@ using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Services;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Tests.Helpers;
 using Google.Protobuf;

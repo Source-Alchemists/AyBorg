@@ -1,0 +1,28 @@
+@using AyBorg.Data.Analytics
+
+<MudTable Items="@EventEntries" Hover="true">
+    <HeaderContent>
+        <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.Timestamp)">Timestamp</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.LogLevel)">Level</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.ServiceUniqueName)">Service Name</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.EventId)">Event ID</MudTableSortLabel></MudTh>
+        <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.Message)">Message</MudTableSortLabel></MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd DataLabel="Timestamp">
+            @context.Timestamp
+        </MudTd>
+        <MudTd DataLabel="Level">
+            @context.LogLevel
+        </MudTd>
+        <MudTd DataLabel="Service Name">
+            @context.ServiceUniqueName
+        </MudTd>
+        <MudTd DataLabel="Event ID">
+            @context.EventId
+        </MudTd>
+        <MudTd DataLabel="Message">
+            @context.Message
+        </MudTd>
+    </RowTemplate>
+</MudTable>

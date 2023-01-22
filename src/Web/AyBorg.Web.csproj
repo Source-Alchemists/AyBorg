@@ -41,6 +41,7 @@
     <ProjectReference Include="..\Data\Migrations\Identity\SqlLite\AyBorg.Data.Identity.Migrations.SqlLite.csproj" />
     <ProjectReference Include="..\Data\Migrations\Identity\PostgreSql\AyBorg.Data.Identity.Migrations.PostgreSql.csproj" />
     <ProjectReference Include="..\SDK\src\Logging\Analytics\AyBorg.SDK.Logging.Analytics.csproj" />
+    <ProjectReference Include="..\Data\Analytics\AyBorg.Data.Analytics.csproj" />
   </ItemGroup>
 
 </Project>

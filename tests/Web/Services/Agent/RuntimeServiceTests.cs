@@ -1,6 +1,6 @@
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Services;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Tests.Helpers;
 using Grpc.Core;

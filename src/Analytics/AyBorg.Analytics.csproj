@@ -4,6 +4,7 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <ItemGroup>
     <ProjectReference Include="..\SDK\src\Communication\gRPC\AyBorg.SDK.Communication.gRPC.csproj" />
+    <ProjectReference Include="..\Data\Analytics\AyBorg.Data.Analytics.csproj" />
   </ItemGroup>
 
 </Project>

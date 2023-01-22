@@ -16,6 +16,7 @@ builder.Services.AddGrpcClient<Ayborg.Gateway.V1.Register.RegisterClient>(option
 builder.Services.AddHostedService<RegistryBackgroundService>();
 
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
+builder.Services.AddSingleton<IEventStorage, EventStorage>();
 
 WebApplication app = builder.Build();
 

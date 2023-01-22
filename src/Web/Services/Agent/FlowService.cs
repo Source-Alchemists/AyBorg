@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Communication.gRPC;
-using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Models;
 using Grpc.Core;
 

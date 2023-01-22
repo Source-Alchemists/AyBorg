@@ -1,0 +1,19 @@
+@page "/analytics"
+@using SDK.Authorization
+@using AyBorg.Web.Pages.Analytics.Shared
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}, {Roles.Auditor}")]
+
+<PageTitle>AyBorg - Analytics</PageTitle>
+
+<MudGrid Class="mud-full-width">
+    <MudItem xs="12">
+        <MudCard>
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Event Log</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <EventLogTable EventEntries="@_eventRecords" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>

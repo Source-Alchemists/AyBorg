@@ -1,7 +1,6 @@
 using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.System.Runtime;
-using AyBorg.Web.Services.AppState;
 using Grpc.Core;
 
 namespace AyBorg.Web.Services.Agent;

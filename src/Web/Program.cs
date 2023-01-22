@@ -8,7 +8,7 @@ using AyBorg.Web;
 using AyBorg.Web.Areas.Identity;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Services.Analytics;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -87,6 +87,7 @@ builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IRuntimeService, RuntimeService>();
 builder.Services.AddScoped<IAgentOverviewService, AgentsOverviewService>();
 builder.Services.AddScoped<IStateService, StateService>();
+builder.Services.AddScoped<IEventLogService, EventLogService>();
 
 builder.Services.AddTransient<ITokenProvider, TokenProvider>();
 builder.Services.AddTransient<IStorageService, StorageService>();

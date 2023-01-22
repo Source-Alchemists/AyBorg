@@ -14,7 +14,7 @@ public sealed class EventLogPassthroughServiceV1 : EventLog.EventLogBase
         _channelService = grpcChannelService;
     }
 
-    public override async Task<Empty> LogEvent(EventRequest request, ServerCallContext context)
+    public override async Task<Empty> LogEvent(EventEntry request, ServerCallContext context)
     {
         IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName("AyBorg.Analytics");
         foreach (ChannelInfo channel in channels)
@@ -24,5 +24,20 @@ public sealed class EventLogPassthroughServiceV1 : EventLog.EventLogBase
         }
 
         return new Empty();
+    }
+
+    public override async Task GetLogEvents(GetEventsRequest request, IServerStreamWriter<EventEntry> responseStream, ServerCallContext context)
+    {
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName("AyBorg.Analytics");
+        CancellationToken token = context.CancellationToken;
+        await Parallel.ForEachAsync(channels, async (channel, token) =>
+        {
+            EventLog.EventLogClient client = _channelService.CreateClient<EventLog.EventLogClient>(channel.ServiceUniqueName);
+            AsyncServerStreamingCall<EventEntry> response = client.GetLogEvents(request, cancellationToken: token);
+            await foreach (EventEntry? entry in response.ResponseStream.ReadAllAsync(cancellationToken: token))
+            {
+                await responseStream.WriteAsync(entry, cancellationToken: token);
+            }
+        });
     }
 }
