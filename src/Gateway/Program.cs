@@ -1,8 +1,10 @@
+using Ayborg.Gateway.Analytics.V1;
 using AyBorg.Data.Gateway;
 using AyBorg.Gateway.Services;
 using AyBorg.Gateway.Services.Agent;
 using AyBorg.Gateway.Services.Analytics;
 using AyBorg.SDK.Authorization;
+using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +27,15 @@ builder.Services.AddDbContextFactory<RegistryContext>(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddGrpc();
 
+builder.Services.AddGrpcClient<EventLog.EventLogClient>(options =>
+{
+    options.ChannelOptionsActions.Add(o => o.UnsafeUseInsecureChannelCallCredentials = true);
+    options.Address = new Uri(builder.Configuration.GetValue("Kestrel:Endpoints:gRPC:Url", "http://localhost:5000")!);
+});
+
+builder.AddAyBorgAnalyticsLogger();
+
+builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddSingleton<IGatewayConfiguration, GatewayConfiguration>();
 builder.Services.AddSingleton<IGrpcChannelService, GrpcChannelService>();
 builder.Services.AddSingleton<IKeeperService, KeeperService>();
