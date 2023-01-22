@@ -1,6 +1,6 @@
 @using AyBorg.Data.Analytics
 
-<MudTable Items="@EventEntries" Hover="true">
+<MudTable Items="@EventEntries" Hover="true" Elevation="0">
     <HeaderContent>
         <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.Timestamp)">Timestamp</MudTableSortLabel></MudTh>
         <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.LogLevel)">Level</MudTableSortLabel></MudTh>
