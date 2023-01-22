@@ -5,7 +5,7 @@ using Grpc.Core;
 
 namespace AyBorg.Agent;
 
-internal static class GrpcClientMiddleware
+internal static class GrpcClientExtension
 {
     private const string FallbackUrl = "http://localhost:5000";
     private const string GatewayUrlConfig = "AyBorg:Gateway:Url";
@@ -26,7 +26,6 @@ internal static class GrpcClientMiddleware
         {
             option.ChannelOptionsActions.Add(o => o.UnsafeUseInsecureChannelCallCredentials = true);
             option.Address = uri;
-
         });
     }
 }

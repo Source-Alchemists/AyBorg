@@ -6,7 +6,7 @@ using Grpc.Core;
 
 namespace AyBorg.Web;
 
-internal static class GrpcClientMiddleware
+internal static class GrpcClientExtension
 {
     private const string FallbackUrl = "http://localhost:5000";
     private const string GatewayUrlConfig = "AyBorg:Gateway:Url";
