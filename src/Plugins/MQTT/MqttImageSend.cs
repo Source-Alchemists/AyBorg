@@ -1,3 +1,4 @@
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.System.Runtime;
@@ -40,7 +41,7 @@ public sealed class MqttImageSend : BaseMqttSendStep
         }
         catch (Exception e)
         {
-            _logger.LogWarning(e, "Error while sending image to MQTT");
+            _logger.LogWarning(new EventId((int)EventLogType.PluginState), e, "Error while sending image to MQTT");
             return false;
         }
     }

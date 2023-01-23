@@ -35,7 +35,7 @@ public sealed class ImageCrop : IStepBody, IDisposable
         _outputImagePort.Value?.Dispose();
         if (_cropRectanglePort.Value.Width <= 0 || _cropRectanglePort.Value.Height <= 0)
         {
-            _logger.LogWarning("Invalid crop region.");
+            _logger.LogWarning(new EventId((int)EventLogType.Result), "Invalid crop region.");
             return ValueTask.FromResult(false);
         }
 

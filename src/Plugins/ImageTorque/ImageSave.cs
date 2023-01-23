@@ -42,7 +42,10 @@ public sealed class ImageSave : IStepBody
     {
         string resultFileName = $"{ReplacePlaceHolder(_fileNamePrefixPort.Value)}{ReplacePlaceHolder(_inputFileNamePort.Value)}{ReplacePlaceHolder(_fileNameSuffixPort.Value)}.png";
         string resultFilePath = Path.Combine($"{_environment.StorageLocation}{_folderPort.Value}", resultFileName);
-        _logger.LogTrace("Saving image to {resultFilePath}", resultFilePath);
+        if (_logger.IsEnabled(LogLevel.Trace))
+        {
+            _logger.LogTrace(new EventId((int)EventLogType.Result), "Saving image to {resultFilePath}", resultFilePath);
+        }
         _imagePort.Value.Save(resultFilePath, EncoderType.Png);
         _outputFileNamePort.Value = resultFileName;
         return ValueTask.FromResult(true);

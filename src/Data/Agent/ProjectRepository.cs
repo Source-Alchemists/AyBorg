@@ -1,3 +1,4 @@
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Projects;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -39,7 +40,7 @@ public sealed class ProjectRepository : IProjectRepository
         ProjectMetaRecord? projectMeta = await context.AyBorgProjectMetas!.FindAsync(projectMetaDbId);
         if (projectMeta == null)
         {
-            _logger.LogWarning("No settings found for project {projectMetaDbId}.", projectMetaDbId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No settings found for project {projectMetaDbId}.", projectMetaDbId);
 
         }
 
@@ -64,7 +65,7 @@ public sealed class ProjectRepository : IProjectRepository
 
         Microsoft.EntityFrameworkCore.ChangeTracking.EntityEntry<ProjectRecord> result = await context.AyBorgProjects!.AddAsync(emptyProject);
         await context.SaveChangesAsync();
-        _logger.LogTrace("Created new project {projectName} with id {projectId}", projectName, result.Entity.Meta.Id);
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectSaved), "Created new project [{projectName}].", projectName);
         return result.Entity;
     }
 
@@ -98,7 +99,7 @@ public sealed class ProjectRepository : IProjectRepository
         }
         catch (Exception ex)
         {
-            _logger.LogWarning("Failed to save project {projectName}. {message}", project.Meta.Name, ex.Message);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Failed to save project {projectName}. {message}", project.Meta.Name, ex.Message);
             return false;
         }
     }
@@ -109,7 +110,7 @@ public sealed class ProjectRepository : IProjectRepository
         List<ProjectRecord> projects = await context.AyBorgProjects!.Include(p => p.Meta).Include(p => p.Settings).Where(p => p.Meta.Id.Equals(projectMetaId)).ToListAsync();
         if (!projects.Any())
         {
-            _logger.LogWarning("No project found with id {projectMetaId}.", projectMetaId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No project found with id {projectMetaId}.", projectMetaId);
             return false;
         }
         IEnumerable<ProjectMetaRecord> metas = projects.Select(p => p.Meta);
@@ -127,7 +128,7 @@ public sealed class ProjectRepository : IProjectRepository
         ProjectMetaRecord? databaseProjectMeta = await context.AyBorgProjectMetas!.FindAsync(projectMeta.DbId);
         if (databaseProjectMeta == null)
         {
-            _logger.LogWarning("No project found for database id {projectMetaDbId}.", projectMeta.DbId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No project found for database id {projectMetaDbId}.", projectMeta.DbId);
             return false;
         }
 
@@ -153,7 +154,7 @@ public sealed class ProjectRepository : IProjectRepository
         }
         catch (Exception ex)
         {
-            _logger.LogWarning("Failed to remove project metas. {message}", ex.Message);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Failed to remove project metas. {message}", ex.Message);
             return false;
         }
     }
@@ -164,7 +165,7 @@ public sealed class ProjectRepository : IProjectRepository
         ProjectRecord? projectRecord = await context.AyBorgProjects!.Include(x => x.Settings).FirstOrDefaultAsync(x => x.Meta.DbId.Equals(projectMetaDbId));
         if (projectRecord == null)
         {
-            _logger.LogWarning("No project found with id [{projectDatabaseId}].", projectMetaDbId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No project found with id [{projectDatabaseId}].", projectMetaDbId);
             return null!;
         }
 

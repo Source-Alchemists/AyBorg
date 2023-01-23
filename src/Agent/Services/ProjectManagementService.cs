@@ -1,4 +1,5 @@
 ﻿using AyBorg.Data.Agent;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Configuration;
 
@@ -87,7 +88,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             // Need to deactivate the project.
             if (!await _engineHost.TryDeactivateProjectAsync())
             {
-                _logger.LogWarning($"Could not deactivate project.");
+                _logger.LogWarning(new EventId((int)EventLogType.ProjectState), $"Could not deactivate project.");
                 return new ProjectManagementResult(false, "Could not deactivate project.");
             }
         }
@@ -97,7 +98,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "Could not delete project.");
         }
 
-        _logger.LogInformation("Removed project with id [{projectId}].", projectMetaId);
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectRemoved), "Removed project [{projectName}].", metas.First().Name);
         return new ProjectManagementResult(true, null);
     }
 
@@ -112,13 +113,13 @@ internal sealed class ProjectManagementService : IProjectManagementService
         ProjectMetaRecord? orgMetaRecord = await _projectRepository.FindMetaAsync(projectMetaDbId);
         if (orgMetaRecord == null)
         {
-            _logger.LogWarning($"No project found to activate.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), $"No project found to activate.");
             return new ProjectManagementResult(false, "No project found to activate.");
         }
 
         if (orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
         {
-            _logger.LogWarning("Project [{orgMetaRecord.Name}] is not owned by this service.", orgMetaRecord.Name);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Project [{orgMetaRecord.Name}] is not owned by this service.", orgMetaRecord.Name);
             return new ProjectManagementResult(false, "Project is not owned by this service.");
         }
 
@@ -131,29 +132,29 @@ internal sealed class ProjectManagementService : IProjectManagementService
         {
             if (!await _engineHost.TryDeactivateProjectAsync())
             {
-                _logger.LogWarning($"Could not deactivate project.");
+                _logger.LogWarning(new EventId((int)EventLogType.ProjectState), $"Could not deactivate project.");
                 return new ProjectManagementResult(false, "Could not deactivate project.");
             }
 
             lastActiveMetaRecord.IsActive = false;
             if (!await _projectRepository.TryUpdateAsync(lastActiveMetaRecord))
             {
-                _logger.LogWarning($"Could not deactivate project.");
+                _logger.LogWarning(new EventId((int)EventLogType.ProjectState), $"Could not deactivate project.");
                 return new ProjectManagementResult(false, "Could not deactivate project.");
             }
 
-            _logger.LogTrace("Project [{lastActiveMetaRecord.DbId}] deactivated.", lastActiveMetaRecord.Id);
+            _logger.LogTrace(new EventId((int)EventLogType.ProjectState), "Project [{lastActiveMetaRecord.DbId}] deactivated.", lastActiveMetaRecord.Id);
         }
 
         // The whole project record need to be loaded and converted to a runtime project.
         if (isActive)
         {
             ProjectRecord orgProjectRecord = await _projectRepository.FindAsync(projectMetaDbId);
-            _logger.LogTrace("Loading project [{orgProjectRecord.Meta.Name}] with step count [{orgProjectRecord.Steps.Count}].", orgProjectRecord.Meta.Name, orgProjectRecord.Steps.Count);
+            _logger.LogTrace(new EventId((int)EventLogType.ProjectState), "Loading project [{orgProjectRecord.Meta.Name}] with step count [{orgProjectRecord.Steps.Count}].", orgProjectRecord.Meta.Name, orgProjectRecord.Steps.Count);
             Project project = await _runtimeConverterService.ConvertAsync(orgProjectRecord);
             if (!await _engineHost.TryActivateProjectAsync(project))
             {
-                _logger.LogWarning("Could not activate project [{projectMetaDbId}].", projectMetaDbId);
+                _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Could not activate project [{projectMetaDbId}].", projectMetaDbId);
                 return new ProjectManagementResult(false, "Could not activate project.");
             }
         }
@@ -182,13 +183,13 @@ internal sealed class ProjectManagementService : IProjectManagementService
         // More then one active project. Deactivating each.
         if (projectMetas.Count() > 1)
         {
-            _logger.LogWarning("More than one active project found. Deactivating each ...");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "More than one active project found. Deactivating each ...");
             foreach (ProjectMetaRecord pm in projectMetas)
             {
                 pm.IsActive = false;
                 if (!await _projectRepository.TryUpdateAsync(pm))
                 {
-                    _logger.LogWarning("Could not deactivate project '{projectName}'.", pm.Name);
+                    _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Could not deactivate project '{projectName}'.", pm.Name);
                     continue;
                 }
             }
@@ -197,7 +198,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
         if (!projectMetas.Any())
         {
-            _logger.LogWarning("Failed to load active project.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Failed to load active project.");
             return new ProjectManagementResult(false, "Failed to load active project.");
         }
 
@@ -206,11 +207,11 @@ internal sealed class ProjectManagementService : IProjectManagementService
         bool result = (await TryChangeActivationStateAsync(projectMeta.DbId, true)).IsSuccessful;
         if (!result)
         {
-            _logger.LogWarning("Could not activate project.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Could not activate project.");
             return new ProjectManagementResult(false, "Could not activate project.");
         }
 
-        _logger.LogInformation("Project [{projectMetaRecord.Name}] activated.", projectMeta.Name);
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Project [{projectMetaRecord.Name}] activated.", projectMeta.Name);
         return new ProjectManagementResult(true, null, projectMeta.DbId);
     }
 
@@ -222,21 +223,21 @@ internal sealed class ProjectManagementService : IProjectManagementService
     {
         if (_engineHost.ActiveProject == null)
         {
-            _logger.LogWarning("No active project.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project.");
             return new ProjectManagementResult(false, "No active project.");
         }
 
         ProjectMetaRecord? previousProjectMetaRecord = (await _projectRepository.GetAllMetasAsync(_serviceUniqueName))!.FirstOrDefault(p => p.IsActive);
         if (previousProjectMetaRecord == null)
         {
-            _logger.LogWarning($"No project found to save.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), $"No project found to save.");
             return new ProjectManagementResult(false, "No project found to save.");
         }
 
         previousProjectMetaRecord.IsActive = false;
         if (!await _projectRepository.TryUpdateAsync(previousProjectMetaRecord))
         {
-            _logger.LogWarning("Could not change active state.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Could not change active state.");
             return new ProjectManagementResult(false, "Could not change active state.");
         }
 
@@ -246,9 +247,11 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
         if (!await _projectRepository.TrySave(projectRecord))
         {
-            _logger.LogWarning("Could not save project.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Could not save project.");
             return new ProjectManagementResult(false, "Could not save project.");
         }
+
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectSaved), "Project [{projectRecord.Meta.Name}] saved.", projectRecord.Meta.Name);
 
         _engineHost.ActiveProject.Meta.Id = projectRecord.Meta.Id;
         return new ProjectManagementResult(true, null, projectRecord.Meta.DbId);
@@ -259,7 +262,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         ProjectMetaRecord? previousProjectMetaRecord = await _projectRepository.FindMetaAsync(projectMetaDbId);
         if (previousProjectMetaRecord == null)
         {
-            _logger.LogWarning($"No project found to save.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), $"No project found to save.");
             return new ProjectManagementResult(false, "No project found to save.");
         }
 
@@ -276,7 +279,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             previousProjectMetaRecord.Comment = comment;
             if (!await _projectRepository.TryUpdateAsync(previousProjectMetaRecord))
             {
-                _logger.LogWarning("Could not update project.");
+                _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Could not update project.");
                 return new ProjectManagementResult(false, "Could not update project.");
             }
 
@@ -285,7 +288,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
         if (projectState == ProjectState.Ready && string.IsNullOrEmpty(approver))
         {
-            _logger.LogWarning("Approver is required.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Approver is required.");
             return new ProjectManagementResult(false, "Approver is required.");
         }
 
@@ -363,9 +366,9 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Could not save project.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Could not save project.");
         }
-        _logger.LogTrace("Project [{projectRecord.Meta.Name}] saved with id [{projectRecord.Meta.DbId}].", projectMetaRecord.Name, projectMetaRecord.DbId);
+        _logger.LogInformation("Project [{projectName}] saved.", projectMetaRecord.Name);
         return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
     }
 
@@ -380,7 +383,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
         if (!await _projectRepository.TryUpdateAsync(projectMetaRecord))
         {
-            _logger.LogWarning("Could not update project.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Could not update project.");
             return new ProjectManagementResult(false, "Could not update project.");
         }
 
@@ -392,7 +395,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
                                                         && pm.VersionIteration.Equals(previousVersionIteration));
         if (!await _projectRepository.TryRemoveRangeAsync(metas))
         {
-            _logger.LogWarning("Could not remove drafts from history.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Could not remove drafts from history.");
             return new ProjectManagementResult(false, "Could not remove drafts from history.");
         }
 

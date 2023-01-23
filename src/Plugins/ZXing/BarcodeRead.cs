@@ -61,12 +61,18 @@ namespace AyBorg.Plugins.ZXing
 
             if (value is null)
             {
-                _logger.LogWarning("Could not find a barcode.");
+                if (_logger.IsEnabled(LogLevel.Trace))
+                {
+                    _logger.LogTrace(new EventId((int)EventLogType.Result), "Could not find a barcode.");
+                }
                 return ValueTask.FromResult(false);
             }
 
             _codePort.Value = value.Text;
-            _logger.LogDebug("Barcode string: '{_codePort.Value}'", _codePort.Value);
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                _logger.LogTrace(new EventId((int)EventLogType.Result), "Barcode string: '{_codePort.Value}'", _codePort.Value);
+            }
             return ValueTask.FromResult(true);
         }
 
