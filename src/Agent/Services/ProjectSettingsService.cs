@@ -1,4 +1,5 @@
 using AyBorg.Data.Agent;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Services;
@@ -40,7 +41,7 @@ public sealed class ProjectSettingsService : IProjectSettingsService
         ProjectMetaRecord? projectMeta = projectMetas.FirstOrDefault(p => p.DbId == projectMetaDbId);
         if (projectMeta == null)
         {
-            _logger.LogWarning("No settings found for project {projectMetaDbId}.", projectMetaDbId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No settings found for project {projectMetaDbId}.", projectMetaDbId);
             return false;
         }
 
@@ -48,6 +49,8 @@ public sealed class ProjectSettingsService : IProjectSettingsService
         {
             _engineHost.ActiveProject!.Settings.IsForceResultCommunicationEnabled = projectSettings.IsForceResultCommunicationEnabled;
         }
+
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Updating project settings for project [{projectName}]: {projectSettings}", projectMeta.Name, projectSettings);
 
         return true;
     }
