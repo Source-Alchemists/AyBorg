@@ -1,3 +1,8 @@
-<MudChart ChartType="ChartType.Pie"
-            InputData="@Data" InputLabels="@Labels"
-            Width="@Width" Height="@Height" />
+@if (_isLoading)
+{
+    <MudSkeleton SkeletonType="SkeletonType.Circle" Width="@Width" Height="@Height" />
+}
+else
+{
+    <MudChart ChartType="ChartType.Pie" InputData="@Data" InputLabels="@Labels" Width="@Width" Height="@Height" />
+}

@@ -16,41 +16,46 @@ public partial class Analytics : ComponentBase
     private string[] _eventIdSummaryLabels = Array.Empty<string>();
     private double[] _eventIdSummaryData = Array.Empty<double>();
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            await foreach (EventLogEntry entry in EventLogService.GetEventsAsync())
+            return Task.Factory.StartNew(async () =>
             {
-                _eventRecords.Insert(0, entry);
-                StateHasChanged();
-            }
+                await foreach (EventLogEntry entry in EventLogService.GetEventsAsync())
+                {
+                    _eventRecords.Insert(0, entry);
+                    await InvokeAsync(StateHasChanged);
+                }
 
-            IEnumerable<IGrouping<LogLevel, EventLogEntry>> levelGroup = _eventRecords.GroupBy(e => e.LogLevel);
-            _eventLevelSummaryLabels = levelGroup.Select(g => g.Key.ToString()).ToArray();
-            _eventLevelSummaryData = new double[_eventLevelSummaryLabels.Length];
-            for (int i = 0; i < _eventLevelSummaryData.Length; i++)
-            {
-                _eventLevelSummaryData[i] = levelGroup.ElementAt(i).Count();
-            }
+                IEnumerable<IGrouping<LogLevel, EventLogEntry>> levelGroup = _eventRecords.GroupBy(e => e.LogLevel);
+                _eventLevelSummaryLabels = levelGroup.Select(g => g.Key.ToString()).ToArray();
+                _eventLevelSummaryData = new double[_eventLevelSummaryLabels.Length];
+                for (int i = 0; i < _eventLevelSummaryData.Length; i++)
+                {
+                    _eventLevelSummaryData[i] = levelGroup.ElementAt(i).Count();
+                }
 
-            IEnumerable<IGrouping<string, EventLogEntry>> serviceGroup = _eventRecords.GroupBy(e => e.ServiceUniqueName);
-            _eventServiceSummaryLabels = serviceGroup.Select(g => g.Key).ToArray();
-            _eventServiceSummaryData = new double[_eventServiceSummaryLabels.Length];
-            for(int i = 0; i < _eventServiceSummaryData.Length; i++)
-            {
-                _eventServiceSummaryData[i] = serviceGroup.ElementAt(i).Count();
-            }
+                IEnumerable<IGrouping<string, EventLogEntry>> serviceGroup = _eventRecords.GroupBy(e => e.ServiceUniqueName);
+                _eventServiceSummaryLabels = serviceGroup.Select(g => g.Key).ToArray();
+                _eventServiceSummaryData = new double[_eventServiceSummaryLabels.Length];
+                for (int i = 0; i < _eventServiceSummaryData.Length; i++)
+                {
+                    _eventServiceSummaryData[i] = serviceGroup.ElementAt(i).Count();
+                }
 
-            IEnumerable<IGrouping<string, EventLogEntry>> eventIdGroup = _eventRecords.GroupBy(e => e.EventName);
-            _eventIdSummaryLabels = eventIdGroup.Select(g => g.Key).ToArray();
-            _eventIdSummaryData = new double[_eventIdSummaryLabels.Length];
-            for(int i = 0; i < _eventIdSummaryData.Length; i++)
-            {
-                _eventIdSummaryData[i] = eventIdGroup.ElementAt(i).Count();
-            }
+                IEnumerable<IGrouping<string, EventLogEntry>> eventIdGroup = _eventRecords.GroupBy(e => e.EventName);
+                _eventIdSummaryLabels = eventIdGroup.Select(g => g.Key).ToArray();
+                _eventIdSummaryData = new double[_eventIdSummaryLabels.Length];
+                for (int i = 0; i < _eventIdSummaryData.Length; i++)
+                {
+                    _eventIdSummaryData[i] = eventIdGroup.ElementAt(i).Count();
+                }
 
-            await InvokeAsync(StateHasChanged);
+                await InvokeAsync(StateHasChanged);
+            });
         }
+
+        return Task.CompletedTask;
     }
 }

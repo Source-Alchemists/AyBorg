@@ -4,6 +4,7 @@ namespace AyBorg.Web.Shared.Charts;
 
 public partial class PieChart : ComponentBase
 {
+    private bool _isLoading = true;
     [Parameter]
     [EditorRequired]
     public string[] Labels { get; set; } = Array.Empty<string>();
@@ -20,6 +21,11 @@ public partial class PieChart : ComponentBase
 
     protected override void OnParametersSet() {
          base.OnParametersSet();
+         if(Labels != Array.Empty<string>())
+         {
+            _isLoading = false;
+         }
+
          StateHasChanged();
     }
 }

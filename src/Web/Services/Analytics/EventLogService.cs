@@ -46,7 +46,7 @@ public sealed class EventLogService : IEventLogService
     {
         if (!Enum.IsDefined(typeof(EventLogType), id))
         {
-            return id.ToString();
+            return "Undefined";
         }
 
         var eventLogType = (EventLogType)id;
