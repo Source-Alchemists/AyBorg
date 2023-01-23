@@ -15,7 +15,7 @@
             <MudCardHeader>
                 <MudText Typo="Typo.h6">Level Summary</MudText>
             </MudCardHeader>
-            <MudCardContent Class="flex-self-center">
+            <MudCardContent Class="flex-self-center" style="min-height:330px">
                 <PieChart Labels="@_eventLevelSummaryLabels" Data="@_eventLevelSummaryData" />
             </MudCardContent>
         </MudCard>
@@ -25,7 +25,7 @@
             <MudCardHeader>
                 <MudText Typo="Typo.h6">Service Summary</MudText>
             </MudCardHeader>
-            <MudCardContent Class="flex-self-center">
+            <MudCardContent Class="flex-self-center" style="min-height:330px">
                 <PieChart Labels="@_eventServiceSummaryLabels" Data="@_eventServiceSummaryData" />
             </MudCardContent>
         </MudCard>
@@ -35,18 +35,15 @@
             <MudCardHeader>
                 <MudText Typo="Typo.h6">Event ID Summary</MudText>
             </MudCardHeader>
-            <MudCardContent Class="flex-self-center">
+            <MudCardContent Class="flex-self-center" style="min-height:330px">
                 <PieChart Labels="@_eventIdSummaryLabels" Data="@_eventIdSummaryData" />
             </MudCardContent>
         </MudCard>
     </MudItem>
     <MudItem xs="12">
         <MudCard>
-            <MudCardHeader>
-                <MudText Typo="Typo.h6">Event Log</MudText>
-            </MudCardHeader>
-            <MudCardContent>
-                <EventLogTable EventEntries="@_eventRecords" />
+            <MudCardContent Class="pt-0">
+                <EventLogTable @ref="_eventLogTable" EventEntries="@_eventRecords" />
             </MudCardContent>
         </MudCard>
     </MudItem>

@@ -1,32 +1,17 @@
-@using AyBorg.Data.Analytics
+@using AyBorg.Web.Shared.Models
 
-<MudTable Items="@EventEntries" Hover="true" Elevation="0">
-    <HeaderContent>
-        <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.Timestamp)">Timestamp</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.LogLevel)">Level</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.ServiceUniqueName)">Service Name</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.EventId)">Event ID</MudTableSortLabel></MudTh>
-        <MudTh><MudTableSortLabel SortBy="new Func<EventRecord, object>(x=>x.Message)">Message</MudTableSortLabel></MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd DataLabel="Timestamp">
-            @context.Timestamp
-        </MudTd>
-        <MudTd DataLabel="Level">
-            @context.LogLevel
-        </MudTd>
-        <MudTd DataLabel="Service Name">
-            <MudTooltip Text="@context.ServiceType">
-                @context.ServiceUniqueName
-            </MudTooltip>
-        </MudTd>
-        <MudTd DataLabel="Event ID">
-            <MudTooltip Text="@context.EventId.ToString()">
-                @context.EventName
-            </MudTooltip>
-        </MudTd>
-        <MudTd DataLabel="Message">
-            @context.Message
-        </MudTd>
-    </RowTemplate>
-</MudTable>
+<MudDataGrid @ref="_table" Items="@EventEntries" SortMode="SortMode.Multiple"
+            FilterMode="DataGridFilterMode.ColumnFilterRow"
+            Filterable="true" Hideable="true" Elevation="0" ShowMenuIcon="true">
+    <ToolBarContent>
+        <MudText Typo="Typo.h6">Event Log</MudText>
+        <MudSpacer />
+    </ToolBarContent>
+    <Columns>
+        <Column T="EventLogEntry" Field="Timestamp" Title="Timestamp (UTC)" />
+        <Column T="EventLogEntry" Field="LogLevel" Title="Level" />
+        <Column T="EventLogEntry" Field="ServiceUniqueName" Title="Service Name" />
+        <Column T="EventLogEntry" Field="EventName" Title="Event ID" />
+        <Column T="EventLogEntry" Field="Message" />
+    </Columns>
+</MudDataGrid>
