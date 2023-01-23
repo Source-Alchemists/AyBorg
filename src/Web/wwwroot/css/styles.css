@@ -32,6 +32,10 @@
     align-items: center;
 }
 
+.page-loading-bar {
+    height: 4px;
+}
+
 .editor-container {
     height: calc(100% - 60px);
 }

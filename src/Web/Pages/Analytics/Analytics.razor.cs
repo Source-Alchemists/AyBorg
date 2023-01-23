@@ -15,6 +15,7 @@ public partial class Analytics : ComponentBase
     private double[] _eventServiceSummaryData = Array.Empty<double>();
     private string[] _eventIdSummaryLabels = Array.Empty<string>();
     private double[] _eventIdSummaryData = Array.Empty<double>();
+    private bool _isLoading = false;
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
@@ -22,10 +23,18 @@ public partial class Analytics : ComponentBase
         {
             return Task.Factory.StartNew(async () =>
             {
+                _isLoading = true;
+                int count = 0;
                 await foreach (EventLogEntry entry in EventLogService.GetEventsAsync())
                 {
                     _eventRecords.Insert(0, entry);
-                    await InvokeAsync(StateHasChanged);
+                    // Smoother loading animation
+                    count++;
+                    if (count > 10)
+                    {
+                        await InvokeAsync(StateHasChanged);
+                        count = 0;
+                    }
                 }
 
                 IEnumerable<IGrouping<LogLevel, EventLogEntry>> levelGroup = _eventRecords.GroupBy(e => e.LogLevel);
@@ -52,6 +61,7 @@ public partial class Analytics : ComponentBase
                     _eventIdSummaryData[i] = eventIdGroup.ElementAt(i).Count();
                 }
 
+                _isLoading = false;
                 await InvokeAsync(StateHasChanged);
             });
         }
