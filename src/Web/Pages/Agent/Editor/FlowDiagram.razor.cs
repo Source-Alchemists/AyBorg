@@ -330,7 +330,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             return;
         }
 
-        Guid? newLinkId = await FlowService.AddLinkAsync(sourcePort.Port.Id, targetPort.Port.Id);
+        Guid? newLinkId = await FlowService.AddLinkAsync(sourcePort.Port, targetPort.Port);
         Link newLink = await FlowService.GetLinkAsync((Guid)newLinkId);
         if (newLink != null && !tmpLink.Id.Equals(newLink.Id.ToString()))
         {
@@ -365,7 +365,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         step.X = (int)relativePosition.X;
         step.Y = (int)relativePosition.Y;
 
-        Step receivedStep = await FlowService.AddStepAsync(step.Id, step.X, step.Y);
+        Step receivedStep = await FlowService.AddStepAsync(step);
         if (receivedStep == null)
         {
             Snackbar.Add($"Could not add '{step.Name}' (Step not found)", Severity.Warning);
@@ -405,7 +405,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
     {
         if (_suspendDiagramRefresh) return;
         if (node is FlowNode flowNode
-            && !await FlowService.TryRemoveStepAsync(flowNode.Step.Id))
+            && !await FlowService.TryRemoveStepAsync(flowNode.Step))
         {
             _diagram.Nodes.Add(node);
         }

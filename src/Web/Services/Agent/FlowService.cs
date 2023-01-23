@@ -1,6 +1,7 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.Web.Shared.Models;
@@ -77,7 +78,7 @@ public class FlowService : IFlowService
         StepDto? resultStep = response.Steps.FirstOrDefault();
         if (resultStep == null)
         {
-            _logger.LogWarning("Could not find step with id {StepId} in iteration {IterationId}", stepId, iterationId);
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), "Could not find step with id [{stepId}] in iteration [{iterationId}]!", stepId, iterationId);
             return null!;
         }
 
@@ -132,7 +133,7 @@ public class FlowService : IFlowService
         LinkDto? resultLink = response.Links.FirstOrDefault();
         if (resultLink == null)
         {
-            _logger.LogWarning("Could not find link with id {LinkId}", linkId);
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), "Could not find link with id [{linkId}]!", linkId);
             return null!;
         }
 
@@ -140,52 +141,52 @@ public class FlowService : IFlowService
     }
 
     /// <summary>
-    /// Adds the step asynchronous.
+    /// Adds the step.
     /// </summary>
-    /// <param name="stepId">The step identifier.</param>
-    /// <param name="x">The x.</param>
-    /// <param name="y">The y.</param>
-    /// <returns></returns>
-    public async ValueTask<Step> AddStepAsync(Guid stepId, int x, int y)
+    /// <param name="step">The step.</param>
+    /// <returns>Added step.</returns>
+    public async ValueTask<Step> AddStepAsync(Step step)
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Adding step [{stepName}] at [{x}, {y}].", step.Name, step.X, step.Y);
             AddFlowStepResponse response = await _editorClient.AddFlowStepAsync(new AddFlowStepRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
-                StepId = stepId.ToString(),
-                X = x,
-                Y = y
+                StepId = step.Id.ToString(),
+                X = step.X,
+                Y = step.Y
             });
 
             return _rpcMapper.FromRpc(response.Step);
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Error adding step");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error adding step!");
             return null!;
         }
     }
 
     /// <summary>
-    /// Removes the step asynchronous.
+    /// Removes the step.
     /// </summary>
-    /// <param name="stepId">The step identifier.</param>
+    /// <param name="step">The step.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryRemoveStepAsync(Guid stepId)
+    public async ValueTask<bool> TryRemoveStepAsync(Step step)
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Removing step [{stepName}] with id [{stepId}].", step.Name, step.Id);
             _ = await _editorClient.DeleteFlowStepAsync(new DeleteFlowStepRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
-                StepId = stepId.ToString()
+                StepId = step.Id.ToString()
             });
             return true;
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Error deleting step");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error deleting step!");
             return false;
         }
     }
@@ -201,6 +202,10 @@ public class FlowService : IFlowService
     {
         try
         {
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                _logger.LogTrace(new EventId((int)EventLogType.UserInteraction), "Moving step [{stepId}] to [{x},{y}].", stepId, x, y);
+            }
             _ = await _editorClient.MoveFlowStepAsync(new MoveFlowStepRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -212,26 +217,27 @@ public class FlowService : IFlowService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Error moving step");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error moving step!");
             return false;
         }
     }
 
     /// <summary>
-    /// Add link between ports asynchronous.
+    /// Add link between ports.
     /// </summary>
-    /// <param name="sourcePortId">The source port identifier.</param>
-    /// <param name="targetPortId">The target port identifier.</param>
+    /// <param name="sourcePort">The source port.</param>
+    /// <param name="targetPort">The target port.</param>
     /// <returns></returns>
-    public async ValueTask<Guid?> AddLinkAsync(Guid sourcePortId, Guid targetPortId)
+    public async ValueTask<Guid?> AddLinkAsync(Port sourcePort, Port targetPort)
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Linking port [{sourcePortName}] to [{targetPortName}].", sourcePort.Name, targetPort.Name);
             LinkFlowPortsResponse response = await _editorClient.LinkFlowPortsAsync(new LinkFlowPortsRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
-                SourceId = sourcePortId.ToString(),
-                TargetId = targetPortId.ToString()
+                SourceId = sourcePort.Id.ToString(),
+                TargetId = targetPort.Id.ToString()
             });
             if (Guid.TryParse(response.LinkId, out Guid linkId))
             {
@@ -244,7 +250,7 @@ public class FlowService : IFlowService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Error linking ports");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error linking ports!");
             return null;
         }
     }
@@ -258,6 +264,7 @@ public class FlowService : IFlowService
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Removing link [{linkId}].", linkId);
             _ = await _editorClient.LinkFlowPortsAsync(new LinkFlowPortsRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -268,7 +275,7 @@ public class FlowService : IFlowService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Error linking ports");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error linking ports!");
             return false;
         }
     }
@@ -308,6 +315,7 @@ public class FlowService : IFlowService
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Setting port value [{port}].", port);
             _ = await _editorClient.UpdateFlowPortAsync(new UpdateFlowPortRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -317,7 +325,7 @@ public class FlowService : IFlowService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Error setting port value");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error setting port value!");
             return false;
         }
     }
