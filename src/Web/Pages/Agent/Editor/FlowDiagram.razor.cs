@@ -114,7 +114,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         {
             Guid iterationId = (Guid)obj;
             IEnumerable<FlowNode> flowNodes = _diagram.Nodes.Cast<FlowNode>();
-            await Parallel.ForEachAsync(flowNodes, async (node, Default) =>
+            await Parallel.ForEachAsync(flowNodes, async (node, token) =>
             {
                 Step newStep = await FlowService.GetStepAsync(node.Step.Id, iterationId);
                 if (newStep != null)

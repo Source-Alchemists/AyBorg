@@ -20,7 +20,6 @@ internal sealed class Engine : IEngine
     private readonly CancellationTokenSource _stopTokenSource = new();
     private Task? _executionTask;
     private bool _isDisposed = false;
-    private Guid _iterationId = Guid.Empty;
 
     /// <summary>
     /// Called when the iteration is finished.
@@ -196,21 +195,21 @@ internal sealed class Engine : IEngine
 
         while (!stopToken.IsCancellationRequested && !abortToken.IsCancellationRequested)
         {
-            _iterationId = Guid.NewGuid();
+            var iterationId = Guid.NewGuid();
             if (_logger.IsEnabled(LogLevel.Trace))
             {
-                _logger.LogTrace(new EventId((int)EventLogType.EngineState), "Engine [{Id}] iteration [{_iterationId}] started.", Meta.Id, _iterationId);
+                _logger.LogTrace(new EventId((int)EventLogType.EngineState), "Engine [{Id}] iteration [{_iterationId}] started.", Meta.Id, iterationId);
             }
 
-            await StartExecuteAllPathItemsAsync(_pathExecuterLogger, _iterationId, executers, pathItems, executingTasks, abortToken);
+            await StartExecuteAllPathItemsAsync(_pathExecuterLogger, iterationId, executers, pathItems, executingTasks, abortToken);
             await WaitAndClearExecutors(executers, executingTasks);
 
             // All steps are executed and the iteration is finished.
-            IterationFinished?.Invoke(this, new IterationFinishedEventArgs(_iterationId, executers.All(e => e.State == PathExecutionState.Completed)));
+            IterationFinished?.Invoke(this, new IterationFinishedEventArgs(iterationId, executers.All(e => e.State == PathExecutionState.Completed)));
 
             if (_logger.IsEnabled(LogLevel.Trace))
             {
-                _logger.LogTrace(new EventId((int)EventLogType.EngineState), "Engine [{Id}] iteration [{_iterationId}] finished.", Meta.Id, _iterationId);
+                _logger.LogTrace(new EventId((int)EventLogType.EngineState), "Engine [{Id}] iteration [{_iterationId}] finished.", Meta.Id, iterationId);
             }
 
             // If the execution type is single run, stop the engine.

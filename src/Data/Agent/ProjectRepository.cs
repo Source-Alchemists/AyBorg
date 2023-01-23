@@ -6,7 +6,7 @@ namespace AyBorg.Data.Agent;
 
 public sealed class ProjectRepository : IProjectRepository
 {
-    public ILogger<ProjectRepository> _logger;
+    private readonly ILogger<ProjectRepository> _logger;
     private readonly IDbContextFactory<ProjectContext> _contextFactory;
 
     public ProjectRepository(ILogger<ProjectRepository> logger, IDbContextFactory<ProjectContext> contextFactory)
