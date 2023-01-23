@@ -1,8 +1,8 @@
-using AyBorg.Data.Analytics;
+using AyBorg.Web.Shared.Models;
 
 namespace AyBorg.Web.Services.Analytics;
 
 public interface IEventLogService
 {
-    IAsyncEnumerable<EventRecord> GetEventsAsync();
+    IAsyncEnumerable<EventLogEntry> GetEventsAsync();
 }

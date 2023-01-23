@@ -25,7 +25,6 @@ public sealed class EventLogServiceV1 : EventLog.EventLogBase
             Timestamp = request.Timestamp.ToDateTime(),
             LogLevel = (LogLevel)request.LogLevel,
             EventId = request.EventId,
-            EventName = request.EventName,
             Message = request.Message
         };
         _logger.LogTrace("{entry}", entry.ToString());
@@ -44,7 +43,6 @@ public sealed class EventLogServiceV1 : EventLog.EventLogBase
                 Timestamp = Timestamp.FromDateTime(entry.Timestamp),
                 LogLevel = (int)entry.LogLevel,
                 EventId = entry.EventId,
-                EventName = entry.EventName,
                 Message = entry.Message
             });
         }

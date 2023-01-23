@@ -45,8 +45,8 @@ public class RegisterServiceV1Tests : BaseGrpcServiceTests<RegisterServiceV1, Re
     {
         // Arrange
         var expectedId = Guid.NewGuid();
-        _mockKeeperService.Setup(s => s.UnregisterAsync(expectedId)).Returns(Task.CompletedTask);
-        _mockKeeperService.Setup(s => s.UnregisterAsync(It.IsNotIn(expectedId))).Throws<KeyNotFoundException>();
+        _mockKeeperService.Setup(s => s.Unregister(expectedId)).Returns(new ServiceEntry());
+        _mockKeeperService.Setup(s => s.Unregister(It.IsNotIn(expectedId))).Throws<KeyNotFoundException>();
 
         var request = new UnregisterRequest
         {

@@ -16,10 +16,14 @@
             @context.LogLevel
         </MudTd>
         <MudTd DataLabel="Service Name">
-            @context.ServiceUniqueName
+            <MudTooltip Text="@context.ServiceType">
+                @context.ServiceUniqueName
+            </MudTooltip>
         </MudTd>
         <MudTd DataLabel="Event ID">
-            @context.EventId
+            <MudTooltip Text="@context.EventId.ToString()">
+                @context.EventName
+            </MudTooltip>
         </MudTd>
         <MudTd DataLabel="Message">
             @context.Message

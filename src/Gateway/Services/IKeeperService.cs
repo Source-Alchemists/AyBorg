@@ -35,7 +35,8 @@ public interface IKeeperService
     /// Unregister a service
     /// </summary>
     /// <param name="serviceId">The service id.</param>
-    Task UnregisterAsync(Guid serviceId);
+    /// <returns>ServiceEntry if the service was found and removed. Null if the service was not found.</returns>
+    ServiceEntry? Unregister(Guid serviceId);
 
     /// <summary>
     /// Updates the service timestamp.

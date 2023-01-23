@@ -1,5 +1,6 @@
 using Ayborg.Gateway.Analytics.V1;
-using AyBorg.Data.Analytics;
+using AyBorg.SDK.Common;
+using AyBorg.Web.Shared.Models;
 using Grpc.Core;
 
 namespace AyBorg.Web.Services.Analytics;
@@ -16,27 +17,39 @@ public sealed class EventLogService : IEventLogService
         _eventLogClient = eventLogClient;
     }
 
-    public async IAsyncEnumerable<EventRecord> GetEventsAsync()
+    public async IAsyncEnumerable<EventLogEntry> GetEventsAsync()
     {
-        AsyncServerStreamingCall<EventEntry> response =_eventLogClient.GetLogEvents(new GetEventsRequest {
+        AsyncServerStreamingCall<EventEntry> response = _eventLogClient.GetLogEvents(new GetEventsRequest
+        {
             ServiceType = string.Empty,
             ServiceUniqueName = string.Empty,
             LogLevel = (int)LogLevel.None,
-            EventId = -1,
-            EventName = string.Empty
+            EventId = -1
         });
 
-        await foreach(EventEntry? entry in response.ResponseStream.ReadAllAsync())
+        await foreach (EventEntry? entry in response.ResponseStream.ReadAllAsync())
         {
-            yield return new EventRecord {
+            yield return new EventLogEntry
+            {
                 ServiceType = entry.ServiceType,
                 ServiceUniqueName = entry.ServiceUniqueName,
                 Timestamp = entry.Timestamp.ToDateTime(),
                 LogLevel = (LogLevel)entry.LogLevel,
                 EventId = entry.EventId,
-                EventName = entry.EventName,
+                EventName = GetEventTypeDescription(entry.EventId),
                 Message = entry.Message
             };
         }
+    }
+
+    private static string GetEventTypeDescription(int id)
+    {
+        if (!Enum.IsDefined(typeof(EventLogType), id))
+        {
+            return id.ToString();
+        }
+
+        var eventLogType = (EventLogType)id;
+        return $"{eventLogType.GetDescription()}";
     }
 }

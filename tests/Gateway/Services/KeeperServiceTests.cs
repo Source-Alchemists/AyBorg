@@ -93,7 +93,7 @@ public sealed class KeeperServiceTests : IDisposable
         Guid result = await _service.RegisterAsync(_validServiceEntry);
         if (unregister)
         {
-            await _service.UnregisterAsync(result);
+            _service.Unregister(result);
         }
         if (registerTwice)
         {
@@ -106,11 +106,11 @@ public sealed class KeeperServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task Test_UnregisterAsync_unknownService()
+    public void Test_UnregisterAsync_unknownService()
     {
         // Arrange
         // Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UnregisterAsync(Guid.Empty));
+        Assert.Throws<KeyNotFoundException>(() => _service.Unregister(Guid.Empty));
     }
 
     [Fact]
