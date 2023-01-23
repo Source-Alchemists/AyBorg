@@ -126,7 +126,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         ProjectMetaRecord? lastActiveMetaRecord = (await _projectRepository.GetAllMetasAsync(_serviceUniqueName))!.FirstOrDefault(x => x.IsActive);
         if (lastActiveMetaRecord == null)
         {
-            _logger.LogTrace("No active project.");
+            _logger.LogTrace(new EventId((int)EventLogType.ProjectState), "No active project.");
         }
         else
         {
@@ -164,6 +164,8 @@ internal sealed class ProjectManagementService : IProjectManagementService
         {
             return new ProjectManagementResult(false, "Could not change active state.");
         }
+
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Project [{orgMetaRecord.Name}] activated.", orgMetaRecord.Name);
 
         return new ProjectManagementResult(true, null, orgMetaRecord.DbId);
     }
