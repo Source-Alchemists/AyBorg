@@ -41,7 +41,7 @@ public sealed class MqttImageSend : BaseMqttSendStep
         }
         catch (Exception e)
         {
-            _logger.LogWarning(new EventId((int)EventLogType.PluginState), e, "Error while sending image to MQTT");
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), e, "Error while sending image to MQTT");
             return false;
         }
     }

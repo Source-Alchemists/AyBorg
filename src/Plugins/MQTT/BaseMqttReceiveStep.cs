@@ -53,7 +53,7 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
         {
             if (_logger.IsEnabled(LogLevel.Trace))
             {
-                _logger.LogTrace(new EventId((int)EventLogType.PluginState), "Unsubscribing from topic {topic}", _lastTopic);
+                _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Unsubscribing from topic {topic}", _lastTopic);
             }
             _subscription.MessageReceived -= OnMessageReceived;
             await _mqttClientProvider.UnsubscribeAsync(_subscription);
@@ -66,7 +66,7 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
             _subscription.MessageReceived += OnMessageReceived;
             if (_logger.IsEnabled(LogLevel.Trace))
             {
-                _logger.LogTrace(new EventId((int)EventLogType.PluginState), "Subscribed to topic {topic}", _topicPort.Value);
+                _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Subscribed to topic {topic}", _topicPort.Value);
             }
         }
 

@@ -169,7 +169,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
-            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Saving project [{projectName}].", projectMeta.Name);
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Saving project [{projectName}] as [{projectState}].", projectMeta.Name, projectSaveInfo.State);
             _ = await _projectManagementClient.SaveProjectAsync(new SaveProjectRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -190,19 +190,19 @@ public class ProjectManagementService : IProjectManagementService
     /// <summary>
     /// Sets the project to ready state.
     /// </summary>
-    /// <param name="dbId">The database identifier.</param>
+    /// <param name="projectMeta">The project meta info.</param>
     /// <param name="projectSaveInfo">State of the project.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryApproveAsync(string dbId,
+    public async ValueTask<bool> TryApproveAsync(Shared.Models.Agent.ProjectMeta projectMeta,
                                                     Shared.Models.Agent.ProjectSaveInfo projectSaveInfo)
     {
         try
         {
-            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Approving project with dbId [{dbId}].", dbId);
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Approving project [{projectName}] version [{projectVersion}].", projectMeta.Name, projectMeta.VersionName);
             _ = await _projectManagementClient.ApproveProjectAsync(new ApproveProjectRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
-                ProjectDbId = dbId,
+                ProjectDbId = projectMeta.DbId,
                 ProjectSaveInfo = await CreateRpcProjectSaveInfoAsync(projectSaveInfo)
             });
 

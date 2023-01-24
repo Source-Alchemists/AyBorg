@@ -285,6 +285,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
                 return new ProjectManagementResult(false, "Could not update project.");
             }
 
+            _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Project [{projectMetaRecord.Name}] changed to [Draft].", previousProjectMetaRecord.Name);
             return new ProjectManagementResult(true, null, previousProjectMetaRecord.DbId);
         }
 
@@ -401,6 +402,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "Could not remove drafts from history.");
         }
 
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Project [{projectMetaRecord.Name}] changed to [Review].", projectMetaRecord.Name);
         return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
     }
 }

@@ -162,7 +162,7 @@ public class ProjectManagementServiceTests
         _mockProjectManagementClient.Setup(m => m.ApproveProjectAsync(It.IsAny<ApproveProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
 
         // Act
-        bool result = await _service.TryApproveAsync(Guid.NewGuid().ToString(), new Shared.Models.Agent.ProjectSaveInfo {
+        bool result = await _service.TryApproveAsync(new ProjectMeta(), new Shared.Models.Agent.ProjectSaveInfo {
             State = SDK.Projects.ProjectState.Review,
             VersionName = "123",
             Comment = string.Empty

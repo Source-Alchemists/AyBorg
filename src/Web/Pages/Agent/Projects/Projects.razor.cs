@@ -143,7 +143,7 @@ public partial class Projects : ComponentBase
         if (!result.Cancelled)
         {
             var resultProjectMetaDto = (ProjectMeta)result.Data;
-            if (await ProjectManagementService.TryApproveAsync(projectMeta.DbId, new ProjectSaveInfo
+            if (await ProjectManagementService.TryApproveAsync(projectMeta, new ProjectSaveInfo
             {
                 State = SDK.Projects.ProjectState.Draft,
                 VersionName = projectMeta.VersionName,

@@ -25,13 +25,13 @@ public sealed class MqttImageReceive : BaseMqttReceiveStep
     {
         if (message.Payload == null)
         {
-            _logger.LogWarning(new EventId((int)EventLogType.PluginState), "Received message with null payload");
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Received message with null payload");
             return;
         }
 
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace(new EventId((int)EventLogType.PluginState), "Received message from topic {topic}", message.Topic);
+            _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Received message from topic {topic}", message.Topic);
         }
         using MemoryStream stream = _memoryStreamManager.GetStream(message.Payload);
 

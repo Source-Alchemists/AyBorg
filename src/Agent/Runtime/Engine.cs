@@ -89,7 +89,7 @@ internal sealed class Engine : IEngine
 
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace(new EventId((int)EventLogType.EngineState), "Engine [{Id}] starting.", Meta.Id);
+            _logger.LogTrace(new EventId((int)EventLogType.Engine), "Engine [{Id}] starting.", Meta.Id);
         }
         Meta.State = EngineState.Starting;
         StateChanged?.Invoke(this, Meta.State);
@@ -148,7 +148,7 @@ internal sealed class Engine : IEngine
             return false;
         }
 
-        _logger.LogTrace(new EventId((int)EventLogType.EngineState), "Engine [{Id}] aborting.", Meta.Id);
+        _logger.LogTrace(new EventId((int)EventLogType.Engine), "Engine [{Id}] aborting.", Meta.Id);
         Meta.State = EngineState.Aborting;
         StateChanged?.Invoke(this, Meta.State);
         _abortTokenSource.Cancel();
@@ -170,7 +170,7 @@ internal sealed class Engine : IEngine
         {
             if (_executionTask != null && !_executionTask.IsCompleted)
             {
-                _logger.LogWarning(new EventId((int)EventLogType.EngineState), "Engine [{Id}] is still running while disposing. Aborting.", Meta.Id);
+                _logger.LogWarning(new EventId((int)EventLogType.Engine), "Engine [{Id}] is still running while disposing. Aborting.", Meta.Id);
                 _abortTokenSource.Cancel();
                 _executionTask.Wait();
                 _executionTask.Dispose();
@@ -198,7 +198,7 @@ internal sealed class Engine : IEngine
             var iterationId = Guid.NewGuid();
             if (_logger.IsEnabled(LogLevel.Trace))
             {
-                _logger.LogTrace(new EventId((int)EventLogType.EngineState), "Engine [{Id}] iteration [{_iterationId}] started.", Meta.Id, iterationId);
+                _logger.LogTrace(new EventId((int)EventLogType.Engine), "Engine [{Id}] iteration [{_iterationId}] started.", Meta.Id, iterationId);
             }
 
             await StartExecuteAllPathItemsAsync(_pathExecuterLogger, iterationId, executers, pathItems, executingTasks, abortToken);
@@ -209,7 +209,7 @@ internal sealed class Engine : IEngine
 
             if (_logger.IsEnabled(LogLevel.Trace))
             {
-                _logger.LogTrace(new EventId((int)EventLogType.EngineState), "Engine [{Id}] iteration [{_iterationId}] finished.", Meta.Id, iterationId);
+                _logger.LogTrace(new EventId((int)EventLogType.Engine), "Engine [{Id}] iteration [{_iterationId}] finished.", Meta.Id, iterationId);
             }
 
             // If the execution type is single run, stop the engine.
@@ -244,12 +244,12 @@ internal sealed class Engine : IEngine
 
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace(new EventId((int)EventLogType.PluginState), "Step [{stepProxy.Name}] [{stepProxy.Id}] completed with result [{success}].", stepProxy.Name, stepProxy.Id, success);
+            _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Step [{stepProxy.Name}] [{stepProxy.Id}] completed with result [{success}].", stepProxy.Name, stepProxy.Id, success);
         }
 
         if (!success)
         {
-            _logger.LogWarning(new EventId((int)EventLogType.PluginState), "Step [{stepProxy.Name}] failed.", stepProxy.Name);
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Step [{stepProxy.Name}] failed.", stepProxy.Name);
         }
     }
 
@@ -257,19 +257,19 @@ internal sealed class Engine : IEngine
     {
         if (state == EngineState.Stopped)
         {
-            _logger.LogInformation(new EventId((int)EventLogType.EngineState), "Engine stopped at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+            _logger.LogInformation(new EventId((int)EventLogType.Engine), "Engine stopped at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
         }
         else if (state == EngineState.Aborted)
         {
-            _logger.LogInformation(new EventId((int)EventLogType.EngineState), "Engine aborted at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+            _logger.LogInformation(new EventId((int)EventLogType.Engine), "Engine aborted at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
         }
         else if (state == EngineState.Finished)
         {
-            _logger.LogInformation(new EventId((int)EventLogType.EngineState), "Engine finished single run at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+            _logger.LogInformation(new EventId((int)EventLogType.Engine), "Engine finished single run at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
         }
         else if (state == EngineState.Running)
         {
-            _logger.LogInformation(new EventId((int)EventLogType.EngineState), "Engine started at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
+            _logger.LogInformation(new EventId((int)EventLogType.Engine), "Engine started at {DateTime.UtcNow} (UTC).", DateTime.UtcNow);
         }
 
         if (state == EngineState.Stopped || state == EngineState.Aborted || state == EngineState.Finished)
