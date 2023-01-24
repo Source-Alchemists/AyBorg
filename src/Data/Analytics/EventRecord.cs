@@ -4,6 +4,7 @@ namespace AyBorg.Data.Analytics;
 
 public record EventRecord
 {
+    public Guid Id { get; set; } = Guid.NewGuid();
     public string ServiceType { get; set; } = string.Empty;
     public string ServiceUniqueName { get; set; } = string.Empty;
     public DateTime Timestamp { get; set; }

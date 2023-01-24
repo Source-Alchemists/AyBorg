@@ -1,30 +1,27 @@
-using System.Collections.Concurrent;
 using AyBorg.Data.Analytics;
 
 namespace AyBorg.Analytics.Services;
 
 public sealed class EventStorage : IEventStorage
 {
-    private readonly ConcurrentQueue<EventRecord> _queue = new();
-    private readonly int _maxMemoryEntries = 1000;
+    private readonly IEventLogRepository _eventLogRepository;
+    private readonly int _maxDaysToKeep = 30;
 
-    public EventStorage(IConfiguration configuration)
+    public EventStorage(IConfiguration configuration, IEventLogRepository eventLogRepository)
     {
-        _maxMemoryEntries = configuration.GetValue("AyBorg:EventStorage:MaxInMemoryEntries", 1000);
+        _eventLogRepository = eventLogRepository;
+        _maxDaysToKeep = configuration.GetValue("AyBorg:EventStorage:MaxDaysToKeep", 30);
     }
 
     public void Add(EventRecord eventRecord)
     {
-        if(_queue.Count > _maxMemoryEntries)
-        {
-            _queue.TryDequeue(out EventRecord? _);
-        }
-
-        _queue.Enqueue(eventRecord);
+        IEnumerable<EventRecord> outdatedEvents = _eventLogRepository.FindAllTill(DateTime.UtcNow - TimeSpan.FromDays(_maxDaysToKeep));
+        _eventLogRepository.TryDelete(outdatedEvents);
+        _eventLogRepository.TryAdd(eventRecord);
     }
 
     public IEnumerable<EventRecord> GetRecords()
     {
-        return _queue.AsEnumerable();
+        return _eventLogRepository.FindAll().OrderBy(e => e.Timestamp);
     }
 }
