@@ -69,10 +69,10 @@ label {
 }
 
 .mud-typography-h6 {
-    font-size: 1.25rem;
+    font-size: 1.125rem;
     font-family: 'Roboto','Helvetica','Arial','sans-serif';
-    font-weight: 500;
-    line-height: 1.6;
+    font-weight: 700;
+    line-height: 2;
     letter-spacing: .0075em;
     text-transform: none;
 }
