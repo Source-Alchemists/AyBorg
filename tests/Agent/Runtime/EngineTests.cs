@@ -1,11 +1,10 @@
-using Microsoft.Extensions.Logging.Abstractions;
-using AyBorg.Agent.Runtime;
+using AyBorg.Agent.Tests;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.System.Runtime;
-using AyBorg.SDK.Common;
 using AyBorg.SDK.Projects;
+using AyBorg.SDK.System.Runtime;
+using Microsoft.Extensions.Logging.Abstractions;
 
-namespace AyBorg.Agent.Tests.Runtime;
+namespace AyBorg.Agent.Runtime.Tests;
 
 public class EngineTests
 {
@@ -16,7 +15,7 @@ public class EngineTests
     /// Start -> Step1 -> Step2 -> End
     /// </summary>
     [Fact]
-    public async Task TestStartSingleRunLinear()
+    public async ValueTask TestStartSingleRunLinear()
     {
         // Arrange
         var project = new Project();
@@ -51,7 +50,7 @@ public class EngineTests
 
         // Act
         bool startResult = await engine.TryStartAsync();
-        while(!done)
+        while (!done)
         {
             await Task.Delay(10);
         }
@@ -67,7 +66,7 @@ public class EngineTests
     ///        |--------> Step2b -^
     /// </summary>
     [Fact]
-    public async Task TestStartSingleRunParallel()
+    public async ValueTask TestStartSingleRunParallel()
     {
         // Arrange
         var project = new Project();
@@ -110,7 +109,7 @@ public class EngineTests
         // Act
         bool startResult = await engine.TryStartAsync();
 
-        while(!done)
+        while (!done)
         {
             await Task.Delay(10);
         }
@@ -119,5 +118,57 @@ public class EngineTests
         Assert.True(startResult);
         Assert.True(successful);
         Assert.All(steps, s => Assert.Equal(lastIterationId, s.IterationId));
+    }
+
+    [Fact]
+    public async ValueTask Test_StopContinuousRun()
+    {
+        // Arrange
+        var project = new Project();
+
+        using var engine = new Engine(_logger, _loggerFactory, project, EngineExecutionType.ContinuousRun);
+        bool done = false;
+        Guid lastIterationId = Guid.Empty;
+        bool successful = false;
+        engine.IterationFinished += (s, e) => { done = true; lastIterationId = e.IterationId; successful = e.Success; };
+
+        // Act
+        bool startResult = await engine.TryStartAsync();
+
+        while (!done)
+        {
+            await Task.Delay(10);
+        }
+
+        bool result = await engine.TryStopAsync();
+
+        // Assert
+        Assert.True(result);
+    }
+
+    [Fact]
+    public async ValueTask Test_AbortContinuousRun()
+    {
+        // Arrange
+        var project = new Project();
+
+        using var engine = new Engine(_logger, _loggerFactory, project, EngineExecutionType.ContinuousRun);
+        bool done = false;
+        Guid lastIterationId = Guid.Empty;
+        bool successful = false;
+        engine.IterationFinished += (s, e) => { done = true; lastIterationId = e.IterationId; successful = e.Success; };
+
+        // Act
+        bool startResult = await engine.TryStartAsync();
+
+        while (!done)
+        {
+            await Task.Delay(10);
+        }
+
+        bool result = await engine.TryAbortAsync();
+
+        // Assert
+        Assert.True(result);
     }
 }

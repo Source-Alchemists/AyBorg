@@ -1,9 +1,8 @@
 using Ayborg.Gateway.V1;
 using AyBorg.Gateway.Models;
-using AyBorg.Gateway.Services;
 using Moq;
 
-namespace AyBorg.Gateway.Tests.Services;
+namespace AyBorg.Gateway.Services.Tests;
 
 public class RegisterServiceV1Tests : BaseGrpcServiceTests<RegisterServiceV1, Register.RegisterClient>
 {
@@ -172,7 +171,7 @@ public class RegisterServiceV1Tests : BaseGrpcServiceTests<RegisterServiceV1, Re
 
         // Assert
         Assert.NotNull(result);
-        if(!filterId && !filterName && !filterUniqueName && !filterType && !filterVersion)
+        if (!filterId && !filterName && !filterUniqueName && !filterType && !filterVersion)
         {
             Assert.Equal(2, result.Services.Count);
             return;

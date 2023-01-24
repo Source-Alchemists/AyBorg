@@ -202,10 +202,7 @@ public class FlowService : IFlowService
     {
         try
         {
-            if (_logger.IsEnabled(LogLevel.Trace))
-            {
-                _logger.LogTrace(new EventId((int)EventLogType.UserInteraction), "Moving step [{stepId}] to [{x},{y}].", stepId, x, y);
-            }
+            _logger.LogTrace(new EventId((int)EventLogType.UserInteraction), "Moving step [{stepId}] to [{x},{y}].", stepId, x, y);
             _ = await _editorClient.MoveFlowStepAsync(new MoveFlowStepRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,

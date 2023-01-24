@@ -1,12 +1,11 @@
 using System.Security.Claims;
-using AyBorg.Gateway.Services;
 using AyBorg.Gateway.Tests.Helpers;
 using Grpc.Core;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace AyBorg.Gateway.Tests.Services;
+namespace AyBorg.Gateway.Services.Tests;
 
 public abstract class BaseGrpcServiceTests<TService, TClient>
     where TService : class

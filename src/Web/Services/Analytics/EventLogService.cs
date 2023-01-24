@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Analytics.V1;
 using AyBorg.SDK.Common;
 using AyBorg.Web.Shared.Models;
@@ -7,13 +8,11 @@ namespace AyBorg.Web.Services.Analytics;
 
 public sealed class EventLogService : IEventLogService
 {
-    private readonly ILogger<EventLogService> _logger;
     private readonly EventLog.EventLogClient _eventLogClient;
 
 
-    public EventLogService(ILogger<EventLogService> logger, EventLog.EventLogClient eventLogClient)
+    public EventLogService(EventLog.EventLogClient eventLogClient)
     {
-        _logger = logger;
         _eventLogClient = eventLogClient;
     }
 
@@ -42,6 +41,7 @@ public sealed class EventLogService : IEventLogService
         }
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static string GetEventTypeDescription(int id)
     {
         if (!Enum.IsDefined(typeof(EventLogType), id))

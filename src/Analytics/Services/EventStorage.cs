@@ -5,7 +5,7 @@ namespace AyBorg.Analytics.Services;
 public sealed class EventStorage : IEventStorage
 {
     private readonly IEventLogRepository _eventLogRepository;
-    private readonly int _maxDaysToKeep = 30;
+    private readonly int _maxDaysToKeep;
 
     public EventStorage(IConfiguration configuration, IEventLogRepository eventLogRepository)
     {
