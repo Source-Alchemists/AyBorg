@@ -256,19 +256,19 @@ public class FlowService : IFlowService
     }
 
     /// <summary>
-    /// Removes the link asynchronous.
+    /// Removes the link.
     /// </summary>
-    /// <param name="linkId">The link identifier.</param>
+    /// <param name="link">The link.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryRemoveLinkAsync(Guid linkId)
+    public async ValueTask<bool> TryRemoveLinkAsync(Link link)
     {
         try
         {
-            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Removing link [{linkId}].", linkId);
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Removing link [{link}].", link);
             _ = await _editorClient.LinkFlowPortsAsync(new LinkFlowPortsRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
-                SourceId = linkId.ToString(),
+                SourceId = link.Id.ToString(),
                 TargetId = string.Empty
             });
             return true;
@@ -315,7 +315,7 @@ public class FlowService : IFlowService
     {
         try
         {
-            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Setting port value [{port}].", port);
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Change port value [{port}].", port);
             _ = await _editorClient.UpdateFlowPortAsync(new UpdateFlowPortRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -325,7 +325,7 @@ public class FlowService : IFlowService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error setting port value!");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error changing port value!");
             return false;
         }
     }

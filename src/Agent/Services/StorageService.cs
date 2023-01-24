@@ -32,7 +32,7 @@ internal sealed class StorageService : IStorageService
         }
         else
         {
-            _logger.LogInformation("Using storage directory at {StorageLocation}", _environment.StorageLocation);
+            _logger.LogTrace("Using storage directory at {StorageLocation}", _environment.StorageLocation);
         }
     }
 
@@ -67,9 +67,9 @@ internal sealed class StorageService : IStorageService
 
         if (Directory.Exists(realPath))
         {
-            foreach (var dir in Directory.GetDirectories(realPath))
+            foreach (string dir in Directory.GetDirectories(realPath))
             {
-                var virtualSubPath = dir.Replace(_environment.StorageLocation, VIRTUAL_ROOT_PATH);
+                string virtualSubPath = dir.Replace(_environment.StorageLocation, VIRTUAL_ROOT_PATH);
                 virtualSubPath = virtualSubPath.Replace("\\", "/");
                 virtualSubPath = virtualSubPath.Replace("//", "/");
                 yield return virtualSubPath;

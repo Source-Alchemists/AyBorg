@@ -2,8 +2,8 @@ using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
-using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services;
+using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Tests.Helpers;
 using Google.Protobuf;
@@ -264,7 +264,7 @@ public class FlowServiceTests
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link());
 
         // Act
-        bool result = await _service.TryRemoveLinkAsync(Guid.NewGuid());
+        bool result = await _service.TryRemoveLinkAsync(new Link());
 
         // Assert
         Assert.True(result);

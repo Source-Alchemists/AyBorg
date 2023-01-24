@@ -391,7 +391,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         var targetPort = (FlowPort)link.TargetPort;
         Link orgLink = links.FirstOrDefault(l => l.Id.ToString().Equals(link.Id));
         if (orgLink == null) return; // Nothing to do. Already removed.
-        if (!await FlowService.TryRemoveLinkAsync(orgLink.Id))
+        if (!await FlowService.TryRemoveLinkAsync(orgLink))
         {
             _diagram.Links.Add(link);
             return;

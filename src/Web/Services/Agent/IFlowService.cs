@@ -39,7 +39,7 @@ public interface IFlowService
     /// <returns></returns>
     ValueTask<bool> TryMoveStepAsync(Guid stepId, int x, int y);
 
-     /// <summary>
+    /// <summary>
     /// Add link between ports.
     /// </summary>
     /// <param name="sourcePort">The source port.</param>
@@ -50,9 +50,9 @@ public interface IFlowService
     /// <summary>
     /// Removes the link.
     /// </summary>
-    /// <param name="linkId">The link identifier.</param>
+    /// <param name="link">The link.</param>
     /// <returns></returns>
-    ValueTask<bool> TryRemoveLinkAsync(Guid linkId);
+    ValueTask<bool> TryRemoveLinkAsync(Link link);
 
     /// <summary>
     /// Gets the port for the given iteration.
