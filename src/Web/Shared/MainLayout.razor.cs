@@ -73,6 +73,8 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
     private void CreateTheme()
     {
         // Light Theme
+        _theme.Palette.Info = new MudColor("#00BCD4");
+        _theme.Palette.InfoDarken = "#00a1b6";
         _theme.Palette.AppbarText = new MudColor("#424242ff");
         _theme.Palette.AppbarBackground = new MudColor("#00000000");
         _theme.Palette.Background = new MudColor("#f9f9f9");
