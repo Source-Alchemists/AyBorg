@@ -13,8 +13,8 @@ legend {
     color: var(--mud-palette-text-primary);
 }
 
-.mud-drawer-content {
-    position: fixed;
+.mud-drawer {
+    position: fixed !important;
 }
 
 /*Blazor error message*/

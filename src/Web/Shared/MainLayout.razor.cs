@@ -75,6 +75,8 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
         // Light Theme
         _theme.Palette.AppbarText = new MudColor("#424242ff");
         _theme.Palette.AppbarBackground = new MudColor("#00000000");
+        _theme.Palette.Background = new MudColor("#f9f9f9");
+        _theme.Palette.DrawerBackground = new MudColor("#f9f9f9");
 
         // Dark Theme
         _theme.PaletteDark.TextPrimary = new MudColor("#f0f0f0");
@@ -83,7 +85,9 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
         _theme.PaletteDark.Background = new MudColor("#1a1a27ff");
         _theme.PaletteDark.BackgroundGrey = new MudColor("#252532");
         _theme.PaletteDark.DrawerBackground = new MudColor("#1a1a27ff");
+        _theme.PaletteDark.DrawerText = new MudColor("#f0f0f0");
         _theme.PaletteDark.AppbarBackground = new MudColor("#1a1a27cc");
+        _theme.PaletteDark.AppbarText = new MudColor("#f0f0f0");
         _theme.PaletteDark.Surface = new MudColor("#1e1e2dff");
 
         _theme.Shadows.Elevation[1] = "0 2px 4px -1px rgba(6, 24, 44, 0.2)";

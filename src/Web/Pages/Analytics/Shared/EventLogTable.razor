@@ -2,7 +2,7 @@
 
 <MudDataGrid @ref="_table" Items="@EventEntries" SortMode="SortMode.Multiple"
             FilterMode="DataGridFilterMode.ColumnFilterRow"
-            Filterable="true" Hideable="true" Elevation="0" ShowMenuIcon="true">
+            Filterable="true" Hideable="true" Hover="true" Elevation="0" ShowMenuIcon="true">
     <ToolBarContent>
         <MudText Typo="Typo.h6">Event Log</MudText>
         <MudSpacer />
@@ -11,7 +11,8 @@
         <Column T="EventLogEntry" Field="Timestamp" Title="Timestamp (UTC)" />
         <Column T="EventLogEntry" Field="LogLevel" Title="Level" />
         <Column T="EventLogEntry" Field="ServiceUniqueName" Title="Service Name" />
-        <Column T="EventLogEntry" Field="EventName" Title="Event ID" />
+        <Column T="EventLogEntry" Field="EventName" Title="Event" />
         <Column T="EventLogEntry" Field="Message" />
+        <Column T="EventLogEntry" Field="EventId" Title="Event ID" Hidden="true" Filterable="false" />
     </Columns>
 </MudDataGrid>
