@@ -297,6 +297,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
         // Moving to ready state
         ProjectRecord previousProjectRecord = await _projectRepository.FindAsync(projectMetaDbId);
+
         ProjectMetaRecord projectMetaRecord = previousProjectMetaRecord with
         {
             DbId = Guid.NewGuid(),
@@ -307,6 +308,16 @@ internal sealed class ProjectManagementService : IProjectManagementService
             UpdatedDate = DateTime.UtcNow,
             ApprovedBy = approver
         };
+
+        if (previousProjectRecord.Meta.IsActive)
+        {
+            previousProjectRecord.Meta.IsActive = false;
+            if (!await _projectRepository.TryUpdateAsync(previousProjectRecord.Meta))
+            {
+                _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Could not deactivate project. Stopping action");
+                return new ProjectManagementResult(false, "Could not deactivate project.");
+            }
+        }
 
         ProjectSettingsRecord projectSettingsRecord = previousProjectRecord.Settings with
         {
@@ -371,6 +382,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         {
             _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Could not save project.");
         }
+
         _logger.LogInformation("Project [{projectName}] saved.", projectMetaRecord.Name);
         return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
     }
