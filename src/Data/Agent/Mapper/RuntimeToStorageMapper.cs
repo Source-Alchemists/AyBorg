@@ -1,21 +1,22 @@
 ﻿using System.Globalization;
 using AutoMapper;
-using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
 
 namespace AyBorg.Data.Agent;
 
 public sealed class RuntimeToStorageMapper : IRuntimeToStorageMapper
 {
-    private readonly AutoMapper.Mapper _mapper;
+    private readonly Mapper _mapper;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RuntimeToStorageMapper"/> class.
     /// </summary>
     public RuntimeToStorageMapper()
     {
-        var config = new MapperConfiguration(config => {
+        var config = new MapperConfiguration(config =>
+        {
             config.CreateMap<ProjectMeta, ProjectMetaRecord>().ReverseMap();
             config.CreateMap<ProjectSettings, ProjectSettingsRecord>().ReverseMap();
             config.CreateMap<Project, ProjectRecord>();

@@ -28,7 +28,7 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
         };
 
         Guid id = await _keeperService.RegisterAsync(newServiceEntry);
-        _logger.LogInformation(new EventId((int)EventLogType.Connect), "Registered {Name} ({Url}) with id [{Id}].", newServiceEntry.Name, newServiceEntry.Url, id);
+        _logger.LogInformation(new EventId((int)EventLogType.Connect), "Registered {name} ({url}).", newServiceEntry.Name, newServiceEntry.Url);
         return new StatusResponse { Success = true, Id = id.ToString(), ErrorMessage = string.Empty };
     }
 

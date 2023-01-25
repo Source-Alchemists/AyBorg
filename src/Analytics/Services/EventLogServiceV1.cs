@@ -27,7 +27,10 @@ public sealed class EventLogServiceV1 : EventLog.EventLogBase
             EventId = request.EventId,
             Message = request.Message
         };
-        _logger.LogTrace("{entry}", entry.ToString());
+        if (_logger.IsEnabled(LogLevel.Trace))
+        {
+            _logger.LogTrace("{entry}", entry.ToString());
+        }
         _eventStorage.Add(entry);
         return Task.FromResult(new Empty());
     }
