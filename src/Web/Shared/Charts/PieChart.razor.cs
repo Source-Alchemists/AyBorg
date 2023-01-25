@@ -4,7 +4,7 @@ namespace AyBorg.Web.Shared.Charts;
 
 public partial class PieChart : ComponentBase
 {
-    private bool _isLoading = true;
+
     [Parameter]
     [EditorRequired]
     public string[] Labels { get; set; } = Array.Empty<string>();
@@ -18,6 +18,8 @@ public partial class PieChart : ComponentBase
 
     [Parameter]
     public string Height { get; set; } = "200px";
+
+    private bool _isLoading = true;
 
     protected override void OnParametersSet() {
          base.OnParametersSet();

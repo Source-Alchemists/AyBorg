@@ -1,1 +1,15 @@
-<MudChart ChartType="ChartType.Line" ChartSeries="@_series" XAxisLabels="@_labels" ChartOptions="@_options" Class="mud-full-width" Width="@Width" Height="@Height" />
+@if (_isLoading)
+{
+    <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="@Width" Height="@Height" />
+    <MudStack Row="true" Class="mud-full-width px-10">
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="10px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="10px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="10px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="10px" />
+    </MudStack>
+}
+else
+{
+    <MudChart ChartType="ChartType.Line" ChartSeries="@_series" XAxisLabels="@_labels" ChartOptions="@_options"
+    Class="mud-full-width" Width="@Width" Height="@Height" />
+}

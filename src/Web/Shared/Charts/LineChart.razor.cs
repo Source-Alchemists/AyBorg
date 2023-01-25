@@ -19,15 +19,22 @@ public partial class LineChart : ComponentBase
     [Parameter]
     public string Height { get; set; } = "100%";
 
+    private bool _isLoading = true;
     private readonly List<ChartSeries> _series = new();
     private readonly ChartOptions _options = new();
     private string[] _labels = Array.Empty<string>();
 
-    protected override void OnAfterRender(bool firstRender) {
-        base.OnAfterRender(firstRender);
-
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _options.YAxisTicks = 1;
+        _options.XAxisLines = false;
         _series.Clear();
         _labels = SeriesLabels.ToArray();
+        if (_labels != Array.Empty<string>())
+        {
+            _isLoading = false;
+        }
         foreach (object key in SeriesData.Keys)
         {
             double[] data = SeriesData[key].ToArray();
@@ -37,8 +44,5 @@ public partial class LineChart : ComponentBase
                 Data = data
             });
         }
-
-        _options.YAxisTicks = 1;
-        _options.XAxisLines = false;
     }
 }

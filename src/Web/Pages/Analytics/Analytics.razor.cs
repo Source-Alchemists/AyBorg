@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using AyBorg.Web.Pages.Analytics.Shared;
 using AyBorg.Web.Services.Analytics;
 using AyBorg.Web.Shared.Models;
@@ -50,30 +51,12 @@ public partial class Analytics : ComponentBase
             _eventLevelOverTimeData.Clear();
             _eventLevelOverTimeLabels.Clear();
             IEnumerable<IGrouping<DateTime, EventLogEntry>> groupedTimeChart = _eventLogTable.FilteredEntries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, e.Timestamp.Minute, e.Timestamp.Second));
-            if (groupedTimeChart.Any(g => g.Any(e => e.LogLevel.Equals(LogLevel.Trace))))
-            {
-                _eventLevelOverTimeData.Add(LogLevel.Trace, new List<double>());
-            }
-            if (groupedTimeChart.Any(g => g.Any(e => e.LogLevel.Equals(LogLevel.Debug))))
-            {
-                _eventLevelOverTimeData.Add(LogLevel.Debug, new List<double>());
-            }
-            if (groupedTimeChart.Any(g => g.Any(e => e.LogLevel.Equals(LogLevel.Information))))
-            {
-                _eventLevelOverTimeData.Add(LogLevel.Information, new List<double>());
-            }
-            if (groupedTimeChart.Any(g => g.Any(e => e.LogLevel.Equals(LogLevel.Warning))))
-            {
-                _eventLevelOverTimeData.Add(LogLevel.Warning, new List<double>());
-            }
-            if (groupedTimeChart.Any(g => g.Any(e => e.LogLevel.Equals(LogLevel.Error))))
-            {
-                _eventLevelOverTimeData.Add(LogLevel.Error, new List<double>());
-            }
-            if (groupedTimeChart.Any(g => g.Any(e => e.LogLevel.Equals(LogLevel.Critical))))
-            {
-                _eventLevelOverTimeData.Add(LogLevel.Critical, new List<double>());
-            }
+            AddTimeSeriesLogLevelIfExists(groupedTimeChart, LogLevel.Trace);
+            AddTimeSeriesLogLevelIfExists(groupedTimeChart, LogLevel.Debug);
+            AddTimeSeriesLogLevelIfExists(groupedTimeChart, LogLevel.Information);
+            AddTimeSeriesLogLevelIfExists(groupedTimeChart, LogLevel.Warning);
+            AddTimeSeriesLogLevelIfExists(groupedTimeChart, LogLevel.Error);
+            AddTimeSeriesLogLevelIfExists(groupedTimeChart, LogLevel.Critical);
             int timeChartCount = groupedTimeChart.Count();
             int count = 0;
             foreach (IGrouping<DateTime, EventLogEntry> groupEntry in groupedTimeChart)
@@ -87,65 +70,75 @@ public partial class Analytics : ComponentBase
                     _eventLevelOverTimeLabels.Add(string.Empty);
                 }
                 count++;
-                int countTrace = groupEntry.Count(g => g.LogLevel.Equals(LogLevel.Trace));
-                int countDebug = groupEntry.Count(g => g.LogLevel.Equals(LogLevel.Debug));
-                int countInfo = groupEntry.Count(g => g.LogLevel.Equals(LogLevel.Information));
-                int countWarn = groupEntry.Count(g => g.LogLevel.Equals(LogLevel.Warning));
-                int countError = groupEntry.Count(g => g.LogLevel.Equals(LogLevel.Error));
-                int countCritical = groupEntry.Count(g => g.LogLevel.Equals(LogLevel.Critical));
-
-                if (_eventLevelOverTimeData.TryGetValue(LogLevel.Debug, out List<double>? debugValue))
-                {
-                    debugValue.Add(countDebug);
-                }
-                if (_eventLevelOverTimeData.TryGetValue(LogLevel.Trace, out List<double>? traceValue))
-                {
-                    traceValue.Add(countTrace);
-                }
-                if (_eventLevelOverTimeData.TryGetValue(LogLevel.Information, out List<double>? infoValue))
-                {
-                    infoValue.Add(countInfo);
-                }
-                if (_eventLevelOverTimeData.TryGetValue(LogLevel.Warning, out List<double>? warnValue))
-                {
-                    warnValue.Add(countWarn);
-                }
-                if (_eventLevelOverTimeData.TryGetValue(LogLevel.Error, out List<double>? errorValue))
-                {
-                    errorValue.Add(countError);
-                }
-                if (_eventLevelOverTimeData.TryGetValue(LogLevel.Critical, out List<double>? criticalValue))
-                {
-                    criticalValue.Add(countCritical);
-                }
+                CountAndAddLogLevelToTimeSeries(groupEntry, LogLevel.Trace);
+                CountAndAddLogLevelToTimeSeries(groupEntry, LogLevel.Debug);
+                CountAndAddLogLevelToTimeSeries(groupEntry, LogLevel.Information);
+                CountAndAddLogLevelToTimeSeries(groupEntry, LogLevel.Warning);
+                CountAndAddLogLevelToTimeSeries(groupEntry, LogLevel.Error);
+                CountAndAddLogLevelToTimeSeries(groupEntry, LogLevel.Critical);
             }
 
-            IEnumerable<IGrouping<LogLevel, EventLogEntry>> levelGroup = _eventLogTable.FilteredEntries.GroupBy(e => e.LogLevel).ToList();
-            _eventLevelSummaryLabels = levelGroup.Select(g => g.Key.ToString()).ToArray();
-            _eventLevelSummaryData = new double[_eventLevelSummaryLabels.Length];
-            for (int i = 0; i < _eventLevelSummaryData.Length; i++)
-            {
-                _eventLevelSummaryData[i] = levelGroup.ElementAt(i).Count();
-            }
-
-            IEnumerable<IGrouping<string, EventLogEntry>> serviceGroup = _eventLogTable.FilteredEntries.GroupBy(e => e.ServiceUniqueName).ToList();
-            _eventServiceSummaryLabels = serviceGroup.Select(g => g.Key).ToArray();
-            _eventServiceSummaryData = new double[_eventServiceSummaryLabels.Length];
-            for (int i = 0; i < _eventServiceSummaryData.Length; i++)
-            {
-                _eventServiceSummaryData[i] = serviceGroup.ElementAt(i).Count();
-            }
-
-            IEnumerable<IGrouping<string, EventLogEntry>> eventIdGroup = _eventLogTable.FilteredEntries.GroupBy(e => e.EventName).ToList();
-            _eventIdSummaryLabels = eventIdGroup.Select(g => g.Key).ToArray();
-            _eventIdSummaryData = new double[_eventIdSummaryLabels.Length];
-            for (int i = 0; i < _eventIdSummaryData.Length; i++)
-            {
-                _eventIdSummaryData[i] = eventIdGroup.ElementAt(i).Count();
-            }
+            CreateLogLevelSummary();
+            CreateServicesSummary();
+            CreateEventsSummary();
             return InvokeAsync(StateHasChanged);
         }
 
         return Task.CompletedTask;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void CreateLogLevelSummary()
+    {
+        IEnumerable<IGrouping<LogLevel, EventLogEntry>> levelGroup = _eventLogTable.FilteredEntries.GroupBy(e => e.LogLevel).ToList();
+        _eventLevelSummaryLabels = levelGroup.Select(g => g.Key.ToString()).ToArray();
+        _eventLevelSummaryData = new double[_eventLevelSummaryLabels.Length];
+        for (int i = 0; i < _eventLevelSummaryData.Length; i++)
+        {
+            _eventLevelSummaryData[i] = levelGroup.ElementAt(i).Count();
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void CreateServicesSummary()
+    {
+        IEnumerable<IGrouping<string, EventLogEntry>> serviceGroup = _eventLogTable.FilteredEntries.GroupBy(e => e.ServiceUniqueName).ToList();
+        _eventServiceSummaryLabels = serviceGroup.Select(g => g.Key).ToArray();
+        _eventServiceSummaryData = new double[_eventServiceSummaryLabels.Length];
+        for (int i = 0; i < _eventServiceSummaryData.Length; i++)
+        {
+            _eventServiceSummaryData[i] = serviceGroup.ElementAt(i).Count();
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void CreateEventsSummary()
+    {
+        IEnumerable<IGrouping<string, EventLogEntry>> eventIdGroup = _eventLogTable.FilteredEntries.GroupBy(e => e.EventName).ToList();
+        _eventIdSummaryLabels = eventIdGroup.Select(g => g.Key).ToArray();
+        _eventIdSummaryData = new double[_eventIdSummaryLabels.Length];
+        for (int i = 0; i < _eventIdSummaryData.Length; i++)
+        {
+            _eventIdSummaryData[i] = eventIdGroup.ElementAt(i).Count();
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void AddTimeSeriesLogLevelIfExists(IEnumerable<IGrouping<DateTime, EventLogEntry>> group, LogLevel logLevel)
+    {
+        if (group.Any(g => g.Any(e => e.LogLevel.Equals(logLevel))))
+        {
+            _eventLevelOverTimeData.Add(logLevel, new List<double>());
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private void CountAndAddLogLevelToTimeSeries(IGrouping<DateTime, EventLogEntry> groupEntry, LogLevel logLevel)
+    {
+        int count = groupEntry.Count(g => g.LogLevel.Equals(logLevel));
+        if (_eventLevelOverTimeData.TryGetValue(logLevel, out List<double>? collection))
+        {
+            collection.Add(count);
+        }
     }
 }
