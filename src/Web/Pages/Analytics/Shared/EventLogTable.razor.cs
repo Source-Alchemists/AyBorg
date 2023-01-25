@@ -22,7 +22,7 @@ public partial class EventLogTable : ComponentBase
 
     public bool IsLoading { get; private set; } = false;
 
-    private async void DownloadLogAsCsv()
+    private async Task DownloadLogAsCsv()
     {
         IsLoading = true;
         try
