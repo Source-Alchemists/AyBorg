@@ -6,6 +6,9 @@
     <ToolBarContent>
         <MudText Typo="Typo.h6">Event Log</MudText>
         <MudSpacer />
+        <MudTooltip Text="Download Log as CSV">
+            <MudIconButton Icon="@Icons.Material.Filled.Download" OnClick="@DownloadLogAsCsv" Disabled="@IsLoading" />
+        </MudTooltip>
     </ToolBarContent>
     <Columns>
         <Column T="EventLogEntry" Field="Timestamp" Title="Timestamp (UTC)" />

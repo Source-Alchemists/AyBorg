@@ -18,6 +18,7 @@ public partial class Analytics : ComponentBase
     private string[] _eventIdSummaryLabels = Array.Empty<string>();
     private double[] _eventIdSummaryData = Array.Empty<double>();
     private bool _isLoading = false;
+    private bool _isEventLogTableLoading => _eventLogTable?.IsLoading ?? false;
 
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
