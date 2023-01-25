@@ -1,13 +1,14 @@
+using AyBorg.Agent;
 using AyBorg.Agent.Guards;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Services.gRPC;
-using AyBorg.Database.Data;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Agent;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
@@ -22,9 +23,9 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.SqlLite")),
+                        x => x.MigrationsAssembly("AyBorg.Data.Agent.Migrations.SqlLite")),
         "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
-                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("AyBorg.Data.Agent.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );
@@ -32,17 +33,9 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddGrpc();
 
-builder.Services.AddGrpcClient<Ayborg.Gateway.V1.Register.RegisterClient>(options =>
-{
-    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
-    options.Address = new Uri(gatewayUrl!);
-});
+builder.RegisterGrpcClients();
 
-builder.Services.AddGrpcClient<Ayborg.Gateway.Agent.V1.Notify.NotifyClient>(options =>
-{
-    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
-    options.Address = new Uri(gatewayUrl!);
-});
+builder.AddAyBorgAnalyticsLogger();
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
 

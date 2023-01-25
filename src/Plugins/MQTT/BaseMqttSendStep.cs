@@ -1,3 +1,4 @@
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.System.Runtime;
@@ -47,7 +48,7 @@ public abstract class BaseMqttSendStep : BaseMqttStep, IDisposable
             }
             catch (Exception ex)
             {
-                _logger.LogWarning(ex, "Error while sending message to MQTT");
+                _logger.LogWarning(new EventId((int)EventLogType.Result), ex, "Error while sending message to MQTT");
                 return false;
             }
         }

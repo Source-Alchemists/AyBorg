@@ -1,10 +1,10 @@
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Gateway.Models;
-using AyBorg.Gateway.Services.Agent;
+using AyBorg.Gateway.Services.Tests;
 using Grpc.Core;
 using Moq;
 
-namespace AyBorg.Gateway.Tests.Services.Agent;
+namespace AyBorg.Gateway.Services.Agent.Tests;
 
 public class NotifyPassthroughServiceV1Tests : BaseGrpcServiceTests<NotifyPassthroughServiceV1, Notify.NotifyClient>
 {

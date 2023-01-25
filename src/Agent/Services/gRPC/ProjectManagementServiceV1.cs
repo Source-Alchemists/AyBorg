@@ -1,6 +1,6 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Authorization;
-using AyBorg.SDK.Data.DAL;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 

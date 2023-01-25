@@ -1,6 +1,5 @@
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Modals;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Shared.Models.Agent;
@@ -144,7 +143,7 @@ public partial class Projects : ComponentBase
         if (!result.Cancelled)
         {
             var resultProjectMetaDto = (ProjectMeta)result.Data;
-            if (await ProjectManagementService.TryApproveAsync(projectMeta.DbId, new ProjectSaveInfo
+            if (await ProjectManagementService.TryApproveAsync(projectMeta, new ProjectSaveInfo
             {
                 State = SDK.Projects.ProjectState.Draft,
                 VersionName = projectMeta.VersionName,

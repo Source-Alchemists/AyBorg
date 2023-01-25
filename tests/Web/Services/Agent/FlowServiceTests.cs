@@ -2,8 +2,8 @@ using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
+using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Tests.Helpers;
 using Google.Protobuf;
@@ -191,7 +191,7 @@ public class FlowServiceTests
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<StepDto>())).Returns(new Step());
 
         // Act
-        Step result = await _service.AddStepAsync(Guid.NewGuid(), 0, 0);
+        Step result = await _service.AddStepAsync(new Step());
 
         // Assert
         Assert.NotNull(result);
@@ -205,7 +205,7 @@ public class FlowServiceTests
         _mockEditorClient.Setup(m => m.DeleteFlowStepAsync(It.IsAny<DeleteFlowStepRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
 
         // Act
-        bool result = await _service.TryRemoveStepAsync(Guid.NewGuid());
+        bool result = await _service.TryRemoveStepAsync(new Step());
 
         // Assert
         Assert.True(result);
@@ -241,7 +241,7 @@ public class FlowServiceTests
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link());
 
         // Act
-        Guid? result = await _service.AddLinkAsync(Guid.NewGuid(), Guid.NewGuid());
+        Guid? result = await _service.AddLinkAsync(new Port(), new Port());
 
         // Assert
         if (!notLinking)
@@ -264,7 +264,7 @@ public class FlowServiceTests
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link());
 
         // Act
-        bool result = await _service.TryRemoveLinkAsync(Guid.NewGuid());
+        bool result = await _service.TryRemoveLinkAsync(new Link());
 
         // Assert
         Assert.True(result);

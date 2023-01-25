@@ -4,6 +4,7 @@
 
 using System;
 using System.Threading.Tasks;
+using AyBorg.SDK.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -26,7 +27,7 @@ namespace AyBorg.Web.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
-            _logger.LogInformation("User logged out.");
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "User logged out.");
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);

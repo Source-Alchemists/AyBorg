@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <Version>0.4.0</Version>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Authors>Source Alchemists</Authors>
+    <Owners>Source Alchemists</Owners>
+    <Company>Source Alchemists</Company>
+    <Copyright>Copyright © Source Alchemists</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <LangVersion>11.0</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+    <AnalysisLevel>7</AnalysisLevel>
+    <AnalysisLevelStyle>7-all</AnalysisLevelStyle>
+
+    <Features>strict</Features>
+  </PropertyGroup>
+</Project>

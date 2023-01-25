@@ -38,6 +38,7 @@ public class ImageLoadTests : IDisposable
     {
         if (!_disposedValue && disposing)
         {
+            Task.Delay(10).Wait(); // Give some time to finished the background task.
             _plugin?.Dispose();
             _disposedValue = true;
         }

@@ -1,14 +1,20 @@
 html {
     height: 100vh;
 }
+
 body {
     height: 100vh;
     font-size: 0.9rem;
-    font-family: Nunito,sans-serif;
+    font-family: Nunito, sans-serif;
 }
 
-label, legend {
+label,
+legend {
     color: var(--mud-palette-text-primary);
+}
+
+.mud-drawer {
+    position: fixed !important;
 }
 
 /*Blazor error message*/

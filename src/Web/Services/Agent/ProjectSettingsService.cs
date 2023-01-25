@@ -1,4 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Common;
 using Grpc.Core;
 
 namespace AyBorg.Web.Services.Agent;
@@ -40,7 +41,7 @@ public sealed class ProjectSettingsService : IProjectSettingsService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to get project settings");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to get project settings");
             return null!;
         }
     }
@@ -56,6 +57,7 @@ public sealed class ProjectSettingsService : IProjectSettingsService
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Updating project communication settings for project [{projectName}]: {projectSettings}", projectMeta.Name, projectSettings);
             _ = await _projectSettingsClient.UpdateProjectSettingsAsync(new UpdateProjectSettingsRequest
             {
                 AgentUniqueName = agentUniqueName,
@@ -70,7 +72,7 @@ public sealed class ProjectSettingsService : IProjectSettingsService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to update project communication settings");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to update project communication settings");
             return false;
         }
     }

@@ -1,6 +1,6 @@
 using AyBorg.Web.Shared.Models;
 
-namespace AyBorg.Web.Services.AppState;
+namespace AyBorg.Web.Services;
 
 public interface IStateService
 {

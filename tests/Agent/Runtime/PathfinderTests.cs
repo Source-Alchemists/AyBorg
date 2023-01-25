@@ -1,8 +1,8 @@
-using AyBorg.Agent.Runtime;
+using AyBorg.Agent.Tests;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
 
-namespace AyBorg.Agent.Tests.Runtime;
+namespace AyBorg.Agent.Runtime.Tests;
 
 #nullable disable
 

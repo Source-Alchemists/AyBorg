@@ -1,4 +1,5 @@
 using System.Text;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
 using Microsoft.Extensions.Logging;
@@ -22,11 +23,14 @@ public sealed class MqttReceive : BaseMqttReceiveStep
     {
         if (message.Payload == null)
         {
-            _logger.LogWarning("Received message with null payload");
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Received message with null payload");
             return;
         }
 
-        _logger.LogTrace("Received message from topic {topic}", message.Topic);
+        if (_logger.IsEnabled(LogLevel.Trace))
+        {
+            _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Received message from topic {topic}", message.Topic);
+        }
         _messagePort.Value = Encoding.UTF8.GetString(message.Payload);
         _hasNewMessage = true;
     }

@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Services.gRPC;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Authorization;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -24,7 +25,7 @@ public class ProjectSettingsServiceV1Tests : BaseGrpcServiceTests<ProjectSetting
     public async ValueTask Test_GetProjectSettings(bool hasInvalidProjectId)
     {
         // Arrange
-        _mockProjectSettingsService.Setup(m => m.GetSettingsRecordAsync(It.IsAny<Guid>())).ReturnsAsync(new SDK.Data.DAL.ProjectSettingsRecord
+        _mockProjectSettingsService.Setup(m => m.GetSettingsRecordAsync(It.IsAny<Guid>())).ReturnsAsync(new ProjectSettingsRecord
         {
             IsForceResultCommunicationEnabled = true
         });

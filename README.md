@@ -41,6 +41,15 @@ The default appsettings give you a good starting point and will also work locall
 
 > :warning: **The default password should be changed immediately!**
 
+## Default Ports
+
+| Service          | HTTP | HTTPS | gRPC |
+| ---------------- | ---- | ----- | ---- |
+| AyBorg.Gateway   |      |       | 5000 |
+| AyBorg.Analytics |      |       | 5001 |
+| AyBorg.Web       | 5010 | 5011  |      |
+| AyBorg.Agent     |      |       | 5020 |
+
 ## Example setups
 
 Services can be added any time. The AyBorg.Gateway will detect the new service and establish the communication.

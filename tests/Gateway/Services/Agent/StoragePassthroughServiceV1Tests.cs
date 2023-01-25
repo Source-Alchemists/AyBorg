@@ -1,12 +1,12 @@
 using System.Security.Claims;
 using Ayborg.Gateway.Agent.V1;
-using AyBorg.Gateway.Services.Agent;
+using AyBorg.Gateway.Services.Tests;
 using AyBorg.Gateway.Tests.Helpers;
 using AyBorg.SDK.Authorization;
 using Grpc.Core;
 using Moq;
 
-namespace AyBorg.Gateway.Tests.Services.Agent;
+namespace AyBorg.Gateway.Services.Agent.Tests;
 
 public class StoragePassthroughServiceV1Tests : BaseGrpcServiceTests<StoragePassthroughServiceV1, Storage.StorageClient>
 {

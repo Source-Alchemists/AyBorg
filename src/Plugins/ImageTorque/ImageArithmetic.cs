@@ -57,7 +57,7 @@ public sealed class ImageArithemtic : IStepBody, IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Failed to perform image arithmetic operation");
+            _logger.LogWarning(new EventId((int)EventLogType.Result), ex, "Failed to perform image arithmetic operation");
             return ValueTask.FromResult(false);
         }
 

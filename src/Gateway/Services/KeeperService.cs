@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
-using AyBorg.Database.Data;
+using AyBorg.Data.Gateway;
 using AyBorg.Gateway.Models;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
 
@@ -127,7 +128,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
         }
 
         using RegistryContext context = await _registryContextFactory.CreateDbContextAsync();
-        SDK.Data.DAL.ServiceEntryRecord? knownService = await context.ServiceEntries!.FirstOrDefaultAsync(x => x.UniqueName == serviceEntry.UniqueName && x.Type == serviceEntry.Type);
+        ServiceEntryRecord? knownService = await context.ServiceEntries!.FirstOrDefaultAsync(x => x.UniqueName == serviceEntry.UniqueName && x.Type == serviceEntry.Type);
         if (knownService != null)
         {
             // Identified existing service by unique name and type.
@@ -136,7 +137,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
             knownService.Name = serviceEntry.Name;
             serviceEntry.LastConnectionTime = DateTime.UtcNow;
             serviceEntry.Id = knownService.Id;
-            _logger.LogTrace("Service {serviceEntry.Name} ({serviceEntry.Url}) is already registered and will be used with same id [{serviceEntry.Id}].", serviceEntry.Name, serviceEntry.Url, serviceEntry.Id);
+            _logger.LogTrace(new EventId((int)EventLogType.Connect), "Service {serviceEntry.Name} ({serviceEntry.Url}) is already registered and will be used with same id [{serviceEntry.Id}].", serviceEntry.Name, serviceEntry.Url, serviceEntry.Id);
         }
         else
         {
@@ -164,9 +165,9 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// Unregister a service.
     /// </summary>
     /// <param name="serviceId">Service id.</param>
-    /// <returns></returns>
+    /// <returns>ServiceEntry if the service was found and removed. Null if the service was not found.</returns>
     /// <exception cref="KeyNotFoundException">Thrown if the specified service is not found.</exception>
-    public async Task UnregisterAsync(Guid serviceId)
+    public ServiceEntry? Unregister(Guid serviceId)
     {
         ServiceEntry? matchingService = FindAvailableService(serviceId);
 
@@ -176,7 +177,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
         }
 
         RemoveService(serviceId);
-        await ValueTask.CompletedTask;
+        return matchingService;
     }
 
     /// <summary>
@@ -278,9 +279,9 @@ public sealed class KeeperService : IKeeperService, IDisposable
                 DateTime utcHeartbeat = serviceItem.LastConnectionTime.AddMilliseconds(HeartbeatValidationTimeoutMs);
                 if ((utcHeartbeat - utcNow).TotalMilliseconds < 0)
                 {
-                    _logger.LogWarning("Service '{serviceItem.Name}' with id '{serviceItem.Id}' time out and will be removed!", serviceItem.Name, serviceItem.Id);
+                    _logger.LogWarning(new EventId((int)EventLogType.Disconnect), "Service '{serviceItem.Name}' with id '{serviceItem.Id}' time out and will be removed!", serviceItem.Name, serviceItem.Id);
                     RemoveService(serviceItem.Id);
-                    _logger.LogInformation("Service '{serviceItem.Name}' (Url: '{serviceItem.Url}') removed!", serviceItem.Name, serviceItem.Url);
+                    _logger.LogInformation(new EventId((int)EventLogType.Disconnect), "Service '{serviceItem.Name}' (Url: '{serviceItem.Url}') removed!", serviceItem.Name, serviceItem.Url);
                 }
             }
 

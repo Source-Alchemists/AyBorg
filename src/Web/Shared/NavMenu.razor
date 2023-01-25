@@ -24,18 +24,27 @@
     </Authorized>
 </AuthorizeView>
 
+@if(_isAnalyticsVisible)
+{
+<AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
+    <Authorized>
+        <MudNavLink Icon="@Icons.Material.Filled.Analytics" href="analytics">Analytics</MudNavLink>
+    </Authorized>
+</AuthorizeView>
+}
+
 <AuthorizeView Roles="@Roles.Administrator">
-        <Authorized>
-            <MudNavGroup Title="Administration" Icon="@Icons.Filled.AdminPanelSettings" Expanded="true">
-                @* <MudNavLink Href="admin" Match="NavLinkMatch.All">
-                    Dashboard
-                </MudNavLink> *@
-                <MudNavLink Href="admin/services" Match="NavLinkMatch.Prefix">
-                    Services
-                </MudNavLink>
-                <MudNavLink Href="admin/usermanagement" Match="NavLinkMatch.All">
-                    User Management
-                </MudNavLink>
-            </MudNavGroup>
+    <Authorized>
+        <MudNavGroup Title="Administration" Icon="@Icons.Filled.AdminPanelSettings" Expanded="true">
+            @* <MudNavLink Href="admin" Match="NavLinkMatch.All">
+                Dashboard
+            </MudNavLink> *@
+            <MudNavLink Href="admin/services" Match="NavLinkMatch.Prefix">
+                Services
+            </MudNavLink>
+            <MudNavLink Href="admin/usermanagement" Match="NavLinkMatch.All">
+                User Management
+            </MudNavLink>
+        </MudNavGroup>
     </Authorized>
 </AuthorizeView>

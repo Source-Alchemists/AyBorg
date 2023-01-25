@@ -2,7 +2,7 @@ using AyBorg.Web.Shared.Models;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 
-namespace AyBorg.Web.Services.AppState;
+namespace AyBorg.Web.Services;
 
 public class StateService : IStateService
 {

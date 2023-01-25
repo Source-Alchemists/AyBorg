@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Overview;
 
-
 public partial class AgentsTable : ComponentBase
 {
     [Parameter]

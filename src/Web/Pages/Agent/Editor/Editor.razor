@@ -14,7 +14,7 @@ else
 }
 <MudGrid hidden="@(_projectMeta?.IsActive != false)">
     <MudItem xs="12">
-        <MudCard>
+        <MudCard Class="rounded-lg">
             <MudCardHeader>
                 <CardHeaderAvatar>
                     <MudIcon Icon="@Icons.Filled.Info" Size="Size.Large" />
@@ -76,7 +76,7 @@ else
         </MudTooltip>
     </MudToolBar>
 
-    <div style="height: 4px">
+    <div class="page-loading-bar">
         <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isProjectServerWaiting)"/>
     </div>
 

@@ -1,9 +1,10 @@
+using AyBorg.SDK.Projects;
+
 namespace AyBorg.Agent.Runtime;
 
 internal sealed class PathExecuter : IDisposable
 {
     private readonly ILogger<PathExecuter> _logger;
-    private readonly PathItem _pathItem;
     private readonly CancellationToken _abortToken;
     private bool _isDisposed = false;
 
@@ -25,7 +26,7 @@ internal sealed class PathExecuter : IDisposable
     /// <summary>
     /// Gets the path item.
     /// </summary>
-    public PathItem PathItem => _pathItem;
+    public PathItem PathItem { get; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PathExecuter"/> class.
@@ -36,11 +37,11 @@ internal sealed class PathExecuter : IDisposable
     public PathExecuter(ILogger<PathExecuter> logger, PathItem pathItem, Guid iterationId, CancellationToken abortToken)
     {
         _logger = logger;
-        _pathItem = pathItem;
+        PathItem = pathItem;
         _abortToken = abortToken;
         TargetIterationId = iterationId;
 
-        foreach (var pred in _pathItem.Predecessors)
+        foreach (IStepProxy pred in PathItem.Predecessors)
         {
             State = PathExecutionState.Waiting; // Waiting to be executed until all predecessors are completed.
             pred.Completed += PredecessorCompleted;
@@ -60,11 +61,11 @@ internal sealed class PathExecuter : IDisposable
         bool stepResult = false;
         try
         {
-            stepResult = await _pathItem.Step.TryRunAsync(TargetIterationId, _abortToken);
+            stepResult = await PathItem.Step.TryRunAsync(TargetIterationId, _abortToken);
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error occurred while executing step [{name}]", _pathItem.Step.Name);
+            _logger.LogWarning(ex, "Error occurred while executing step [{name}]", PathItem.Step.Name);
         }
         finally
         {
@@ -75,7 +76,7 @@ internal sealed class PathExecuter : IDisposable
     }
 
     /// <summary>
-    /// Dispose the path executer. 
+    /// Dispose the path executer.
     public void Dispose()
     {
         Dispose(true);
@@ -85,7 +86,7 @@ internal sealed class PathExecuter : IDisposable
     private void PredecessorCompleted(object? sender, bool successful)
     {
         if (!successful) State = PathExecutionState.Failed; // No need to execute the step if a predecessor failed.
-        if (_pathItem.Predecessors.All(p => p.IterationId.Equals(TargetIterationId)))
+        if (PathItem.Predecessors.All(p => p.IterationId.Equals(TargetIterationId)))
         {
             State = PathExecutionState.Ready;
         }
@@ -95,7 +96,7 @@ internal sealed class PathExecuter : IDisposable
     {
         if (isDisposing && !_isDisposed)
         {
-            foreach (var pred in _pathItem.Predecessors)
+            foreach (IStepProxy pred in PathItem.Predecessors)
             {
                 pred.Completed -= PredecessorCompleted;
             }

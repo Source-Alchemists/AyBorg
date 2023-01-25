@@ -1,14 +1,14 @@
-using AyBorg.Database.Data;
+using AyBorg.Data.Identity;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Communication.gRPC.Registry;
+using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.Web;
 using AyBorg.Web.Areas.Identity;
-using AyBorg.Web.BuilderTools;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Services.Analytics;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -26,9 +26,9 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.SqlLite")),
+                        x => x.MigrationsAssembly("AyBorg.Data.Identity.Migrations.SqlLite")),
         "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
-                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("AyBorg.Data.Identity..Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );
@@ -67,7 +67,9 @@ builder.Services.AddMudServices(config =>
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredSessionStorage();
 
-GrpcClientRegisterTool.Register(builder);
+builder.RegisterGrpcClients();
+
+builder.AddAyBorgAnalyticsLogger();
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
 builder.Services.AddHostedService<NotifyBackgroundService>();
@@ -85,6 +87,7 @@ builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IRuntimeService, RuntimeService>();
 builder.Services.AddScoped<IAgentOverviewService, AgentsOverviewService>();
 builder.Services.AddScoped<IStateService, StateService>();
+builder.Services.AddScoped<IEventLogService, EventLogService>();
 
 builder.Services.AddTransient<ITokenProvider, TokenProvider>();
 builder.Services.AddTransient<IStorageService, StorageService>();

@@ -1,12 +1,5 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Version>0.3.0</Version>
-  </PropertyGroup>
-
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
   <ItemGroup>
@@ -26,13 +19,16 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SDK\database\AyBorg.Database.Data\AyBorg.Database.Data.csproj" />
-    <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.SqlLite\AyBorg.Database.Migrations.SqlLite.csproj" />
-    <ProjectReference Include="..\SDK\database\migrations\AyBorg.Database.Migrations.PostgreSql\AyBorg.Database.Migrations.PostgreSql.csproj" />
     <ProjectReference Include="..\SDK\src\System\AyBorg.SDK.System.csproj" />
     <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
+    <ProjectReference Include="..\SDK\src\Logging\Analytics\AyBorg.SDK.Logging.Analytics.csproj" />
     <ProjectReference Include="..\SDK\src\Communication\MQTT\AyBorg.SDK.Communication.MQTT.csproj" />
     <ProjectReference Include="..\SDK\src\Communication\gRPC\AyBorg.SDK.Communication.gRPC.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Data\Migrations\Agent\SqlLite\AyBorg.Data.Agent.Migrations.SqlLite.csproj" />
+    <ProjectReference Include="..\Data\Migrations\Agent\PostgreSql\AyBorg.Data.Agent.Migrations.PostgreSql.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,13 +1,12 @@
+using AyBorg.Diagrams.Core;
+using AyBorg.Diagrams.Core.Models;
+using AyBorg.Diagrams.Core.Models.Base;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Communication.gRPC.Models;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Modals;
-using AyBorg.Diagrams.Core;
-using AyBorg.Diagrams.Core.Models;
-using AyBorg.Diagrams.Core.Models.Base;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -115,7 +114,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         {
             Guid iterationId = (Guid)obj;
             IEnumerable<FlowNode> flowNodes = _diagram.Nodes.Cast<FlowNode>();
-            await Parallel.ForEachAsync(flowNodes, async (node, Default) =>
+            await Parallel.ForEachAsync(flowNodes, async (node, token) =>
             {
                 Step newStep = await FlowService.GetStepAsync(node.Step.Id, iterationId);
                 if (newStep != null)
@@ -331,7 +330,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             return;
         }
 
-        Guid? newLinkId = await FlowService.AddLinkAsync(sourcePort.Port.Id, targetPort.Port.Id);
+        Guid? newLinkId = await FlowService.AddLinkAsync(sourcePort.Port, targetPort.Port);
         Link newLink = await FlowService.GetLinkAsync((Guid)newLinkId);
         if (newLink != null && !tmpLink.Id.Equals(newLink.Id.ToString()))
         {
@@ -366,7 +365,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         step.X = (int)relativePosition.X;
         step.Y = (int)relativePosition.Y;
 
-        Step receivedStep = await FlowService.AddStepAsync(step.Id, step.X, step.Y);
+        Step receivedStep = await FlowService.AddStepAsync(step);
         if (receivedStep == null)
         {
             Snackbar.Add($"Could not add '{step.Name}' (Step not found)", Severity.Warning);
@@ -392,7 +391,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         var targetPort = (FlowPort)link.TargetPort;
         Link orgLink = links.FirstOrDefault(l => l.Id.ToString().Equals(link.Id));
         if (orgLink == null) return; // Nothing to do. Already removed.
-        if (!await FlowService.TryRemoveLinkAsync(orgLink.Id))
+        if (!await FlowService.TryRemoveLinkAsync(orgLink))
         {
             _diagram.Links.Add(link);
             return;
@@ -406,7 +405,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
     {
         if (_suspendDiagramRefresh) return;
         if (node is FlowNode flowNode
-            && !await FlowService.TryRemoveStepAsync(flowNode.Step.Id))
+            && !await FlowService.TryRemoveStepAsync(flowNode.Step))
         {
             _diagram.Nodes.Add(node);
         }

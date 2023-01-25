@@ -1,13 +1,12 @@
-using AyBorg.Database.Data;
+using AyBorg.Data.Gateway;
 using AyBorg.Gateway.Models;
-using AyBorg.Gateway.Services;
 using AyBorg.SDK.System.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace AyBorg.Gateway.Tests.Services;
+namespace AyBorg.Gateway.Services.Tests;
 
 public sealed class KeeperServiceTests : IDisposable
 {
@@ -91,11 +90,11 @@ public sealed class KeeperServiceTests : IDisposable
         // Arrange
         // Act
         Guid result = await _service.RegisterAsync(_validServiceEntry);
-        if(unregister)
+        if (unregister)
         {
-            await _service.UnregisterAsync(result);
+            _service.Unregister(result);
         }
-        if(registerTwice)
+        if (registerTwice)
         {
             _mockGrpcChannelService.Setup(c => c.TryRegisterChannel(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(false);
             await Assert.ThrowsAsync<InvalidOperationException>(() => _service.RegisterAsync(_validServiceEntry));
@@ -106,11 +105,11 @@ public sealed class KeeperServiceTests : IDisposable
     }
 
     [Fact]
-    public async Task Test_UnregisterAsync_unknownService()
+    public void Test_UnregisterAsync_unknownService()
     {
         // Arrange
         // Assert
-        await Assert.ThrowsAsync<KeyNotFoundException>(() => _service.UnregisterAsync(Guid.Empty));
+        Assert.Throws<KeyNotFoundException>(() => _service.Unregister(Guid.Empty));
     }
 
     [Fact]
