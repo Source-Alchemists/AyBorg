@@ -22,7 +22,7 @@ internal static class GrpcClientExtension
 
     private static void CreateClientFactory<T>(WebApplicationBuilder builder, Uri uri) where T : ClientBase
     {
-        IHttpClientBuilder httpClientBuilder = builder.Services.AddGrpcClient<T>(option =>
+        builder.Services.AddGrpcClient<T>(option =>
         {
             option.ChannelOptionsActions.Add(o => o.UnsafeUseInsecureChannelCallCredentials = true);
             option.Address = uri;
