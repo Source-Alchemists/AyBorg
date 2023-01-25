@@ -50,7 +50,7 @@ public partial class Analytics : ComponentBase
         {
             _eventLevelOverTimeData.Clear();
             _eventLevelOverTimeLabels.Clear();
-            IEnumerable<IGrouping<DateTime, EventLogEntry>> groupedTimeChart = _eventLogTable.FilteredEntries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, e.Timestamp.Minute, e.Timestamp.Second));
+            IEnumerable<IGrouping<DateTime, EventLogEntry>> groupedTimeChart = GroupTimeChartToCompactTime(_eventLogTable.FilteredEntries);
             AddTimeSeriesLogLevelIfExists(groupedTimeChart, LogLevel.Trace);
             AddTimeSeriesLogLevelIfExists(groupedTimeChart, LogLevel.Debug);
             AddTimeSeriesLogLevelIfExists(groupedTimeChart, LogLevel.Information);
@@ -85,6 +85,37 @@ public partial class Analytics : ComponentBase
         }
 
         return Task.CompletedTask;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static IEnumerable<IGrouping<DateTime, EventLogEntry>> GroupTimeChartToCompactTime(IEnumerable<EventLogEntry> entries)
+    {
+        if(!entries.Any())
+        {
+            return entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day));
+        }
+        IEnumerable<IGrouping<DateTime, EventLogEntry>> resultGroup;
+        DateTime minTimestamp = entries.Min(e => e.Timestamp);
+        DateTime maxTimestamp = entries.Max(e => e.Timestamp);
+        TimeSpan diffTime = maxTimestamp - minTimestamp;
+        if (diffTime > TimeSpan.FromDays(1))
+        {
+            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day));
+        }
+        else if (diffTime > TimeSpan.FromHours(1))
+        {
+            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, 0, 0));
+        }
+        else if (diffTime > TimeSpan.FromMinutes(1))
+        {
+            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, e.Timestamp.Minute, 0));
+        }
+        else
+        {
+            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, e.Timestamp.Minute, e.Timestamp.Second));
+        }
+
+        return resultGroup;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
