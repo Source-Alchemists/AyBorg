@@ -1,4 +1,5 @@
-﻿using AyBorg.Data.Agent;
+﻿using System.Runtime.CompilerServices;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Configuration;
@@ -296,6 +297,11 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
 
         // Moving to ready state
+        return await SaveProjectAsReady(projectMetaDbId, projectState, newVersionName, comment, approver, previousProjectMetaRecord);
+    }
+
+    private async ValueTask<ProjectManagementResult> SaveProjectAsReady(Guid projectMetaDbId, ProjectState projectState, string newVersionName, string comment, string? approver, ProjectMetaRecord previousProjectMetaRecord)
+    {
         ProjectRecord previousProjectRecord = await _projectRepository.FindAsync(projectMetaDbId);
 
         ProjectMetaRecord projectMetaRecord = previousProjectMetaRecord with
@@ -334,6 +340,28 @@ internal sealed class ProjectManagementService : IProjectManagementService
             Links = new()
         };
 
+        ReconstructSteps(previousProjectRecord, projectRecord);
+
+        try
+        {
+            await _projectRepository.AddAsync(projectRecord);
+            if (_engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(previousProjectMetaRecord.Id))
+            {
+                _engineHost.ActiveProject.Settings.IsForceResultCommunicationEnabled = false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Could not save project.");
+        }
+
+        _logger.LogInformation("Project [{projectName}] saved as ready.", projectMetaRecord.Name);
+        return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void ReconstructSteps(ProjectRecord previousProjectRecord, ProjectRecord projectRecord)
+    {
         projectRecord.Steps.Clear();
         projectRecord.Links.Clear();
         foreach (StepRecord s in previousProjectRecord.Steps)
@@ -369,22 +397,6 @@ internal sealed class ProjectManagementService : IProjectManagementService
             };
             projectRecord.Links.Add(nl);
         }
-
-        try
-        {
-            await _projectRepository.AddAsync(projectRecord);
-            if (_engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(previousProjectMetaRecord.Id))
-            {
-                _engineHost.ActiveProject.Settings.IsForceResultCommunicationEnabled = false;
-            }
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Could not save project.");
-        }
-
-        _logger.LogInformation("Project [{projectName}] saved.", projectMetaRecord.Name);
-        return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
     }
 
     private async ValueTask<ProjectManagementResult> TrySaveDraftToReviewAsync(ProjectMetaRecord projectMetaRecord, string versionName, string comment)

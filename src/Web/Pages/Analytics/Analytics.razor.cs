@@ -27,23 +27,7 @@ public partial class Analytics : ComponentBase
     {
         if (firstRender)
         {
-            return Task.Factory.StartNew(async () =>
-            {
-                _isLoading = true;
-                int count = 0;
-                await foreach (EventLogEntry entry in EventLogService.GetEventsAsync())
-                {
-                    _eventRecords.Insert(0, entry);
-                    // Smoother loading animation
-                    count++;
-                    if (count > 10)
-                    {
-                        await InvokeAsync(StateHasChanged);
-                        count = 0;
-                    }
-                }
-                _isLoading = false;
-            });
+            return LoadEventLogAsync();
         }
 
         if (!_isLoading)
@@ -86,6 +70,25 @@ public partial class Analytics : ComponentBase
 
         return Task.CompletedTask;
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private Task LoadEventLogAsync() => Task.Factory.StartNew(async () =>
+    {
+        _isLoading = true;
+        int count = 0;
+        await foreach (EventLogEntry entry in EventLogService.GetEventsAsync())
+        {
+            _eventRecords.Insert(0, entry);
+            // Smoother loading animation
+            count++;
+            if (count > 10)
+            {
+                await InvokeAsync(StateHasChanged);
+                count = 0;
+            }
+        }
+        _isLoading = false;
+    });
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static IEnumerable<IGrouping<DateTime, EventLogEntry>> GroupTimeChartToCompactTime(IEnumerable<EventLogEntry> entries)
