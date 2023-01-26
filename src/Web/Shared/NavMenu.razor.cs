@@ -1,3 +1,4 @@
+using AyBorg.SDK.System;
 using AyBorg.Web.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -17,7 +18,7 @@ public partial class NavMenu : ComponentBase
         await base.OnInitializedAsync();
         try
         {
-            IEnumerable<Models.ServiceInfoEntry> analyticsServices = await RegistryService.ReceiveServicesAsync("AyBorg.Analytics");
+            IEnumerable<Models.ServiceInfoEntry> analyticsServices = await RegistryService.ReceiveServicesAsync(ServiceTypes.Analytics);
             _isAnalyticsVisible = analyticsServices.Any();
         }
         catch (Exception ex)

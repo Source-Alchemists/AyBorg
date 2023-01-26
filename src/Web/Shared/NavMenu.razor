@@ -33,6 +33,12 @@
 </AuthorizeView>
 }
 
+<AuthorizeView Roles="Administrator, Auditor">
+    <Authorized>
+        <MudNavLink Icon="@Icons.Material.Filled.Assignment" href="audit">Audit</MudNavLink>
+    </Authorized>
+</AuthorizeView>
+
 <AuthorizeView Roles="@Roles.Administrator">
     <Authorized>
         <MudNavGroup Title="Administration" Icon="@Icons.Filled.AdminPanelSettings" Expanded="true">

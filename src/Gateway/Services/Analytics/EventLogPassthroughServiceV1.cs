@@ -1,5 +1,6 @@
 using Ayborg.Gateway.Analytics.V1;
 using AyBorg.Gateway.Models;
+using AyBorg.SDK.System;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -16,7 +17,7 @@ public sealed class EventLogPassthroughServiceV1 : EventLog.EventLogBase
 
     public override async Task<Empty> LogEvent(EventEntry request, ServerCallContext context)
     {
-        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName("AyBorg.Analytics");
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Analytics);
         foreach (ChannelInfo channel in channels)
         {
             EventLog.EventLogClient client = _channelService.CreateClient<EventLog.EventLogClient>(channel.ServiceUniqueName);
@@ -28,7 +29,7 @@ public sealed class EventLogPassthroughServiceV1 : EventLog.EventLogBase
 
     public override async Task GetLogEvents(GetEventsRequest request, IServerStreamWriter<EventEntry> responseStream, ServerCallContext context)
     {
-        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName("AyBorg.Analytics");
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Analytics);
         await Parallel.ForEachAsync(channels, async (channel, token) =>
         {
             EventLog.EventLogClient client = _channelService.CreateClient<EventLog.EventLogClient>(channel.ServiceUniqueName);
