@@ -24,6 +24,11 @@
     text-overflow: ellipsis;
 }
 
+.blur {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+}
+
 .flex-self-center {
     display: flex;
     flex-direction: row;

@@ -10,12 +10,12 @@ public partial class NavMenu : ComponentBase
     [Inject] IStateService StateService { get; set; } = null!;
     [Inject] IRegistryService RegistryService { get; set; } = null!;
 
-
     private bool _isAnalyticsVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
         try
         {
             IEnumerable<Models.ServiceInfoEntry> analyticsServices = await RegistryService.ReceiveServicesAsync(ServiceTypes.Analytics);

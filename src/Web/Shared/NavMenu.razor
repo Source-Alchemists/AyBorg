@@ -5,7 +5,7 @@
 
 <AuthorizeView Roles="Administrator, Engineer, Reviewer">
     <Authorized>
-        <MudNavGroup Title="Agents" Icon="@Icons.Filled.Workspaces" Expanded="true">
+        <MudNavGroup Title="Agents" Icon="@Icons.Filled.Workspaces" IconColor="Color.Primary" Expanded="true">
             <MudNavLink Href="agents/overview"  Match="NavLinkMatch.All">
                 Overview
             </MudNavLink>
@@ -28,14 +28,14 @@
 {
 <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
     <Authorized>
-        <MudNavLink Icon="@Icons.Material.Filled.Analytics" href="analytics">Analytics</MudNavLink>
+        <MudNavLink Icon="@Icons.Material.Filled.Analytics" IconColor="Color.Primary" href="analytics">Analytics</MudNavLink>
     </Authorized>
 </AuthorizeView>
 }
 
 <AuthorizeView Roles="Administrator, Auditor">
     <Authorized>
-        <MudNavGroup Title="Security" Icon="@Icons.Material.Filled.Security" Expanded="true">
+        <MudNavGroup Title="Audit" Icon="@Icons.Material.Filled.Assignment" IconColor="Color.Primary" Expanded="true">
             <MudNavLink Href="audit/report" Match="NavLinkMatch.Prefix">
                 New Report
             </MudNavLink>
@@ -48,14 +48,11 @@
 
 <AuthorizeView Roles="@Roles.Administrator">
     <Authorized>
-        <MudNavGroup Title="Administration" Icon="@Icons.Filled.AdminPanelSettings" Expanded="true">
-            @* <MudNavLink Href="admin" Match="NavLinkMatch.All">
-                Dashboard
-            </MudNavLink> *@
-            <MudNavLink Href="admin/services" Match="NavLinkMatch.Prefix">
+        <MudNavGroup Title="Administration" Icon="@Icons.Filled.AdminPanelSettings" IconColor="Color.Primary" Expanded="true">
+            <MudNavLink Href="admin/services" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">
                 Services
             </MudNavLink>
-            <MudNavLink Href="admin/usermanagement" Match="NavLinkMatch.All">
+            <MudNavLink Href="admin/usermanagement" Match="NavLinkMatch.All" Icon="@Icons.Filled.ManageAccounts">
                 User Management
             </MudNavLink>
         </MudNavGroup>
