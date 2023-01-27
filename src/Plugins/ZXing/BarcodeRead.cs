@@ -82,6 +82,7 @@ namespace AyBorg.Plugins.ZXing
             // possible improvements: input of a list of possible formats
             if (enumObj.Equals(BarcodeFormats.All))
             {
+                // Warning: do not use zxing lib All_1D formats for all barcodes, this parameter has not all barcodes listed
                 return new List<BarcodeFormat>(){
                     BarcodeFormat.CODABAR,
                     BarcodeFormat.CODE_39,
