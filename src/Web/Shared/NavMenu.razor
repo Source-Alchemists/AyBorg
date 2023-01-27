@@ -35,7 +35,14 @@
 
 <AuthorizeView Roles="Administrator, Auditor">
     <Authorized>
-        <MudNavLink Icon="@Icons.Material.Filled.Assignment" href="audit">Audit</MudNavLink>
+        <MudNavGroup Title="Security" Icon="@Icons.Material.Filled.Security" Expanded="true">
+            <MudNavLink Href="audit/report" Match="NavLinkMatch.Prefix">
+                New Report
+            </MudNavLink>
+            <MudNavLink Href="audit/reports" Match="NavLinkMatch.Prefix">
+                Exported Reports
+            </MudNavLink>
+        </MudNavGroup>
     </Authorized>
 </AuthorizeView>
 

@@ -47,6 +47,7 @@ The default appsettings give you a good starting point and will also work locall
 | ---------------- | ---- | ----- | ---- |
 | AyBorg.Gateway   |      |       | 5000 |
 | AyBorg.Analytics |      |       | 5001 |
+| AyBorg.Audit     |      |       | 5002 |
 | AyBorg.Web       | 5010 | 5011  |      |
 | AyBorg.Agent     |      |       | 5020 |
 
