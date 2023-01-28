@@ -5,10 +5,15 @@ using Grpc.Core;
 
 namespace AyBorg.Audit.Services;
 
-public sealed class AuditV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
+public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
 {
     public override Task<Empty> AddEntry(AuditEntry request, ServerCallContext context)
     {
+        switch(request.PayloadCase)
+        {
+            case AuditEntry.PayloadOneofCase.AgentProject:
+            break;
+        }
         return Task.FromResult(new Empty());
     }
 

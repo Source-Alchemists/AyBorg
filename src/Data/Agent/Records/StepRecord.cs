@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using AyBorg.SDK.Common;
+using System.Text.Json.Serialization;
 
 namespace AyBorg.Data.Agent;
 
@@ -51,5 +51,6 @@ public record StepRecord
     /// Gets or sets the project record.
     /// </summary>
     /// <remarks>Used by entity.</remarks>
+    [JsonIgnore]
     public ProjectRecord ProjectRecord { get; set; } = new ProjectRecord();
 }

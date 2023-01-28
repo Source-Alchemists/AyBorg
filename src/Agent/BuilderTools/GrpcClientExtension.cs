@@ -1,5 +1,6 @@
 using Ayborg.Gateway.Agent.V1;
 using Ayborg.Gateway.Analytics.V1;
+using Ayborg.Gateway.Audit.V1;
 using Ayborg.Gateway.V1;
 using Grpc.Core;
 
@@ -17,6 +18,7 @@ internal static class GrpcClientExtension
         CreateClientFactory<Register.RegisterClient>(builder, gatewayUrl);
         CreateClientFactory<Notify.NotifyClient>(builder, gatewayUrl);
         CreateClientFactory<EventLog.EventLogClient>(builder, gatewayUrl);
+        CreateClientFactory<Audit.AuditClient>(builder, gatewayUrl);
         return builder;
     }
 

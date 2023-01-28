@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace AyBorg.Data.Agent;
 
@@ -25,14 +26,15 @@ public record LinkRecord {
     public Guid TargetId { get; set; }
 
     /// <summary>
-    /// Gets or sets the project record.
-    /// </summary>
-    /// <remarks>Used by entity for navigation.</remarks>
-    public ProjectRecord ProjectRecord { get; set; } = new ProjectRecord();
-
-    /// <summary>
     /// Gets or sets the project record identifier.
     /// </summary>
     /// <remarks>Used by entity for navigation.</remarks>
     public Guid ProjectRecordId { get; set; }
+
+    /// <summary>
+    /// Gets or sets the project record.
+    /// </summary>
+    /// <remarks>Used by entity for navigation.</remarks>
+    [JsonIgnore]
+    public ProjectRecord ProjectRecord { get; set; } = new ProjectRecord();
 }

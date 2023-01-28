@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 using AyBorg.SDK.Common.Ports;
 
 namespace AyBorg.Data.Agent;
@@ -46,5 +47,6 @@ public record PortRecord
     /// Gets or sets the step record.
     /// </summary>
     /// <remarks>Used by entity.</remarks>
+    [JsonIgnore]
     public StepRecord StepRecord { get; set; } = new StepRecord();
 }

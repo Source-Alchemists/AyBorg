@@ -13,6 +13,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     private readonly IEngineHost _engineHost;
     private readonly IRuntimeToStorageMapper _runtimeToStorageMapper;
     private readonly IRuntimeConverterService _runtimeConverterService;
+    private readonly IAuditProviderService _auditProviderService;
     private readonly string _serviceUniqueName;
 
     /// <summary>
@@ -39,18 +40,22 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <param name="runtimeHost">The runtime host.</param>
     /// <param name="runtimeToStorageMapper">The runtime to storage mapper.</param>
     /// <param name="runtimeConverterService">The runtime converter service.</param>
+    /// <param name="auditProviderService">The audit provider service.</param>
     public ProjectManagementService(ILogger<ProjectManagementService> logger,
                                     IServiceConfiguration serviceConfiguration,
                                     IProjectRepository projectRepository,
                                     IEngineHost runtimeHost,
                                     IRuntimeToStorageMapper runtimeToStorageMapper,
-                                    IRuntimeConverterService runtimeConverterService)
+                                    IRuntimeConverterService runtimeConverterService,
+                                    IAuditProviderService auditProviderService)
     {
         _logger = logger;
         _projectRepository = projectRepository;
         _engineHost = runtimeHost;
         _runtimeToStorageMapper = runtimeToStorageMapper;
         _runtimeConverterService = runtimeConverterService;
+        _auditProviderService = auditProviderService;
+
         _serviceUniqueName = serviceConfiguration.UniqueName;
     }
 
@@ -246,6 +251,11 @@ internal sealed class ProjectManagementService : IProjectManagementService
         ProjectRecord projectRecord = _runtimeToStorageMapper.Map(_engineHost.ActiveProject);
         projectRecord.Meta = previousProjectMetaRecord with { DbId = Guid.Empty, IsActive = true };
         projectRecord.Settings.DbId = Guid.Empty;
+
+        if(!await _auditProviderService.TryAddAsync(projectRecord))
+        {
+            return new ProjectManagementResult(false, "Could not add audit information.");
+        }
 
         if (!await _projectRepository.TrySave(projectRecord))
         {

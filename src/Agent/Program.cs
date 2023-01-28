@@ -39,29 +39,33 @@ builder.AddAyBorgAnalyticsLogger();
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
 
-// Repositories
-builder.Services.AddSingleton<IProjectRepository, ProjectRepository>();
-
-builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
-builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
-builder.Services.AddSingleton<IRuntimeMapper, RuntimeMapper>();
-builder.Services.AddSingleton<IRpcMapper, RpcMapper>();
-builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
-builder.Services.AddSingleton<IRuntimeConverterService, RuntimeConverterService>();
 builder.Services.AddSingleton<IPluginsService, PluginsService>();
-builder.Services.AddSingleton<IProjectManagementService, ProjectManagementService>();
 builder.Services.AddSingleton<IEngineHost, EngineHost>();
-builder.Services.AddSingleton<IEngineFactory, EngineFactory>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
-builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
 
-builder.Services.AddScoped<IJwtConsumer, JwtConsumer>();
-builder.Services.AddScoped<IFlowService, FlowService>();
-
-builder.Services.AddTransient<IProjectSettingsService, ProjectSettingsService>();
+builder.Services.AddTransient<IJwtConsumer, JwtConsumer>();
+// Repositories
+builder.Services.AddTransient<IProjectRepository, ProjectRepository>();
+// Environment / Configuration
+builder.Services.AddTransient<IEnvironment, AyBorg.SDK.Common.Environment>();
+builder.Services.AddTransient<IServiceConfiguration, ServiceConfiguration>();
+// Mapper / Converter
+builder.Services.AddTransient<IRuntimeMapper, RuntimeMapper>();
+builder.Services.AddTransient<IRpcMapper, RpcMapper>();
+builder.Services.AddTransient<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
+builder.Services.AddTransient<IRuntimeConverterService, RuntimeConverterService>();
+// Runtime / Project
+builder.Services.AddTransient<IFlowService, FlowService>();
+builder.Services.AddTransient<IEngineFactory, EngineFactory>();
 builder.Services.AddTransient<IStorageService, StorageService>();
+builder.Services.AddTransient<INotifyService, NotifyService>();
+builder.Services.AddTransient<IProjectManagementService, ProjectManagementService>();
+builder.Services.AddTransient<IProjectSettingsService, ProjectSettingsService>();
+// Audit
+builder.Services.AddTransient<AuditMapper>();
+builder.Services.AddTransient<IAuditProviderService, AuditProviderService>();
 
 WebApplication app = builder.Build();
 
