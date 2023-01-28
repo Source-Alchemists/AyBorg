@@ -214,7 +214,6 @@ internal sealed class ProjectManagementService : IProjectManagementService
             return new ProjectManagementResult(false, "Could not activate project.");
         }
 
-        _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Project [{projectMetaRecord.Name}] activated.", projectMeta.Name);
         return new ProjectManagementResult(true, null, projectMeta.DbId);
     }
 
