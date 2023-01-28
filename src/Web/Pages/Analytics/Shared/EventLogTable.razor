@@ -11,7 +11,7 @@
         </MudTooltip>
     </ToolBarContent>
     <Columns>
-        <Column T="EventLogEntry" Field="Timestamp" Title="Timestamp (UTC)" />
+        <Column T="EventLogEntry" Field="Timestamp" Title="Timestamp (UTC)" CellStyleFunc="@_timestampCellStyleFunc"/>
         <Column T="EventLogEntry" Field="LogLevel" Title="Level" />
         <Column T="EventLogEntry" Field="ServiceUniqueName" Title="Service Name" />
         <Column T="EventLogEntry" Field="EventName" Title="Event" />

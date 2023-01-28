@@ -1,9 +1,20 @@
-
+using AyBorg.Audit;
+using AyBorg.SDK.Communication.gRPC.Registry;
+using AyBorg.SDK.Logging.Analytics;
+using AyBorg.SDK.System.Configuration;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddGrpc();
+
+builder.RegisterGrpcClients();
+
+builder.AddAyBorgAnalyticsLogger();
+
+builder.Services.AddHostedService<RegistryBackgroundService>();
+
+builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 
 WebApplication app = builder.Build();
 

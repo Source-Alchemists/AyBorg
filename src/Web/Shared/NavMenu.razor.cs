@@ -11,6 +11,7 @@ public partial class NavMenu : ComponentBase
     [Inject] IRegistryService RegistryService { get; set; } = null!;
 
     private bool _isAnalyticsVisible = false;
+    private bool _isAuditVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -18,8 +19,10 @@ public partial class NavMenu : ComponentBase
 
         try
         {
-            IEnumerable<Models.ServiceInfoEntry> analyticsServices = await RegistryService.ReceiveServicesAsync(ServiceTypes.Analytics);
-            _isAnalyticsVisible = analyticsServices.Any();
+            IEnumerable<Models.ServiceInfoEntry> services = await RegistryService.ReceiveServicesAsync();
+
+            _isAnalyticsVisible = services.Any(s => s.Type.Equals(ServiceTypes.Analytics));
+            _isAuditVisible = services.Any(s => s.Type.Equals(ServiceTypes.Audit));
         }
         catch (Exception ex)
         {

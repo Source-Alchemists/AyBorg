@@ -43,4 +43,9 @@ public partial class EventLogTable : ComponentBase
         }
         IsLoading = false;
     }
+
+    private static Func<EventLogEntry, string> _timestampCellStyleFunc => x =>
+    {
+        return "min-width: 200px";
+    };
 }

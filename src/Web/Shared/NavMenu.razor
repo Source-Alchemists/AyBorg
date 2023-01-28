@@ -33,6 +33,8 @@
 </AuthorizeView>
 }
 
+@if(_isAuditVisible)
+{
 <AuthorizeView Roles="Administrator, Auditor">
     <Authorized>
         <MudNavGroup Title="Audit" Icon="@Icons.Material.Filled.Assignment" IconColor="Color.Primary" Expanded="true">
@@ -45,6 +47,7 @@
         </MudNavGroup>
     </Authorized>
 </AuthorizeView>
+}
 
 <AuthorizeView Roles="@Roles.Administrator">
     <Authorized>
