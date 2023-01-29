@@ -22,13 +22,18 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
         {
             case AuditEntry.PayloadOneofCase.AgentProject:
                 Data.Audit.Models.Agent.ProjectAuditRecord projectAuditRecord = _agentMapper.Map(request.AgentProject);
-                projectAuditRecord.EntryId = Guid.Parse(request.Token);
+                projectAuditRecord.TokenId = Guid.Parse(request.Token);
                 if (!_agentAuditService.TryAdd(projectAuditRecord))
                 {
                     throw new RpcException(Status.DefaultCancelled, "Failed to add project audit entry.");
                 }
                 break;
         }
+        return Task.FromResult(new Empty());
+    }
+
+    public override Task<Empty> InvalidateEntry(AuditReportMeta request, ServerCallContext context)
+    {
         return Task.FromResult(new Empty());
     }
 

@@ -260,13 +260,19 @@ internal sealed class ProjectManagementService : IProjectManagementService
             projectRecord.Meta = previousProjectMetaRecord with { DbId = Guid.Empty, IsActive = true };
             projectRecord.Settings.DbId = Guid.Empty;
 
-            if (!await _auditProviderService.TryAddAsync(projectRecord))
+            Guid auditToken = await _auditProviderService.AddAsync(projectRecord);
+            if (auditToken.Equals(Guid.Empty))
             {
                 throw new ProjectException("Could not add audit information.");
             }
 
             if (!await _projectRepository.TrySave(projectRecord))
             {
+                if (!await _auditProviderService.TryInvalidateAsync(auditToken))
+                {
+                    throw new ProjectException("Could not invalidate audit information.");
+                }
+
                 throw new ProjectException("Could not save project.");
             }
 

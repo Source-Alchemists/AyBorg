@@ -6,7 +6,7 @@ namespace AyBorg.Data.Audit.Models.Agent;
 public record ProjectAuditRecord
 {
     [Key]
-    public Guid EntryId { get; set; }
+    public Guid TokenId { get; set; }
     public Guid Id { get; set; }
     public string Name { get; set; } = string.Empty;
     public ProjectState State { get; set; }
