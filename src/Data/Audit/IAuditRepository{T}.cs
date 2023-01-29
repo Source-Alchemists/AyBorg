@@ -1,6 +1,6 @@
 namespace AyBorg.Data.Audit;
 
-public interface IAuditRepository<T>
+public interface IAuditRepository<in T>
 {
     bool TryAdd(T entry);
 }

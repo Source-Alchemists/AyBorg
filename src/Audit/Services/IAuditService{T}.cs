@@ -1,6 +1,6 @@
 namespace AyBorg.Audit.Services;
 
-public interface IAuditService<T>
+public interface IAuditService<in T>
 {
     bool TryAdd(T record);
 }
