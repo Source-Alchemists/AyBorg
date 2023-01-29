@@ -71,7 +71,7 @@ internal sealed class Engine : IEngine
 
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace("Engine [{Id}] with execution type [{executionType}] created.", Meta.Id, executionType);
+            _logger.LogTrace(new EventId((int)EventLogType.Engine), "Engine [{Id}] with execution type [{executionType}] created.", Meta.Id, executionType);
         }
     }
 
@@ -83,7 +83,7 @@ internal sealed class Engine : IEngine
     {
         if (Meta.State != EngineState.Idle)
         {
-            _logger.LogWarning($"Engine is not in idle state. Cannot start.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), $"Engine is not in idle state. Cannot start.");
             return false;
         }
 
@@ -98,13 +98,13 @@ internal sealed class Engine : IEngine
         IEnumerable<PathItem> pathItems = await pathfinder.CreatePathAsync(_project.Steps, _project.Links);
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace("Engine [{Id}] path created.", Meta.Id);
+            _logger.LogTrace(new EventId((int)EventLogType.Engine), "Engine [{Id}] path created.", Meta.Id);
         }
 
         _executionTask = Task.Factory.StartNew(async () => await ExecutePathAsync(pathItems, _stopTokenSource.Token, _abortTokenSource.Token), TaskCreationOptions.LongRunning);
         if (_logger.IsEnabled(LogLevel.Trace))
         {
-            _logger.LogTrace("Engine [{Id}] execution started.", Meta.Id);
+            _logger.LogTrace(new EventId((int)EventLogType.Engine), "Engine [{Id}] execution started.", Meta.Id);
         }
 
         Meta.State = EngineState.Running;
@@ -120,12 +120,12 @@ internal sealed class Engine : IEngine
     {
         if (ExecutionType == EngineExecutionType.SingleRun)
         {
-            _logger.LogWarning($"Engine is a single run engine. Cannot stop.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), $"Engine is a single run engine. Cannot stop.");
             return false;
         }
         if (Meta.State != EngineState.Running)
         {
-            _logger.LogWarning($"Engine is not in running state. Cannot stop.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), $"Engine is not in running state. Cannot stop.");
             return false;
         }
 
@@ -144,7 +144,7 @@ internal sealed class Engine : IEngine
     {
         if (Meta.State != EngineState.Running && Meta.State != EngineState.Stopping)
         {
-            _logger.LogWarning($"Engine is not in running or stopping state. Cannot abort.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), $"Engine is not in running or stopping state. Cannot abort.");
             return false;
         }
 

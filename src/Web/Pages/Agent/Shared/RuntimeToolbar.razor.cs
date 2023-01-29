@@ -107,7 +107,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
-            Snackbar.Add("Failed to start run", Severity.Warning);
+            Snackbar.Add("Failed to start run", Severity.Error);
         }
     }
 
@@ -119,7 +119,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
-            Snackbar.Add("Failed to start run", Severity.Warning);
+            Snackbar.Add("Failed to start run", Severity.Error);
         }
     }
 
@@ -131,7 +131,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
-            Snackbar.Add("Failed to stop run", Severity.Warning);
+            Snackbar.Add("Failed to stop run", Severity.Error);
         }
     }
 
@@ -143,7 +143,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
-            Snackbar.Add("Failed to abort run", Severity.Warning);
+            Snackbar.Add("Failed to abort run", Severity.Error);
         }
     }
 

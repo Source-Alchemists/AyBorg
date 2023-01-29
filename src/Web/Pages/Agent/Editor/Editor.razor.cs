@@ -69,7 +69,7 @@ public partial class Editor : ComponentBase
             Comment = string.Empty
         }))
         {
-            Snackbar.Add("Could not save project.", Severity.Warning);
+            Snackbar.Add("Could not save project.", Severity.Error);
         }
         _isProjectServerWaiting = false;
         await InvokeAsync(StateHasChanged);

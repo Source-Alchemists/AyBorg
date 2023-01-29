@@ -43,7 +43,7 @@ internal sealed class PluginsService : IPluginsService
             string? configFolder = _configuration.GetValue<string>("AyBorg:Plugins:Folder");
             if (configFolder == null)
             {
-                _logger.LogWarning("No plugin folder specified in configuration. (Hint: AyBorg:Plugins:Folder)");
+                _logger.LogWarning(new EventId((int)EventLogType.Engine), "No plugin folder specified in configuration. (Hint: AyBorg:Plugins:Folder)");
                 return;
             }
 

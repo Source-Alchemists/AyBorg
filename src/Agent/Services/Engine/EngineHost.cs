@@ -1,4 +1,5 @@
 using AyBorg.Agent.Runtime;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Runtime;
 using Grpc.Core;
@@ -86,7 +87,7 @@ internal sealed class EngineHost : IEngineHost
     {
         if (_engine == null)
         {
-            _logger.LogTrace("No active engine.");
+            _logger.LogTrace(new EventId((int)EventLogType.Engine), "No active engine.");
             return new EngineMeta();
         }
 
@@ -102,7 +103,7 @@ internal sealed class EngineHost : IEngineHost
     {
         if (ActiveProject == null)
         {
-            _logger.LogWarning("No active project.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project.");
             return new EngineMeta();
         }
 
@@ -111,7 +112,7 @@ internal sealed class EngineHost : IEngineHost
                 || _engine.Meta.State == EngineState.Stopping
                 || _engine.Meta.State == EngineState.Aborting))
         {
-            _logger.LogWarning("Engine is already running.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), "Engine is already running.");
             return _engine.Meta;
         }
 
@@ -126,7 +127,7 @@ internal sealed class EngineHost : IEngineHost
         bool startResult = await _engine.TryStartAsync();
         if (!startResult)
         {
-            _logger.LogWarning("Engine start failed.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), "Engine start failed.");
         }
 
         return _engine.Meta;
@@ -140,20 +141,20 @@ internal sealed class EngineHost : IEngineHost
     {
         if (_engine == null)
         {
-            _logger.LogWarning("No active engine.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), "No active engine.");
             return new EngineMeta();
         }
 
         if (_engine.Meta.State != EngineState.Running)
         {
-            _logger.LogWarning("Engine is not running. ({State})", _engine.Meta.State);
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), "Engine is not running. ({State})", _engine.Meta.State);
             return _engine.Meta;
         }
 
         bool stopResult = await _engine.TryStopAsync();
         if (!stopResult)
         {
-            _logger.LogWarning("Engine stop failed.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), "Engine stop failed.");
         }
 
         return _engine.Meta;
@@ -167,20 +168,20 @@ internal sealed class EngineHost : IEngineHost
     {
         if (_engine == null)
         {
-            _logger.LogWarning("No active engine.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), "No active engine.");
             return new EngineMeta();
         }
 
         if (_engine.Meta.State == EngineState.Aborting)
         {
-            _logger.LogWarning("Engine is already aborting.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), "Engine is already aborting.");
             return _engine.Meta;
         }
 
         bool abortResult = await _engine.TryAbortAsync();
         if (!abortResult)
         {
-            _logger.LogWarning("Engine abort failed.");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), "Engine abort failed.");
         }
 
         return _engine.Meta;
@@ -207,7 +208,7 @@ internal sealed class EngineHost : IEngineHost
     {
         if (_engine == null)
         {
-            _logger.LogWarning("No engine");
+            _logger.LogWarning(new EventId((int)EventLogType.Engine), "No engine");
             return;
         }
 
@@ -227,7 +228,7 @@ internal sealed class EngineHost : IEngineHost
     {
         if (ActiveProject == null)
         {
-            _logger.LogWarning("No active project.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project.");
             return;
         }
 
@@ -238,7 +239,7 @@ internal sealed class EngineHost : IEngineHost
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to notify engine iteration finished.");
+            _logger.LogError(new EventId((int)EventLogType.Engine), ex, "Failed to notify engine iteration finished.");
         }
     }
 }

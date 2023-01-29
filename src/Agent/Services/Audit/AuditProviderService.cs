@@ -39,7 +39,7 @@ public sealed class AuditProviderService : IAuditProviderService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(new EventId((int)EventLogType.Audit), ex, "Failed to add audit entry for project [{projectName}].", project.Meta.Name);
+            _logger.LogError(new EventId((int)EventLogType.Audit), ex, "Failed to add audit entry for project [{projectName}].", project.Meta.Name);
         }
 
         return false;
