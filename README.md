@@ -1,6 +1,6 @@
 # AyBorg
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Source-Alchemists_AyBorg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Source-Alchemists_AyBorg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Source-Alchemists_AyBorg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Source-Alchemists_AyBorg) [![Twitter Follow](https://img.shields.io/twitter/follow/ayborg_io?logo=twitter&style=flat-square)](https://twitter.com/ayborg_io?ref_src=twsrc%5Etfw)
 
 :star:  We appreciate your star, it helps!
 

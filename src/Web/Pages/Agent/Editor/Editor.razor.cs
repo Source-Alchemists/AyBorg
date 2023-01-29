@@ -28,6 +28,7 @@ public partial class Editor : ComponentBase
     [Inject] IProjectManagementService? ProjectManagementService { get; set; }
     [Inject] IStateService StateService { get; set; } = null!;
     [Inject] IDialogService DialogService { get; set; } = null!;
+    [Inject] ISnackbar Snackbar { get; set; } = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -61,12 +62,15 @@ public partial class Editor : ComponentBase
     private async void OnProjectSaveClicked()
     {
         _isProjectServerWaiting = true;
-        await ProjectManagementService!.TrySaveAsync(_projectMeta!, new ProjectSaveInfo
+        if (!await ProjectManagementService!.TrySaveAsync(_projectMeta!, new ProjectSaveInfo
         {
             State = SDK.Projects.ProjectState.Draft,
             VersionName = _projectMeta!.VersionName,
             Comment = string.Empty
-        });
+        }))
+        {
+            Snackbar.Add("Could not save project.", Severity.Warning);
+        }
         _isProjectServerWaiting = false;
         await InvokeAsync(StateHasChanged);
     }

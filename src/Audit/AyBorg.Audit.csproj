@@ -3,6 +3,7 @@
   <ItemGroup>
     <ProjectReference Include="..\SDK\src\Logging\Analytics\AyBorg.SDK.Logging.Analytics.csproj" />
     <ProjectReference Include="..\SDK\src\Communication\gRPC\AyBorg.SDK.Communication.gRPC.csproj" />
+    <ProjectReference Include="..\Data\Audit\AyBorg.Data.Audit.csproj" />
   </ItemGroup>
 
 </Project>

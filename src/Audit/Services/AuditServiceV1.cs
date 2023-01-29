@@ -7,12 +7,26 @@ namespace AyBorg.Audit.Services;
 
 public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
 {
+    private readonly AgentMapper _agentMapper;
+    private readonly IAgentAuditService _agentAuditService;
+
+    public AuditServiceV1(AgentMapper agentMapper, IAgentAuditService agentAuditService)
+    {
+        _agentMapper = agentMapper;
+        _agentAuditService = agentAuditService;
+    }
+
     public override Task<Empty> AddEntry(AuditEntry request, ServerCallContext context)
     {
-        switch(request.PayloadCase)
+        switch (request.PayloadCase)
         {
             case AuditEntry.PayloadOneofCase.AgentProject:
-            break;
+                Data.Audit.Models.Agent.ProjectAuditRecord projectAuditRecord = _agentMapper.Map(request.AgentProject);
+                if (!_agentAuditService.TryAdd(projectAuditRecord))
+                {
+                    throw new RpcException(Status.DefaultCancelled, "Failed to add project audit entry.");
+                }
+                break;
         }
         return Task.FromResult(new Empty());
     }

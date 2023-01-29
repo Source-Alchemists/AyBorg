@@ -15,7 +15,7 @@ public sealed class AuditMapper
             VersionName = projectRecord.Meta.VersionName,
             VersionIteration = Convert.ToInt32(projectRecord.Meta.VersionIteration),
             Comment = projectRecord.Meta.Comment,
-            ApprovedBye = projectRecord.Meta.ApprovedBy ?? string.Empty,
+            ApprovedBy = projectRecord.Meta.ApprovedBy ?? string.Empty,
             Settings = new AgentProjectSettingsAuditEntry
             {
                 IsForceResultCommunicationEnabled = projectRecord.Settings.IsForceResultCommunicationEnabled
