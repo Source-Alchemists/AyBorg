@@ -45,8 +45,9 @@ public interface IProjectManagementService
     /// <summary>
     /// Save active project.
     /// </summary>
+    /// <param name="userName">Name of the user saving the project.</param>
     /// <returns></returns>
-    ValueTask<ProjectManagementResult> TrySaveActiveAsync();
+    ValueTask<ProjectManagementResult> TrySaveActiveAsync(string userName);
 
     /// <summary>
     /// Save the project as new version.

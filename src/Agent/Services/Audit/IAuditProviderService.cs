@@ -4,6 +4,6 @@ namespace AyBorg.Agent.Services;
 
 public interface IAuditProviderService
 {
-    ValueTask<Guid> AddAsync(ProjectRecord project);
+    ValueTask<Guid> AddAsync(ProjectRecord project, string userName);
     ValueTask<bool> TryInvalidateAsync(Guid tokenId);
 }

@@ -91,13 +91,12 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
 
             ProjectMetaRecord? activeProjectMeta = metas.FirstOrDefault(pm => pm.IsActive);
-            if (activeProjectMeta != null && _engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(activeProjectMeta.Id))
+            if (activeProjectMeta != null
+                && _engineHost.ActiveProject != null
+                && _engineHost.ActiveProject.Meta.Id.Equals(activeProjectMeta.Id)
+                && !await _engineHost.TryDeactivateProjectAsync()) // Need to deactivated project.
             {
-                // Need to deactivate the project.
-                if (!await _engineHost.TryDeactivateProjectAsync())
-                {
-                    throw new ProjectException("Could not deactivate engine project.");
-                }
+                throw new ProjectException("Could not deactivate engine project.");
             }
 
             if (!await _projectRepository.TryDeleteAsync(projectMetaId))
@@ -240,8 +239,9 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <summary>
     /// Save active project asynchronous.
     /// </summary>
+    /// <param name="userName">Name of the user saving the project.</param>
     /// <returns></returns>
-    public async ValueTask<ProjectManagementResult> TrySaveActiveAsync()
+    public async ValueTask<ProjectManagementResult> TrySaveActiveAsync(string userName)
     {
         try
         {
@@ -260,7 +260,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             projectRecord.Meta = previousProjectMetaRecord with { DbId = Guid.Empty, IsActive = true };
             projectRecord.Settings.DbId = Guid.Empty;
 
-            Guid auditToken = await _auditProviderService.AddAsync(projectRecord);
+            Guid auditToken = await _auditProviderService.AddAsync(projectRecord, userName);
             if (auditToken.Equals(Guid.Empty))
             {
                 throw new ProjectException("Could not add audit information.");

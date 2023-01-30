@@ -213,7 +213,7 @@ public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManag
                                                                             It.IsAny<string>(),
                                                                             It.IsAny<string>()))
                                                                             .ReturnsAsync(new ProjectManagementResult { IsSuccessful = !isSaveFailing });
-        _mockProjectManagementService.Setup(m => m.TrySaveActiveAsync()).ReturnsAsync(new ProjectManagementResult { IsSuccessful = !isSaveFailing });
+        _mockProjectManagementService.Setup(m => m.TrySaveActiveAsync(It.IsAny<string>())).ReturnsAsync(new ProjectManagementResult { IsSuccessful = !isSaveFailing });
         _mockProjectManagementService.Setup(m => m.ActiveProjectId).Returns(projectId);
         _mockProjectManagementService.Setup(m => m.GetAllMetasAsync()).ReturnsAsync(new List<ProjectMetaRecord> {
             new ProjectMetaRecord { Id = projectId, ServiceUniqueName = "Test", IsActive = hasActiveProject, State = projectState }

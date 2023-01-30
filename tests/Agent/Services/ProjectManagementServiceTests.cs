@@ -173,7 +173,7 @@ public sealed class ProjectManagementServiceTests
         _mockRuntimeToStorageMapper.Setup(r => r.Map(It.IsAny<Project>())).Returns(new ProjectRecord());
 
         // Act
-        ProjectManagementResult result = await _service.TrySaveActiveAsync();
+        ProjectManagementResult result = await _service.TrySaveActiveAsync(It.IsAny<string>());
 
         // Assert
         Assert.Equal(expectedSuccess, result.IsSuccessful);

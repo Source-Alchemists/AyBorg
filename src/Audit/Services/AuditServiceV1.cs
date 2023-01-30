@@ -1,5 +1,6 @@
 
 using Ayborg.Gateway.Audit.V1;
+using AyBorg.SDK.System;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -18,23 +19,43 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
 
     public override Task<Empty> AddEntry(AuditEntry request, ServerCallContext context)
     {
-        switch (request.PayloadCase)
+        return Task.Factory.StartNew(() =>
         {
-            case AuditEntry.PayloadOneofCase.AgentProject:
-                Data.Audit.Models.Agent.ProjectAuditRecord projectAuditRecord = _agentMapper.Map(request.AgentProject);
-                projectAuditRecord.TokenId = Guid.Parse(request.Token);
-                if (!_agentAuditService.TryAdd(projectAuditRecord))
-                {
-                    throw new RpcException(Status.DefaultCancelled, "Failed to add project audit entry.");
-                }
-                break;
-        }
-        return Task.FromResult(new Empty());
+            switch (request.PayloadCase)
+            {
+                case AuditEntry.PayloadOneofCase.AgentProject:
+                    Data.Audit.Models.Agent.ProjectAuditRecord projectAuditRecord = _agentMapper.Map(request.AgentProject);
+                    projectAuditRecord.Id = Guid.Parse(request.Token);
+                    projectAuditRecord.SavedBy = request.User;
+                    if (!_agentAuditService.TryAdd(projectAuditRecord))
+                    {
+                        throw new RpcException(new Status(StatusCode.DataLoss, "Failed to add project audit entry."));
+                    }
+                    break;
+            }
+
+            return new Empty();
+        });
     }
 
-    public override Task<Empty> InvalidateEntry(AuditReportMeta request, ServerCallContext context)
+    public override Task<Empty> InvalidateEntry(InvalidateAuditEntryRequest request, ServerCallContext context)
     {
-        return Task.FromResult(new Empty());
+        return Task.Factory.StartNew(() =>
+        {
+            if (request.ServiceType.Equals(ServiceTypes.Agent))
+            {
+                if (!_agentAuditService.TryRemove(Guid.Parse(request.Token)))
+                {
+                    throw new RpcException(new Status(StatusCode.Internal, "Failed to invalidate audit entry."));
+                }
+            }
+            else
+            {
+                throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid service type."));
+            }
+
+            return new Empty();
+        });
     }
 
     public override Task GetEntries(GetAuditEntriesRequest request, IServerStreamWriter<AuditEntry> responseStream, ServerCallContext context)

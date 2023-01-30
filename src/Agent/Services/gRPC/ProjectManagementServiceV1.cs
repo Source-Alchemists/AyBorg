@@ -119,7 +119,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
                 if (activeProject.State == SDK.Projects.ProjectState.Draft)
                 {
                     // Save active project
-                    result = await _projectManagementService.TrySaveActiveAsync();
+                    result = await _projectManagementService.TrySaveActiveAsync(request.ProjectSaveInfo.UserName);
                 }
                 else
                 {

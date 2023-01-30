@@ -11,7 +11,7 @@ public sealed class AgentMapper
     {
         var result = new ProjectAuditRecord
         {
-            Id = Guid.Parse(entry.Id),
+            ProjectId = Guid.Parse(entry.Id),
             Name = entry.Name,
             State = (ProjectState)entry.State,
             VersionName = entry.VersionName,

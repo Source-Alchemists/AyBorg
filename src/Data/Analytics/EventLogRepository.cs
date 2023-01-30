@@ -1,16 +1,19 @@
 using LiteDB;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Data.Analytics;
 
 public sealed class EventLogRepository : IEventLogRepository, IDisposable
 {
+    private readonly ILogger<EventLogRepository> _logger;
     private readonly LiteDatabase _database;
     private bool _disposedValue;
 
-    public EventLogRepository(IConfiguration configuration)
+    public EventLogRepository(ILogger<EventLogRepository> logger, IConfiguration configuration)
     {
-        string? connectionString = configuration.GetConnectionString("DatabaseConnection");
+        _logger = logger;
+        string connectionString = configuration.GetConnectionString("Database")!;
         _database = new LiteDatabase(connectionString)
         {
             UtcDate = true
@@ -19,26 +22,50 @@ public sealed class EventLogRepository : IEventLogRepository, IDisposable
 
     public bool TryAdd(EventRecord eventRecord)
     {
-        ILiteCollection<EventRecord> collection = _database.GetCollection<EventRecord>("events");
-        collection.Insert(eventRecord with { Timestamp = DateTime.SpecifyKind(eventRecord.Timestamp, DateTimeKind.Utc) });
-        return _database.Commit();
-    }
-
-    public bool TryDelete(EventRecord eventRecord)
-    {
-        ILiteCollection<EventRecord> collection = _database.GetCollection<EventRecord>("events");
-        collection.DeleteMany(e => e.Id.Equals(eventRecord.Id));
-        return _database.Commit();
-    }
-
-    public bool TryDelete(IEnumerable<EventRecord> eventRecords)
-    {
-        ILiteCollection<EventRecord> collection = _database.GetCollection<EventRecord>("events");
-        foreach(EventRecord outdatedEvent in eventRecords)
+        try
         {
-            collection.Delete(outdatedEvent.Id);
+            ILiteCollection<EventRecord> collection = _database.GetCollection<EventRecord>("events");
+            collection.Insert(eventRecord);
+            return true;
         }
-        return _database.Commit();
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to add event record.");
+            return false;
+        }
+    }
+
+    public bool TryRemove(EventRecord eventRecord)
+    {
+        try
+        {
+            ILiteCollection<EventRecord> collection = _database.GetCollection<EventRecord>("events");
+            collection.DeleteMany(e => e.Id.Equals(eventRecord.Id));
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to remove event record.");
+            return false;
+        }
+    }
+
+    public bool TryRemove(IEnumerable<EventRecord> eventRecords)
+    {
+        try
+        {
+            ILiteCollection<EventRecord> collection = _database.GetCollection<EventRecord>("events");
+            foreach (EventRecord outdatedEvent in eventRecords)
+            {
+                collection.Delete(outdatedEvent.Id);
+            }
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to remove event records.");
+            return false;
+        }
     }
 
     public IEnumerable<EventRecord> FindAll()

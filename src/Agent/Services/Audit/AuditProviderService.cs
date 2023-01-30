@@ -23,7 +23,7 @@ public sealed class AuditProviderService : IAuditProviderService
         _serviceConfiguration = serviceConfiguration;
     }
 
-    public async ValueTask<Guid> AddAsync(ProjectRecord project)
+    public async ValueTask<Guid> AddAsync(ProjectRecord project, string userName)
     {
         try
         {
@@ -31,6 +31,7 @@ public sealed class AuditProviderService : IAuditProviderService
             await _auditClient.AddEntryAsync(new AuditEntry
             {
                 Token = tokenId.ToString(),
+                User = userName,
                 ServiceType = ServiceTypes.Agent,
                 ServiceUniqueName = _serviceConfiguration.UniqueName,
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
@@ -51,12 +52,10 @@ public sealed class AuditProviderService : IAuditProviderService
     {
         try
         {
-            await _auditClient.InvalidateEntryAsync(new AuditReportMeta
+            await _auditClient.InvalidateEntryAsync(new InvalidateAuditEntryRequest
             {
                 Token = tokenId.ToString(),
-                ServiceType = string.Empty,
-                ServiceUniqueName = string.Empty,
-                Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
+                ServiceType = ServiceTypes.Agent
             });
             return true;
         }

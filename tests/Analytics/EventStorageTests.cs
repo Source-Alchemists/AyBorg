@@ -25,13 +25,13 @@ public class EventStorageTests
     {
         // Arrange
         var testRecord = new EventRecord();
-        _mockRepository.Setup(m => m.TryDelete(It.IsAny<IEnumerable<EventRecord>>())).Returns(true);
+        _mockRepository.Setup(m => m.TryRemove(It.IsAny<IEnumerable<EventRecord>>())).Returns(true);
         _mockRepository.Setup(m => m.TryAdd(It.IsAny<EventRecord>())).Returns(true);
         // Act
         _storage.Add(testRecord);
 
         // Assert
-        _mockRepository.Verify(m => m.TryDelete(It.IsAny<IEnumerable<EventRecord>>()));
+        _mockRepository.Verify(m => m.TryRemove(It.IsAny<IEnumerable<EventRecord>>()));
         _mockRepository.Verify(m => m.TryAdd(testRecord));
     }
 

@@ -32,7 +32,7 @@ public sealed class AuditPassthroughServiceV1 : Ayborg.Gateway.Audit.V1.Audit.Au
         return new Empty();
     }
 
-    public override async Task<Empty> InvalidateEntry(AuditReportMeta request, ServerCallContext context)
+    public override async Task<Empty> InvalidateEntry(InvalidateAuditEntryRequest request, ServerCallContext context)
     {
         IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Audit);
         ThrowIfAuditRequiredButNotAvailable(channels);
