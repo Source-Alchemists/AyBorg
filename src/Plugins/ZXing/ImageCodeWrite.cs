@@ -1,6 +1,3 @@
-using System.Net.Mime;
-using System.Runtime.CompilerServices;
-using AyBorg.Plugins.ZXing.Models;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
@@ -10,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using ZXing;
 using ZXing.Common;
 
-namespace ZXing
+namespace AyBorg.Plugins.ZXing
 {
     public class ImageCodeWrite : IStepBody
     {
@@ -19,6 +16,7 @@ namespace ZXing
         private readonly StringPort _codePort = new("Code", PortDirection.Input, string.Empty);
         private readonly NumericPort _widthPort = new("Width", PortDirection.Input, 100);
         private readonly NumericPort _heightPort = new("Height", PortDirection.Input, 100);
+        private readonly NumericPort _marginPort = new("Margin", PortDirection.Input, 0);
         private readonly ImagePort _imagePort = new("Image", PortDirection.Output, null!);
         private byte[] _tmpBuffer = null!;
         public string DefaultName => "Image.Code.Write";
@@ -33,15 +31,20 @@ namespace ZXing
                 _imagePort,
                 _formatPort,
                 _codePort,
+                _widthPort,
+                _heightPort,
             };
         }
         public IEnumerable<IPort> Ports { get; }
 
-        public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken) {
+        public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken) {      
+            _imagePort.Value?.Dispose();
+
             var writer = new BarcodeWriterGeneric{
                 Options = new EncodingOptions{
                     Width = (int)_widthPort.Value,
                     Height = (int)_heightPort.Value,
+                    Margin = (int) _marginPort.Value,
                 },
                  Format = (BarcodeFormat)_formatPort.Value,
                 Encoder = new MultiFormatWriter(),
@@ -49,7 +52,12 @@ namespace ZXing
             
             var result = writer.Encode(_codePort.Value);
 
-            _imagePort.Value = new Image(BitMatrixToPixelBuffer(result));
+            var buffer = BitMatrixToPixelBuffer(result);
+
+            //Todo write image to rgb converter in imageTorque
+            // todo throw correct errors when width hight margin is not set correctly
+
+            _imagePort.Value = new Image(buffer);
             return new ValueTask<bool>(true);
         }
 

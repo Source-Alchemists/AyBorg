@@ -43,6 +43,15 @@ namespace AyBorg.Plugins.ZXing
 
         public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
         {
+            if (_imagePort.Value is null)
+            {
+                if (_logger.IsEnabled(LogLevel.Trace))
+                {
+                    _logger.LogTrace(new EventId((int)EventLogType.Result), "Image is null.");
+                }
+                return ValueTask.FromResult(false);
+            }
+
             ReadOnlySpan<byte> imageBuffer = _imagePort.Value.AsPacked<Rgb24>().Buffer;
             if (_tmpBuffer == null || _tmpBuffer.Length != imageBuffer.Length)
             {
