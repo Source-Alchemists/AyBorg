@@ -38,10 +38,10 @@
 <AuthorizeView Roles="Administrator, Auditor">
     <Authorized>
         <MudNavGroup Title="Audit" Icon="@Icons.Material.Filled.Assignment" IconColor="Color.Primary" Expanded="true">
-            <MudNavLink Href="audit/report" Match="NavLinkMatch.Prefix">
+            <MudNavLink Href="audit/reports/new" Match="NavLinkMatch.All" >
                 New Report
             </MudNavLink>
-            <MudNavLink Href="audit/reports" Match="NavLinkMatch.Prefix">
+            <MudNavLink Href="audit/reports" Match="NavLinkMatch.All" >
                 Exported Reports
             </MudNavLink>
         </MudNavGroup>

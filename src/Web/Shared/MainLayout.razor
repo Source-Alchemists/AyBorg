@@ -28,7 +28,8 @@
 
                 <MudDrawer @bind-Open="@_isDrawerOpen" Elevation="0" Variant="@DrawerVariant.Responsive">
                     <MudDrawerHeader>
-                        <MudText Typo="Typo.h5" hidden="@(!_isDrawerOpen)">AyBorg</MudText>
+                        <MudImage Src="icons/logo.svg" Width="46" Height="46" />
+                        <MudText Typo="Typo.h5" hidden="@(!_isDrawerOpen)" Class="ml-3 mt-1" Color="Color.Primary">AyBorg</MudText>
                     </MudDrawerHeader>
                     <MudNavMenu Bordered="true" Color="Color.Primary">
                         <NavMenu />
