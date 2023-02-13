@@ -37,6 +37,12 @@
     align-items: center;
 }
 
+.brand-text {
+    letter-spacing: .4rem;
+    font-weight: 500;
+    user-select: none;
+}
+
 .page-loading-bar {
     height: 4px;
 }
