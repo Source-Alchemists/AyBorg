@@ -1,5 +1,6 @@
 
 using Ayborg.Gateway.Audit.V1;
+using AyBorg.Data.Audit.Models;
 using AyBorg.SDK.System;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -24,9 +25,7 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
             switch (request.PayloadCase)
             {
                 case AuditEntry.PayloadOneofCase.AgentProject:
-                    Data.Audit.Models.Agent.ProjectAuditRecord projectAuditRecord = _agentMapper.Map(request.AgentProject);
-                    projectAuditRecord.Id = Guid.Parse(request.Token);
-                    projectAuditRecord.SavedBy = request.User;
+                    Data.Audit.Models.Agent.ProjectAuditRecord projectAuditRecord = _agentMapper.MapToProjectRecord(request);
                     if (!_agentAuditService.TryAdd(projectAuditRecord))
                     {
                         throw new RpcException(new Status(StatusCode.DataLoss, "Failed to add project audit entry."));
@@ -58,13 +57,21 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
         });
     }
 
-    public override Task GetEntries(GetAuditEntriesRequest request, IServerStreamWriter<AuditEntry> responseStream, ServerCallContext context)
+    public override async Task GetChangesets(GetAuditChangesetsRequest request, IServerStreamWriter<AuditChangeset> responseStream, ServerCallContext context)
     {
-        return Task.CompletedTask;
+        foreach (ChangesetRecord changeset in _agentAuditService.GetChangesets())
+        {
+            await responseStream.WriteAsync(_agentMapper.Map(changeset));
+        }
     }
 
-    public override Task GetReportMetas(GetAuditReportMetasRequest request, IServerStreamWriter<AuditReportMeta> responseStream, ServerCallContext context)
-    {
-        return Task.CompletedTask;
-    }
+    // public override Task GetChanges(GetAuditChangesRequest request, IServerStreamWriter<AuditChange> responseStream, ServerCallContext context)
+    // {
+    //     return Task.CompletedTask;
+    // }
+
+    // public override Task GetReportMetas(GetAuditReportMetasRequest request, IServerStreamWriter<AuditReportMeta> responseStream, ServerCallContext context)
+    // {
+    //     return Task.CompletedTask;
+    // }
 }

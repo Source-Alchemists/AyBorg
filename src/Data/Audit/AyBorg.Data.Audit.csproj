@@ -5,5 +5,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\SDK\src\Projects\AyBorg.SDK.Projects.csproj" />
+    <ProjectReference Include="..\..\SDK\src\System\AyBorg.SDK.System.csproj" />
   </ItemGroup>
 </Project>

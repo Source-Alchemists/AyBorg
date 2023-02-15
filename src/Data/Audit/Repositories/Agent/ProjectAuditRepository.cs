@@ -62,6 +62,13 @@ public sealed class AgentProjectAuditRepository : IProjectAuditRepository
         return collection.Find(a => a.Timestamp >= from && a.Timestamp <= to).ToList();
     }
 
+    public IEnumerable<ProjectAuditRecord> FindAll()
+    {
+        using LiteDatabase database = CreateDatabase();
+        ILiteCollection<ProjectAuditRecord> collection = database.GetCollection<ProjectAuditRecord>("agentProjectAudits");
+        return collection.FindAll().ToList();
+    }
+
     private LiteDatabase CreateDatabase()
     {
         return new LiteDatabase(_connectionString)

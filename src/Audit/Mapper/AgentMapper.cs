@@ -1,30 +1,38 @@
 using Ayborg.Gateway.Audit.V1;
+using AyBorg.Data.Audit.Models;
 using AyBorg.Data.Audit.Models.Agent;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
+using AyBorg.SDK.System;
+using Google.Protobuf.WellKnownTypes;
 
 namespace AyBorg.Audit;
 
 public sealed class AgentMapper
 {
-    public ProjectAuditRecord Map(AgentProjectAuditEntry entry)
+    public ProjectAuditRecord MapToProjectRecord(AuditEntry entry)
     {
         var result = new ProjectAuditRecord
         {
-            ProjectId = Guid.Parse(entry.Id),
-            Name = entry.Name,
-            State = (ProjectState)entry.State,
-            VersionName = entry.VersionName,
-            VersionIteration = entry.VersionIteration,
-            Comment = entry.Comment,
-            ApprovedBy = entry.ApprovedBy,
+            Id = Guid.Parse(entry.Token),
+            ServiceType = entry.ServiceType,
+            ServiceUniqueName = entry.ServiceUniqueName,
+            User = entry.User,
+            Type = (AuditEntryType)entry.Type,
+            ProjectId = Guid.Parse(entry.AgentProject.Id),
+            ProjectName = entry.AgentProject.Name,
+            ProjectState = (ProjectState)entry.AgentProject.State,
+            VersionName = entry.AgentProject.VersionName,
+            VersionIteration = entry.AgentProject.VersionIteration,
+            Comment = entry.AgentProject.Comment,
+            Approver = entry.AgentProject.ApprovedBy,
             Settings = new ProjectSettingsAuditRecord
             {
-                IsForceResultCommunicationEnabled = entry.Settings.IsForceResultCommunicationEnabled
+                IsForceResultCommunicationEnabled = entry.AgentProject.Settings.IsForceResultCommunicationEnabled
             }
         };
 
-        foreach (AgentStepAuditEntry? step in entry.Steps)
+        foreach (AgentStepAuditEntry? step in entry.AgentProject.Steps)
         {
             var stepRecord = new StepAuditRecord
             {
@@ -51,7 +59,7 @@ public sealed class AgentMapper
             result.Steps.Add(stepRecord);
         }
 
-        foreach (AgentLinkAuditEntry? link in entry.Links)
+        foreach (AgentLinkAuditEntry? link in entry.AgentProject.Links)
         {
             result.Links.Add(new LinkAuditRecord
             {
@@ -62,5 +70,25 @@ public sealed class AgentMapper
         }
 
         return result;
+    }
+
+    public AuditChangeset Map(ChangesetRecord changeset)
+    {
+        return new AuditChangeset
+        {
+            Token = changeset.Id.ToString(),
+            ServiceType = changeset.ServiceType,
+            ServiceUniqueName = changeset.ServiceUniqueName,
+            ProjectId = changeset.ProjectId.ToString(),
+            ProjectName = changeset.ProjectName,
+            ProjectState = (int)changeset.ProjectState,
+            VersionName = changeset.VersionName ?? string.Empty, // Can be empty
+            VersionIteration = changeset.VersionIteration,
+            User = changeset.User,
+            Approver = changeset.Approver ?? string.Empty, // Can be empty
+            Comment = changeset.Comment ?? string.Empty, // Can be empty
+            Timestamp = Timestamp.FromDateTime(changeset.Timestamp),
+            Type = (int)changeset.Type
+        };
     }
 }

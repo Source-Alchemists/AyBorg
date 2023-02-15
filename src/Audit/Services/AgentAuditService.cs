@@ -1,3 +1,4 @@
+using AyBorg.Data.Audit.Models;
 using AyBorg.Data.Audit.Models.Agent;
 using AyBorg.Data.Audit.Repositories.Agent;
 using AyBorg.SDK.Common;
@@ -20,7 +21,7 @@ public sealed class AgentAuditService : IAgentAuditService
         bool result = _projectAuditRepository.TryAdd(record);
         if (result == true)
         {
-            _logger.LogInformation(new EventId((int)EventLogType.Audit), "Audit entry added for project [{projectName}] with state [{projectState}].", record.Name, record.State);
+            _logger.LogInformation(new EventId((int)EventLogType.Audit), "Audit entry added for project [{projectName}] with state [{projectState}].", record.ProjectName, record.ProjectState);
         }
         return result;
     }
@@ -34,7 +35,15 @@ public sealed class AgentAuditService : IAgentAuditService
             {
                 throw new AuditException("Failed to find audit record.");
             }
-            _logger.LogInformation(new EventId((int)EventLogType.Audit), "Audit entry removed for project [{projectName}] with state [{projectState}].", record.Name, record.State);
+            if(record.Timestamp < DateTime.UtcNow - TimeSpan.FromHours(1))
+            {
+                throw new AuditException("Audit record is older than 1 hour and can not be removed anymore.");
+            }
+            if (!_projectAuditRepository.TryRemove(record))
+            {
+                throw new AuditException("Failed to remove audit record.");
+            }
+            _logger.LogInformation(new EventId((int)EventLogType.Audit), "Audit entry removed for project [{projectName}] with state [{projectState}].", record.ProjectName, record.ProjectState);
             return true;
         }
         catch (Exception ex)
@@ -43,4 +52,6 @@ public sealed class AgentAuditService : IAgentAuditService
             return false;
         }
     }
+
+    public IEnumerable<ChangesetRecord> GetChangesets() => _projectAuditRepository.FindAll().Cast<ChangesetRecord>();
 }
