@@ -4,7 +4,7 @@ using AyBorg.Data.Audit.Models.Agent;
 
 namespace AyBorg.Audit.Services;
 
-public sealed class CompareService : ICompareService
+public sealed class AgentCompareService : IAgentCompareService
 {
     public IEnumerable<ChangeRecord> Compare(IEnumerable<ProjectAuditRecord> projectAuditRecords)
     {

@@ -14,9 +14,9 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
     private readonly AgentMapper _agentMapper;
     private readonly IAgentAuditService _agentAuditService;
     private readonly IProjectAuditRepository _projectAuditRepository;
-    private readonly ICompareService _compareService;
+    private readonly IAgentCompareService _compareService;
 
-    public AuditServiceV1(AgentMapper agentMapper, IAgentAuditService agentAuditService, IProjectAuditRepository projectAuditRepository, ICompareService compareService)
+    public AuditServiceV1(AgentMapper agentMapper, IAgentAuditService agentAuditService, IProjectAuditRepository projectAuditRepository, IAgentCompareService compareService)
     {
         _agentMapper = agentMapper;
         _agentAuditService = agentAuditService;
