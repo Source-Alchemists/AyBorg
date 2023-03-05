@@ -42,7 +42,8 @@ public sealed class AuditMapper
                     Id = port.Id.ToString(),
                     Name = port.Name,
                     Value = value ?? string.Empty,
-                    Brand = (int)port.Brand
+                    Brand = (int)port.Brand,
+                    Direction = (int)port.Direction
                 });
             }
             result.Steps.Add(stepDto);

@@ -1,0 +1,135 @@
+@using AyBorg.Web.Shared.Models;
+
+<MudCard>
+    <MudCardHeader>
+        <table class="mud-full-width">
+            <thead hidden>
+                <tr>
+                    <th scope="col">Timestamp</th>
+                    <th scope="col">Service</th>
+                    <th scope="col">Account</th>
+                </tr>
+            </thead>
+            <colgroup>
+            <col>
+            <col>
+            <col>
+            <col>
+            </colgroup>
+            <tbody>
+                <tr>
+                    <td colspan="3">
+                        <MudText Typo="Typo.h6">@_changesetTitle</MudText>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <MudBadge Content="@_changesCount" Overlap="true" Color="Color.Primary">
+                            <MudText Typo="Typo.subtitle1"><strong>Timestamp:</strong> @_changesetTimestamp - UTC</MudText>
+                        </MudBadge>
+                    </td>
+                    <td>
+                        <MudText Typo="Typo.subtitle1"><strong>Service:</strong> @_changesetService</MudText>
+                    </td>
+                    <td>
+                        <MudText Typo="Typo.subtitle1"><strong>Account:</strong> @_changesetAccount</MudText>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <MudText Typo="Typo.subtitle2"><strong>Comment:</strong> @_changesetComment</MudText>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </MudCardHeader>
+    <MudCardContent style="padding-left: 0; padding-right: 0; padding-bottom: 0">
+        <table class="mud-full-width">
+            <thead hidden>
+                <tr>
+                    <th scope="col">Original Border</th>
+                    <th scope="col">Original</th>
+                    <th scope="col">Diff Border</th>
+                    <th scope="col">Diff</th>
+                </tr>
+            </thead>
+            <colgroup>
+            <col width="44">
+            <col>
+            <col width="44">
+            <col>
+            </colgroup>
+            <tbody>
+                @foreach (var change in Changes)
+                {
+                    <tr>
+                        <td colspan="4" class="audit-compare-property">
+                            <MudText Typo="Typo.subtitle1">@change.Label</MudText>
+                        </td>
+                    </tr>
+                    @if (change.SubLabel != string.Empty)
+                    {
+                    <tr>
+                        <td colspan="4" class="audit-compare-property">
+                            <MudText Typo="Typo.subtitle2">@change.SubLabel</MudText>
+                        </td>
+                    </tr>
+                    }
+
+                    <tr>
+                        @if(change.ValueA != string.Empty)
+                        {
+                            <td class="audit-compare-deletion-border-color">
+                                <MudIcon Icon="@Icons.Material.Filled.Remove" Color="Color.Default" style="float: right" />
+                            </td>
+                            <td class="audit-compare-value-container audit-compare-deletion-color">
+                                @((MarkupString)change.ValueA)
+                            </td>
+                        }
+                        else
+                        {
+                            <td colspan="2" class="audit-compare-value-container audit-compare-neutral-color" />
+                        }
+                        @if(change.ValueB != string.Empty)
+                        {
+                            <td class="audit-compare-addition-border-color">
+                                <MudIcon Icon="@Icons.Material.Filled.Add" Color="Color.Default" style="float: right" />
+                            </td>
+                            <td class="audit-compare-value-container audit-compare-addition-color">
+                                @((MarkupString)change.ValueB)
+                            </td>
+                        }
+                        else
+                        {
+                            <td colspan="2" class="audit-compare-value-container audit-compare-neutral-color" />
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </MudCardContent>
+</MudCard>
+
+@code {
+    [Parameter, EditorRequired] public AuditChangeset ChangesetA { get; set; } = null!;
+    [Parameter, EditorRequired] public AuditChangeset ChangesetB { get; set; } = null!;
+    [Parameter, EditorRequired] public IEnumerable<AuditChange> Changes { get; set; } = null!;
+
+    private string _changesetTitle = string.Empty;
+    private string _changesetComment = string.Empty;
+    private string _changesetTimestamp = string.Empty;
+    private string _changesetService = string.Empty;
+    private string _changesetAccount = string.Empty;
+    private int _changesCount => Changes.Count();
+
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _changesetTitle = ChangesetB.ProjectName;
+        _changesetTimestamp = ChangesetB.Timestamp.ToString();
+        _changesetService = $"{ChangesetB.ServiceUniqueName} / {ChangesetB.ServiceType}";
+        _changesetAccount = ChangesetB.User;
+        _changesetComment = ChangesetB.Comment;
+    }
+}

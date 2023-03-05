@@ -1,5 +1,6 @@
 @page "/audit/reports/create"
 @using SDK.Authorization
+@using AyBorg.Web.Pages.Audit.Shared
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Auditor}")]
 
 <PageTitle>AyBorg - Audit Report</PageTitle>
@@ -7,27 +8,50 @@
 <div class="page-loading-bar">
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)"/>
 </div>
-<MudToolBar Class="mud-full-width">
-    <MudDateRangePicker Label="Date Range" Editable="true" @bind-DateRange="_dateRange" Class="mr-5" />
-    <MudSelect T="ServiceOption" Label="Services" MultiSelection="true" SelectAll="true" ToStringFunc="@_serviceSelectionConveter" @bind-SelectedValues="_selectedOptions" Class="mr-5">
-        @foreach (var option in _selectableServiceOptions)
-        {
-            <MudSelectItem T="ServiceOption" Value="@option">@option.Label</MudSelectItem>
-        }
-    </MudSelect>
-    <MudTooltip Text="Filter">
-        <MudIconButton Icon="@Icons.Material.Filled.FilterList" Color="Color.Primary" />
-    </MudTooltip>
-</MudToolBar>
+<div hidden="@_isFilterHidden">
+    <MudToolBar Class="mud-full-width">
+        <MudDateRangePicker Label="Date Range" Editable="true" @bind-DateRange="_dateRange" Class="mr-5" />
+        <MudSelect T="ServiceOption" Label="Services" MultiSelection="true" SelectAll="true" ToStringFunc="@_serviceSelectionConveter" @bind-SelectedValues="_selectedOptions" Class="mr-5">
+            @foreach (var option in _selectableServiceOptions)
+            {
+                <MudSelectItem T="ServiceOption" Value="@option">@option.Label</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTooltip Text="Filter">
+            <MudIconButton Icon="@Icons.Material.Filled.FilterList" Color="Color.Primary" />
+        </MudTooltip>
+        <MudTooltip Text="Compare">
+            <MudIconButton Icon="@Icons.Material.Filled.Compare" Color="Color.Primary" OnClick="CompareClicked" />
+        </MudTooltip>
+    </MudToolBar>
 
-@foreach (var service in _groupedChangesets.Keys)
-{
-    <MudCard Class="mud-full-width rounded-lg mt-5">
-        <MudCardHeader Class="pb-0">
-            <MudText Typo="Typo.h6">@service.Label Changesets</MudText>
-        </MudCardHeader>
-        <MudCardContent>
+    @if (!_groupedChangesets.Keys.Any())
+    {
+        <MudAlert Severity="Severity.Info" ContentAlignment="HorizontalAlignment.Center">No changesets to compare.</MudAlert>
+    }
 
-        </MudCardContent>
-    </MudCard>
-}
+    @foreach (var service in _groupedChangesets.Keys)
+    {
+        <MudCard Class="mud-full-width rounded-lg mt-5">
+            <MudCardHeader Class="pb-0">
+                <MudText Typo="Typo.h6">@service.Label - Changesets</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <AuditChangesetTable @ref="_changesetTables[service]" Changesets="@_groupedChangesets[service]" />
+            </MudCardContent>
+        </MudCard>
+    }
+</div>
+
+<div hidden="@(!_isFilterHidden)">
+    <MudToolBar Class="mud-full-width">
+        <MudTooltip Text="Back">
+            <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small" OnClick="PreviewBackClicked" />
+        </MudTooltip>
+    </MudToolBar>
+
+    @foreach (var compareGroup in _compareGroups)
+    {
+        <AuditChangesTable ChangesetA="@compareGroup.ChangesetA" ChangesetB="@compareGroup.ChangesetB" Changes="@compareGroup.Changes" />
+    }
+</div>

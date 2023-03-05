@@ -25,4 +25,17 @@ internal static class AuditMapper
             Type = (AuditEntryType)changeset.Type
         };
     }
+
+    public static AuditChange Map(Ayborg.Gateway.Audit.V1.AuditChange change)
+    {
+        return new AuditChange
+        {
+            ChangesetTokenA = Guid.Parse(change.RelatedTokenA),
+            ChangesetTokenB = Guid.Parse(change.RelatedTokenB),
+            Label = change.Label,
+            SubLabel = change.SubLabel,
+            ValueA = change.OriginalValue,
+            ValueB = change.ChangedValue
+        };
+    }
 }

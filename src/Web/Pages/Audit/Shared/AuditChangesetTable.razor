@@ -1,10 +1,13 @@
 @using AyBorg.Web.Shared.Models
 
 <MudDataGrid Items="@Changesets" SortMode="SortMode.Multiple"
+            MultiSelection="true"
             FilterMode="DataGridFilterMode.ColumnFilterRow"
-            Filterable="true" Hover="true" Elevation="0">
+            Filterable="true" Hover="true" Elevation="0"
+            SelectedItems="@SelectedChangesets">
 
     <Columns>
+        <SelectColumn T="AuditChangeset" />
         <Column T="AuditChangeset" Field="Timestamp" Title="Timestamp (UTC)" />
         <Column T="AuditChangeset" Field="ProjectName" Title="Project Name" />
         <Column T="AuditChangeset" Field="ProjectState" Title="Project State" />

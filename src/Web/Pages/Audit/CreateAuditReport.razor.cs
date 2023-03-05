@@ -1,19 +1,26 @@
 using System.Runtime.CompilerServices;
+using AyBorg.Web.Pages.Audit.Shared;
 using AyBorg.Web.Services;
 using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using Newtonsoft.Json;
 
 namespace AyBorg.Web.Pages.Audit;
 
 public partial class CreateAuditReport : ComponentBase
 {
     [Inject] IAuditService AuditService { get; init; } = null!;
+    [Inject] ISnackbar Snackbar { get; init; } = null!;
 
+    private readonly Dictionary<ServiceOption, List<AuditChangeset>> _groupedChangesets = new();
+    private readonly Dictionary<ServiceOption, AuditChangesetTable> _changesetTables = new();
+    private readonly List<CompareGroup> _compareGroups = new();
     private bool _isLoading = true;
-    private Dictionary<ServiceOption, List<AuditChangeset>> _groupedChangesets = new();
+    private bool _isFilterHidden = false;
     private ServiceOption[] _selectableServiceOptions = Array.Empty<ServiceOption>();
     private IEnumerable<ServiceOption> _selectedOptions = new HashSet<ServiceOption>();
+    private List<AuditChangeset> _selectedChangesets = new();
     private DateRange _dateRange = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -36,6 +43,12 @@ public partial class CreateAuditReport : ComponentBase
         await foreach (AuditChangeset changeset in AuditService.GetAuditChangesetsAsync())
         {
             unsortedChangesets.Add(changeset);
+        }
+
+        if (!unsortedChangesets.Any())
+        {
+            _isLoading = false;
+            return;
         }
 
         DateTime minTimestamp = unsortedChangesets.Min(c => c.Timestamp).ToUniversalTime();
@@ -61,8 +74,95 @@ public partial class CreateAuditReport : ComponentBase
         _isLoading = false;
     }
 
-    Func<ServiceOption, string> _serviceSelectionConveter = s => s.ServiceUniqueName;
+    private async void CompareClicked()
+    {
+        try
+        {
+            _isLoading = true;
+
+            var selectedChangesets = new HashSet<AuditChangeset>();
+            foreach (ServiceOption service in _changesetTables.Keys)
+            {
+                foreach (AuditChangeset changeset in _changesetTables[service].SelectedChangesets)
+                {
+                    selectedChangesets.Add(changeset);
+                }
+            }
+
+            _compareGroups.Clear();
+            _selectedChangesets = selectedChangesets.OrderBy(c => c.Timestamp).ToList();
+
+            if (!_selectedChangesets.Any())
+            {
+                _isLoading = false;
+                Snackbar.Add("Please select at least one changset!", Severity.Warning);
+                return;
+            }
+
+            _isFilterHidden = true;
+
+            await foreach (AuditChange change in AuditService.GetAuditChangesAsync(selectedChangesets))
+            {
+                CompareGroup? compareGroup = _compareGroups.FirstOrDefault(g => g.ChangesetA.Token.Equals(change.ChangesetTokenA) && g.ChangesetB.Token.Equals(change.ChangesetTokenB));
+                if (compareGroup == null)
+                {
+                    AuditChangeset changesetA = _selectedChangesets.FirstOrDefault(c => c.Token.Equals(change.ChangesetTokenA)) ?? new AuditChangeset();
+                    AuditChangeset changesetB = _selectedChangesets.First(c => c.Token.Equals(change.ChangesetTokenB));
+                    compareGroup = new CompareGroup
+                    {
+                        ChangesetA = changesetA,
+                        ChangesetB = changesetB
+                    };
+                    _compareGroups.Add(compareGroup);
+                }
+
+                compareGroup.Changes.Add(change with
+                {
+                    ValueA = Prettify(change.ValueA),
+                    ValueB = Prettify(change.ValueB)
+                });
+            }
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void PreviewBackClicked()
+    {
+        _isFilterHidden = false;
+    }
+
+    private static string Prettify(string original)
+    {
+        try
+        {
+            using (var stringReader = new StringReader(original))
+            using (var stringWriter = new StringWriter())
+            {
+                var jsonReader = new JsonTextReader(stringReader);
+                var jsonWriter = new JsonTextWriter(stringWriter) { Formatting = Formatting.Indented, IndentChar = '#', Indentation = 9 };
+                jsonWriter.WriteToken(jsonReader);
+                string intended = stringWriter.ToString();
+                intended = intended.Replace("#########", "<br />");
+                return intended.Insert(intended.LastIndexOf('}'), "<br />");
+            }
+        }
+        catch
+        {
+            return original;
+        }
+    }
+
+    readonly Func<ServiceOption, string> _serviceSelectionConveter = s => s.ServiceUniqueName;
 
     private record ServiceOption(string ServiceUniqueName, string ServiceType, string Label);
+    private record CompareGroup
+    {
+        public AuditChangeset ChangesetA { get; init; } = null!;
+        public AuditChangeset ChangesetB { get; init; } = null!;
+        public IList<AuditChange> Changes { get; } = new List<AuditChange>();
+    }
 
 }

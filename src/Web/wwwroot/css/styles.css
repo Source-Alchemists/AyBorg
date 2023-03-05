@@ -141,3 +141,33 @@
     border-color: var(--a-theme-flow-node-port-shape-color);
     background-color: var(--a-theme-flow-node-port-shape-color);
 }
+
+.audit-compare-property {
+    background-color: var(--a-theme-compare-subtitle-background-color);
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.audit-compare-value-container {
+    width: 50%;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+.audit-compare-addition-color {
+    background-color: var( --a-theme-compare-addition-background-color);
+}
+.audit-compare-addition-border-color {
+    background-color: var( --a-theme-compare-addition-border-background-color);
+    min-width: 44px;
+    min-height: 20px;
+}
+.audit-compare-deletion-color {
+    background-color: var( --a-theme-compare-deletion-background-color);
+}
+.audit-compare-deletion-border-color {
+    background-color: var( --a-theme-compare-deletion-border-background-color);
+    min-width: 44px;
+    min-height: 20px;
+}
+.audit-compare-neutral-color {
+    background-color: var(--a-theme-compare-neutral-background-color);
+}

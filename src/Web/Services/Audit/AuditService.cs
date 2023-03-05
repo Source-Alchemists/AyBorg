@@ -31,4 +31,16 @@ public sealed class AuditService : IAuditService
             yield return AuditMapper.Map(changeset);
         }
     }
+
+    public async IAsyncEnumerable<Shared.Models.AuditChange> GetAuditChangesAsync(IEnumerable<Shared.Models.AuditChangeset> changesets)
+    {
+        var request = new GetAuditChangesRequest();
+        request.Tokens.AddRange(changesets.Select(c => c.Token.ToString()).ToList());
+        AsyncServerStreamingCall<AuditChange> response = _auditClient.GetChanges(request);
+
+        await foreach (AuditChange? change in response.ResponseStream.ReadAllAsync())
+        {
+            yield return AuditMapper.Map(change);
+        }
+    }
 }

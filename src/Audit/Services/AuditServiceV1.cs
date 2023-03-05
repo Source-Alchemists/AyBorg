@@ -1,6 +1,8 @@
 
 using Ayborg.Gateway.Audit.V1;
 using AyBorg.Data.Audit.Models;
+using AyBorg.Data.Audit.Models.Agent;
+using AyBorg.Data.Audit.Repositories.Agent;
 using AyBorg.SDK.System;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -11,11 +13,15 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
 {
     private readonly AgentMapper _agentMapper;
     private readonly IAgentAuditService _agentAuditService;
+    private readonly IProjectAuditRepository _projectAuditRepository;
+    private readonly ICompareService _compareService;
 
-    public AuditServiceV1(AgentMapper agentMapper, IAgentAuditService agentAuditService)
+    public AuditServiceV1(AgentMapper agentMapper, IAgentAuditService agentAuditService, IProjectAuditRepository projectAuditRepository, ICompareService compareService)
     {
         _agentMapper = agentMapper;
         _agentAuditService = agentAuditService;
+        _projectAuditRepository = projectAuditRepository;
+        _compareService = compareService;
     }
 
     public override Task<Empty> AddEntry(AuditEntry request, ServerCallContext context)
@@ -25,7 +31,7 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
             switch (request.PayloadCase)
             {
                 case AuditEntry.PayloadOneofCase.AgentProject:
-                    Data.Audit.Models.Agent.ProjectAuditRecord projectAuditRecord = _agentMapper.MapToProjectRecord(request);
+                    ProjectAuditRecord projectAuditRecord = _agentMapper.MapToProjectRecord(request);
                     if (!_agentAuditService.TryAdd(projectAuditRecord))
                     {
                         throw new RpcException(new Status(StatusCode.DataLoss, "Failed to add project audit entry."));
@@ -65,10 +71,15 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
         }
     }
 
-    // public override Task GetChanges(GetAuditChangesRequest request, IServerStreamWriter<AuditChange> responseStream, ServerCallContext context)
-    // {
-    //     return Task.CompletedTask;
-    // }
+    public override async Task GetChanges(GetAuditChangesRequest request, IServerStreamWriter<AuditChange> responseStream, ServerCallContext context)
+    {
+        IEnumerable<ProjectAuditRecord> changesets = _projectAuditRepository.FindAll().Where(c => request.Tokens.Any(t => t.Equals(c.Id.ToString(), StringComparison.OrdinalIgnoreCase)));
+        IEnumerable<ChangeRecord> changes = _compareService.Compare(changesets);
+        foreach (ChangeRecord change in changes)
+        {
+            await responseStream.WriteAsync(_agentMapper.Map(change));
+        }
+    }
 
     // public override Task GetReportMetas(GetAuditReportMetasRequest request, IServerStreamWriter<AuditReportMeta> responseStream, ServerCallContext context)
     // {

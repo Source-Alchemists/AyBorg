@@ -47,13 +47,16 @@ public sealed class AgentMapper
 
             foreach (AgentPortAuditEntry? port in step.Ports)
             {
-                stepRecord.Ports.Add(new PortAuditRecord
+                var portRecord = new PortAuditRecord
                 {
                     Id = Guid.Parse(port.Id),
                     Name = port.Name,
                     Value = port.Value,
-                    Brand = (PortBrand)port.Brand
-                });
+                    Brand = (PortBrand)port.Brand,
+                    Direction = (PortDirection)port.Direction
+                };
+                Console.WriteLine(portRecord);
+                stepRecord.Ports.Add(portRecord);
             }
 
             result.Steps.Add(stepRecord);
@@ -89,6 +92,19 @@ public sealed class AgentMapper
             Comment = changeset.Comment ?? string.Empty, // Can be empty
             Timestamp = Timestamp.FromDateTime(changeset.Timestamp),
             Type = (int)changeset.Type
+        };
+    }
+
+    public AuditChange Map(ChangeRecord change)
+    {
+        return new AuditChange
+        {
+            RelatedTokenA = change.ChangesetAId.ToString(),
+            RelatedTokenB = change.ChangesetBId.ToString(),
+            Label = change.Label,
+            SubLabel = change.SubLabel,
+            OriginalValue = change.ValueA ?? string.Empty,
+            ChangedValue = change.ValueB ?? string.Empty
         };
     }
 }
