@@ -124,6 +124,36 @@ public partial class CreateAuditReport : ComponentBase
                 });
             }
 
+            foreach (IGrouping<Guid, AuditChangeset> selectedChangesetGroup in selectedChangesets.GroupBy(c => c.ProjectId))
+            {
+                IOrderedEnumerable<AuditChangeset> g = selectedChangesetGroup.OrderByDescending(g => g.Timestamp);
+                if (g.Count() > 1)
+                {
+                    AuditChangeset lastChangeset = null!;
+                    foreach (AuditChangeset changeset in g)
+                    {
+                        if (lastChangeset == null)
+                        {
+                            lastChangeset = changeset;
+                            continue;
+                        }
+
+                        AuditChangeset cB = lastChangeset;
+                        AuditChangeset cA = changeset;
+                        if (!tmpCompareGroups.Any(t => t.ChangesetA.Equals(cA) && t.ChangesetB.Equals(cB)))
+                        {
+                            tmpCompareGroups.Add(new CompareGroup
+                            {
+                                ChangesetA = cA,
+                                ChangesetB = cB
+                            });
+                        }
+
+                        lastChangeset = null!;
+                    }
+                }
+            }
+
             _compareGroups.AddRange(tmpCompareGroups.OrderByDescending(g => g.ChangesetB.Timestamp));
         }
         finally
