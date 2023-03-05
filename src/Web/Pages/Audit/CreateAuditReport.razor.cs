@@ -57,7 +57,7 @@ public partial class CreateAuditReport : ComponentBase
 
         foreach (IGrouping<string, AuditChangeset> group in unsortedChangesets.GroupBy(c => c.ServiceUniqueName))
         {
-            var changesets = group.ToList();
+            var changesets = group.OrderByDescending(c => c.Timestamp).ToList();
             string serviceType = changesets.First().ServiceType;
             _groupedChangesets.Add(new ServiceOption(group.Key, serviceType, $"{group.Key} ({serviceType})"), changesets);
         }
@@ -101,9 +101,10 @@ public partial class CreateAuditReport : ComponentBase
 
             _isFilterHidden = true;
 
+            var tmpCompareGroups = new List<CompareGroup>();
             await foreach (AuditChange change in AuditService.GetAuditChangesAsync(selectedChangesets))
             {
-                CompareGroup? compareGroup = _compareGroups.FirstOrDefault(g => g.ChangesetA.Token.Equals(change.ChangesetTokenA) && g.ChangesetB.Token.Equals(change.ChangesetTokenB));
+                CompareGroup? compareGroup = tmpCompareGroups.FirstOrDefault(g => g.ChangesetA.Token.Equals(change.ChangesetTokenA) && g.ChangesetB.Token.Equals(change.ChangesetTokenB));
                 if (compareGroup == null)
                 {
                     AuditChangeset changesetA = _selectedChangesets.FirstOrDefault(c => c.Token.Equals(change.ChangesetTokenA)) ?? new AuditChangeset();
@@ -113,7 +114,7 @@ public partial class CreateAuditReport : ComponentBase
                         ChangesetA = changesetA,
                         ChangesetB = changesetB
                     };
-                    _compareGroups.Add(compareGroup);
+                    tmpCompareGroups.Add(compareGroup);
                 }
 
                 compareGroup.Changes.Add(change with
@@ -122,6 +123,8 @@ public partial class CreateAuditReport : ComponentBase
                     ValueB = Prettify(change.ValueB)
                 });
             }
+
+            _compareGroups.AddRange(tmpCompareGroups.OrderByDescending(g => g.ChangesetB.Timestamp));
         }
         finally
         {

@@ -1,6 +1,6 @@
 @using AyBorg.Web.Shared.Models;
 
-<MudCard>
+<MudCard Class="mb-10">
     <MudCardHeader>
         <table class="mud-full-width">
             <thead hidden>
@@ -43,7 +43,7 @@
             </tbody>
         </table>
     </MudCardHeader>
-    <MudCardContent style="padding-left: 0; padding-right: 0; padding-bottom: 0">
+    <MudCardContent Class="px-1 pb-1">
         <table class="mud-full-width">
             <thead hidden>
                 <tr>
@@ -131,5 +131,10 @@
         _changesetService = $"{ChangesetB.ServiceUniqueName} / {ChangesetB.ServiceType}";
         _changesetAccount = ChangesetB.User;
         _changesetComment = ChangesetB.Comment;
+
+        if (ChangesetA.Token != Guid.Empty)
+        {
+            _changesetTimestamp = $"{ChangesetA.Timestamp} -> {ChangesetB.Timestamp}";
+        }
     }
 }

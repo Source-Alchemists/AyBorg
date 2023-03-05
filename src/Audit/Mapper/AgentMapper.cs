@@ -55,7 +55,6 @@ public sealed class AgentMapper
                     Brand = (PortBrand)port.Brand,
                     Direction = (PortDirection)port.Direction
                 };
-                Console.WriteLine(portRecord);
                 stepRecord.Ports.Add(portRecord);
             }
 
