@@ -66,26 +66,27 @@ public sealed class CompareService : ICompareService
             }
         }
 
-        // foreach (LinkAuditRecord linkRecord in projectAuditRecord.Links)
-        // {
-        //     StepAuditRecord sourceStep = projectAuditRecord.Steps.First(s => s.Ports.Any(p => p.Id.Equals(linkRecord.SourceId)));
-        //     StepAuditRecord targetStep = projectAuditRecord.Steps.First(s => s.Ports.Any(p => p.Id.Equals(linkRecord.TargetId)));
-        //     string sourceStepName = sourceStep.Name;
-        //     string targetStepName = targetStep.Name;
-        //     PortAuditRecord sourcePort = sourceStep.Ports.First(p => p.Id.Equals(linkRecord.SourceId));
-        //     PortAuditRecord targetPort = sourceStep.Ports.First(p => p.Id.Equals(linkRecord.TargetId));
-        //     string sourcePortName = sourcePort.Name;
-        //     string targetPortName = targetPort.Name;
+        foreach (LinkAuditRecord linkRecord in projectAuditRecord.Links)
+        {
+            StepAuditRecord sourceStep = projectAuditRecord.Steps.First(s => s.Ports.Any(p => p.Id.Equals(linkRecord.SourceId)));
+            StepAuditRecord targetStep = projectAuditRecord.Steps.First(s => s.Ports.Any(p => p.Id.Equals(linkRecord.TargetId)));
+            string sourceStepName = sourceStep.Name;
+            string targetStepName = targetStep.Name;
+            PortAuditRecord sourcePort = sourceStep.Ports.First(p => p.Id.Equals(linkRecord.SourceId));
+            PortAuditRecord targetPort = targetStep.Ports.First(p => p.Id.Equals(linkRecord.TargetId));
+            string sourcePortName = sourcePort.Name;
+            string targetPortName = targetPort.Name;
 
-        //     result.Add(new ChangeRecord
-        //     {
-        //         ChangesetAId = Guid.Empty,
-        //         ChangesetBId = projectAuditRecord.Id,
-        //         PropertyName = $"Project/Links/{linkRecord.Id}",
-        //         ValueA = string.Empty,
-        //         ValueB = $"{sourceStepName}.{sourcePortName} -> {targetStepName}.{targetPortName}"
-        //     });
-        // }
+            result.Add(new ChangeRecord
+            {
+                ChangesetAId = Guid.Empty,
+                ChangesetBId = projectAuditRecord.Id,
+                Label = $"Project/Links/{sourceStepName}/{sourcePortName}",
+                SubLabel = "Link",
+                ValueA = string.Empty,
+                ValueB = $"{sourceStepName}.{sourcePortName} -> {targetStepName}.{targetPortName}"
+            });
+        }
 
         return result;
     }
@@ -120,7 +121,7 @@ public sealed class CompareService : ICompareService
         return result;
     }
 
-    private record StepInfo
+    private sealed record StepInfo
     {
         public string Name { get; }
         public string TypeName { get; }

@@ -74,7 +74,7 @@ public partial class CreateAuditReport : ComponentBase
         _isLoading = false;
     }
 
-    private async void CompareClicked()
+    private async Task CompareClicked()
     {
         try
         {
@@ -157,8 +157,8 @@ public partial class CreateAuditReport : ComponentBase
 
     readonly Func<ServiceOption, string> _serviceSelectionConveter = s => s.ServiceUniqueName;
 
-    private record ServiceOption(string ServiceUniqueName, string ServiceType, string Label);
-    private record CompareGroup
+    private sealed record ServiceOption(string ServiceUniqueName, string ServiceType, string Label);
+    private sealed record CompareGroup
     {
         public AuditChangeset ChangesetA { get; init; } = null!;
         public AuditChangeset ChangesetB { get; init; } = null!;

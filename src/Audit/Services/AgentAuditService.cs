@@ -19,7 +19,7 @@ public sealed class AgentAuditService : IAgentAuditService
     public bool TryAdd(ProjectAuditRecord record)
     {
         bool result = _projectAuditRepository.TryAdd(record);
-        if (result == true)
+        if (result)
         {
             _logger.LogInformation(new EventId((int)EventLogType.Audit), "Audit entry added for project [{projectName}] with state [{projectState}].", record.ProjectName, record.ProjectState);
         }
