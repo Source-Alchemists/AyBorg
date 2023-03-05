@@ -129,7 +129,6 @@ public sealed class AgentCompareService : IAgentCompareService
             {
                 // Step removed
                 result.AddRange(RemoveOldStep(stepA, projectAuditRecordA.Id, projectAuditRecordB.Id));
-                continue;
             }
         }
 
