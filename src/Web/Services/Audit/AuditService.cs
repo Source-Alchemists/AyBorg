@@ -7,12 +7,10 @@ namespace AyBorg.Web.Services;
 
 public sealed class AuditService : IAuditService
 {
-    private readonly ILogger<AuditService> _logger;
     private readonly Audit.AuditClient _auditClient;
 
-    public AuditService(ILogger<AuditService> logger, Audit.AuditClient auditClient)
+    public AuditService(Audit.AuditClient auditClient)
     {
-        _logger = logger;
         _auditClient = auditClient;
     }
 

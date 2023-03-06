@@ -14,6 +14,7 @@ public partial class CreateAuditReport : ComponentBase
 
     private readonly Dictionary<ServiceOption, List<AuditChangeset>> _groupedChangesets = new();
     private readonly Dictionary<ServiceOption, AuditChangesetTable> _changesetTables = new();
+    private Dictionary<ServiceOption, List<AuditChangeset>> _filteredGroupedChangesets = new();
     private bool _isLoading = true;
     private bool _isFilterHidden = false;
     private ServiceOption[] _selectableServiceOptions = Array.Empty<ServiceOption>();
@@ -68,6 +69,7 @@ public partial class CreateAuditReport : ComponentBase
         }
 
         _selectedOptions = new HashSet<ServiceOption>(_selectableServiceOptions);
+        _filteredGroupedChangesets = new Dictionary<ServiceOption, List<AuditChangeset>>(_groupedChangesets);
 
         _isLoading = false;
     }
@@ -103,7 +105,7 @@ public partial class CreateAuditReport : ComponentBase
         }
     }
 
-    private void OnCompareViewLoaded()
+    private void CompareViewLoaded()
     {
         _isLoading = false;
     }
@@ -111,6 +113,24 @@ public partial class CreateAuditReport : ComponentBase
     private void PreviewBackClicked()
     {
         _isFilterHidden = false;
+    }
+
+    private void FilterClicked()
+    {
+        _selectedChangesets.Clear();
+        foreach (KeyValuePair<ServiceOption, AuditChangesetTable> t in _changesetTables)
+        {
+            t.Value.SelectedChangesets.Clear();
+        }
+
+        DateTime startDate = _dateRange.Start?.Date ?? DateTime.MinValue;
+        DateTime endDate = _dateRange.End?.Date ?? DateTime.MaxValue;
+        var tmpGroup = new Dictionary<ServiceOption, List<AuditChangeset>>(_groupedChangesets.Where(k => _selectedOptions.Any(o => o.ServiceUniqueName.Equals(k.Key.ServiceUniqueName))));
+        _filteredGroupedChangesets = new Dictionary<ServiceOption, List<AuditChangeset>>();
+        foreach (ServiceOption serviceOption in tmpGroup.Keys)
+        {
+            _filteredGroupedChangesets.Add(serviceOption, tmpGroup[serviceOption].Where(c => c.Timestamp.Date >= startDate && c.Timestamp.Date <= endDate).ToList());
+        }
     }
 
     readonly Func<ServiceOption, string> _serviceSelectionConveter = s => s.ServiceUniqueName;
