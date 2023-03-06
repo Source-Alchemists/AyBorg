@@ -7,12 +7,10 @@ namespace AyBorg.Web.Pages.Audit.Shared;
 public partial class AuditChangesetTable : ComponentBase
 {
     [Parameter, EditorRequired] public IEnumerable<AuditChangeset>? Changesets { get; init; }
-    public HashSet<AuditChangeset> SelectedChangesets { get; set; } = new();
-
-    private MudDataGrid<AuditChangeset> _grid = null!;
+    public HashSet<AuditChangeset> SelectedChangesets { get; private set; } = new();
 
     private void OnSelectedItemsChanged(HashSet<AuditChangeset> changesets)
     {
-        SelectedChangesets = _grid.SelectedItems;
+        SelectedChangesets = changesets;
     }
 }

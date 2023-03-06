@@ -4,7 +4,6 @@ using AyBorg.Web.Services;
 using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
-using Newtonsoft.Json;
 
 namespace AyBorg.Web.Pages.Audit;
 
@@ -15,7 +14,6 @@ public partial class CreateAuditReport : ComponentBase
 
     private readonly Dictionary<ServiceOption, List<AuditChangeset>> _groupedChangesets = new();
     private readonly Dictionary<ServiceOption, AuditChangesetTable> _changesetTables = new();
-    private readonly List<CompareGroup> _compareGroups = new();
     private bool _isLoading = true;
     private bool _isFilterHidden = false;
     private ServiceOption[] _selectableServiceOptions = Array.Empty<ServiceOption>();
@@ -74,7 +72,7 @@ public partial class CreateAuditReport : ComponentBase
         _isLoading = false;
     }
 
-    private async Task CompareClicked()
+    private void CompareClicked()
     {
         try
         {
@@ -88,8 +86,6 @@ public partial class CreateAuditReport : ComponentBase
                     selectedChangesets.Add(changeset);
                 }
             }
-
-            _compareGroups.Clear();
             _selectedChangesets = selectedChangesets.OrderBy(c => c.Timestamp).ToList();
 
             if (!_selectedChangesets.Any())
@@ -100,66 +96,16 @@ public partial class CreateAuditReport : ComponentBase
             }
 
             _isFilterHidden = true;
-
-            var tmpCompareGroups = new List<CompareGroup>();
-            await foreach (AuditChange change in AuditService.GetAuditChangesAsync(selectedChangesets))
-            {
-                CompareGroup? compareGroup = tmpCompareGroups.FirstOrDefault(g => g.ChangesetA.Token.Equals(change.ChangesetTokenA) && g.ChangesetB.Token.Equals(change.ChangesetTokenB));
-                if (compareGroup == null)
-                {
-                    AuditChangeset changesetA = _selectedChangesets.FirstOrDefault(c => c.Token.Equals(change.ChangesetTokenA)) ?? new AuditChangeset();
-                    AuditChangeset changesetB = _selectedChangesets.First(c => c.Token.Equals(change.ChangesetTokenB));
-                    compareGroup = new CompareGroup
-                    {
-                        ChangesetA = changesetA,
-                        ChangesetB = changesetB
-                    };
-                    tmpCompareGroups.Add(compareGroup);
-                }
-
-                compareGroup.Changes.Add(change with
-                {
-                    ValueA = Prettify(change.ValueA),
-                    ValueB = Prettify(change.ValueB)
-                });
-            }
-
-            foreach (IGrouping<Guid, AuditChangeset> selectedChangesetGroup in selectedChangesets.GroupBy(c => c.ProjectId))
-            {
-                IOrderedEnumerable<AuditChangeset> g = selectedChangesetGroup.OrderByDescending(g => g.Timestamp);
-                if (g.Count() > 1)
-                {
-                    AuditChangeset lastChangeset = null!;
-                    foreach (AuditChangeset changeset in g)
-                    {
-                        if (lastChangeset == null)
-                        {
-                            lastChangeset = changeset;
-                            continue;
-                        }
-
-                        AuditChangeset cB = lastChangeset;
-                        AuditChangeset cA = changeset;
-                        if (!tmpCompareGroups.Any(t => t.ChangesetA.Equals(cA) && t.ChangesetB.Equals(cB)))
-                        {
-                            tmpCompareGroups.Add(new CompareGroup
-                            {
-                                ChangesetA = cA,
-                                ChangesetB = cB
-                            });
-                        }
-
-                        lastChangeset = null!;
-                    }
-                }
-            }
-
-            _compareGroups.AddRange(tmpCompareGroups.OrderByDescending(g => g.ChangesetB.Timestamp));
         }
-        finally
+        catch
         {
             _isLoading = false;
         }
+    }
+
+    private void OnCompareViewLoaded()
+    {
+        _isLoading = false;
     }
 
     private void PreviewBackClicked()
@@ -167,35 +113,7 @@ public partial class CreateAuditReport : ComponentBase
         _isFilterHidden = false;
     }
 
-    private static string Prettify(string original)
-    {
-        try
-        {
-            using (var stringReader = new StringReader(original))
-            using (var stringWriter = new StringWriter())
-            {
-                var jsonReader = new JsonTextReader(stringReader);
-                var jsonWriter = new JsonTextWriter(stringWriter) { Formatting = Formatting.Indented, IndentChar = '#', Indentation = 9 };
-                jsonWriter.WriteToken(jsonReader);
-                string intended = stringWriter.ToString();
-                intended = intended.Replace("#########", "<br />");
-                return intended.Insert(intended.LastIndexOf('}'), "<br />");
-            }
-        }
-        catch
-        {
-            return original;
-        }
-    }
-
     readonly Func<ServiceOption, string> _serviceSelectionConveter = s => s.ServiceUniqueName;
 
     private sealed record ServiceOption(string ServiceUniqueName, string ServiceType, string Label);
-    private sealed record CompareGroup
-    {
-        public AuditChangeset ChangesetA { get; init; } = null!;
-        public AuditChangeset ChangesetB { get; init; } = null!;
-        public IList<AuditChange> Changes { get; } = new List<AuditChange>();
-    }
-
 }

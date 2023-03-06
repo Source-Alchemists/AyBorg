@@ -43,15 +43,12 @@
     }
 </div>
 
-<div hidden="@(!_isFilterHidden)">
+@if (_isFilterHidden)
+{
     <MudToolBar Class="mud-full-width">
         <MudTooltip Text="Back">
             <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small" OnClick="PreviewBackClicked" />
         </MudTooltip>
     </MudToolBar>
-
-    @foreach (var compareGroup in _compareGroups)
-    {
-        <AuditChangesTable ChangesetA="@compareGroup.ChangesetA" ChangesetB="@compareGroup.ChangesetB" Changes="@compareGroup.Changes" />
-    }
-</div>
+    <CompareView SelectedChangesets="_selectedChangesets" Loaded="OnCompareViewLoaded" />
+}
