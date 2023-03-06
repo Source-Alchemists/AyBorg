@@ -1,10 +1,11 @@
 @using AyBorg.Web.Shared.Models
 
-<MudDataGrid Items="@Changesets" SortMode="SortMode.Multiple"
+<MudDataGrid @ref="_grid" T="AuditChangeset" Items="@Changesets" SortMode="SortMode.Multiple"
             MultiSelection="true"
             FilterMode="DataGridFilterMode.ColumnFilterRow"
-            Filterable="true" Hover="true" Elevation="0"
-            SelectedItems="@SelectedChangesets">
+            Filterable="true"
+            SelectedItemsChanged="@OnSelectedItemsChanged"
+            Hover="true" Elevation="0">
 
     <Columns>
         <SelectColumn T="AuditChangeset" />
