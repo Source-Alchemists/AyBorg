@@ -27,7 +27,7 @@ public partial class CompareView : ComponentBase
     private async ValueTask<List<CompareGroup>> GetTempCompareGroupsAsync()
     {
         var tmpCompareGroups = new List<CompareGroup>();
-        await foreach (AuditChange change in AuditService.GetAuditChangesAsync(SelectedChangesets))
+        await foreach (AuditChange change in AuditService.GetChangesAsync(SelectedChangesets))
         {
             CompareGroup? compareGroup = tmpCompareGroups.FirstOrDefault(g => g.ChangesetA.Token.Equals(change.ChangesetTokenA) && g.ChangesetB.Token.Equals(change.ChangesetTokenB));
             if (compareGroup == null)

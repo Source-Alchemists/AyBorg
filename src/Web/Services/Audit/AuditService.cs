@@ -18,7 +18,7 @@ public sealed class AuditService : IAuditService
         _auditClient = auditClient;
     }
 
-    public async IAsyncEnumerable<Shared.Models.AuditChangeset> GetAuditChangesetsAsync()
+    public async IAsyncEnumerable<Shared.Models.AuditChangeset> GetChangesetsAsync()
     {
         AsyncServerStreamingCall<AuditChangeset> response = _auditClient.GetChangesets(new GetAuditChangesetsRequest
         {
@@ -34,7 +34,7 @@ public sealed class AuditService : IAuditService
         }
     }
 
-    public async IAsyncEnumerable<Shared.Models.AuditChange> GetAuditChangesAsync(IEnumerable<Shared.Models.AuditChangeset> changesets)
+    public async IAsyncEnumerable<Shared.Models.AuditChange> GetChangesAsync(IEnumerable<Shared.Models.AuditChangeset> changesets)
     {
         var request = new GetAuditChangesRequest();
         request.Tokens.AddRange(changesets.Select(c => c.Token.ToString()).ToList());
@@ -68,6 +68,16 @@ public sealed class AuditService : IAuditService
         {
             _logger.LogError(new EventId((int)EventLogType.Audit), ex, "Failed to save report");
             return false;
+        }
+    }
+
+    public async IAsyncEnumerable<Shared.Models.AuditReport> GetReportsAsync()
+    {
+        AsyncServerStreamingCall<AuditReport> response = _auditClient.GetSavedReports(new Empty());
+
+        await foreach (AuditReport? report in response.ResponseStream.ReadAllAsync())
+        {
+            yield return AuditMapper.Map(report);
         }
     }
 }

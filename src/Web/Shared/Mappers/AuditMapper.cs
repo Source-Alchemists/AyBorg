@@ -40,6 +40,21 @@ internal static class AuditMapper
         };
     }
 
+    public static AuditReport Map(Ayborg.Gateway.Audit.V1.AuditReport report)
+    {
+        var result = new AuditReport {
+            Id = Guid.Parse(report.Id),
+            Timestamp = report.Timestamp.ToDateTime(),
+            Name = report.ReportName,
+            Comment = report.Comment
+        };
+        foreach(Ayborg.Gateway.Audit.V1.AuditChangeset? changeset in report.Changesets)
+        {
+            result.Changesets.Add(Map(changeset));
+        }
+        return result;
+    }
+
     public static Ayborg.Gateway.Audit.V1.AuditChangeset Map(AuditChangeset changeset)
     {
         return new Ayborg.Gateway.Audit.V1.AuditChangeset

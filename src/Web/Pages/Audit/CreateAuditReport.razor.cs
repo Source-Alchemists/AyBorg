@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using AyBorg.Web.Pages.Audit.Shared;
 using AyBorg.Web.Services;
 using AyBorg.Web.Shared.Models;
@@ -34,13 +33,12 @@ public partial class CreateAuditReport : ComponentBase
         await InvokeAsync(StateHasChanged);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private async ValueTask LoadChangesetsAsync()
     {
         _isLoading = true;
         _groupedChangesets.Clear();
         var unsortedChangesets = new List<AuditChangeset>();
-        await foreach (AuditChangeset changeset in AuditService.GetAuditChangesetsAsync())
+        await foreach (AuditChangeset changeset in AuditService.GetChangesetsAsync())
         {
             unsortedChangesets.Add(changeset);
         }
