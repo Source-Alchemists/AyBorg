@@ -18,9 +18,8 @@ builder.Services.AddHostedService<RegistryBackgroundService>();
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 
 builder.Services.AddTransient<AyBorg.Data.Audit.Repositories.Agent.IProjectAuditRepository, AyBorg.Data.Audit.Repositories.Agent.AgentProjectAuditRepository>();
+builder.Services.AddTransient<AyBorg.Data.Audit.Repositories.IAuditReportRepository, AyBorg.Data.Audit.Repositories.AuditReportRepository>();
 builder.Services.AddTransient<IAgentAuditService, AgentAuditService>();
-builder.Services.AddTransient<IAgentCompareService, AgentCompareService>();
-builder.Services.AddTransient<AgentMapper>();
 
 WebApplication app = builder.Build();
 

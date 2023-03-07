@@ -8,9 +8,9 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace AyBorg.Audit;
 
-public sealed class AgentMapper
+public static class AuditMapper
 {
-    public ProjectAuditRecord MapToProjectRecord(AuditEntry entry)
+    public static ProjectAuditRecord MapToProjectRecord(AuditEntry entry)
     {
         var result = new ProjectAuditRecord
         {
@@ -74,7 +74,7 @@ public sealed class AgentMapper
         return result;
     }
 
-    public AuditChangeset Map(ChangesetRecord changeset)
+    public static AuditChangeset Map(ChangesetRecord changeset)
     {
         return new AuditChangeset
         {
@@ -94,7 +94,25 @@ public sealed class AgentMapper
         };
     }
 
-    public AuditChange Map(ChangeRecord change)
+    public static AuditReport Map(AuditReportRecord record)
+    {
+        AuditReport result = new()
+        {
+            Id = record.Id.ToString(),
+            Timestamp = Timestamp.FromDateTime(record.Timestamp),
+            ReportName = record.Name,
+            Comment = record.Comment
+        };
+
+        foreach (ChangesetRecord changeset in record.Changesets)
+        {
+            result.Changesets.Add(Map(changeset));
+        }
+
+        return result;
+    }
+
+    public static AuditChange Map(ChangeRecord change)
     {
         return new AuditChange
         {

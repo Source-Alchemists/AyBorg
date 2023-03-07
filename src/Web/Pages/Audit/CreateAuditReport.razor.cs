@@ -11,6 +11,7 @@ public partial class CreateAuditReport : ComponentBase
 {
     [Inject] IAuditService AuditService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
+    [Inject] IDialogService DialogService { get; init; } = null!;
 
     private readonly Dictionary<ServiceOption, List<AuditChangeset>> _groupedChangesets = new();
     private readonly Dictionary<ServiceOption, AuditChangesetTable> _changesetTables = new();
@@ -130,6 +131,22 @@ public partial class CreateAuditReport : ComponentBase
         foreach (ServiceOption serviceOption in tmpGroup.Keys)
         {
             _filteredGroupedChangesets.Add(serviceOption, tmpGroup[serviceOption].Where(c => c.Timestamp.Date >= startDate && c.Timestamp.Date <= endDate).ToList());
+        }
+    }
+
+    private async Task SaveClicked()
+    {
+        IDialogReference dialog = DialogService.Show<SaveAuditReportDialog>("Save audit report");
+        DialogResult result = await dialog.Result;
+        if (result.Cancelled)
+        {
+            return;
+        }
+
+        var resultData = (SaveAuditReportDialog.ResultData)result.Data;
+        if (!await AuditService.TrySaveReport(resultData.ReportName, resultData.Comment, _selectedChangesets))
+        {
+            Snackbar.Add("Failed to save audit report!", Severity.Error);
         }
     }
 

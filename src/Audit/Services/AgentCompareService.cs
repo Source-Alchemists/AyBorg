@@ -4,9 +4,9 @@ using AyBorg.Data.Audit.Models.Agent;
 
 namespace AyBorg.Audit.Services;
 
-public sealed class AgentCompareService : IAgentCompareService
+public static class AgentCompareService
 {
-    public IEnumerable<ChangeRecord> Compare(IEnumerable<ProjectAuditRecord> projectAuditRecords)
+    public static IEnumerable<ChangeRecord> Compare(IEnumerable<ProjectAuditRecord> projectAuditRecords)
     {
         var changes = new List<ChangeRecord>();
         IEnumerable<IGrouping<Guid, ProjectAuditRecord>> groupedProjectAuditRecords = projectAuditRecords.GroupBy(r => r.ProjectId);

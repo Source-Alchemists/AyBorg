@@ -69,10 +69,10 @@ else
         }
         <MudSpacer />
         <MudTooltip Text="Save as draft">
-            <MudIconButton Color="Color.Default" Icon="@Icons.Filled.SaveAlt" OnClick="@OnProjectSaveClicked" Disabled=@(_projectMeta?.State != ProjectState.Draft) />
+            <MudIconButton Icon="@Icons.Filled.SaveAlt" Color="Color.Primary" OnClick="@OnProjectSaveClicked" Disabled=@(_projectMeta?.State != ProjectState.Draft) />
         </MudTooltip>
         <MudTooltip Text="Settings">
-            <MudIconButton Icon="@Icons.Filled.Settings" OnClick="@OnProjectSettingsClicked" />
+            <MudIconButton Icon="@Icons.Filled.Settings" Color="Color.Default" OnClick="@OnProjectSettingsClicked" />
         </MudTooltip>
     </MudToolBar>
 

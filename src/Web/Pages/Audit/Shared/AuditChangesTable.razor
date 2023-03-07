@@ -19,7 +19,10 @@
             <tbody>
                 <tr>
                     <td colspan="3">
-                        <MudText Typo="Typo.h6">@_changesetTitle</MudText>
+                        <MudStack Row="true" Spacing="3">
+                            <MudIcon Icon="@Icons.Material.Filled.TrackChanges" Class="mt-1" />
+                            <MudText Typo="Typo.h6">@_changesetTitle</MudText>
+                        </MudStack>
                     </td>
                 </tr>
                 <tr>
@@ -125,7 +128,6 @@
     private string _changesetService = string.Empty;
     private string _changesetAccount = string.Empty;
     private int _changesCount => Changes.Count();
-
 
     protected override void OnParametersSet()
     {

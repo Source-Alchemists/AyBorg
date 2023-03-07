@@ -34,7 +34,12 @@
     {
         <MudCard Class="mud-full-width rounded-lg mt-5">
             <MudCardHeader Class="pb-0">
-                <MudText Typo="Typo.h6">@service.Label - Changesets</MudText>
+                <CardHeaderAvatar>
+                    <MudIcon Icon="@Icons.Material.Filled.TrackChanges" />
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">@service.Label - Changesets</MudText>
+                </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
                 <AuditChangesetTable @ref="_changesetTables[service]" Changesets="@_filteredGroupedChangesets[service]" />
@@ -49,6 +54,11 @@
         <MudTooltip Text="Back">
             <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small" OnClick="PreviewBackClicked" />
         </MudTooltip>
+        <MudSpacer />
+        <MudTooltip Text="Save report">
+            <MudIconButton Icon="@Icons.Material.Filled.SaveAlt" Title="Save report" Color="Color.Primary" OnClick="@SaveClicked" />
+        </MudTooltip>
+
     </MudToolBar>
     <CompareView SelectedChangesets="_selectedChangesets" Loaded="CompareViewLoaded" />
 }
