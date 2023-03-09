@@ -31,12 +31,18 @@
                     <MudTh>Name</MudTh>
                     <MudTh>Comment</MudTh>
                     <MudTh>Changes</MudTh>
+                    <MudTh hidden=@(!_isAdminRole)></MudTh>
                 </HeaderContent>
                 <RowTemplate>
                     <MudTd DataLabel="Timestamp">@context.Timestamp</MudTd>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="Comment">@context.Comment</MudTd>
                     <MudTd DataLabel="ChangesetCount">@context.ChangesetCount</MudTd>
+                    <MudTd hidden=@(!_isAdminRole)>
+                        <MudTooltip Text="Delete report">
+                            <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="() => DeleteReportClicked(context)" />
+                        </MudTooltip>
+                    </MudTd>
                 </RowTemplate>
             </MudTable>
         </MudCardContent>
@@ -46,10 +52,11 @@
 @if (_isFilterHidden)
 {
     <MudToolBar Class="mud-full-width">
-        <MudTooltip Text="Back">
-            <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small" OnClick="PreviewBackClicked" />
-        </MudTooltip>
+    <MudTooltip Text="Back">
+        <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small"
+            OnClick="PreviewBackClicked" />
+    </MudTooltip>
 
-    </MudToolBar>
+</MudToolBar>
     <CompareView SelectedChangesets="_selectedChangesets" Loaded="CompareViewLoaded" />
 }

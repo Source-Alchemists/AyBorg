@@ -81,7 +81,7 @@ public sealed class AuditPassthroughServiceV1 : Ayborg.Gateway.Audit.V1.Audit.Au
         });
     }
 
-    public override async Task<Empty> SaveReport(SaveAuditReportRequest request, ServerCallContext context)
+    public override async Task<Empty> AddReport(AddAuditReportRequest request, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Auditor });
         IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Audit);
@@ -90,13 +90,13 @@ public sealed class AuditPassthroughServiceV1 : Ayborg.Gateway.Audit.V1.Audit.Au
         await Parallel.ForEachAsync(channels, async (channel, token) =>
         {
             Ayborg.Gateway.Audit.V1.Audit.AuditClient client = _channelService.CreateClient<Ayborg.Gateway.Audit.V1.Audit.AuditClient>(channel.ServiceUniqueName);
-            await client.SaveReportAsync(request, headers: headers, cancellationToken: context.CancellationToken);
+            await client.AddReportAsync(request, headers: headers, cancellationToken: context.CancellationToken);
         });
 
         return new Empty();
     }
 
-    public override async Task GetSavedReports(Empty request, IServerStreamWriter<AuditReport> responseStream, ServerCallContext context)
+    public override async Task GetReports(Empty request, IServerStreamWriter<AuditReport> responseStream, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Auditor });
         IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Audit);
@@ -105,12 +105,27 @@ public sealed class AuditPassthroughServiceV1 : Ayborg.Gateway.Audit.V1.Audit.Au
         await Parallel.ForEachAsync(channels, async (channel, token) =>
         {
             Ayborg.Gateway.Audit.V1.Audit.AuditClient client = _channelService.CreateClient<Ayborg.Gateway.Audit.V1.Audit.AuditClient>(channel.ServiceUniqueName);
-            AsyncServerStreamingCall<AuditReport> response = client.GetSavedReports(request, headers: headers, cancellationToken: context.CancellationToken);
+            AsyncServerStreamingCall<AuditReport> response = client.GetReports(request, headers: headers, cancellationToken: context.CancellationToken);
             await foreach (AuditReport? report in response.ResponseStream.ReadAllAsync(cancellationToken: context.CancellationToken))
             {
                 await responseStream.WriteAsync(report, cancellationToken: context.CancellationToken);
             }
         });
+    }
+
+    public override async Task<Empty> DeleteReport(AuditReport request, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Audit);
+        ThrowIfAuditRequiredButNotAvailable(channels);
+
+        await Parallel.ForEachAsync(channels, async (channel, token) =>
+        {
+            Ayborg.Gateway.Audit.V1.Audit.AuditClient client = _channelService.CreateClient<Ayborg.Gateway.Audit.V1.Audit.AuditClient>(channel.ServiceUniqueName);
+            await client.DeleteReportAsync(request, headers: headers, cancellationToken: context.CancellationToken);
+        });
+
+        return new Empty();
     }
 
     private void ThrowIfAuditRequiredButNotAvailable(IEnumerable<ChannelInfo> channels)

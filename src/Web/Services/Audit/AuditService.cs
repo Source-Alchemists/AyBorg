@@ -3,7 +3,6 @@ using AyBorg.SDK.Common;
 using AyBorg.Web.Shared.Mappers;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
-using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Web.Services;
 
@@ -48,7 +47,7 @@ public sealed class AuditService : IAuditService
 
     public async ValueTask<bool> TrySaveReport(string reportName, string comment, IEnumerable<Shared.Models.AuditChangeset> changesets)
     {
-        var request = new SaveAuditReportRequest
+        var request = new AddAuditReportRequest
         {
             ReportName = reportName,
             Comment = comment
@@ -61,7 +60,7 @@ public sealed class AuditService : IAuditService
 
         try
         {
-            await _auditClient.SaveReportAsync(request);
+            await _auditClient.AddReportAsync(request);
             return true;
         }
         catch (RpcException ex)
@@ -73,11 +72,25 @@ public sealed class AuditService : IAuditService
 
     public async IAsyncEnumerable<Shared.Models.AuditReport> GetReportsAsync()
     {
-        AsyncServerStreamingCall<AuditReport> response = _auditClient.GetSavedReports(new Empty());
+        AsyncServerStreamingCall<AuditReport> response = _auditClient.GetReports(new Empty());
 
         await foreach (AuditReport? report in response.ResponseStream.ReadAllAsync())
         {
             yield return AuditMapper.Map(report);
+        }
+    }
+
+    public async ValueTask<bool> TryDeleteReport(Shared.Models.AuditReport report)
+    {
+        try
+        {
+            await _auditClient.DeleteReportAsync(AuditMapper.Map(report));
+            return true;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogError(new EventId((int)EventLogType.Audit), ex, "Failed to delete report");
+            return false;
         }
     }
 }

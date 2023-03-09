@@ -94,6 +94,26 @@ public static class AuditMapper
         };
     }
 
+    public static ChangesetRecord Map(AuditChangeset changeset)
+    {
+        return new ChangesetRecord
+        {
+            Id = Guid.Parse(changeset.Token),
+            ServiceType = changeset.ServiceType,
+            ServiceUniqueName = changeset.ServiceUniqueName,
+            ProjectId = Guid.Parse(changeset.ProjectId),
+            ProjectName = changeset.ProjectName,
+            ProjectState = (ProjectState)changeset.ProjectState,
+            VersionName = changeset.VersionName,
+            VersionIteration = changeset.VersionIteration,
+            User = changeset.User,
+            Approver = changeset.Approver,
+            Comment = changeset.Comment,
+            Timestamp = changeset.Timestamp.ToDateTime(),
+            Type = (AuditEntryType)changeset.Type
+        };
+    }
+
     public static AuditReport Map(AuditReportRecord record)
     {
         AuditReport result = new()
@@ -105,6 +125,24 @@ public static class AuditMapper
         };
 
         foreach (ChangesetRecord changeset in record.Changesets)
+        {
+            result.Changesets.Add(Map(changeset));
+        }
+
+        return result;
+    }
+
+    public static AuditReportRecord Map(AuditReport report)
+    {
+        AuditReportRecord result = new()
+        {
+            Id = Guid.Parse(report.Id),
+            Timestamp = report.Timestamp.ToDateTime(),
+            Name = report.ReportName,
+            Comment = report.Comment
+        };
+
+        foreach (AuditChangeset changeset in report.Changesets)
         {
             result.Changesets.Add(Map(changeset));
         }

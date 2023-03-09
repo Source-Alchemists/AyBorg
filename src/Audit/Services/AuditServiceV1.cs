@@ -83,7 +83,7 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
         }
     }
 
-    public override Task<Empty> SaveReport(SaveAuditReportRequest request, ServerCallContext context)
+    public override Task<Empty> AddReport(AddAuditReportRequest request, ServerCallContext context)
     {
         return Task.Factory.StartNew(() =>
         {
@@ -94,14 +94,14 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
             };
 
             IEnumerable<ProjectAuditRecord> requestedChangesets = _projectAuditRepository.FindAll().Where(c => request.Changesets.Any(r => r.Token.Equals(c.Id.ToString())));
-            if(!requestedChangesets.Any())
+            if (!requestedChangesets.Any())
             {
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "No changesets found."));
             }
 
             record.Changesets.AddRange(requestedChangesets);
 
-            if(!_auditReportRepository.TryAdd(record))
+            if (!_auditReportRepository.TryAdd(record))
             {
                 throw new RpcException(new Status(StatusCode.DataLoss, "Failed to save audit report."));
             }
@@ -112,9 +112,22 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
         });
     }
 
-    public override async Task GetSavedReports(Empty request, IServerStreamWriter<AuditReport> responseStream, ServerCallContext context)
+    public override Task<Empty> DeleteReport(AuditReport request, ServerCallContext context)
     {
-        foreach(AuditReportRecord report in _auditReportRepository.FindAll())
+        return Task.Factory.StartNew(() =>
+        {
+            AuditReportRecord report = AuditMapper.Map(request);
+            if (!_auditReportRepository.TryRemove(report))
+            {
+                throw new RpcException(new Status(StatusCode.Internal, "Failed to delete audit report."));
+            }
+            return new Empty();
+        });
+    }
+
+    public override async Task GetReports(Empty request, IServerStreamWriter<AuditReport> responseStream, ServerCallContext context)
+    {
+        foreach (AuditReportRecord report in _auditReportRepository.FindAll())
         {
             await responseStream.WriteAsync(AuditMapper.Map(report));
         }

@@ -1,19 +1,26 @@
+using AyBorg.SDK.Authorization;
 using AyBorg.Web.Services;
+using AyBorg.Web.Shared.Modals;
 using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
 
 namespace AyBorg.Web.Pages.Audit;
 
 public partial class SavedAuditReports : ComponentBase
 {
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; init; } = null!;
     [Inject] IAuditService AuditService { get; init; } = null!;
+    [Inject] IDialogService DialogService { get; init; } = null!;
+    [Inject] ISnackbar Snackbar { get; init; } = null!;
     private bool _isLoading = false;
     private bool _isFilterHidden = false;
     private readonly List<AuditReport> _auditReports = new();
     private readonly List<AuditReport> _filteredAuditReports = new();
-    private List<AuditChangeset> _selectedChangesets = new();
+    private readonly List<AuditChangeset> _selectedChangesets = new();
     private DateRange _dateRange = new();
+    private bool _isAdminRole = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -21,6 +28,7 @@ public partial class SavedAuditReports : ComponentBase
 
         if (firstRender)
         {
+            _isAdminRole = await IsAdminRoleAsync();
             await LoadReportsAsync();
         }
     }
@@ -29,6 +37,8 @@ public partial class SavedAuditReports : ComponentBase
     {
         _isLoading = true;
         _auditReports.Clear();
+        _filteredAuditReports.Clear();
+        _selectedChangesets.Clear();
         var tmpReports = new List<AuditReport>();
         await foreach (AuditReport report in AuditService.GetReportsAsync())
         {
@@ -50,7 +60,7 @@ public partial class SavedAuditReports : ComponentBase
         DateTime endDate = _dateRange.End?.Date ?? DateTime.MaxValue;
 
         _filteredAuditReports.Clear();
-        _filteredAuditReports.AddRange(_auditReports.Where(r => r.Timestamp.Date >= startDate && r .Timestamp.Date <= endDate));
+        _filteredAuditReports.AddRange(_auditReports.Where(r => r.Timestamp.Date >= startDate && r.Timestamp.Date <= endDate));
         _isLoading = false;
     }
 
@@ -72,5 +82,37 @@ public partial class SavedAuditReports : ComponentBase
     private void PreviewBackClicked()
     {
         _isFilterHidden = false;
+    }
+
+    private async Task DeleteReportClicked(AuditReport report)
+    {
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete audit report",
+                                            new DialogParameters {
+                                                { "NeedPassword", true },
+                                                { "ContentText", "Are you sure you want to delete the audit report?" }
+                                            });
+        DialogResult result = await dialog.Result;
+        if (!result.Cancelled)
+        {
+            if (!await AuditService.TryDeleteReport(report))
+            {
+                Snackbar.Add("Could not delete audit report!", Severity.Error);
+                return;
+            }
+
+            await LoadReportsAsync();
+        }
+    }
+
+    private async ValueTask<bool> IsAdminRoleAsync()
+    {
+        AuthenticationState authState = await AuthenticationState;
+        System.Security.Claims.ClaimsPrincipal user = authState.User;
+        if (user == null)
+        {
+            return false;
+        }
+
+        return user.IsInRole(Roles.Administrator);
     }
 }
