@@ -36,6 +36,7 @@ public partial class SavedAuditReports : ComponentBase
     private async ValueTask LoadReportsAsync()
     {
         _isLoading = true;
+        await InvokeAsync(StateHasChanged);
         _auditReports.Clear();
         _filteredAuditReports.Clear();
         _selectedChangesets.Clear();
