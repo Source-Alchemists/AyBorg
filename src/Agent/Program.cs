@@ -64,7 +64,6 @@ builder.Services.AddTransient<INotifyService, NotifyService>();
 builder.Services.AddTransient<IProjectManagementService, ProjectManagementService>();
 builder.Services.AddTransient<IProjectSettingsService, ProjectSettingsService>();
 // Audit
-builder.Services.AddTransient<AuditMapper>();
 builder.Services.AddTransient<IAuditProviderService, AuditProviderService>();
 
 WebApplication app = builder.Build();

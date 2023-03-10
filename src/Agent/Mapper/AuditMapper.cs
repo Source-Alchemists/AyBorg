@@ -1,11 +1,11 @@
 using Ayborg.Gateway.Audit.V1;
 using AyBorg.Data.Agent;
 
-namespace AyBorg.Agent.Services;
+namespace AyBorg.Agent;
 
-public sealed class AuditMapper
+public static class AuditMapper
 {
-    public AgentProjectAuditEntry Map(ProjectRecord projectRecord)
+    public static AgentProjectAuditEntry Map(ProjectRecord projectRecord)
     {
         var result = new AgentProjectAuditEntry
         {
@@ -24,28 +24,7 @@ public sealed class AuditMapper
 
         foreach (StepRecord step in projectRecord.Steps)
         {
-            var stepDto = new AgentStepAuditEntry
-            {
-                Id = step.Id.ToString(),
-                Name = step.Name,
-                X = step.X,
-                Y = step.Y,
-                AssemblyName = step.MetaInfo.AssemblyName,
-                AssemblyVersion = step.MetaInfo.AssemblyVersion,
-                TypeName = step.MetaInfo.TypeName
-            };
-            foreach (PortRecord port in step.Ports)
-            {
-                string value = port.Direction == SDK.Common.Ports.PortDirection.Input ? port.Value : string.Empty;
-                stepDto.Ports.Add(new AgentPortAuditEntry
-                {
-                    Id = port.Id.ToString(),
-                    Name = port.Name,
-                    Value = value ?? string.Empty,
-                    Brand = (int)port.Brand,
-                    Direction = (int)port.Direction
-                });
-            }
+            AgentStepAuditEntry stepDto = Map(step);
             result.Steps.Add(stepDto);
         }
 
@@ -61,4 +40,34 @@ public sealed class AuditMapper
 
         return result;
     }
+
+    private static AgentStepAuditEntry Map(StepRecord step)
+    {
+        var stepDto = new AgentStepAuditEntry
+        {
+            Id = step.Id.ToString(),
+            Name = step.Name,
+            X = step.X,
+            Y = step.Y,
+            AssemblyName = step.MetaInfo.AssemblyName,
+            AssemblyVersion = step.MetaInfo.AssemblyVersion,
+            TypeName = step.MetaInfo.TypeName
+        };
+        foreach (PortRecord port in step.Ports)
+        {
+            string value = port.Direction == SDK.Common.Ports.PortDirection.Input ? port.Value : string.Empty;
+            stepDto.Ports.Add(Map(port, value));
+        }
+
+        return stepDto;
+    }
+
+    private static AgentPortAuditEntry Map(PortRecord port, string value) => new()
+    {
+        Id = port.Id.ToString(),
+        Name = port.Name,
+        Value = value ?? string.Empty,
+        Brand = (int)port.Brand,
+        Direction = (int)port.Direction
+    };
 }

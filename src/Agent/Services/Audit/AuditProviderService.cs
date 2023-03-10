@@ -12,14 +12,12 @@ public sealed class AuditProviderService : IAuditProviderService
 {
     private readonly ILogger<AuditProviderService> _logger;
     private readonly Audit.AuditClient _auditClient;
-    private readonly AuditMapper _auditMapper;
     private readonly IServiceConfiguration _serviceConfiguration;
 
-    public AuditProviderService(ILogger<AuditProviderService> logger, Audit.AuditClient auditClient, AuditMapper auditMapper, IServiceConfiguration serviceConfiguration)
+    public AuditProviderService(ILogger<AuditProviderService> logger, Audit.AuditClient auditClient, IServiceConfiguration serviceConfiguration)
     {
         _logger = logger;
         _auditClient = auditClient;
-        _auditMapper = auditMapper;
         _serviceConfiguration = serviceConfiguration;
     }
 
@@ -36,7 +34,7 @@ public sealed class AuditProviderService : IAuditProviderService
                 ServiceUniqueName = _serviceConfiguration.UniqueName,
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
                 Type = (int)AuditEntryType.Project,
-                AgentProject = _auditMapper.Map(project)
+                AgentProject = AuditMapper.Map(project)
             });
             return tokenId;
         }
