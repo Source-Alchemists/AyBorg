@@ -3,7 +3,7 @@ using AyBorg.SDK.Common.Ports;
 
 namespace AyBorg.Audit.Services.Tests;
 
-public class AgentCompareServiceTest
+public class AgentCompareServiceTests
 {
     [Fact]
     public void Test_CompareTwoChangesetsFromSameProject()

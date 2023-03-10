@@ -4,7 +4,7 @@ using Google.Protobuf.WellKnownTypes;
 
 namespace AyBorg.Audit.Tests;
 
-public class AuditMapperTest
+public class AuditMapperTests
 {
     [Fact]
     public void Test_MapRecordChangesetToRpcChangeset()
