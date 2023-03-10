@@ -1,6 +1,6 @@
 using Ayborg.Gateway.Audit.V1;
 using AyBorg.SDK.Common;
-using AyBorg.Web.Shared.Mappers;
+using AyBorg.Web.Shared;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 

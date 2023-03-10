@@ -3,7 +3,7 @@ using AyBorg.SDK.System;
 using AyBorg.Web.Shared.Models;
 using Google.Protobuf.WellKnownTypes;
 
-namespace AyBorg.Web.Shared.Mappers;
+namespace AyBorg.Web.Shared;
 
 internal static class AuditMapper
 {
@@ -24,6 +24,26 @@ internal static class AuditMapper
             Comment = changeset.Comment,
             Timestamp = changeset.Timestamp.ToDateTime(),
             Type = (AuditEntryType)changeset.Type
+        };
+    }
+
+    public static Ayborg.Gateway.Audit.V1.AuditChangeset Map(AuditChangeset changeset)
+    {
+        return new Ayborg.Gateway.Audit.V1.AuditChangeset
+        {
+            Token = changeset.Token.ToString(),
+            ServiceType = changeset.ServiceType,
+            ServiceUniqueName = changeset.ServiceUniqueName,
+            ProjectId = changeset.ProjectId.ToString(),
+            ProjectName = changeset.ProjectName,
+            ProjectState = (int)changeset.ProjectState,
+            VersionName = changeset.VersionName,
+            VersionIteration = changeset.VersionIteration,
+            User = changeset.User,
+            Approver = changeset.Approver,
+            Comment = changeset.Comment,
+            Timestamp = Timestamp.FromDateTime(changeset.Timestamp),
+            Type = (int)changeset.Type
         };
     }
 
@@ -70,25 +90,5 @@ internal static class AuditMapper
             result.Changesets.Add(Map(changeset));
         }
         return result;
-    }
-
-    public static Ayborg.Gateway.Audit.V1.AuditChangeset Map(AuditChangeset changeset)
-    {
-        return new Ayborg.Gateway.Audit.V1.AuditChangeset
-        {
-            Token = changeset.Token.ToString(),
-            ServiceType = changeset.ServiceType,
-            ServiceUniqueName = changeset.ServiceUniqueName,
-            ProjectId = changeset.ProjectId.ToString(),
-            ProjectName = changeset.ProjectName,
-            ProjectState = (int)changeset.ProjectState,
-            VersionName = changeset.VersionName,
-            VersionIteration = changeset.VersionIteration,
-            User = changeset.User,
-            Approver = changeset.Approver,
-            Comment = changeset.Comment,
-            Timestamp = Timestamp.FromDateTime(changeset.Timestamp),
-            Type = (int)changeset.Type
-        };
     }
 }
