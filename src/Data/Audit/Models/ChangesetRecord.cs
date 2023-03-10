@@ -1,5 +1,4 @@
 using AyBorg.SDK.Projects;
-using AyBorg.SDK.System;
 
 namespace AyBorg.Data.Audit.Models;
 
@@ -19,5 +18,4 @@ public record ChangesetRecord
     public string Approver { get; set; } = string.Empty;
     public string Comment { get; set; } = string.Empty;
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-    public AuditEntryType Type { get; set; } = AuditEntryType.Unknown;
 }

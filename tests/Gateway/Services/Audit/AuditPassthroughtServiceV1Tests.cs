@@ -5,7 +5,6 @@ using AyBorg.Gateway.Services.Tests;
 using AyBorg.Gateway.Tests.Helpers;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Projects;
-using AyBorg.SDK.System;
 using AyBorg.SDK.System.Configuration;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -37,7 +36,6 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
             ServiceUniqueName = "TestService",
             User = "TestUser",
             Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
-            Type = (int)AuditEntryType.Project,
             AgentProject = new AgentProjectAuditEntry
             {
                 Id = Guid.NewGuid().ToString(),

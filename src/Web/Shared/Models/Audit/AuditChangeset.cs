@@ -1,5 +1,4 @@
 using AyBorg.SDK.Projects;
-using AyBorg.SDK.System;
 
 namespace AyBorg.Web.Shared.Models;
 
@@ -17,5 +16,4 @@ public sealed record AuditChangeset
     public string Approver { get; init; } = string.Empty;
     public string Comment { get; init; } = string.Empty;
     public DateTime Timestamp { get; init; }
-    public AuditEntryType Type { get; init; }
 }

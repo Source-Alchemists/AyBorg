@@ -3,7 +3,6 @@ using AyBorg.Data.Audit.Models;
 using AyBorg.Data.Audit.Models.Agent;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
-using AyBorg.SDK.System;
 using Google.Protobuf.WellKnownTypes;
 
 namespace AyBorg.Audit;
@@ -18,7 +17,6 @@ public static class AuditMapper
             ServiceType = entry.ServiceType,
             ServiceUniqueName = entry.ServiceUniqueName,
             User = entry.User,
-            Type = (AuditEntryType)entry.Type,
             ProjectId = Guid.Parse(entry.AgentProject.Id),
             ProjectName = entry.AgentProject.Name,
             ProjectState = (ProjectState)entry.AgentProject.State,
@@ -65,8 +63,7 @@ public static class AuditMapper
             User = changeset.User,
             Approver = changeset.Approver ?? string.Empty, // Can be empty
             Comment = changeset.Comment ?? string.Empty, // Can be empty
-            Timestamp = Timestamp.FromDateTime(changeset.Timestamp),
-            Type = (int)changeset.Type
+            Timestamp = Timestamp.FromDateTime(changeset.Timestamp)
         };
     }
 
@@ -85,8 +82,7 @@ public static class AuditMapper
             User = changeset.User,
             Approver = changeset.Approver,
             Comment = changeset.Comment,
-            Timestamp = changeset.Timestamp.ToDateTime(),
-            Type = (AuditEntryType)changeset.Type
+            Timestamp = changeset.Timestamp.ToDateTime()
         };
     }
 

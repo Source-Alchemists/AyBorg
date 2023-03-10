@@ -23,8 +23,7 @@ public class AuditMapperTests
             User = "Test.User",
             Approver = "Test.Approver",
             Comment = "Test comment!",
-            Timestamp = DateTime.UtcNow - TimeSpan.FromMinutes(5),
-            Type = SDK.System.AuditEntryType.Project
+            Timestamp = DateTime.UtcNow - TimeSpan.FromMinutes(5)
         };
 
         // Act
@@ -44,7 +43,6 @@ public class AuditMapperTests
         Assert.Equal(changeset.Approver, result.Approver);
         Assert.Equal(changeset.Comment, result.Comment);
         Assert.Equal(changeset.Timestamp, result.Timestamp.ToDateTime());
-        Assert.Equal((int)changeset.Type, result.Type);
     }
 
     [Fact]
@@ -64,8 +62,7 @@ public class AuditMapperTests
             User = "Test.User",
             Approver = "Test.Approver",
             Comment = "Test comment!",
-            Timestamp = Timestamp.FromDateTime(DateTime.UtcNow - TimeSpan.FromMinutes(5)),
-            Type = (int)SDK.System.AuditEntryType.Project
+            Timestamp = Timestamp.FromDateTime(DateTime.UtcNow - TimeSpan.FromMinutes(5))
         };
 
         // Act
@@ -85,7 +82,6 @@ public class AuditMapperTests
         Assert.Equal(changeset.Approver, result.Approver);
         Assert.Equal(changeset.Comment, result.Comment);
         Assert.Equal(changeset.Timestamp.ToDateTime(), result.Timestamp);
-        Assert.Equal((SDK.System.AuditEntryType)changeset.Type, result.Type);
     }
 
     [Fact]
@@ -138,8 +134,7 @@ public class AuditMapperTests
                     User = "Test.User",
                     Approver = "Test.Approver",
                     Comment = "Test comment!",
-                    Timestamp = DateTime.UtcNow - TimeSpan.FromMinutes(5),
-                    Type = SDK.System.AuditEntryType.Project
+                    Timestamp = DateTime.UtcNow - TimeSpan.FromMinutes(5)
                 }
             }
         };
@@ -181,8 +176,7 @@ public class AuditMapperTests
             User = "Test.User",
             Approver = "Test.Approver",
             Comment = "Test comment!",
-            Timestamp = Timestamp.FromDateTime(DateTime.UtcNow - TimeSpan.FromMinutes(5)),
-            Type = (int)SDK.System.AuditEntryType.Project
+            Timestamp = Timestamp.FromDateTime(DateTime.UtcNow - TimeSpan.FromMinutes(5))
         });
 
         // Act
@@ -207,7 +201,6 @@ public class AuditMapperTests
             ServiceType = "Test.Type",
             ServiceUniqueName = "Test.Name",
             User = "Test.User",
-            Type = (int)SDK.System.AuditEntryType.Project,
             AgentProject = new Ayborg.Gateway.Audit.V1.AgentProjectAuditEntry
             {
                 Id = Guid.NewGuid().ToString(),
@@ -256,7 +249,6 @@ public class AuditMapperTests
         Assert.Equal(entry.ServiceType, result.ServiceType);
         Assert.Equal(entry.ServiceUniqueName, result.ServiceUniqueName);
         Assert.Equal(entry.User, result.User);
-        Assert.Equal((SDK.System.AuditEntryType)entry.Type, result.Type);
         Assert.Equal(Guid.Parse(entry.AgentProject.Id), result.ProjectId);
         Assert.Equal(entry.AgentProject.Name, result.ProjectName);
         Assert.Equal((SDK.Projects.ProjectState)entry.AgentProject.State, result.ProjectState);

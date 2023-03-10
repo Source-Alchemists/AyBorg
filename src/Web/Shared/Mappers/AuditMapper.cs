@@ -1,5 +1,4 @@
 using AyBorg.SDK.Projects;
-using AyBorg.SDK.System;
 using AyBorg.Web.Shared.Models;
 using Google.Protobuf.WellKnownTypes;
 
@@ -22,8 +21,7 @@ internal static class AuditMapper
             User = changeset.User,
             Approver = changeset.Approver,
             Comment = changeset.Comment,
-            Timestamp = changeset.Timestamp.ToDateTime(),
-            Type = (AuditEntryType)changeset.Type
+            Timestamp = changeset.Timestamp.ToDateTime()
         };
     }
 
@@ -42,8 +40,7 @@ internal static class AuditMapper
             User = changeset.User,
             Approver = changeset.Approver,
             Comment = changeset.Comment,
-            Timestamp = Timestamp.FromDateTime(changeset.Timestamp),
-            Type = (int)changeset.Type
+            Timestamp = Timestamp.FromDateTime(changeset.Timestamp)
         };
     }
 

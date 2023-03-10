@@ -1,5 +1,4 @@
 using AyBorg.SDK.Projects;
-using AyBorg.SDK.System;
 using Google.Protobuf.WellKnownTypes;
 
 namespace AyBorg.Web.Shared;
@@ -22,8 +21,7 @@ public class AuditMapperTests {
             User = "TestUser",
             Approver = "TestUser",
             Comment = "TestComment",
-            Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
-            Type = (int)AuditEntryType.Project
+            Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
         };
 
         // Act
@@ -43,7 +41,6 @@ public class AuditMapperTests {
         Assert.Equal(changeset.Approver, result.Approver);
         Assert.Equal(changeset.Comment, result.Comment);
         Assert.Equal(changeset.Timestamp.ToDateTime(), result.Timestamp);
-        Assert.Equal((AuditEntryType)changeset.Type, result.Type);
     }
 
     [Fact]
@@ -62,8 +59,7 @@ public class AuditMapperTests {
             User = "TestUser",
             Approver = "TestUser",
             Comment = "TestComment",
-            Timestamp = DateTime.UtcNow,
-            Type = AuditEntryType.Project
+            Timestamp = DateTime.UtcNow
         };
 
         // Act
@@ -83,7 +79,6 @@ public class AuditMapperTests {
         Assert.Equal(changeset.Approver, result.Approver);
         Assert.Equal(changeset.Comment, result.Comment);
         Assert.Equal(changeset.Timestamp, result.Timestamp.ToDateTime());
-        Assert.Equal((int)changeset.Type, result.Type);
     }
 
     [Fact]
@@ -135,8 +130,7 @@ public class AuditMapperTests {
             User = "TestUser",
             Approver = "TestUser",
             Comment = "TestComment",
-            Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
-            Type = (int)AuditEntryType.Project
+            Timestamp = Timestamp.FromDateTime(DateTime.UtcNow)
         });
 
         // Act
@@ -174,8 +168,7 @@ public class AuditMapperTests {
             User = "TestUser",
             Approver = "TestUser",
             Comment = "TestComment",
-            Timestamp = DateTime.UtcNow,
-            Type = AuditEntryType.Project
+            Timestamp = DateTime.UtcNow
         });
 
         // Act

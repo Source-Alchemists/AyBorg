@@ -76,6 +76,11 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
     public override async Task GetChanges(GetAuditChangesRequest request, IServerStreamWriter<AuditChange> responseStream, ServerCallContext context)
     {
         IEnumerable<ProjectAuditRecord> changesets = _projectAuditRepository.FindAll().Where(c => request.Tokens.Any(t => t.Equals(c.Id.ToString(), StringComparison.OrdinalIgnoreCase)));
+        if (!changesets.Any())
+        {
+            throw new RpcException(new Status(StatusCode.InvalidArgument, "No changesets found."));
+        }
+
         IEnumerable<ChangeRecord> changes = AgentCompareService.Compare(changesets);
         foreach (ChangeRecord change in changes)
         {

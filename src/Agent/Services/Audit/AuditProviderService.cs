@@ -33,7 +33,6 @@ public sealed class AuditProviderService : IAuditProviderService
                 ServiceType = ServiceTypes.Agent,
                 ServiceUniqueName = _serviceConfiguration.UniqueName,
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
-                Type = (int)AuditEntryType.Project,
                 AgentProject = AuditMapper.Map(project)
             });
             return tokenId;
