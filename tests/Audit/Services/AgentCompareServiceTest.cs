@@ -5,32 +5,6 @@ namespace AyBorg.Audit.Services.Tests;
 
 public class AgentCompareServiceTest
 {
-    private static StepAuditRecord CreateStep(Guid id, string name, string assemblyName, string assemblyVersion, string typeName, List<PortAuditRecord> ports)
-    {
-        return new StepAuditRecord
-        {
-            Id = id,
-            Name = name,
-            X = 1,
-            Y = 2,
-            AssemblyName = assemblyName,
-            AssemblyVersion = assemblyVersion,
-            TypeName = typeName,
-            Ports = ports
-        };
-    }
-
-    private static PortAuditRecord CreatePort(Guid id, string name, string value, PortBrand brand = PortBrand.String, PortDirection direction = PortDirection.Input)
-    {
-        return new PortAuditRecord {
-            Id = id,
-            Name = name,
-            Value = value,
-            Brand = brand,
-            Direction = direction
-        };
-    }
-
     [Fact]
     public void Test_CompareTwoChangesetsFromSameProject()
     {
@@ -61,7 +35,8 @@ public class AgentCompareServiceTest
             Id = Guid.NewGuid(),
             Timestamp = DateTime.UtcNow - TimeSpan.FromMinutes(10),
             ProjectId = projectId,
-            Settings = new ProjectSettingsAuditRecord { IsForceResultCommunicationEnabled = true },
+            ProjectState = SDK.Projects.ProjectState.Draft,
+            Settings = new ProjectSettingsAuditRecord { IsForceResultCommunicationEnabled = false },
             Steps = new List<StepAuditRecord> {
                 CreateStep(knownStepId, knownStepName, knownStepAssemblyName, knownStepAssemblyVersion, knownStepTypeName,
                 new List<PortAuditRecord> {
@@ -98,6 +73,7 @@ public class AgentCompareServiceTest
             Id = Guid.NewGuid(),
             Timestamp = DateTime.UtcNow,
             ProjectId = projectId,
+            ProjectState = SDK.Projects.ProjectState.Ready,
             Settings = new ProjectSettingsAuditRecord { IsForceResultCommunicationEnabled = true },
             Steps = new List<StepAuditRecord> {
                 CreateStep(knownStepId, knownStepName, knownStepAssemblyName, knownStepAssemblyVersion, knownStepTypeName,
@@ -144,7 +120,7 @@ public class AgentCompareServiceTest
         Assert.NotNull(diffs);
         Assert.Single(diffs.GroupBy(d => d.ChangesetAId));
         Assert.Single(diffs.GroupBy(d => d.ChangesetBId));
-        Assert.Equal(6, diffs.Count());
+        Assert.Equal(8, diffs.Count());
         Assert.Single(diffs.Where(d => d.ValueA.Equals("Test_123") && d.ValueB.Equals("Test_abc")));
         Assert.Single(diffs.Where(d => d.ValueA.Equals(string.Empty) && d.ValueB.Equals("Test_456")));
         Assert.Single(diffs.Where(d => d.ValueA.Equals("Test_123") && d.ValueB.Equals(string.Empty)));
@@ -240,5 +216,31 @@ public class AgentCompareServiceTest
 
         // Assert
         Assert.Empty(result);
+    }
+
+    private static StepAuditRecord CreateStep(Guid id, string name, string assemblyName, string assemblyVersion, string typeName, List<PortAuditRecord> ports)
+    {
+        return new StepAuditRecord
+        {
+            Id = id,
+            Name = name,
+            X = 1,
+            Y = 2,
+            AssemblyName = assemblyName,
+            AssemblyVersion = assemblyVersion,
+            TypeName = typeName,
+            Ports = ports
+        };
+    }
+
+    private static PortAuditRecord CreatePort(Guid id, string name, string value, PortBrand brand = PortBrand.String, PortDirection direction = PortDirection.Input)
+    {
+        return new PortAuditRecord {
+            Id = id,
+            Name = name,
+            Value = value,
+            Brand = brand,
+            Direction = direction
+        };
     }
 }

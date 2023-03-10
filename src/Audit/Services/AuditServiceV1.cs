@@ -33,7 +33,7 @@ public sealed class AuditServiceV1 : Ayborg.Gateway.Audit.V1.Audit.AuditBase
             switch (request.PayloadCase)
             {
                 case AuditEntry.PayloadOneofCase.AgentProject:
-                    ProjectAuditRecord projectAuditRecord = AuditMapper.MapToProjectRecord(request);
+                    ProjectAuditRecord projectAuditRecord = AuditMapper.Map(request);
                     if (!_agentAuditService.TryAdd(projectAuditRecord))
                     {
                         throw new RpcException(new Status(StatusCode.DataLoss, "Failed to add project audit entry."));

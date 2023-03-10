@@ -10,7 +10,7 @@ namespace AyBorg.Audit;
 
 public static class AuditMapper
 {
-    public static ProjectAuditRecord MapToProjectRecord(AuditEntry entry)
+    public static ProjectAuditRecord Map(AuditEntry entry)
     {
         var result = new ProjectAuditRecord
         {
@@ -34,31 +34,7 @@ public static class AuditMapper
 
         foreach (AgentStepAuditEntry? step in entry.AgentProject.Steps)
         {
-            var stepRecord = new StepAuditRecord
-            {
-                Id = Guid.Parse(step.Id),
-                Name = step.Name,
-                X = step.X,
-                Y = step.Y,
-                AssemblyName = step.AssemblyName,
-                AssemblyVersion = step.AssemblyVersion,
-                TypeName = step.TypeName
-            };
-
-            foreach (AgentPortAuditEntry? port in step.Ports)
-            {
-                var portRecord = new PortAuditRecord
-                {
-                    Id = Guid.Parse(port.Id),
-                    Name = port.Name,
-                    Value = port.Value,
-                    Brand = (PortBrand)port.Brand,
-                    Direction = (PortDirection)port.Direction
-                };
-                stepRecord.Ports.Add(portRecord);
-            }
-
-            result.Steps.Add(stepRecord);
+            result.Steps.Add(Map(step));
         }
 
         foreach (AgentLinkAuditEntry? link in entry.AgentProject.Links)
@@ -114,6 +90,19 @@ public static class AuditMapper
         };
     }
 
+    public static AuditChange Map(ChangeRecord change)
+    {
+        return new AuditChange
+        {
+            RelatedTokenA = change.ChangesetAId.ToString(),
+            RelatedTokenB = change.ChangesetBId.ToString(),
+            Label = change.Label,
+            SubLabel = change.SubLabel,
+            OriginalValue = change.ValueA ?? string.Empty,
+            ChangedValue = change.ValueB ?? string.Empty
+        };
+    }
+
     public static AuditReport Map(AuditReportRecord record)
     {
         AuditReport result = new()
@@ -150,16 +139,36 @@ public static class AuditMapper
         return result;
     }
 
-    public static AuditChange Map(ChangeRecord change)
+    private static StepAuditRecord Map(AgentStepAuditEntry step)
     {
-        return new AuditChange
+        var result = new StepAuditRecord
         {
-            RelatedTokenA = change.ChangesetAId.ToString(),
-            RelatedTokenB = change.ChangesetBId.ToString(),
-            Label = change.Label,
-            SubLabel = change.SubLabel,
-            OriginalValue = change.ValueA ?? string.Empty,
-            ChangedValue = change.ValueB ?? string.Empty
+            Id = Guid.Parse(step.Id),
+            Name = step.Name,
+            X = step.X,
+            Y = step.Y,
+            AssemblyName = step.AssemblyName,
+            AssemblyVersion = step.AssemblyVersion,
+            TypeName = step.TypeName
+        };
+
+        foreach (AgentPortAuditEntry? port in step.Ports)
+        {
+            result.Ports.Add(Map(port));
+        }
+
+        return result;
+    }
+
+    private static PortAuditRecord Map(AgentPortAuditEntry port)
+    {
+        return new PortAuditRecord
+        {
+            Id = Guid.Parse(port.Id),
+            Name = port.Name,
+            Value = port.Value,
+            Brand = (PortBrand)port.Brand,
+            Direction = (PortDirection)port.Direction
         };
     }
 }
