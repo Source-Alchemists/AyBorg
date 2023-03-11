@@ -142,7 +142,7 @@ public partial class CreateAuditReport : ComponentBase
         }
 
         var resultData = (SaveAuditReportDialog.ResultData)result.Data;
-        if (!await AuditService.TrySaveReport(resultData.ReportName, resultData.Comment, _selectedChangesets))
+        if (!await AuditService.TryAddReport(resultData.ReportName, resultData.Comment, _selectedChangesets))
         {
             Snackbar.Add("Failed to save audit report!", Severity.Error);
         }

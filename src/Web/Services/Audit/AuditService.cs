@@ -45,7 +45,7 @@ public sealed class AuditService : IAuditService
         }
     }
 
-    public async ValueTask<bool> TrySaveReport(string reportName, string comment, IEnumerable<Shared.Models.AuditChangeset> changesets)
+    public async ValueTask<bool> TryAddReport(string reportName, string comment, IEnumerable<Shared.Models.AuditChangeset> changesets)
     {
         var request = new AddAuditReportRequest
         {
