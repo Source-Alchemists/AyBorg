@@ -17,6 +17,12 @@ legend {
     position: fixed !important;
 }
 
+.mud-card-header {
+    border-bottom: 4px solid;
+    border-image-slice: 1;
+    border-image-source: linear-gradient(to left, var(--mud-palette-primary), var(--mud-palette-secondary));
+}
+
 /*Blazor error message*/
 #blazor-error-ui {
     background: lightyellow;
