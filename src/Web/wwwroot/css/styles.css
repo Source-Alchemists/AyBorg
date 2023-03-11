@@ -48,7 +48,7 @@
 }
 
 .editor-container {
-    height: calc(100% - 60px);
+    height: calc(100% - 70px);
 }
 
 /*Blazor diagram*/
