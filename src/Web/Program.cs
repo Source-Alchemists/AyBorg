@@ -91,6 +91,7 @@ builder.Services.AddScoped<IEventLogService, EventLogService>();
 
 builder.Services.AddTransient<ITokenProvider, TokenProvider>();
 builder.Services.AddTransient<IStorageService, StorageService>();
+builder.Services.AddTransient<IAuditService, AuditService>();
 
 WebApplication app = builder.Build();
 

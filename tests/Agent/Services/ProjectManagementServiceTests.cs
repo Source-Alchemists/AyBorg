@@ -18,6 +18,7 @@ public sealed class ProjectManagementServiceTests
     private readonly Mock<IRuntimeToStorageMapper> _mockRuntimeToStorageMapper = new();
     private readonly Mock<IRuntimeConverterService> _mockRuntimeConverterService = new();
     private readonly Mock<IProjectRepository> _mockProjectRepository = new();
+    private readonly Mock<IAuditProviderService> _mockAuditProviderService = new();
     private readonly ProjectManagementService _service;
 
     public ProjectManagementServiceTests()
@@ -36,7 +37,8 @@ public sealed class ProjectManagementServiceTests
                                                     _mockProjectRepository.Object,
                                                     _mockEngineHost.Object,
                                                     _mockRuntimeToStorageMapper.Object,
-                                                    _mockRuntimeConverterService.Object);
+                                                    _mockRuntimeConverterService.Object,
+                                                    _mockAuditProviderService.Object);
     }
 
     [Theory]
@@ -171,7 +173,7 @@ public sealed class ProjectManagementServiceTests
         _mockRuntimeToStorageMapper.Setup(r => r.Map(It.IsAny<Project>())).Returns(new ProjectRecord());
 
         // Act
-        ProjectManagementResult result = await _service.TrySaveActiveAsync();
+        ProjectManagementResult result = await _service.TrySaveActiveAsync(It.IsAny<string>());
 
         // Assert
         Assert.Equal(expectedSuccess, result.IsSuccessful);

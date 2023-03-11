@@ -7,7 +7,7 @@ internal class EnumToRecordConverter : IValueConverter<Enum, string>
 {
     public string Convert(Enum sourceMember, ResolutionContext context)
     {
-        var names = Enum.GetNames(sourceMember.GetType());
+        string[] names = Enum.GetNames(sourceMember.GetType());
         var record = new EnumRecord
         {
             Name = sourceMember.ToString(),

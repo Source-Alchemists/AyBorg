@@ -1,3 +1,4 @@
+using AyBorg.SDK.System;
 using AyBorg.Web.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -9,16 +10,19 @@ public partial class NavMenu : ComponentBase
     [Inject] IStateService StateService { get; set; } = null!;
     [Inject] IRegistryService RegistryService { get; set; } = null!;
 
-
     private bool _isAnalyticsVisible = false;
+    private bool _isAuditVisible = false;
 
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
+
         try
         {
-            IEnumerable<Models.ServiceInfoEntry> analyticsServices = await RegistryService.ReceiveServicesAsync("AyBorg.Analytics");
-            _isAnalyticsVisible = analyticsServices.Any();
+            IEnumerable<Models.ServiceInfoEntry> services = await RegistryService.ReceiveServicesAsync();
+
+            _isAnalyticsVisible = services.Any(s => s.Type.Equals(ServiceTypes.Analytics));
+            _isAuditVisible = services.Any(s => s.Type.Equals(ServiceTypes.Audit));
         }
         catch (Exception ex)
         {

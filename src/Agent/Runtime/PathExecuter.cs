@@ -65,7 +65,7 @@ internal sealed class PathExecuter : IDisposable
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(ex, "Error occurred while executing step [{name}]", PathItem.Step.Name);
+            _logger.LogError(ex, "Error occurred while executing step [{name}]", PathItem.Step.Name);
         }
         finally
         {

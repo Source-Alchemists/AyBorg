@@ -80,7 +80,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
                 return UpdateImagePortValue(imagePort);
         }
 
-        _logger.LogWarning("Port type {PortType} is not supported", port.GetType().Name);
+        _logger.LogError("Port type {PortType} is not supported", port.GetType().Name);
         return await ValueTask.FromResult(false);
     }
 
@@ -177,7 +177,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
             }
             catch (KeyNotFoundException ex)
             {
-                _logger.LogWarning(ex, "Step {StepName} with type {TypeName} not found", stepRecord.Name, stepRecord.MetaInfo.TypeName);
+                _logger.LogError(new EventId((int)EventLogType.Engine), ex, "Step {StepName} with type {TypeName} not found", stepRecord.Name, stepRecord.MetaInfo.TypeName);
             }
         }
 
@@ -243,7 +243,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
             PortRecord? portRecord = portRecords.FirstOrDefault(x => x.Name == port.Name && x.Direction == port.Direction);
             if (portRecord == null)
             {
-                _logger.LogWarning("Port record {port.Name} not found! Will use default value.", port.Name);
+                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Port record {port.Name} not found! Will use default value.", port.Name);
                 continue;
             }
 

@@ -1,0 +1,62 @@
+@page "/audit/reports"
+@using SDK.Authorization
+@using AyBorg.Web.Shared.Models
+@using AyBorg.Web.Pages.Audit.Shared
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Auditor}")]
+<PageTitle>AyBorg - Audit Report</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+<div hidden="@_isFilterHidden">
+    <MudToolBar Class="mud-full-width">
+        <MudDateRangePicker Label="Date Range" Editable="true" @bind-DateRange="_dateRange" Class="mr-5" />
+        <MudTooltip Text="Filter">
+            <MudIconButton Icon="@Icons.Material.Filled.FilterList" Color="Color.Primary" OnClick="FilterClicked" />
+        </MudTooltip>
+    </MudToolBar>
+    <MudCard Class="mud-full-width rounded-lg mt-5">
+        <MudCardHeader Class="pb-0">
+            <CardHeaderAvatar>
+                <MudIcon Icon="@Icons.Material.Filled.TrackChanges" />
+            </CardHeaderAvatar>
+            <CardHeaderContent>
+                <MudText Typo="Typo.h6">Audit reports</MudText>
+            </CardHeaderContent>
+        </MudCardHeader>
+        <MudCardContent>
+            <MudTable T="AuditReport" Items="@_filteredAuditReports" Hover="true" OnRowClick="RowClicked" Elevation="0">
+                <HeaderContent>
+                    <MudTh>Timestamp (UTC)</MudTh>
+                    <MudTh>Name</MudTh>
+                    <MudTh>Comment</MudTh>
+                    <MudTh>Changes</MudTh>
+                    <MudTh hidden=@(!_isAdminRole)></MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd DataLabel="Timestamp">@context.Timestamp</MudTd>
+                    <MudTd DataLabel="Name">@context.Name</MudTd>
+                    <MudTd DataLabel="Comment">@context.Comment</MudTd>
+                    <MudTd DataLabel="ChangesetCount">@context.ChangesetCount</MudTd>
+                    <MudTd hidden=@(!_isAdminRole)>
+                        <MudTooltip Text="Delete report">
+                            <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="() => DeleteReportClicked(context)" />
+                        </MudTooltip>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudCardContent>
+    </MudCard>
+</div>
+
+@if (_isFilterHidden)
+{
+    <MudToolBar Class="mud-full-width">
+    <MudTooltip Text="Back">
+        <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small"
+            OnClick="PreviewBackClicked" />
+    </MudTooltip>
+
+</MudToolBar>
+    <CompareView SelectedChangesets="_selectedChangesets" Loaded="CompareViewLoaded" />
+}

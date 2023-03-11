@@ -1,5 +1,5 @@
 <MudCard Style="height: calc(100vh - 148px)" Class="rounded-lg d-flex justify-center flex-column">
-    <MudCardHeader class="order-0">
+    <MudCardHeader Class="order-0">
         <CardHeaderAvatar>
             <MudIcon Icon="@Icons.Filled.Apps" />
         </CardHeaderAvatar>
@@ -11,7 +11,7 @@
         <MudTextField T="string" Label="Search" TextChanged="@OnSearchTextChanged"
                         Variant="Variant.Filled" Adornment="Adornment.End"
                         AdornmentIcon="@Icons.Material.Filled.Search" Clearable="true"
-                        Immediate="true" Class="mt-0" />
+                        Immediate="true" Class="mt-3" />
         <MudSelect T ="string" Label="Category" SelectedValues="_selectedCategories"
                     SelectedValuesChanged="@OnSelectedCategoryChanged">
             @foreach (var category in _availableCategories)

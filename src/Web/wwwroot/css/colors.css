@@ -5,4 +5,19 @@
     --a-theme-flow-node-port-field-color: #8391A2;
     --a-theme-flow-node-port-image-color: var(--mud-palette-info);
     --a-theme-flow-node-port-shape-color: #c100e7;
+    --a-theme-compare-subtitle-background-color: #ddf4ff;
+    --a-theme-compare-addition-background-color: #e6ffec;
+    --a-theme-compare-addition-border-background-color: #ccffd8;
+    --a-theme-compare-deletion-background-color: #ffeae9;
+    --a-theme-compare-deletion-border-background-color: #ffd7d5;
+    --a-theme-compare-neutral-background-color: #f4f6f8;
+}
+
+html[data-color=dark] {
+    --a-theme-compare-subtitle-background-color: #162741;
+    --a-theme-compare-addition-background-color: #142c1d;
+    --a-theme-compare-addition-border-background-color: #1f4b2b;
+    --a-theme-compare-deletion-background-color: #3a1d1e;
+    --a-theme-compare-deletion-border-background-color: #602726;
+    --a-theme-compare-neutral-background-color: #181d24;
 }

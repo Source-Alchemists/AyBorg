@@ -368,7 +368,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         Step receivedStep = await FlowService.AddStepAsync(step);
         if (receivedStep == null)
         {
-            Snackbar.Add($"Could not add '{step.Name}' (Step not found)", Severity.Warning);
+            Snackbar.Add($"Could not add '{step.Name}' (Step not found)", Severity.Error);
             return;
         }
 

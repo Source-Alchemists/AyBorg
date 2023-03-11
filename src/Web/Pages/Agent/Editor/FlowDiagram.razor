@@ -9,7 +9,7 @@
 			<MudText Typo="Typo.h6">Automation</MudText>
 		</CardHeaderContent>
 		<CardHeaderActions>
-			<MudButtonGroup Variant="Variant.Text" Color="Color.Primary">
+			<MudButtonGroup Variant="Variant.Filled" Color="Color.Default" DisableElevation>
 				<MudTooltip Text="Zoom in">
 					<MudIconButton Icon="@Icons.Filled.ZoomIn" OnClick="@OnZoomInClicked" />
 				</MudTooltip>
@@ -22,7 +22,7 @@
 			</MudButtonGroup>
 		</CardHeaderActions>
 	</MudCardHeader>
-	<MudCardContent Style="height: calc(100% - 60px)" class="pt-0 mt-0">
+	<MudCardContent Style="height: calc(100% - 70px)" Class="pt-0 mt-3">
 		<div Class="diagram-container" dropzone="none" ondragover="event.preventDefault();" @ondragenter="OnDragEnter"
 			@ondrop="OnDrop">
 			<CascadingValue Value="_diagram">

@@ -1,0 +1,36 @@
+<MudDialog>
+    <DialogContent>
+        <MudForm @ref="_form" @bind-IsValid="_isValid">
+            <MudTextField T="string" Label="Audit report name" Required="true" RequiredError="Audit report name is required!" @bind-value="_auditReportName" />
+            <MudAlert Severity="Severity.Info">Providing a comment for the <strong>audit report</strong> is recommended!</MudAlert>
+            <MudTextField T="string" Label="Comment" @bind-value="_comment" />
+        </MudForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="CloseClicked">Close</MudButton>
+        <MudButton StartIcon="@Icons.Material.Filled.SaveAlt" Color="Color.Primary" OnClick="SaveClicked">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+
+    private MudForm _form = null!;
+    private bool _isValid = false;
+    private string _auditReportName = string.Empty;
+    private string _comment = string.Empty;
+
+    private void CloseClicked() => MudDialog.Cancel();
+
+    private async Task SaveClicked() {
+        await _form.Validate();
+        if(!_isValid)
+        {
+            return;
+        }
+
+        MudDialog.Close(DialogResult.Ok(new ResultData(_auditReportName, _comment)));
+    }
+
+    public record ResultData (string ReportName, string Comment);
+}

@@ -1,6 +1,5 @@
-using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Analytics.V1;
-using AyBorg.SDK.Common;
+using AyBorg.Web.Shared.Mappers;
 using AyBorg.Web.Shared.Models;
 using Grpc.Core;
 
@@ -28,28 +27,7 @@ public sealed class EventLogService : IEventLogService
 
         await foreach (EventEntry? entry in response.ResponseStream.ReadAllAsync())
         {
-            yield return new EventLogEntry
-            {
-                ServiceType = entry.ServiceType,
-                ServiceUniqueName = entry.ServiceUniqueName,
-                Timestamp = entry.Timestamp.ToDateTime(),
-                LogLevel = (LogLevel)entry.LogLevel,
-                EventId = entry.EventId,
-                EventName = GetEventTypeDescription(entry.EventId),
-                Message = entry.Message
-            };
+            yield return EventLogMapper.Map(entry);
         }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static string GetEventTypeDescription(int id)
-    {
-        if (!Enum.IsDefined(typeof(EventLogType), id))
-        {
-            return "Undefined";
-        }
-
-        var eventLogType = (EventLogType)id;
-        return $"{eventLogType.GetDescription()}";
     }
 }

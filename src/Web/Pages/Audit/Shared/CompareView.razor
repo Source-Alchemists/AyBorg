@@ -1,0 +1,4 @@
+@foreach (var compareGroup in _compareGroups.OrderBy(g => g.ChangesetB.ServiceUniqueName))
+{
+    <AuditChangesTable ChangesetA="@compareGroup.ChangesetA" ChangesetB="@compareGroup.ChangesetB" Changes="@compareGroup.Changes" />
+}

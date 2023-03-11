@@ -14,7 +14,7 @@
     <Authorized>
         <MudLayout Class="mud-height-full">
             <MudDrawerContainer Class="mud-height-full">
-                <MudAppBar Elevation="0">
+                <MudAppBar Elevation="0" Class="blur">
                     <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
                     <MudSpacer />
                     <MudToggleIconButton Toggled="@_isDarkMode"
@@ -28,7 +28,8 @@
 
                 <MudDrawer @bind-Open="@_isDrawerOpen" Elevation="0" Variant="@DrawerVariant.Responsive">
                     <MudDrawerHeader>
-                        <MudText Typo="Typo.h5" hidden="@(!_isDrawerOpen)">AyBorg</MudText>
+                        <MudImage Src="icons/logo.svg" Width="40" Height="40" />
+                        <MudText Typo="Typo.h5" hidden="@(!_isDrawerOpen)" Class="ml-3 mt-2 brand-text" Color="Color.Primary">AyBorg</MudText>
                     </MudDrawerHeader>
                     <MudNavMenu Bordered="true" Color="Color.Primary">
                         <NavMenu />

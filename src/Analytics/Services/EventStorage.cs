@@ -16,7 +16,7 @@ public sealed class EventStorage : IEventStorage
     public void Add(EventRecord eventRecord)
     {
         IEnumerable<EventRecord> outdatedEvents = _eventLogRepository.FindAllTill(DateTime.UtcNow - TimeSpan.FromDays(_maxDaysToKeep));
-        _eventLogRepository.TryDelete(outdatedEvents);
+        _eventLogRepository.TryRemove(outdatedEvents);
         _eventLogRepository.TryAdd(eventRecord);
     }
 

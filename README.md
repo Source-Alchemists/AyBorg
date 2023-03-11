@@ -1,25 +1,20 @@
 # AyBorg
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Source-Alchemists_AyBorg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Source-Alchemists_AyBorg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Source-Alchemists_AyBorg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Source-Alchemists_AyBorg) [![Twitter Follow](https://img.shields.io/twitter/follow/ayborg_io?logo=twitter&style=flat-square)](https://twitter.com/ayborg_io?ref_src=twsrc%5Etfw)
 
-## Why AyBorg?
+:star:  We appreciate your star, it helps!
 
-- **Easy to use!**
-  - Don't spend a lot of time to write code, just use instead AyBorg's user **friendly no code** interface!
-  - If you ever need to write code, still don't spend to much time on it, with AyBorg's very simple plugin interface!
-- **One interface to fit them all!** Don't invest a lot of money to train your employees in different applications!
-- **Scalable!** No matter how many devices are connected, AyBorg can handle them all in one interface!
-- **Easy to integrate into your existing infrastructure**, thanks to MQTT!
-- **No vendor lock-in!**
-  - Run it on Azure, AWS, or on premise.
-  - No specific library to use! Your processing library? No Problem, use it!
-- **Data secure!** Keep the data on your edge device or send it to the cloud. Your solution, your choice!
-- **Open for extensions!**
-  - You need a new fancy plugin? Go for it, AyBorg is open to be extented.
-  - AyBorg is not only easy to use, it is also easy to extend! (See [StepBody](doc/agent/plugins/custom-plugins.md#stepBody))
-  - You write your logic, AyBorg does the rest!
+Hey there! Are you tired of complex and expensive Industrial IoT solutions that only add to your headaches? Introducing AyBorg, the powerful and scalable no-code/low-code platform for your production processes.
 
-### Steps
+Our platform is free, open-source and provides a service-oriented architecture that can be easily adapted to your needs. With AyBorg, you'll have the power to build and customize your own industrial applications without needing to write a single line of code. Simply drag and drop elements, connect the ports and voila! You've got a fully functioning application that can be easily scaled and customized as your business grows.
+
+We've got your back when it comes to monitoring your production goods too. Our platform has a focus on using camera systems for image processing, making it easier for you to keep an eye on your production. And if you need to add some extra features, our platform can be easily extended with plugins.
+
+With AyBorg, you don't have to worry about being locked into one vendor. Our platform is open-source, meaning you have the freedom to adapt and modify it as you see fit. And because it's free, you'll be saving money compared to closed source solutions. Plus, with our built-in auditing functionality, you'll have even more control over your processes and data, leading to improved efficiency and cost savings.
+
+So what are you waiting for? Say goodbye to complex and expensive solutions, and hello to the power of AyBorg. Get started today!
+
+## Steps
 
 Steps are called the plugins, provding methods executed in the runtime flow:
 
@@ -47,6 +42,7 @@ The default appsettings give you a good starting point and will also work locall
 | ---------------- | ---- | ----- | ---- |
 | AyBorg.Gateway   |      |       | 5000 |
 | AyBorg.Analytics |      |       | 5001 |
+| AyBorg.Audit     |      |       | 5002 |
 | AyBorg.Web       | 5010 | 5011  |      |
 | AyBorg.Agent     |      |       | 5020 |
 
