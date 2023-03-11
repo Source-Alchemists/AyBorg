@@ -26,7 +26,7 @@ public sealed class AuditProviderService : IAuditProviderService
         try
         {
             var tokenId = Guid.NewGuid();
-            await _auditClient.AddEntryAsync(new AuditEntry
+            var auditEntry = new AuditEntry
             {
                 Token = tokenId.ToString(),
                 User = userName,
@@ -34,15 +34,15 @@ public sealed class AuditProviderService : IAuditProviderService
                 ServiceUniqueName = _serviceConfiguration.UniqueName,
                 Timestamp = Timestamp.FromDateTime(DateTime.UtcNow),
                 AgentProject = AuditMapper.Map(project)
-            });
+            };
+            await _auditClient.AddEntryAsync(auditEntry);
             return tokenId;
         }
         catch (RpcException ex)
         {
             _logger.LogError(new EventId((int)EventLogType.Audit), ex, "Failed to add audit entry for project [{projectName}].", project.Meta.Name);
+            return Guid.Empty;
         }
-
-        return Guid.Empty;
     }
 
     public async ValueTask<bool> TryInvalidateAsync(Guid tokenId)
@@ -59,8 +59,7 @@ public sealed class AuditProviderService : IAuditProviderService
         catch (RpcException ex)
         {
             _logger.LogError(new EventId((int)EventLogType.Audit), ex, "Failed to invalidate audit entry for token [{tokenId}].", tokenId);
+            return false;
         }
-
-        return false;
     }
 }
