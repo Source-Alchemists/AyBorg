@@ -31,6 +31,7 @@ public sealed class ProjectManagementServiceTests
             .AddInMemoryCollection(settings!)
             .Build();
         _serviceConfiguration = new ServiceConfiguration(s_serviceLogger, configuration);
+        _mockAuditProviderService.Setup(m => m.AddAsync(It.IsAny<ProjectRecord>(), It.IsAny<string>())).ReturnsAsync(Guid.NewGuid());
 
         _service = new ProjectManagementService(s_projLogger,
                                                     _serviceConfiguration,
@@ -45,7 +46,7 @@ public sealed class ProjectManagementServiceTests
     [InlineData(true, true)]
     [InlineData(false, true)]
     [InlineData(true, false)]
-    public async ValueTask Test_CreateAsync(bool hasActiveProject, bool isActivateSuccessful)
+    public async Task Test_CreateAsync(bool hasActiveProject, bool isActivateSuccessful)
     {
         // Arrange
         var expectedProject = new ProjectRecord
@@ -77,7 +78,7 @@ public sealed class ProjectManagementServiceTests
     [InlineData(false, false, true, true, false)]
     [InlineData(false, true, true, false, true)]
     [InlineData(true, true, false, true, true)]
-    public async ValueTask Test_TryDeleteAsync(bool expectedSuccess, bool containsProject, bool isActiveProject, bool isDeactivationSuccessful, bool isDeleteSuccessful)
+    public async Task Test_TryDeleteAsync(bool expectedSuccess, bool containsProject, bool isActiveProject, bool isDeactivationSuccessful, bool isDeleteSuccessful)
     {
         // Arrange
         var projectId = Guid.NewGuid();
@@ -106,7 +107,7 @@ public sealed class ProjectManagementServiceTests
     [InlineData(false, true, true, true, true, false, true, true)]
     [InlineData(false, true, true, true, true, true, false, true)]
     [InlineData(false, true, true, true, true, true, true, false)]
-    public async ValueTask Test_TryChangeActivationStateAsync(bool expectedSuccess, bool activate, bool hasActiveProject, bool containsProject, bool isValidService, bool isDeactivationSuccessful, bool isUpdateSuccessful, bool isActivateSuccessful)
+    public async Task Test_TryChangeActivationStateAsync(bool expectedSuccess, bool activate, bool hasActiveProject, bool containsProject, bool isValidService, bool isDeactivationSuccessful, bool isUpdateSuccessful, bool isActivateSuccessful)
     {
         // Arrange
         var projectId = Guid.NewGuid();
@@ -134,7 +135,7 @@ public sealed class ProjectManagementServiceTests
     [InlineData(false, true, true, false)]
     [InlineData(false, true, false, true)]
     [InlineData(false, false, true, true)]
-    public async ValueTask Test_TryLoadActiveAsync(bool expectedSuccess, bool hasActiveProject, bool isUpdateSuccessful, bool isChangeActivationSuccessful)
+    public async Task Test_TryLoadActiveAsync(bool expectedSuccess, bool hasActiveProject, bool isUpdateSuccessful, bool isChangeActivationSuccessful)
     {
         // Arrange
         var projectId = Guid.NewGuid();
@@ -163,7 +164,7 @@ public sealed class ProjectManagementServiceTests
     [InlineData(false, true, true, false, true)]
     [InlineData(false, true, false, true, true)]
     [InlineData(false, false, true, true, true)]
-    public async ValueTask Test_TrySaveActiveAsync(bool expectedSuccess, bool hasEngineActiveProject, bool hasActiveProject, bool isUpdateSuccessful, bool isSaveSuccessful)
+    public async Task Test_TrySaveActiveAsync(bool expectedSuccess, bool hasEngineActiveProject, bool hasActiveProject, bool isUpdateSuccessful, bool isSaveSuccessful)
     {
         // Arrange
         _mockEngineHost.Setup(e => e.ActiveProject).Returns(hasEngineActiveProject ? new Project() : null!);
@@ -181,18 +182,21 @@ public sealed class ProjectManagementServiceTests
 
     [Theory]
     [InlineData(true, ProjectState.Draft, ProjectState.Draft, null, true, true, true)]
+    [InlineData(true, ProjectState.Review, ProjectState.Draft, null, true, true, true)]
+    [InlineData(true, ProjectState.Review, ProjectState.Ready, "Test_approver", true, true, true)]
     [InlineData(false, ProjectState.Draft, ProjectState.Draft, null, true, true, false)]
     [InlineData(false, ProjectState.Draft, ProjectState.Draft, null, true, false, true)]
-    [InlineData(true, ProjectState.Review, ProjectState.Draft, null, true, true, true)]
     [InlineData(false, ProjectState.Review, ProjectState.Draft, null, true, false, true)]
-    [InlineData(true, ProjectState.Review, ProjectState.Ready, "Test_approver", true, true, true)]
     [InlineData(false, ProjectState.Review, ProjectState.Ready, null, true, true, true)]
-    public async ValueTask Test_TrySaveNewVersionAsync(bool expectedSuccess, ProjectState oldProjectState, ProjectState newProjectState, string? approver, bool containsProject, bool isUpdateSuccessful, bool isRemoveSuccessful)
+    public async Task Test_TrySaveNewVersionAsync(bool expectedSuccess, ProjectState oldProjectState, ProjectState newProjectState, string? approver, bool containsProject, bool isUpdateSuccessful, bool isRemoveSuccessful)
     {
         // Arrange
         var projectId = Guid.NewGuid();
         _mockProjectRepository.Setup(r => r.FindAsync(It.IsAny<Guid>())).ReturnsAsync(new ProjectRecord
         {
+            Meta = new ProjectMetaRecord {
+                State = oldProjectState
+            },
             Steps = new List<StepRecord> { new StepRecord {
                 Ports = new List<PortRecord> { new PortRecord() }
             } },
@@ -206,6 +210,7 @@ public sealed class ProjectManagementServiceTests
         } : null!);
         _mockProjectRepository.Setup(r => r.TryUpdateAsync(It.IsAny<ProjectMetaRecord>())).ReturnsAsync(isUpdateSuccessful);
         _mockProjectRepository.Setup(r => r.TryRemoveRangeAsync(It.IsAny<IEnumerable<ProjectMetaRecord>>())).ReturnsAsync(isRemoveSuccessful);
+        _mockProjectRepository.Setup(r => r.AddAsync(It.IsAny<ProjectRecord>())).ReturnsAsync(new ProjectRecord());
 
         // Act
         ProjectManagementResult result = await _service.TrySaveAsync(projectId, newProjectState, "1.2.3", approver!, "Test_comment");
