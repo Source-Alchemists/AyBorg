@@ -9,7 +9,7 @@ public class ImageBinarizeTests : IDisposable
     private bool _disposedValue;
 
     [Fact]
-    public async ValueTask Test_TryRunAsync()
+    public async Task Test_TryRunAsync()
     {
         // Arrange
         using Image testImage = Image.Load("./resources/luna.jpg");

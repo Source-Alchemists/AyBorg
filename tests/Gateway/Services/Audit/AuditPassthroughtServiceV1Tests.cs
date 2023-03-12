@@ -24,7 +24,7 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
     }
 
     [Fact]
-    public async ValueTask Test_AddEntry()
+    public async Task Test_AddEntry()
     {
         // Arrange
         AsyncUnaryCall<Empty> mockCallAddFlowStep = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
@@ -60,7 +60,7 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
     }
 
     [Fact]
-    public async ValueTask Test_InvalidateEntry()
+    public async Task Test_InvalidateEntry()
     {
         // Arrange
         AsyncUnaryCall<Empty> mockCallAddFlowStep = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
@@ -79,7 +79,7 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
     [InlineData(Roles.Auditor, true)]
     [InlineData(Roles.Engineer, false)]
     [InlineData(Roles.Reviewer, false)]
-    public async ValueTask Test_GetChangesets(string userRole, bool isAllowed)
+    public async Task Test_GetChangesets(string userRole, bool isAllowed)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -99,7 +99,7 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
         }
         else
         {
-            await Assert.ThrowsAsync<RpcException>(() => _service.GetChangesets(new GetAuditChangesetsRequest(), mockServerStreamWriter.Object, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.GetChangesets(new GetAuditChangesetsRequest(), mockServerStreamWriter.Object, _serverCallContext));
         }
     }
 
@@ -108,7 +108,7 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
     [InlineData(Roles.Auditor, true)]
     [InlineData(Roles.Engineer, false)]
     [InlineData(Roles.Reviewer, false)]
-    public async ValueTask Test_GetChanges(string userRole, bool isAllowed)
+    public async Task Test_GetChanges(string userRole, bool isAllowed)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -128,7 +128,7 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
         }
         else
         {
-            await Assert.ThrowsAsync<RpcException>(() => _service.GetChanges(new GetAuditChangesRequest(), mockServerStreamWriter.Object, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.GetChanges(new GetAuditChangesRequest(), mockServerStreamWriter.Object, _serverCallContext));
         }
     }
 
@@ -137,7 +137,7 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
     [InlineData(Roles.Auditor, true)]
     [InlineData(Roles.Engineer, false)]
     [InlineData(Roles.Reviewer, false)]
-    public async ValueTask Test_GetReports(string userRole, bool isAllowed)
+    public async Task Test_GetReports(string userRole, bool isAllowed)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -157,7 +157,7 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
         }
         else
         {
-            await Assert.ThrowsAsync<RpcException>(() => _service.GetReports(new Empty(), mockServerStreamWriter.Object, _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.GetReports(new Empty(), mockServerStreamWriter.Object, _serverCallContext));
         }
     }
 
@@ -166,7 +166,7 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
     [InlineData(Roles.Auditor, true)]
     [InlineData(Roles.Engineer, false)]
     [InlineData(Roles.Reviewer, false)]
-    public async ValueTask Test_AddReport(string userRole, bool isAllowed)
+    public async Task Test_AddReport(string userRole, bool isAllowed)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -183,16 +183,16 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
         }
         else
         {
-            await Assert.ThrowsAsync<RpcException>(() => _service.AddReport(new AddAuditReportRequest(), _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.AddReport(new AddAuditReportRequest(), _serverCallContext));
         }
     }
 
     [Theory]
     [InlineData(Roles.Administrator, true)]
-    [InlineData(Roles.Auditor, true)]
+    [InlineData(Roles.Auditor, false)]
     [InlineData(Roles.Engineer, false)]
     [InlineData(Roles.Reviewer, false)]
-    public async ValueTask Test_DeleteReport(string userRole, bool isAllowed)
+    public async Task Test_DeleteReport(string userRole, bool isAllowed)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -209,7 +209,7 @@ public class AuditPassthroughServiceV1Tests : BaseGrpcServiceTests<AuditPassthro
         }
         else
         {
-            await Assert.ThrowsAsync<RpcException>(() => _service.DeleteReport(new AuditReport(), _serverCallContext));
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _service.DeleteReport(new AuditReport(), _serverCallContext));
         }
     }
 }

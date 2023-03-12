@@ -18,7 +18,7 @@ public class EventLogServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetEventsAsync()
+    public async Task Test_GetEventsAsync()
     {
         // Arrange
         var testEntry = new EventEntry

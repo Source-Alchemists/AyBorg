@@ -15,11 +15,13 @@ public class EventLogPassthroughServiceV1Tests : BaseGrpcServiceTests<EventLogPa
         _mockGrpcChannelService.Setup(m => m.GetChannelsByTypeName(It.IsAny<string>())).Returns(new List<ChannelInfo> {
             new ChannelInfo()
         });
+        AsyncUnaryCall<Empty> mockCall = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
+        _mockClient.Setup(m => m.LogEventAsync(It.IsAny<EventEntry>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCall);
         _service = new EventLogPassthroughServiceV1(_mockGrpcChannelService.Object);
     }
 
     [Fact]
-    public async ValueTask Test_LogEvent()
+    public async Task Test_LogEvent()
     {
         // Act
         Empty result = await _service.LogEvent(new EventEntry{
@@ -36,7 +38,7 @@ public class EventLogPassthroughServiceV1Tests : BaseGrpcServiceTests<EventLogPa
     }
 
     [Fact]
-    public async ValueTask Test_GetLogEvents()
+    public async Task Test_GetLogEvents()
     {
         // Arrange
         var request = new GetEventsRequest {

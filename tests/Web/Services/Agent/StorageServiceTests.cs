@@ -25,7 +25,7 @@ public class StorageServiceTest
     }
 
     [Fact]
-    public async ValueTask Test_GetDirectoriesAsync()
+    public async Task Test_GetDirectoriesAsync()
     {
         // Arrange
         var response = new GetDirectoriesResponse();

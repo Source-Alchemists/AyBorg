@@ -33,7 +33,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetStepsAsync()
+    public async Task Test_GetStepsAsync()
     {
         // Arrange
         var getFlowStepsResponse = new GetFlowStepsResponse();
@@ -78,7 +78,7 @@ public class FlowServiceTests
     [InlineData(true, true, false)]
     [InlineData(true, false, true)]
     [InlineData(false, true, true)]
-    public async ValueTask Test_GetStepAsync(bool hasStep, bool updatePorts, bool skipOutputPorts)
+    public async Task Test_GetStepAsync(bool hasStep, bool updatePorts, bool skipOutputPorts)
     {
         // Arrange
         var getFlowStepsResponse = new GetFlowStepsResponse();
@@ -133,7 +133,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetLinksAsync()
+    public async Task Test_GetLinksAsync()
     {
         // Arrange
         var getFlowLinksResponse = new GetFlowLinksResponse();
@@ -153,7 +153,7 @@ public class FlowServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_GetLinkAsync(bool hasLink)
+    public async Task Test_GetLinkAsync(bool hasLink)
     {
         // Arrange
         var getFlowLinksResponse = new GetFlowLinksResponse();
@@ -182,7 +182,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_AddStepAsync()
+    public async Task Test_AddStepAsync()
     {
         // Arrange
         AsyncUnaryCall<AddFlowStepResponse> call = GrpcCallHelpers.CreateAsyncUnaryCall(new AddFlowStepResponse());
@@ -198,7 +198,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryRemoveStepAsync()
+    public async Task Test_TryRemoveStepAsync()
     {
         // Arrange
         AsyncUnaryCall<Empty> call = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
@@ -212,7 +212,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryMoveStepAsync()
+    public async Task Test_TryMoveStepAsync()
     {
         // Arrange
         AsyncUnaryCall<Empty> call = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
@@ -228,7 +228,7 @@ public class FlowServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_AddLinkAsync(bool notLinking)
+    public async Task Test_AddLinkAsync(bool notLinking)
     {
         // Arrange
         var expectedId = Guid.NewGuid();
@@ -255,7 +255,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryRemoveLinkAsync()
+    public async Task Test_TryRemoveLinkAsync()
     {
         // Arrange
         AsyncUnaryCall<LinkFlowPortsResponse> callGetFlowLinks = GrpcCallHelpers.CreateAsyncUnaryCall(new LinkFlowPortsResponse());
@@ -273,7 +273,7 @@ public class FlowServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_GetPortAsync(bool hasPort)
+    public async Task Test_GetPortAsync(bool hasPort)
     {
         // Arrange
         var response = new GetFlowPortsResponse();
@@ -301,7 +301,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TrySetPortValueAsync()
+    public async Task Test_TrySetPortValueAsync()
     {
         // Arrange
         AsyncUnaryCall<Empty> call = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());

@@ -27,7 +27,7 @@ public class AuditServiceV1Tests : BaseGrpcServiceTests<AuditServiceV1, Ayborg.G
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_AddEntry(bool canAdd)
+    public async Task Test_AddEntry(bool canAdd)
     {
         // Arrange
         var request = new AuditEntry
@@ -70,7 +70,7 @@ public class AuditServiceV1Tests : BaseGrpcServiceTests<AuditServiceV1, Ayborg.G
     [InlineData(true, ServiceTypes.Agent)]
     [InlineData(false, ServiceTypes.Agent)]
     [InlineData(false, ServiceTypes.Analytics)]
-    public async ValueTask Test_InvalidateEntry(bool canRemove, string serviceType)
+    public async Task Test_InvalidateEntry(bool canRemove, string serviceType)
     {
         // Arrange
         var request = new InvalidateAuditEntryRequest
@@ -96,7 +96,7 @@ public class AuditServiceV1Tests : BaseGrpcServiceTests<AuditServiceV1, Ayborg.G
     }
 
     [Fact]
-    public async ValueTask Test_GetChangesets()
+    public async Task Test_GetChangesets()
     {
         // Arrange
         _mockAgentAuditService.Setup(m => m.GetChangesets()).Returns(new List<ChangesetRecord> {
@@ -114,7 +114,7 @@ public class AuditServiceV1Tests : BaseGrpcServiceTests<AuditServiceV1, Ayborg.G
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_GetChanges(bool containsChangesets)
+    public async Task Test_GetChanges(bool containsChangesets)
     {
         // Arrange
         var changesetAId = Guid.NewGuid();
@@ -162,7 +162,7 @@ public class AuditServiceV1Tests : BaseGrpcServiceTests<AuditServiceV1, Ayborg.G
     [InlineData(true, true)]
     [InlineData(true, false)]
     [InlineData(false, false)]
-    public async ValueTask Test_AddReport(bool containsRequestedChangesets, bool canAdd)
+    public async Task Test_AddReport(bool containsRequestedChangesets, bool canAdd)
     {
         // Arrange
         var changesetId = Guid.NewGuid();
@@ -205,7 +205,7 @@ public class AuditServiceV1Tests : BaseGrpcServiceTests<AuditServiceV1, Ayborg.G
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_DeleteReport(bool canRemove)
+    public async Task Test_DeleteReport(bool canRemove)
     {
         // Arrang
         var request = new AuditReport
@@ -232,7 +232,7 @@ public class AuditServiceV1Tests : BaseGrpcServiceTests<AuditServiceV1, Ayborg.G
     }
 
     [Fact]
-    public async ValueTask Test_GetReports()
+    public async Task Test_GetReports()
     {
         // Arrange
         var mockServerStreamWriter = new Mock<IServerStreamWriter<AuditReport>>();

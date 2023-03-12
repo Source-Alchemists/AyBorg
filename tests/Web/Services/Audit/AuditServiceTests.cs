@@ -19,7 +19,7 @@ public class AuditServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetChangesetsAsync()
+    public async Task Test_GetChangesetsAsync()
     {
         // Arrange
         AsyncServerStreamingCall<AuditChangeset> callStream = GrpcCallHelpers.CreateAsyncServerStreamingCall(new List<AuditChangeset> {
@@ -40,7 +40,7 @@ public class AuditServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetChanges()
+    public async Task Test_GetChanges()
     {
         // Arrange
         AsyncServerStreamingCall<AuditChange> callStream = GrpcCallHelpers.CreateAsyncServerStreamingCall(new List<AuditChange> {
@@ -60,7 +60,7 @@ public class AuditServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetReports()
+    public async Task Test_GetReports()
     {
         // Arrange
         AsyncServerStreamingCall<AuditReport> callStream = GrpcCallHelpers.CreateAsyncServerStreamingCall(new List<AuditReport> {
@@ -82,7 +82,7 @@ public class AuditServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_TryAddReport(bool canAdd)
+    public async Task Test_TryAddReport(bool canAdd)
     {
         // Arrange
         var changesets = new List<Shared.Models.AuditChangeset> {
@@ -113,7 +113,7 @@ public class AuditServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_TryDeleteReport(bool canAdd)
+    public async Task Test_TryDeleteReport(bool canAdd)
     {
         // Arrange
         var report = new Shared.Models.AuditReport {

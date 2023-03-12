@@ -33,7 +33,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetMetasAsync()
+    public async Task Test_GetMetasAsync()
     {
         // Arrange
         var response = new GetProjectMetasResponse();
@@ -53,7 +53,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetMetasAsync_Failed()
+    public async Task Test_GetMetasAsync_Failed()
     {
         // Arrange
         _mockProjectManagementClient.Setup(m => m.GetProjectMetasAsync(It.IsAny<GetProjectMetasRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
@@ -66,7 +66,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetActiveMetaAsync()
+    public async Task Test_GetActiveMetaAsync()
     {
         // Arrange
         var response = new GetProjectMetasResponse();
@@ -94,7 +94,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetActiveMetaAsync_Failed()
+    public async Task Test_GetActiveMetaAsync_Failed()
     {
         // Arrange
         _mockProjectManagementClient.Setup(m => m.GetProjectMetasAsync(It.IsAny<GetProjectMetasRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
@@ -103,11 +103,11 @@ public class ProjectManagementServiceTests
         Shared.Models.Agent.ProjectMeta result = await _service.GetActiveMetaAsync();
 
         // Assert
-        Assert.Null(result);
+        Assert.Equal(new Shared.Models.Agent.ProjectMeta(), result);
     }
 
     [Fact]
-    public async ValueTask Test_()
+    public async Task Test_()
     {
         // Arrange
         var response = new CreateProjectResponse
@@ -129,7 +129,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_CreateAsync_Failed()
+    public async Task Test_CreateAsync_Failed()
     {
         // Arrange
         _mockProjectManagementClient.Setup(m => m.CreateProjectAsync(It.IsAny<CreateProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
@@ -142,7 +142,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryDeleteAsync()
+    public async Task Test_TryDeleteAsync()
     {
         // Arrange
         var response = new Empty();
@@ -157,7 +157,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryDeleteAsync_Failed()
+    public async Task Test_TryDeleteAsync_Failed()
     {
         // Arrange
         _mockProjectManagementClient.Setup(m => m.DeleteProjectAsync(It.IsAny<DeleteProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
@@ -170,7 +170,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryActivateAsync()
+    public async Task Test_TryActivateAsync()
     {
         // Arrange
         var response = new Empty();
@@ -185,7 +185,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryActivateAsync_Failed()
+    public async Task Test_TryActivateAsync_Failed()
     {
         // Arrange
         _mockProjectManagementClient.Setup(m => m.ActivateProjectAsync(It.IsAny<ActivateProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
@@ -198,7 +198,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TrySaveAsync()
+    public async Task Test_TrySaveAsync()
     {
         // Arrange
         var response = new Empty();
@@ -218,7 +218,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TrySaveAsync_Failed()
+    public async Task Test_TrySaveAsync_Failed()
     {
         // Arrange
         _mockProjectManagementClient.Setup(m => m.SaveProjectAsync(It.IsAny<SaveProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
@@ -236,7 +236,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryApproveAsync()
+    public async Task Test_TryApproveAsync()
     {
         // Arrange
         var response = new Empty();
@@ -256,7 +256,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryApproveAsync_Failed()
+    public async Task Test_TryApproveAsync_Failed()
     {
         // Arrange
         _mockProjectManagementClient.Setup(m => m.ApproveProjectAsync(It.IsAny<ApproveProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));

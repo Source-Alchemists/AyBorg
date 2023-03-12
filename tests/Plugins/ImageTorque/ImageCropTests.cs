@@ -14,7 +14,7 @@ public class ImageCropTests : IDisposable
     [InlineData(true, 10, 10)]
     [InlineData(false, 0, 10)]
     [InlineData(false, 10, 0)]
-    public async ValueTask Test_TryRunAsync(bool expectedResult, int width, int height)
+    public async Task Test_TryRunAsync(bool expectedResult, int width, int height)
     {
         // Arrange
         using Image testImage = Image.Load("./resources/luna.jpg");

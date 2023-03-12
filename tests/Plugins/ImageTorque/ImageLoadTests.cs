@@ -18,7 +18,7 @@ public class ImageLoadTests : IDisposable
     }
 
     [Fact]
-    public async ValueTask Test_TryRunAsync()
+    public async Task Test_TryRunAsync()
     {
         // Arrange
         _mockEnvironment.Setup(m => m.StorageLocation).Returns("./");

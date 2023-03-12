@@ -12,7 +12,7 @@ public class ImageMirrorTests : IDisposable
     [InlineData(false, false)]
     [InlineData(true, false)]
     [InlineData(true, true)]
-    public async ValueTask Test_TryRunAsync(bool mirrorVertical, bool mirrorHorizontal)
+    public async Task Test_TryRunAsync(bool mirrorVertical, bool mirrorHorizontal)
     {
         // Arrange
         using Image testImage = Image.Load("./resources/luna.jpg");

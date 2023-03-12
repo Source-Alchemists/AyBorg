@@ -19,7 +19,7 @@ public class AgentsOverviewServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_UpdateAsync()
+    public async Task Test_UpdateAsync()
     {
         // Arrange
         _mockRegistryService.Setup(m => m.ReceiveServicesAsync(It.IsAny<string>())).ReturnsAsync(new List<ServiceInfoEntry> {
@@ -57,9 +57,9 @@ public class AgentsOverviewServiceTests
         Assert.Equal(1, _service.ActiveAgentsCount);
         Assert.Equal(3, _service.InactiveAgentsCount);
         Assert.Equal(4, _service.AgentServices.Count());
-        Assert.Single(_service.AgentServices.Where(a => a.Name.Equals("None")));
-        Assert.Single(_service.AgentServices.Where(a => a.Name.Equals("ProjectName")));
-        Assert.Single(_service.AgentServices.Where(a => a.Name.Equals("ProjectName2")));
-        Assert.Single(_service.AgentServices.Where(a => a.Name.Equals("ProjectNam3")));
+        Assert.Single(_service.AgentServices.Where(a => a.Name.Equals("Agent-NoActiveProject")));
+        Assert.Single(_service.AgentServices.Where(a => a.Name.Equals("Agent - 1")));
+        Assert.Single(_service.AgentServices.Where(a => a.Name.Equals("Agent - 2")));
+        Assert.Single(_service.AgentServices.Where(a => a.Name.Equals("Agent-ActiveProject")));
     }
 }

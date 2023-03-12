@@ -19,11 +19,16 @@ public class EventServiceV1Tests
     public EventServiceV1Tests()
     {
         _serverCallContext = TestServerCallContext.Create(null, new CancellationTokenSource().Token);
+        _mockEventStorage.Setup(m => m.GetRecords()).Returns(new List<EventRecord> {
+            new EventRecord {
+                Timestamp = DateTime.UtcNow
+            }
+        });
         _service = new EventLogServiceV1(s_logger, _mockEventStorage.Object);
     }
 
     [Fact]
-    public async ValueTask Test_LogEvent()
+    public async Task Test_LogEvent()
     {
         // Arrange
         var testEntry = new EventEntry
@@ -45,7 +50,7 @@ public class EventServiceV1Tests
     }
 
     [Fact]
-    public async ValueTask Test_GetLogEvents()
+    public async Task Test_GetLogEvents()
     {
          // Arrange
         var request = new GetEventsRequest {
@@ -61,6 +66,6 @@ public class EventServiceV1Tests
         await _service.GetLogEvents(request, mockServerStreamWriter.Object, _serverCallContext);
 
         // Assert
-        mockServerStreamWriter.Verify(w => w.WriteAsync(It.IsAny<EventEntry>(), It.IsAny<CancellationToken>()));
+        mockServerStreamWriter.Verify(w => w.WriteAsync(It.IsAny<EventEntry>()));
     }
 }
