@@ -13,6 +13,10 @@ legend {
     color: var(--mud-palette-text-primary);
 }
 
+.mud-full-height {
+    height: 100%;
+}
+
 .mud-drawer {
     position: fixed !important;
 }

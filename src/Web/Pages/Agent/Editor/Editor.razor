@@ -12,100 +12,77 @@ else
 {
     <PageTitle>AyBorg - Editor (@_serviceName)</PageTitle>
 }
-<MudGrid hidden="@(_projectMeta?.IsActive != false)">
-    <MudItem xs="12">
-        <MudCard Class="rounded-lg">
-            <MudCardHeader>
-                <CardHeaderAvatar>
-                    <MudIcon Icon="@Icons.Filled.Info" Size="Size.Large" />
-                </CardHeaderAvatar>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">No active project!</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudText Typo="Typo.body2">Please create a new project or activate an existing one.</MudText>
-            </MudCardContent>
-        </MudCard>
-    </MudItem>
-</MudGrid>
 <AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
-@if (_projectMeta?.IsActive != false)
+@if (_isProjectLoaded)
 {
-    <MudToolBar Class="px-0" hidden="@(_projectMeta == null)">
-    @if (_projectMeta != null)
-        {
-            @if (_projectMeta.State == ProjectState.Draft)
-            {
-                <MudTooltip Text="Draft">
-                    <MudIcon Icon="@Icons.Filled.GppBad" Size="Size.Large" Color="Color.Error" />
-                </MudTooltip>
-            }
-            else if (_projectMeta.State == ProjectState.Review)
-            {
-                <MudTooltip Text="Review">
-                    <MudIcon Icon="@Icons.Filled.SafetyCheck" Size="Size.Large" Color="Color.Warning" />
-                </MudTooltip>
-            }
-            else if (_projectMeta.State == ProjectState.Ready)
-            {
-                <MudTooltip Text="Ready">
-                    <MudIcon Icon="@Icons.Filled.GppGood" Size="Size.Large" Color="Color.Info" />
-                </MudTooltip>
-            }
-            <MudText Typo="Typo.h5" Class="pl-3">@_projectMeta.Name</MudText>
-            @if(_projectMeta.State != ProjectState.Draft)
-            {
-                <MudTooltip Text="Read only mode">
-                    <MudIcon Icon="@Icons.Filled.Lock" Size="Size.Medium" Color="Color.Default" Class="pl-2" />
-                </MudTooltip>
-            }
-        }
+    <MudToolBar Class="px-0">
+    <MudTooltip Text="Draft" hidden="@(_projectState != ProjectState.Draft)">
+        <MudIcon Icon="@Icons.Filled.GppBad" Size="Size.Large" Color="Color.Error" />
+    </MudTooltip>
+    <MudTooltip Text="Review" hidden="@(_projectState != ProjectState.Review)">
+        <MudIcon Icon="@Icons.Filled.SafetyCheck" Size="Size.Large" Color="Color.Warning" />
+    </MudTooltip>
+    <MudTooltip Text="Ready" hidden="@(_projectState != ProjectState.Ready)">
+        <MudIcon Icon="@Icons.Filled.GppGood" Size="Size.Large" Color="Color.Info" />
+    </MudTooltip>
+    <MudText Typo="Typo.h5" Class="pl-3">@_projectName</MudText>
+    <MudTooltip Text="Read only mode" hidden=@(_projectState == ProjectState.Draft)>
+        <MudIcon Icon="@Icons.Filled.Lock" Size="Size.Medium" Color="Color.Default" Class="pl-2" />
+    </MudTooltip>
 
-        <MudSpacer />
-        @if (!_areSubComponentsHidden)
-        {
-            <RuntimeToolbar ServiceUniqueName="@_serviceUniqueName" />
-        }
-        <MudSpacer />
-        <MudTooltip Text="Save as draft">
-            <MudIconButton Icon="@Icons.Filled.SaveAlt" Color="Color.Primary" OnClick="@OnProjectSaveClicked" Disabled=@(_projectMeta?.State != ProjectState.Draft) />
-        </MudTooltip>
-        <MudTooltip Text="Settings">
-            <MudIconButton Icon="@Icons.Filled.Settings" Color="Color.Default" OnClick="@OnProjectSettingsClicked" />
-        </MudTooltip>
-    </MudToolBar>
+    <MudSpacer />
+    @if (!_areSubComponentsHidden)
+    {
+        <RuntimeToolbar ServiceUniqueName="@_serviceUniqueName" />
+    }
+    <MudSpacer />
+    <MudTooltip Text="Save as draft">
+        <MudIconButton Icon="@Icons.Filled.SaveAlt" Color="Color.Primary" OnClick="@OnProjectSaveClicked"
+        Disabled=@(_projectState != ProjectState.Draft) />
+    </MudTooltip>
+    <MudTooltip Text="Settings">
+        <MudIconButton Icon="@Icons.Filled.Settings" Color="Color.Default" OnClick="@OnProjectSettingsClicked" />
+    </MudTooltip>
+</MudToolBar>
 
-    <div class="page-loading-bar">
-        <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isProjectServerWaiting)"/>
-    </div>
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
 
-    <MudGrid Class="editor-container" hidden="@(_projectMeta == null)">
-        @if (_projectMeta != null)
-        {
-            @if (_projectMeta.State == ProjectState.Draft)
+<MudGrid Class="editor-container">
+    @if (_projectState == ProjectState.Draft)
+    {
+        <MudHidden Breakpoint="Breakpoint.Sm" Invert="false">
+            <MudItem md="5" lg="3" xl="2">
+                @if (!_areSubComponentsHidden)
+                {
+                    <StepsSelection ServiceUniqueName="@_serviceUniqueName" />
+                }
+            </MudItem>
+        </MudHidden>
+        <MudItem xs="12" md="7" lg="9" xl="10" class="mud-width-full">
+            @if (!_areSubComponentsHidden)
             {
-                <MudHidden Breakpoint="Breakpoint.Sm" Invert="false">
-                    <MudItem md="5" lg="3" xl="2">
-                        @if (!_areSubComponentsHidden)
-                        {
-                            <StepsSelection ServiceUniqueName="@_serviceUniqueName" />
-                        }
-                    </MudItem>
-                </MudHidden>
-                <MudItem xs="12" md="7" lg="9" xl="10" class="mud-width-full">
-        @if (!_areSubComponentsHidden)
-                    {
-                        <FlowDiagram />
-                    }
-                </MudItem>
+                <FlowDiagram />
             }
-            else
-            {
-                <MudItem xs="12" class="mud-width-full">
-                    <FlowDiagram Disabled/>
-                </MudItem>
-            }
-        }
-    </MudGrid>
+        </MudItem>
+    }
+    else
+    {
+        <MudItem xs="12" class="mud-width-full">
+            <FlowDiagram Disabled />
+        </MudItem>
+    }
+</MudGrid>
+}
+else
+{
+    <PagePlaceholder>
+        <MudButton Class="center-horizontal mt-1"
+                    StartIcon="@Icons.Filled.AddBox"
+                    Color="Color.Primary"
+                    Variant="Variant.Filled"
+                    OnClick="OnCreateProjectClicked"
+                    hidden=@(_isLoading)>Create project</MudButton>
+    </PagePlaceholder>
 }

@@ -80,7 +80,7 @@ public class ProjectManagementService : IProjectManagementService
     public async ValueTask<Shared.Models.Agent.ProjectMeta> GetActiveMetaAsync(string serviceUniqueName)
     {
         IEnumerable<Shared.Models.Agent.ProjectMeta> projectMetas = await GetMetasAsync(serviceUniqueName);
-        return projectMetas.FirstOrDefault(pm => pm.IsActive)!;
+        return projectMetas.FirstOrDefault(pm => pm.IsActive) ?? new Shared.Models.Agent.ProjectMeta();
     }
 
     /// <summary>

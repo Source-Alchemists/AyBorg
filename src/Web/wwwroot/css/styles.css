@@ -29,6 +29,12 @@
     -webkit-backdrop-filter: blur(12px);
 }
 
+.center-horizontal {
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, 0);
+}
+
 .flex-self-center {
     display: flex;
     flex-direction: row;
@@ -45,6 +51,20 @@
 
 .page-loading-bar {
     height: 4px;
+}
+
+.page-placeholder-image {
+    position: relative;
+    width: 50%;
+    height: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    opacity: 0.8;
+}
+.page-placeholder-action {
+    position: relative;
+    top: 25%;
 }
 
 .editor-container {
