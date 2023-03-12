@@ -24,7 +24,7 @@ public class ProjectSettingsServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetSettingsRecordAsync()
+    public async Task Test_GetSettingsRecordAsync()
     {
         // Act
         ProjectSettingsRecord result = await _service.GetSettingsRecordAsync(Guid.NewGuid());
@@ -37,7 +37,7 @@ public class ProjectSettingsServiceTests
     [InlineData(false, false)]
     [InlineData(true, false)]
     [InlineData(true, true)]
-    public async ValueTask Test_TryUpdateActiveProjectSettingsAsync(bool hasMeta, bool isActive)
+    public async Task Test_TryUpdateActiveProjectSettingsAsync(bool hasMeta, bool isActive)
     {
         // Arrange
         var expectedId = Guid.NewGuid();

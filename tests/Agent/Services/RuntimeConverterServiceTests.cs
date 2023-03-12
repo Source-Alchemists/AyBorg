@@ -29,7 +29,7 @@ public class RuntimeConverterServiceTests
     [InlineData(true, PortBrand.Enum, PortBrand.Enum)]
     [InlineData(true, PortBrand.Rectangle, null)]
     [InlineData(true, PortBrand.Image, null)]
-    public async ValueTask Test_TryUpdatePortValueAsync(bool expectedSuccess, PortBrand portBrand, object value)
+    public async Task Test_TryUpdatePortValueAsync(bool expectedSuccess, PortBrand portBrand, object value)
     {
         // Arrange
         if (portBrand == PortBrand.Rectangle)

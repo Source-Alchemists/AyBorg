@@ -25,7 +25,7 @@ public class AuditProviderServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_AddAsync(bool canAdd)
+    public async Task Test_AddAsync(bool canAdd)
     {
         // Arrange
         var project = new ProjectRecord {
@@ -62,7 +62,7 @@ public class AuditProviderServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_TryInvalidateAsync(bool canInvalidate)
+    public async Task Test_TryInvalidateAsync(bool canInvalidate)
     {
         // Arrange
         if (canInvalidate)

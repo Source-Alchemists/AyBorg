@@ -15,7 +15,7 @@ public class EngineTests
     /// Start -> Step1 -> Step2 -> End
     /// </summary>
     [Fact]
-    public async ValueTask TestStartSingleRunLinear()
+    public async Task TestStartSingleRunLinear()
     {
         // Arrange
         var project = new Project();
@@ -66,7 +66,7 @@ public class EngineTests
     ///        |--------> Step2b -^
     /// </summary>
     [Fact]
-    public async ValueTask TestStartSingleRunParallel()
+    public async Task TestStartSingleRunParallel()
     {
         // Arrange
         var project = new Project();
@@ -121,7 +121,7 @@ public class EngineTests
     }
 
     [Fact]
-    public async ValueTask Test_StopContinuousRun()
+    public async Task Test_StopContinuousRun()
     {
         // Arrange
         var project = new Project();
@@ -147,7 +147,7 @@ public class EngineTests
     }
 
     [Fact]
-    public async ValueTask Test_AbortContinuousRun()
+    public async Task Test_AbortContinuousRun()
     {
         // Arrange
         var project = new Project();
