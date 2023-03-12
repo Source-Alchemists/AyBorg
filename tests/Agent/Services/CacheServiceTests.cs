@@ -1,10 +1,8 @@
 using AyBorg.Agent.Services;
-using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Agent;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
 namespace AyBorg.Agent.Tests.Services;

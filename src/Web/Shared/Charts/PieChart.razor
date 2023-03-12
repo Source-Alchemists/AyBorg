@@ -1,0 +1,14 @@
+@if (_isLoading)
+{
+    <MudSkeleton SkeletonType="SkeletonType.Circle" Width="@Width" Height="@Height" />
+    <MudStack Row="true" Class="mud-full-width px-10">
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="10px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="10px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="10px" />
+        <MudSkeleton SkeletonType="SkeletonType.Rectangle" Width="100%" Height="10px" />
+    </MudStack>
+}
+else
+{
+    <MudChart ChartType="ChartType.Pie" InputData="@Data" InputLabels="@Labels" Width="@Width" Height="@Height" />
+}

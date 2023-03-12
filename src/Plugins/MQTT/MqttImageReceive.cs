@@ -1,3 +1,4 @@
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
 using ImageTorque;
@@ -24,11 +25,14 @@ public sealed class MqttImageReceive : BaseMqttReceiveStep
     {
         if (message.Payload == null)
         {
-            _logger.LogWarning("Received message with null payload");
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Received message with null payload");
             return;
         }
 
-        _logger.LogTrace("Received message from topic {topic}", message.Topic);
+        if (_logger.IsEnabled(LogLevel.Trace))
+        {
+            _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Received message from topic {topic}", message.Topic);
+        }
         using MemoryStream stream = _memoryStreamManager.GetStream(message.Payload);
 
         var image = Image.Load(stream);

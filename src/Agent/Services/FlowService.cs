@@ -1,4 +1,5 @@
 using System.Runtime.CompilerServices;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
 
@@ -41,7 +42,7 @@ internal sealed class FlowService : IFlowService
     {
         if (_runtimeHost.ActiveProject == null)
         {
-            _logger.LogWarning("No active project found.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project found.");
             return Enumerable.Empty<IStepProxy>();
         }
 
@@ -55,7 +56,7 @@ internal sealed class FlowService : IFlowService
     {
         if (_runtimeHost.ActiveProject == null)
         {
-            _logger.LogWarning("No active project found.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project found.");
             return Enumerable.Empty<PortLink>();
         }
 
@@ -71,14 +72,14 @@ internal sealed class FlowService : IFlowService
     {
         if (_runtimeHost.ActiveProject == null)
         {
-            _logger.LogWarning("No active project found.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project found.");
             return null!;
         }
 
         IStepProxy? targetStep = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Ports.Any(p => p.Id == portId));
         if (targetStep == null)
         {
-            _logger.LogTrace("Port with id '{portId}' not found. Already removed.", portId);
+            _logger.LogTrace(new EventId((int)EventLogType.ProjectState), "Port with id '{portId}' not found. Already removed.", portId);
             return null!;
         }
 
@@ -96,7 +97,7 @@ internal sealed class FlowService : IFlowService
     {
         if (_runtimeHost.ActiveProject == null)
         {
-            _logger.LogWarning("No active project found.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project found.");
             return null!;
         }
 
@@ -104,7 +105,7 @@ internal sealed class FlowService : IFlowService
 
         if (pluginProxy == null)
         {
-            _logger.LogWarning("Step with id '{stepId}' not found.", stepId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Step with id '{stepId}' not found.", stepId);
             return null!;
         }
 
@@ -117,7 +118,9 @@ internal sealed class FlowService : IFlowService
         {
             AddedSteps = new[] { stepProxy.Id.ToString() }
         });
-        return await ValueTask.FromResult(stepProxy);
+
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Step [{stepName}] added.", stepProxy.Name);
+        return stepProxy;
     }
 
     /// <summary>
@@ -128,7 +131,7 @@ internal sealed class FlowService : IFlowService
     {
         if (_runtimeHost.ActiveProject == null)
         {
-            _logger.LogWarning("No active project found.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project found.");
             return false;
         }
 
@@ -136,7 +139,7 @@ internal sealed class FlowService : IFlowService
         IStepProxy? step = project.Steps.FirstOrDefault(s => s.Id == stepId);
         if (step == null)
         {
-            _logger.LogWarning("Step with id '{stepId}' not found.", stepId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Step with id '{stepId}' not found.", stepId);
             return false;
         }
 
@@ -167,6 +170,7 @@ internal sealed class FlowService : IFlowService
             RemovedLinks = removedLinks.Select(l => l.Id.ToString()).ToArray()
         });
 
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Step [{stepName}] removed.", step.Name);
         return true;
     }
 
@@ -181,14 +185,14 @@ internal sealed class FlowService : IFlowService
     {
         if (_runtimeHost.ActiveProject == null)
         {
-            _logger.LogWarning("No active project found.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project found.");
             return false;
         }
 
         IStepProxy? step = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Id == stepId);
         if (step == null)
         {
-            _logger.LogWarning("Step with id '{stepId}' not found.", stepId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Step with id '{stepId}' not found.", stepId);
             return false;
         }
         step.X = x;
@@ -212,7 +216,7 @@ internal sealed class FlowService : IFlowService
     {
         if (_runtimeHost.ActiveProject == null)
         {
-            _logger.LogWarning("No active project found.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project found.");
             return null!;
         }
 
@@ -250,7 +254,7 @@ internal sealed class FlowService : IFlowService
         if (sourceStep!.Links.Any(x => x.SourceId == sourcePortId && x.TargetId == targetPortId)
             || targetStep!.Links.Any(x => x.SourceId == sourcePortId && x.TargetId == targetPortId))
         {
-            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are already linked.", sourcePortId, targetPortId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Ports with ids [{sourcePortName}] and [{targetPortName}] are already linked.", sourcePort!.Name, targetPort!.Name);
             return null!;
         }
 
@@ -266,6 +270,7 @@ internal sealed class FlowService : IFlowService
             AddedLinks = new[] { link.Id.ToString() }
         });
 
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Port linked [{sourcePortName}] to [{targetPortName}].", sourcePort.Name, targetPort.Name);
         return link;
     }
 
@@ -278,14 +283,14 @@ internal sealed class FlowService : IFlowService
     {
         if (_runtimeHost.ActiveProject == null)
         {
-            _logger.LogWarning("No active project found.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project found.");
             return false;
         }
 
         IEnumerable<IStepProxy> steps = _runtimeHost.ActiveProject.Steps.Where(s => s.Links.Any(l => l.Id == linkId));
         if (!steps.Any())
         {
-            _logger.LogTrace("Link with id '{linkId}' not found. Already removed.", linkId);
+            _logger.LogTrace(new EventId((int)EventLogType.ProjectState), "Link with id '{linkId}' not found. Already removed.", linkId);
             return true;
         }
 
@@ -307,6 +312,7 @@ internal sealed class FlowService : IFlowService
             RemovedLinks = new[] { link.Id.ToString() }
         });
 
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Port unlinked [{sourcePortName}] from [{targetPortName}].", sourcePort.Name, targetPort.Name);
         return true;
     }
 
@@ -320,14 +326,14 @@ internal sealed class FlowService : IFlowService
     {
         if (_runtimeHost.ActiveProject == null)
         {
-            _logger.LogWarning("No active project found.");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project found.");
             return false;
         }
 
         IStepProxy? targetStep = _runtimeHost.ActiveProject.Steps.FirstOrDefault(s => s.Ports.Any(p => p.Id == portId));
         if (targetStep == null)
         {
-            _logger.LogWarning("Port with id '{portId}' not found.", portId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Port with id [{portId}] not found.", portId);
             return false;
         }
 
@@ -338,7 +344,16 @@ internal sealed class FlowService : IFlowService
             ChangedPorts = new[] { port.Id.ToString() }
         });
 
-        return await _runtimeConverterService.TryUpdatePortValueAsync(port, value);
+        if (await _runtimeConverterService.TryUpdatePortValueAsync(port, value))
+        {
+            _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Port [{portName}] updated.", port.Name);
+            return true;
+        }
+        else
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Port [{portName}] update failed.", port.Name);
+            return false;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -346,19 +361,19 @@ internal sealed class FlowService : IFlowService
     {
         if (sourcePort == null || targetPort == null)
         {
-            _logger.LogWarning("Ports with ids '{sourcePortId}' and/or '{targetPortId}' not found.", sourcePortId, targetPortId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Ports with ids [{sourcePortId}] and/or [{targetPortId}] not found.", sourcePortId, targetPortId);
             return false;
         }
 
         if (sourcePort.Direction != PortDirection.Output || targetPort.Direction != PortDirection.Input)
         {
-            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are not compatible.", sourcePortId, targetPortId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Ports with ids [{sourcePortId}] and [{targetPortId}] are not compatible.", sourcePortId, targetPortId);
             return false;
         }
 
         if (!PortConverter.IsConvertable(sourcePort, targetPort))
         {
-            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are not convertable.", sourcePortId, targetPortId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Ports with ids [{sourcePortId}] and [{targetPortId}] are not convertable.", sourcePortId, targetPortId);
             return false;
         }
 
@@ -370,7 +385,7 @@ internal sealed class FlowService : IFlowService
     {
         if (sourceStep!.Id == targetStep!.Id)
         {
-            _logger.LogWarning("Ports with ids '{sourcePortId}' and '{targetPortId}' are in the same step.", sourcePortId, targetPortId);
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "Ports with ids [{sourcePortId}] and [{targetPortId}] are in the same step.", sourcePortId, targetPortId);
             return false;
         }
 

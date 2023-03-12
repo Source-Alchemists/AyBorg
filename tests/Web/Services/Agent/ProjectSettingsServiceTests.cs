@@ -22,7 +22,7 @@ public class ProjectSettingsServiceTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async ValueTask Test_GetProjectSettingsAsync(bool isSuccessful)
+    public async Task Test_GetProjectSettingsAsync(bool isSuccessful)
     {
         // Arrange
         if (isSuccessful)
@@ -55,7 +55,7 @@ public class ProjectSettingsServiceTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async ValueTask Test_TryUpdateProjectCommunicationSettingsAsync(bool isSuccessful)
+    public async Task Test_TryUpdateProjectCommunicationSettingsAsync(bool isSuccessful)
     {
         // Arrange
         if (isSuccessful)

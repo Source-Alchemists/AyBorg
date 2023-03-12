@@ -22,7 +22,7 @@ public class StorageServiceV1Tests : BaseGrpcServiceTests<StorageServiceV1, Stor
     [InlineData(Roles.Reviewer, true)]
     [InlineData(Roles.Auditor, true)]
     [InlineData("", false)]
-    public async ValueTask Test_GetDirectories(string userRole, bool isAllowed)
+    public async Task Test_GetDirectories(string userRole, bool isAllowed)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });

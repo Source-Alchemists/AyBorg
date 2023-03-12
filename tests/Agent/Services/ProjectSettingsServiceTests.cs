@@ -1,6 +1,5 @@
 using AyBorg.Agent.Services;
-using AyBorg.Database.Data;
-using AyBorg.SDK.Data.DAL;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Projects;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -25,7 +24,7 @@ public class ProjectSettingsServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetSettingsRecordAsync()
+    public async Task Test_GetSettingsRecordAsync()
     {
         // Act
         ProjectSettingsRecord result = await _service.GetSettingsRecordAsync(Guid.NewGuid());
@@ -38,7 +37,7 @@ public class ProjectSettingsServiceTests
     [InlineData(false, false)]
     [InlineData(true, false)]
     [InlineData(true, true)]
-    public async ValueTask Test_TryUpdateActiveProjectSettingsAsync(bool hasMeta, bool isActive)
+    public async Task Test_TryUpdateActiveProjectSettingsAsync(bool hasMeta, bool isActive)
     {
         // Arrange
         var expectedId = Guid.NewGuid();
@@ -47,7 +46,8 @@ public class ProjectSettingsServiceTests
             new ProjectMetaRecord { DbId = expectedId }
         });
         _mockProjectManagementService.Setup(s => s.ActiveProjectId).Returns(isActive ? expectedId : Guid.NewGuid());
-        var newProjectSettings = new ProjectSettings {
+        var newProjectSettings = new ProjectSettings
+        {
             IsForceResultCommunicationEnabled = true
         };
 

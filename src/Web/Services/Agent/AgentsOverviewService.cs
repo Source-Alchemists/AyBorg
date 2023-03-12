@@ -1,3 +1,4 @@
+using AyBorg.SDK.System;
 using AyBorg.SDK.System.Runtime;
 using AyBorg.Web.Shared.Models;
 
@@ -25,7 +26,7 @@ public class AgentsOverviewService : IAgentOverviewService
     public async Task UpdateAsync()
     {
         var tmpAgentList = new List<AgentServiceEntry>();
-        foreach (ServiceInfoEntry Agent in await _registryService!.ReceiveServicesAsync("AyBorg.Agent"))
+        foreach (ServiceInfoEntry Agent in await _registryService!.ReceiveServicesAsync(ServiceTypes.Agent))
         {
             Shared.Models.Agent.ProjectMeta projectMeta = await _projectManagementService!.GetActiveMetaAsync(Agent.UniqueName);
             EngineMeta status = await _runtimeService!.GetStatusAsync(Agent.UniqueName);

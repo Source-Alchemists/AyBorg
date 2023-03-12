@@ -1,5 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
-using AyBorg.Web.Services.AppState;
+using AyBorg.SDK.Common;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components.Authorization;
 
@@ -61,7 +61,7 @@ public class ProjectManagementService : IProjectManagementService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to get project metas");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to get project metas!");
             return new List<Shared.Models.Agent.ProjectMeta>();
         }
     }
@@ -80,7 +80,7 @@ public class ProjectManagementService : IProjectManagementService
     public async ValueTask<Shared.Models.Agent.ProjectMeta> GetActiveMetaAsync(string serviceUniqueName)
     {
         IEnumerable<Shared.Models.Agent.ProjectMeta> projectMetas = await GetMetasAsync(serviceUniqueName);
-        return projectMetas.FirstOrDefault(pm => pm.IsActive)!;
+        return projectMetas.FirstOrDefault(pm => pm.IsActive) ?? new Shared.Models.Agent.ProjectMeta();
     }
 
     /// <summary>
@@ -93,6 +93,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Creating project [{projectName}]", projectName);
             CreateProjectResponse response = await _projectManagementClient.CreateProjectAsync(new CreateProjectRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -103,7 +104,7 @@ public class ProjectManagementService : IProjectManagementService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to create project");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to create project!");
             return null!;
         }
     }
@@ -117,6 +118,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Deleting project [{projectName}]", projectMeta.Name);
             _ = await _projectManagementClient.DeleteProjectAsync(new DeleteProjectRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -127,7 +129,7 @@ public class ProjectManagementService : IProjectManagementService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to delete project");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to delete project!");
             return false;
         }
     }
@@ -141,6 +143,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Activating project [{projectName}]", projectMeta.Name);
             _ = await _projectManagementClient.ActivateProjectAsync(new ActivateProjectRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -151,7 +154,7 @@ public class ProjectManagementService : IProjectManagementService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to activate project");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to activate project!");
             return false;
         }
     }
@@ -166,6 +169,7 @@ public class ProjectManagementService : IProjectManagementService
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Saving project [{projectName}] as [{projectState}].", projectMeta.Name, projectSaveInfo.State);
             _ = await _projectManagementClient.SaveProjectAsync(new SaveProjectRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -178,7 +182,7 @@ public class ProjectManagementService : IProjectManagementService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to save project");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to save project!");
             return false;
         }
     }
@@ -186,18 +190,19 @@ public class ProjectManagementService : IProjectManagementService
     /// <summary>
     /// Sets the project to ready state.
     /// </summary>
-    /// <param name="dbId">The database identifier.</param>
+    /// <param name="projectMeta">The project meta info.</param>
     /// <param name="projectSaveInfo">State of the project.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryApproveAsync(string dbId,
+    public async ValueTask<bool> TryApproveAsync(Shared.Models.Agent.ProjectMeta projectMeta,
                                                     Shared.Models.Agent.ProjectSaveInfo projectSaveInfo)
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Approving project [{projectName}] version [{projectVersion}].", projectMeta.Name, projectMeta.VersionName);
             _ = await _projectManagementClient.ApproveProjectAsync(new ApproveProjectRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
-                ProjectDbId = dbId,
+                ProjectDbId = projectMeta.DbId,
                 ProjectSaveInfo = await CreateRpcProjectSaveInfoAsync(projectSaveInfo)
             });
 
@@ -205,7 +210,7 @@ public class ProjectManagementService : IProjectManagementService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to approve project");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to approve project!");
             return false;
         }
     }

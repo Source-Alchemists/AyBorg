@@ -1,8 +1,7 @@
 using AyBorg.Gateway.Models;
-using AyBorg.Gateway.Services;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace AyBorg.Gateway.Tests.Services;
+namespace AyBorg.Gateway.Services.Tests;
 
 public class GrpcChannelServiceTests
 {

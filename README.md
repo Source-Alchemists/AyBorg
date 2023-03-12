@@ -1,45 +1,102 @@
 # AyBorg
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Source-Alchemists_AyBorg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Source-Alchemists_AyBorg)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Source-Alchemists_AyBorg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Source-Alchemists_AyBorg) [![Twitter Follow](https://img.shields.io/twitter/follow/ayborg_io?logo=twitter&style=flat-square)](https://twitter.com/ayborg_io?ref_src=twsrc%5Etfw)
 
-## Why AyBorg?
+:star:  We appreciate your star, it helps!
 
-- **Easy to use!**
-  - Don't spend a lot of time to write code, just use instead AyBorg's user **friendly no code** interface!
-  - If you ever need to write code, still don't spend to much time on it, with AyBorg's very simple plugin interface!
-- **One interface to fit them all!** Don't invest a lot of money to train your employees in different applications!
-- **Scalable!** No matter how many devices are connected, AyBorg can handle them all in one interface!
-- **Easy to integrate into your existing infrastructure**, thanks to MQTT!
-- **No vendor lock-in!**
-  - Run it on Azure, AWS, or on premise.
-  - No specific library to use! Your processing library? No Problem, use it!
-- **Data secure!** Keep the data on your edge device or send it to the cloud. Your solution, your choice!
-- **Open for extensions!**
-  - You need a new fancy plugin? Go for it, AyBorg is open to be extented.
-  - AyBorg is not only easy to use, it is also easy to extend! (See [StepBody](doc/agent/plugins/custom-plugins.md#stepBody))
-  - You write your logic, AyBorg does the rest!
+![Logo](doc/img/logo.svg)
 
-### Steps
+Hey there! Are you tired of complex and expensive Industrial IoT solutions that only add to your headaches? Introducing AyBorg, the powerful and scalable no-code/low-code platform for your production processes.
 
-Steps are called the plugins, provding methods executed in the runtime flow:
+Our platform is free, open-source and provides a service-oriented architecture that can be easily adapted to your needs. With AyBorg, you'll have the power to build and customize your own industrial applications without needing to write a single line of code. Simply drag and drop elements, connect the ports and voila! You've got a fully functioning application that can be easily scaled and customized as your business grows.
 
-![FlowScreenshot01](doc/img/FlowScreenshot01.png)
+We've got your back when it comes to monitoring your production goods too. Our platform has a focus on using camera systems for image processing, making it easier for you to keep an eye on your production. And if you need to add some extra features, our platform can be easily extended with plugins.
+
+With AyBorg, you don't have to worry about being locked into one vendor. Our platform is open-source, meaning you have the freedom to adapt and modify it as you see fit. And because it's free, you'll be saving money compared to closed source solutions. Plus, with our built-in auditing functionality, you'll have even more control over your processes and data, leading to improved efficiency and cost savings.
+
+So what are you waiting for? Say goodbye to complex and expensive solutions, and hello to the power of AyBorg. Get started today!
+
+## Agents
+
+AyBorg's **Agents** are specially designed services for automating processes. Using the **AyBorg.Gateway**, they can seamlessly communicate with other areas of the application. These powerful tools are ideal for optimizing your workflow and can help increase your efficiency.
+
+### Editor
+
+Our user-friendly editor makes it a breeze to program your own workflows using simple drag and drop of steps/plugins into the data flow.
+
+![AgentEditor](doc/img/agent-editor.png)
+
+### Work with multiple agents
+
+Experience unparalleled flexibility in your workflow! Work with as many agents as you want and distribute them across different systems. Thanks to seamless communication via the MQTT protocol, your creativity knows no bounds. Whether it's simple or complex scenarios, our agents enable you to perfectly realize your ideas!
+
+![AgentOverview](doc/img/agent-overview.png)
+
+### Project overview
+
+The project overview lays out all the projects and their current status. That way, you can see in a jiffy which projects have been given the green light for production.
+
+![ProjectOverview](doc/img/agent-projects.png)
+
+## Analytics
+
+Get an overview of all events at a glance, whether it's user interaction, system event, or exception. It is important that you can understand and control your system at all times.
+
+![Analytics](doc/img/analytics.png)
+
+## Audit
+
+In industries such as **medicine**, **pharmaceuticals**, and **food**, it is becoming increasingly important to conduct automated processes in an auditable system. Such a system is particularly essential in highly regulated areas such as **[FDA 21 CFR Part 11](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfcfr/cfrsearch.cfm)**. AyBorg has focused on ensuring high auditability and can therefore be used in these areas as well.
+
+### Create new audit report
+
+![AuditChangesets](doc/img/audit-changesets.png)
+
+### Audit changes (diff)
+
+![AuditDiff](doc/img/audit-diff.png)
+
+### Save your reports
+
+![AuditSavedReports](doc/img/audit-saved-reports.png)
+
+## Administration
+
+### Service overview
+
+![ServiceOverview](doc/img/admin-service-overview.png)
+
+### Usermanagement
+
+![Usermanagement](doc/img/admin-usermanagement.png)
 
 ## Getting started
 
-Because AyBorg is orchastrated into multipe microservices, you need to start each service separately.
+Because AyBorg is orchastrated into multipe services, you need to start each service separately.
 In most cases the following setup makes sense:
 
 1. A MQTT broker (e.g. [Eclipse-Mosquitto](https://mosquitto.org))
 2. AyBorg.Gateway
-3. AyBorg.Web
-4. One or more [AyBorg.Agent(s)](doc/agent/agent.md)
+3. AyBorg.Analytics
+4. AyBorg.Audit
+5. AyBorg.Web
+6. One or more [AyBorg.Agent(s)](doc/agent/agent.md)
 
 The default appsettings give you a good starting point and will also work locally, but for real scenarios, you will need to change the settings.
 
 > AyBorg default user "**SystemAdmin**" with password "**SystemAdmin123!**".
 
 > :warning: **The default password should be changed immediately!**
+
+## Default Ports
+
+| Service          | HTTP | HTTPS | gRPC |
+| ---------------- | ---- | ----- | ---- |
+| AyBorg.Gateway   |      |       | 5000 |
+| AyBorg.Analytics |      |       | 5001 |
+| AyBorg.Audit     |      |       | 5002 |
+| AyBorg.Web       | 5010 | 5011  |      |
+| AyBorg.Agent     |      |       | 5020 |
 
 ## Example setups
 

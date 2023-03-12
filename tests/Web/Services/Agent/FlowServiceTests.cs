@@ -2,8 +2,8 @@ using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
+using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Tests.Helpers;
 using Google.Protobuf;
@@ -33,7 +33,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetStepsAsync()
+    public async Task Test_GetStepsAsync()
     {
         // Arrange
         var getFlowStepsResponse = new GetFlowStepsResponse();
@@ -78,7 +78,7 @@ public class FlowServiceTests
     [InlineData(true, true, false)]
     [InlineData(true, false, true)]
     [InlineData(false, true, true)]
-    public async ValueTask Test_GetStepAsync(bool hasStep, bool updatePorts, bool skipOutputPorts)
+    public async Task Test_GetStepAsync(bool hasStep, bool updatePorts, bool skipOutputPorts)
     {
         // Arrange
         var getFlowStepsResponse = new GetFlowStepsResponse();
@@ -133,7 +133,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetLinksAsync()
+    public async Task Test_GetLinksAsync()
     {
         // Arrange
         var getFlowLinksResponse = new GetFlowLinksResponse();
@@ -153,7 +153,7 @@ public class FlowServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_GetLinkAsync(bool hasLink)
+    public async Task Test_GetLinkAsync(bool hasLink)
     {
         // Arrange
         var getFlowLinksResponse = new GetFlowLinksResponse();
@@ -182,7 +182,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_AddStepAsync()
+    public async Task Test_AddStepAsync()
     {
         // Arrange
         AsyncUnaryCall<AddFlowStepResponse> call = GrpcCallHelpers.CreateAsyncUnaryCall(new AddFlowStepResponse());
@@ -191,28 +191,28 @@ public class FlowServiceTests
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<StepDto>())).Returns(new Step());
 
         // Act
-        Step result = await _service.AddStepAsync(Guid.NewGuid(), 0, 0);
+        Step result = await _service.AddStepAsync(new Step());
 
         // Assert
         Assert.NotNull(result);
     }
 
     [Fact]
-    public async ValueTask Test_TryRemoveStepAsync()
+    public async Task Test_TryRemoveStepAsync()
     {
         // Arrange
         AsyncUnaryCall<Empty> call = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
         _mockEditorClient.Setup(m => m.DeleteFlowStepAsync(It.IsAny<DeleteFlowStepRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
 
         // Act
-        bool result = await _service.TryRemoveStepAsync(Guid.NewGuid());
+        bool result = await _service.TryRemoveStepAsync(new Step());
 
         // Assert
         Assert.True(result);
     }
 
     [Fact]
-    public async ValueTask Test_TryMoveStepAsync()
+    public async Task Test_TryMoveStepAsync()
     {
         // Arrange
         AsyncUnaryCall<Empty> call = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
@@ -228,7 +228,7 @@ public class FlowServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_AddLinkAsync(bool notLinking)
+    public async Task Test_AddLinkAsync(bool notLinking)
     {
         // Arrange
         var expectedId = Guid.NewGuid();
@@ -241,7 +241,7 @@ public class FlowServiceTests
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link());
 
         // Act
-        Guid? result = await _service.AddLinkAsync(Guid.NewGuid(), Guid.NewGuid());
+        Guid? result = await _service.AddLinkAsync(new Port(), new Port());
 
         // Assert
         if (!notLinking)
@@ -255,7 +255,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryRemoveLinkAsync()
+    public async Task Test_TryRemoveLinkAsync()
     {
         // Arrange
         AsyncUnaryCall<LinkFlowPortsResponse> callGetFlowLinks = GrpcCallHelpers.CreateAsyncUnaryCall(new LinkFlowPortsResponse());
@@ -264,7 +264,7 @@ public class FlowServiceTests
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link());
 
         // Act
-        bool result = await _service.TryRemoveLinkAsync(Guid.NewGuid());
+        bool result = await _service.TryRemoveLinkAsync(new Link());
 
         // Assert
         Assert.True(result);
@@ -273,7 +273,7 @@ public class FlowServiceTests
     [Theory]
     [InlineData(true)]
     [InlineData(false)]
-    public async ValueTask Test_GetPortAsync(bool hasPort)
+    public async Task Test_GetPortAsync(bool hasPort)
     {
         // Arrange
         var response = new GetFlowPortsResponse();
@@ -301,7 +301,7 @@ public class FlowServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TrySetPortValueAsync()
+    public async Task Test_TrySetPortValueAsync()
     {
         // Arrange
         AsyncUnaryCall<Empty> call = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());

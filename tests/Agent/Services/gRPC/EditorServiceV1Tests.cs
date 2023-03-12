@@ -31,7 +31,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
     }
 
     [Fact]
-    public async ValueTask Test_GetAvailableSteps()
+    public async Task Test_GetAvailableSteps()
     {
         // Arrange
         _mockPluginsService.Setup(p => p.Steps).Returns(new List<IStepProxy>
@@ -55,7 +55,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
     [InlineData(0, false, false, false, true)]
     [InlineData(1, false, false, false, false)]
     [InlineData(1, false, false, true, false)]
-    public async ValueTask Test_GetFlowSteps(int expectedStepsCount, bool hasEmptyIdStr, bool hasInvalidIterationId, bool hasEmptyIterationId, bool hasInvalidStepId)
+    public async Task Test_GetFlowSteps(int expectedStepsCount, bool hasEmptyIdStr, bool hasInvalidIterationId, bool hasEmptyIterationId, bool hasInvalidStepId)
     {
         // Arrange
         Guid iterationId = hasEmptyIterationId ? Guid.Empty : Guid.NewGuid();
@@ -92,7 +92,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
     [Theory]
     [InlineData(0, true, true)]
     [InlineData(1, true, false)]
-    public async ValueTask Test_GetFlowLinks(int expectedLinksCount, bool hasLinkId, bool hasInvalidLinkId)
+    public async Task Test_GetFlowLinks(int expectedLinksCount, bool hasLinkId, bool hasInvalidLinkId)
     {
         // Arrange
         var link1 = new PortLink(CreatePortMock("P1", Guid.NewGuid()).Object, CreatePortMock("P2", Guid.NewGuid()).Object);
@@ -121,7 +121,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
     [InlineData(0, false, false, false, false, true)]
     [InlineData(1, false, false, false, false, false)]
     [InlineData(1, false, false, true, false, false)]
-    public async ValueTask Test_GetFlowPorts(int expectedPortsCount, bool hasEmptyIdStr, bool hasInvalidIterationId, bool hasEmptyIterationId, bool hasInvalidPortId, bool hasWrongPortId)
+    public async Task Test_GetFlowPorts(int expectedPortsCount, bool hasEmptyIdStr, bool hasInvalidIterationId, bool hasEmptyIterationId, bool hasInvalidPortId, bool hasWrongPortId)
     {
         // Arrange
         Guid iterationId = hasEmptyIterationId ? Guid.Empty : Guid.NewGuid();
@@ -161,7 +161,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
     [InlineData(Roles.Auditor, false, false, false)]
     [InlineData(Roles.Administrator, true, false, true)]
     [InlineData(Roles.Administrator, true, true, false)]
-    public async ValueTask Test_AddFlowStep(string userRole, bool isAllowed, bool hasInvalidStepId, bool hasWrongStepId)
+    public async Task Test_AddFlowStep(string userRole, bool isAllowed, bool hasInvalidStepId, bool hasWrongStepId)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -201,7 +201,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
     [InlineData(Roles.Auditor, false, false, false)]
     [InlineData(Roles.Administrator, true, false, true)]
     [InlineData(Roles.Administrator, true, true, false)]
-    public async ValueTask Test_DeleteFlowStep(string userRole, bool isAllowed, bool hasInvalidStepId, bool hasWrongStepId)
+    public async Task Test_DeleteFlowStep(string userRole, bool isAllowed, bool hasInvalidStepId, bool hasWrongStepId)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -238,7 +238,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
     [InlineData(Roles.Auditor, false, false, false)]
     [InlineData(Roles.Administrator, true, false, true)]
     [InlineData(Roles.Administrator, true, true, false)]
-    public async ValueTask Test_MoveFlowStep(string userRole, bool isAllowed, bool hasInvalidStepId, bool hasWrongStepId)
+    public async Task Test_MoveFlowStep(string userRole, bool isAllowed, bool hasInvalidStepId, bool hasWrongStepId)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -277,7 +277,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
     [InlineData(Roles.Administrator, true, false, false, true, true)]
     [InlineData(Roles.Administrator, true, false, true, false, false)]
     [InlineData(Roles.Administrator, true, true, false, false, false)]
-    public async ValueTask Test_LinkFlowPorts(string userRole, bool isAllowed, bool hasInvalidSourceId, bool hasInvalidTargetId, bool isUnlinking, bool isUnlinkFailing)
+    public async Task Test_LinkFlowPorts(string userRole, bool isAllowed, bool hasInvalidSourceId, bool hasInvalidTargetId, bool isUnlinking, bool isUnlinkFailing)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -325,7 +325,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
     [InlineData(Roles.Reviewer, false, false)]
     [InlineData(Roles.Auditor, false, false)]
     [InlineData(Roles.Administrator, true, true)]
-    public async ValueTask Test_UpdateFlowPort(string userRole, bool isAllowed, bool isUpdateFailing)
+    public async Task Test_UpdateFlowPort(string userRole, bool isAllowed, bool isUpdateFailing)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -360,7 +360,7 @@ public class EditorServiceV1Tests : BaseGrpcServiceTests<EditorServiceV1, Editor
     [InlineData(false, true, false, false, 100, 100)]
     [InlineData(false, false, true, false, 100, 100)]
     [InlineData(false, false, false, true, 100, 100)]
-    public async ValueTask Test_GetImageStream(bool hasEmpyIterationId, bool hasInvalidIterationId, bool hasInvalidPortId, bool hasWrongPortId, int imageWidth, int imageHeight)
+    public async Task Test_GetImageStream(bool hasEmpyIterationId, bool hasInvalidIterationId, bool hasInvalidPortId, bool hasWrongPortId, int imageWidth, int imageHeight)
     {
         // Arrange
         var request = new GetImageStreamRequest

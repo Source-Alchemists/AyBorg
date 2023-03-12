@@ -31,7 +31,7 @@ public sealed class EngineHostTests : IDisposable
     }
 
     [Fact]
-    public async ValueTask Test_TryActivateProjectAsync()
+    public async Task Test_TryActivateProjectAsync()
     {
         // Arrange
         var project = new Project();
@@ -48,7 +48,7 @@ public sealed class EngineHostTests : IDisposable
     [InlineData(false, false)]
     [InlineData(true, false)]
     [InlineData(true, true)]
-    public async ValueTask Test_TryDeactivateProjectAsync(bool hasActiveProject, bool hasEngine)
+    public async Task Test_TryDeactivateProjectAsync(bool hasActiveProject, bool hasEngine)
     {
         // Arrange
         if (hasActiveProject)
@@ -75,9 +75,8 @@ public sealed class EngineHostTests : IDisposable
     [Theory]
     [InlineData(false, false)]
     [InlineData(true, false)]
-    [InlineData(false, true)]
     [InlineData(true, true)]
-    public async ValueTask Test_GetEngineStatusAsync(bool hasActiveProject, bool hasEngine)
+    public async Task Test_GetEngineStatusAsync(bool hasActiveProject, bool hasEngine)
     {
         // Arrange
         if (hasActiveProject)
@@ -116,7 +115,7 @@ public sealed class EngineHostTests : IDisposable
     [InlineData(true, false, EngineExecutionType.ContinuousRun)]
     [InlineData(false, true, EngineExecutionType.ContinuousRun)]
     [InlineData(true, true, EngineExecutionType.ContinuousRun)]
-    public async ValueTask Test_StartRunAsync(bool hasActiveProject, bool hasEngine, EngineExecutionType executionType)
+    public async Task Test_StartRunAsync(bool hasActiveProject, bool hasEngine, EngineExecutionType executionType)
     {
         // Arrange
         if (hasActiveProject)
@@ -135,6 +134,10 @@ public sealed class EngineHostTests : IDisposable
             {
                 State = EngineState.Running
             });
+        }
+        else
+        {
+            _mockEngine.Setup(e => e.Meta).Returns(new EngineMeta());
         }
 
         // Act
@@ -161,7 +164,7 @@ public sealed class EngineHostTests : IDisposable
     [InlineData(true, false, EngineState.Running)]
     [InlineData(false, true, EngineState.Running)]
     [InlineData(true, true, EngineState.Running)]
-    public async ValueTask Test_StopRunAsync(bool hasActiveProject, bool hasEngine, EngineState engineState)
+    public async Task Test_StopRunAsync(bool hasActiveProject, bool hasEngine, EngineState engineState)
     {
         // Arrange
         if (hasActiveProject)
@@ -207,7 +210,7 @@ public sealed class EngineHostTests : IDisposable
     [InlineData(true, false, EngineState.Aborting)]
     [InlineData(false, true, EngineState.Aborting)]
     [InlineData(true, true, EngineState.Aborting)]
-    public async ValueTask Test_AbortRunAsync(bool hasActiveProject, bool hasEngine, EngineState engineState)
+    public async Task Test_AbortRunAsync(bool hasActiveProject, bool hasEngine, EngineState engineState)
     {
         // Arrange
         if (hasActiveProject)

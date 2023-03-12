@@ -18,7 +18,7 @@ public class RuntimeServiceV1Tests : BaseGrpcServiceTests<RuntimeServiceV1, Aybo
     }
 
     [Fact]
-    public async ValueTask Test_GetStatus()
+    public async Task Test_GetStatus()
     {
         // Arrange
         _mockEngineHost.Setup(m => m.GetEngineStatus()).Returns(new EngineMeta());
@@ -37,7 +37,7 @@ public class RuntimeServiceV1Tests : BaseGrpcServiceTests<RuntimeServiceV1, Aybo
     [InlineData(Roles.Engineer, true)]
     [InlineData(Roles.Reviewer, true)]
     [InlineData(Roles.Auditor, false)]
-    public async ValueTask Test_StartRun(string userRole, bool isAllowed)
+    public async Task Test_StartRun(string userRole, bool isAllowed)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -65,7 +65,7 @@ public class RuntimeServiceV1Tests : BaseGrpcServiceTests<RuntimeServiceV1, Aybo
     [InlineData(Roles.Engineer, true)]
     [InlineData(Roles.Reviewer, true)]
     [InlineData(Roles.Auditor, false)]
-    public async ValueTask Test_StopRun(string userRole, bool isAllowed)
+    public async Task Test_StopRun(string userRole, bool isAllowed)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -91,7 +91,7 @@ public class RuntimeServiceV1Tests : BaseGrpcServiceTests<RuntimeServiceV1, Aybo
     [InlineData(Roles.Engineer, true)]
     [InlineData(Roles.Reviewer, true)]
     [InlineData(Roles.Auditor, false)]
-    public async ValueTask Test_AbortRun(string userRole, bool isAllowed)
+    public async Task Test_AbortRun(string userRole, bool isAllowed)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });

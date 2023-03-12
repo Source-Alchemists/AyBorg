@@ -1,5 +1,6 @@
 using Ayborg.Gateway.V1;
 using AyBorg.Gateway.Models;
+using AyBorg.SDK.Common;
 using Grpc.Core;
 
 namespace AyBorg.Gateway.Services;
@@ -27,7 +28,7 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
         };
 
         Guid id = await _keeperService.RegisterAsync(newServiceEntry);
-        _logger.LogInformation("Registered {Name} ({Url}) with id [{Id}].", newServiceEntry.Name, newServiceEntry.Url, id);
+        _logger.LogInformation(new EventId((int)EventLogType.Connect), "Registered {name} ({url}).", newServiceEntry.Name, newServiceEntry.Url);
         return new StatusResponse { Success = true, Id = id.ToString(), ErrorMessage = string.Empty };
     }
 
@@ -40,13 +41,13 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
                 return new StatusResponse { Success = false, Id = request.Id, ErrorMessage = "Invalid id" };
             }
 
-            await _keeperService.UnregisterAsync(id);
-            _logger.LogInformation("Unregistered {Id}.", id);
-            return new StatusResponse { Success = true, Id = request.Id, ErrorMessage = string.Empty };
+            ServiceEntry? service = _keeperService.Unregister(id);
+            _logger.LogInformation(new EventId((int)EventLogType.Disconnect), "Unregistered {serviceName}.", service!.UniqueName);
+            return await Task.FromResult(new StatusResponse { Success = true, Id = request.Id, ErrorMessage = string.Empty });
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogWarning("Failed to unregister", ex.Message);
+            _logger.LogWarning(new EventId((int)EventLogType.Disconnect), "Failed to unregister", ex.Message);
             return new StatusResponse { Success = false, Id = request.Id, ErrorMessage = "Failed to unregister" };
         }
     }

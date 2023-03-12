@@ -14,10 +14,10 @@ else
 <AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
 <MudGrid class="pt-6">
     <MudItem xs="12">
-        <MudCard>
+        <MudCard Class="rounded-lg">
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudIcon Icon="@Icons.Filled.GppBad" Size="Size.Large" Color="Color.Secondary" />
+                    <MudIcon Icon="@Icons.Filled.GppBad" Size="Size.Large" Color="Color.Error" />
                 </CardHeaderAvatar>
                 <CardHeaderContent>
 				    <MudText Typo="Typo.h6">Draft</MudText>
@@ -38,7 +38,7 @@ else
     @if(_reviewProjects.Any())
     {
         <MudItem xs="12">
-            <MudCard>
+            <MudCard Class="rounded-lg">
                 <MudCardHeader>
                     <CardHeaderAvatar>
                         <MudIcon Icon="@Icons.Filled.SafetyCheck" Size="Size.Large" Color="Color.Warning" />
@@ -61,10 +61,10 @@ else
     @if(_readyProjects.Any())
     {
         <MudItem xs="12">
-            <MudCard>
+            <MudCard Class="rounded-lg">
                 <MudCardHeader>
                     <CardHeaderAvatar>
-                        <MudIcon Icon="@Icons.Filled.GppGood" Size="Size.Large" Color="Color.Tertiary" />
+                        <MudIcon Icon="@Icons.Filled.GppGood" Size="Size.Large" Color="Color.Info" />
                     </CardHeaderAvatar>
                     <CardHeaderContent>
                         <MudText Typo="Typo.h6">Ready</MudText>

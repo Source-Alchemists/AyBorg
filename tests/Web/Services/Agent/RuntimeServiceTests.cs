@@ -1,6 +1,6 @@
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services.AppState;
+using AyBorg.Web.Services;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Tests.Helpers;
 using Grpc.Core;
@@ -29,7 +29,7 @@ public class RuntimeServiceTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async ValueTask Test_GetStatusAsync(bool isSuccessful)
+    public async Task Test_GetStatusAsync(bool isSuccessful)
     {
         // Arrange
         if (isSuccessful)
@@ -67,7 +67,7 @@ public class RuntimeServiceTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async ValueTask Test_StartRunAsync(bool isSuccessful)
+    public async Task Test_StartRunAsync(bool isSuccessful)
     {
         // Arrange
         if (isSuccessful)
@@ -105,7 +105,7 @@ public class RuntimeServiceTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async ValueTask Test_StopRunAsync(bool isSuccessful)
+    public async Task Test_StopRunAsync(bool isSuccessful)
     {
         // Arrange
         if (isSuccessful)
@@ -143,7 +143,7 @@ public class RuntimeServiceTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async ValueTask Test_AbortRunAsync(bool isSuccessful)
+    public async Task Test_AbortRunAsync(bool isSuccessful)
     {
         // Arrange
         if (isSuccessful)

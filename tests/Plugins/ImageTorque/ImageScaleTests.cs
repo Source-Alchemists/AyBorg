@@ -11,7 +11,7 @@ public class ImageScaleTests : IDisposable
     [Theory]
     [InlineData(409, 202, 0.5d)]
     [InlineData(819, 404, 1d)]
-    public async ValueTask Test_TryRunAsync(int expectedWidth, int expectedHeight, double scaleFactor)
+    public async Task Test_TryRunAsync(int expectedWidth, int expectedHeight, double scaleFactor)
     {
         // Arrange
         using Image testImage = Image.Load("./resources/luna.jpg");

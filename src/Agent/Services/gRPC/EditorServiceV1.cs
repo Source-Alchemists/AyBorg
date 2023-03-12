@@ -2,6 +2,7 @@ using System.Buffers;
 using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.Authorization;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
@@ -64,7 +65,6 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             Guid iterationId = Guid.Empty;
             if (!string.IsNullOrEmpty(request.IterationId) && !Guid.TryParse(request.IterationId, out iterationId))
             {
-                _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
             }
 
@@ -76,7 +76,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                 {
                     if (!Guid.TryParse(idStr, out Guid stepId))
                     {
-                        _logger.LogWarning("Invalid step id: {StepId}", idStr);
+                        _logger.LogWarning(new EventId((int)EventLogType.Engine), "Invalid step id: {StepId}", idStr);
                         continue;
                     }
 
@@ -118,7 +118,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                 {
                     if (!Guid.TryParse(idStr, out Guid linkId))
                     {
-                        _logger.LogWarning("Invalid link id: {LinkId}", idStr);
+                        _logger.LogWarning(new EventId((int)EventLogType.Engine), "Invalid link id: {LinkId}", idStr);
                         continue;
                     }
 
@@ -142,7 +142,6 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         Guid iterationId = Guid.Empty;
         if (!string.IsNullOrEmpty(request.IterationId) && !Guid.TryParse(request.IterationId, out iterationId))
         {
-            _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
         }
 
@@ -150,14 +149,14 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         {
             if (!Guid.TryParse(portIdStr, out Guid portId))
             {
-                _logger.LogWarning("Invalid port id: {PortId}", portIdStr);
+                _logger.LogWarning(new EventId((int)EventLogType.Engine), "Invalid port id: {PortId}", portIdStr);
                 continue;
             }
 
             IPort port = _flowService.GetPort(portId);
             if (port == null)
             {
-                _logger.LogTrace("Port not found: {PortId}", portId);
+                _logger.LogTrace(new EventId((int)EventLogType.Engine), "Port not found: {PortId}", portId);
                 continue;
             }
 
@@ -181,14 +180,12 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         if (!Guid.TryParse(request.StepId, out Guid stepId))
         {
-            _logger.LogWarning("Invalid step id: {StepId}", request.StepId);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
         }
 
         IStepProxy stepProxy = await _flowService.AddStepAsync(stepId, request.X, request.Y);
         if (stepProxy == null)
         {
-            _logger.LogWarning("Step not found: {StepId}", request.StepId);
             throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
         }
 
@@ -203,13 +200,11 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         if (!Guid.TryParse(request.StepId, out Guid stepId))
         {
-            _logger.LogWarning("Invalid step id: {StepId}", request.StepId);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
         }
 
         if (!await _flowService.TryRemoveStepAsync(stepId))
         {
-            _logger.LogWarning("Step not found: {StepId}", request.StepId);
             throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
         }
 
@@ -221,13 +216,11 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         if (!Guid.TryParse(request.StepId, out Guid stepId))
         {
-            _logger.LogWarning("Invalid step id: {StepId}", request.StepId);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
         }
 
         if (!await _flowService.TryMoveStepAsync(stepId, request.X, request.Y))
         {
-            _logger.LogWarning("Step not found: {StepId}", request.StepId);
             throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
         }
 
@@ -239,7 +232,6 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         if (!Guid.TryParse(request.SourceId, out Guid sourceId))
         {
-            _logger.LogWarning("Invalid source id: {SourceId}", request.SourceId);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid source id"));
         }
 
@@ -248,7 +240,6 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             // Try to link
             if (!Guid.TryParse(request.TargetId, out Guid targetId))
             {
-                _logger.LogWarning("Invalid target id: {TargetId}", request.TargetId);
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid target id"));
             }
 
@@ -263,7 +254,6 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             // Try to unlink
             if (!await _flowService.TryUnlinkPortsAsync(sourceId))
             {
-                _logger.LogWarning("Source port not found: {SourceId}", request.SourceId);
                 throw new RpcException(new Status(StatusCode.NotFound, "Source port not found"));
             }
 
@@ -277,7 +267,6 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         Port port = _rpcMapper.FromRpc(request.Port);
         if (!await _flowService.TryUpdatePortValueAsync(port.Id, port.Value!))
         {
-            _logger.LogWarning("Could not update port: {PortId}", port.Id);
             throw new RpcException(new Status(StatusCode.Internal, "Could not update port"));
         }
 
@@ -289,20 +278,17 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         Guid iterationId = Guid.Empty;
         if (!string.IsNullOrEmpty(request.IterationId) && !Guid.TryParse(request.IterationId, out iterationId))
         {
-            _logger.LogWarning("Invalid iteration id: {IterationId}", request.IterationId);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid iteration id"));
         }
 
         if (!Guid.TryParse(request.PortId, out Guid portId))
         {
-            _logger.LogWarning("Invalid port id: {PortId}", request.PortId);
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid port id"));
         }
 
         IPort port = _flowService.GetPort(portId);
         if (port == null)
         {
-            _logger.LogWarning("Port not found: {PortId}", portId);
             throw new RpcException(new Status(StatusCode.NotFound, "Port not found"));
         }
 
@@ -322,7 +308,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         Image originalImage = (Image)originalImageModel.OriginalImage!;
         if (originalImage == null)
         {
-            _logger.LogTrace("Image not found: {PortId}", portId);
+            _logger.LogTrace(new EventId((int)EventLogType.Engine), "Image not found: {PortId}", portId);
             return;
         }
 

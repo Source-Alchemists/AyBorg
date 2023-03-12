@@ -1,0 +1,7 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Agent\AyBorg.Data.Agent.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,6 +1,6 @@
 using Blazored.LocalStorage;
 
-namespace AyBorg.Web.Services.AppState;
+namespace AyBorg.Web.Services;
 
 public class AutomationFlowState
 {

@@ -17,7 +17,7 @@ public class RegistryServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_ReceiveServicesAsync()
+    public async Task Test_ReceiveServicesAsync()
     {
         // Arrange
         var response = new GetServicesResponse();

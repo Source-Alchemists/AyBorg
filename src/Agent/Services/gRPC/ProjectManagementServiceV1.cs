@@ -1,6 +1,6 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Authorization;
-using AyBorg.SDK.Data.DAL;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -60,11 +60,11 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ProjectDbId"));
         }
         ProjectSaveInfo saveInfo = request.ProjectSaveInfo;
-        ProjectManagementResult result = await _projectManagementService.TrySaveNewVersionAsync(dbId,
+        ProjectManagementResult result = await _projectManagementService.TrySaveAsync(dbId,
                                                                                                 SDK.Projects.ProjectState.Ready,
                                                                                                 saveInfo.VersionName,
-                                                                                                saveInfo.Comment,
-                                                                                                saveInfo.UserName);
+                                                                                                saveInfo.UserName,
+                                                                                                saveInfo.Comment);
         if (!result.IsSuccessful)
         {
             throw new RpcException(new Status(StatusCode.Internal, result.Message!));
@@ -119,7 +119,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
                 if (activeProject.State == SDK.Projects.ProjectState.Draft)
                 {
                     // Save active project
-                    result = await _projectManagementService.TrySaveActiveAsync();
+                    result = await _projectManagementService.TrySaveActiveAsync(request.ProjectSaveInfo.UserName);
                 }
                 else
                 {
@@ -173,10 +173,10 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
         ProjectSaveInfo saveInfo = request.ProjectSaveInfo;
         var state = (SDK.Projects.ProjectState)saveInfo.State;
 
-        return await _projectManagementService.TrySaveNewVersionAsync(dbId,
+        return await _projectManagementService.TrySaveAsync(dbId,
                                                                         state,
                                                                         saveInfo.VersionName,
-                                                                        saveInfo.Comment,
-                                                                        saveInfo.UserName);
+                                                                        saveInfo.UserName,
+                                                                        saveInfo.Comment);
     }
 }

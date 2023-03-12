@@ -6,7 +6,7 @@
 
 <MudGrid class="pt-6">
     <MudItem xs="12">
-        <MudCard>
+        <MudCard Class="rounded-lg">
             <MudCardHeader>
                 <CardHeaderAvatar>
                     <MudIcon Icon="@Icons.Filled.ManageAccounts" Size="Size.Large" />
@@ -50,7 +50,7 @@
                                     <MudMenuItem Icon="@Icons.Filled.LockOpen" IconColor="Color.Warning" @onclick="() => OnUnlockAccountClicked(context)">
                                         Unlock
                                     </MudMenuItem>
-                                } 
+                                }
                                 else if(!@context.UserName.Equals("SystemAdmin"))
                                 {
                                     <MudMenuItem Icon="@Icons.Filled.Lock" IconColor="Color.Warning" @onclick="() => OnLockAccountClicked(context)">

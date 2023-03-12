@@ -1,13 +1,14 @@
+using AyBorg.Agent;
 using AyBorg.Agent.Guards;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Services.gRPC;
-using AyBorg.Database.Data;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.Data.Mapper;
+using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Agent;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
@@ -22,9 +23,9 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
-                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.SqlLite")),
+                        x => x.MigrationsAssembly("AyBorg.Data.Agent.Migrations.SqlLite")),
         "PostgreSql" => options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSqlConnection")!,
-                        x => x.MigrationsAssembly("AyBorg.Database.Migrations.PostgreSql")),
+                        x => x.MigrationsAssembly("AyBorg.Data.Agent.Migrations.PostgreSql")),
         _ => throw new Exception("Invalid database provider")
     }
 );
@@ -32,43 +33,38 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
 builder.Services.AddAuthorization();
 builder.Services.AddGrpc();
 
-builder.Services.AddGrpcClient<Ayborg.Gateway.V1.Register.RegisterClient>(options =>
-{
-    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
-    options.Address = new Uri(gatewayUrl!);
-});
+builder.RegisterGrpcClients();
 
-builder.Services.AddGrpcClient<Ayborg.Gateway.Agent.V1.Notify.NotifyClient>(options =>
-{
-    string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
-    options.Address = new Uri(gatewayUrl!);
-});
+builder.AddAyBorgAnalyticsLogger();
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
 
-// Repositories
-builder.Services.AddSingleton<IProjectRepository, ProjectRepository>();
-
-builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
-builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
-builder.Services.AddSingleton<IRuntimeMapper, RuntimeMapper>();
-builder.Services.AddSingleton<IRpcMapper, RpcMapper>();
-builder.Services.AddSingleton<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
-builder.Services.AddSingleton<IRuntimeConverterService, RuntimeConverterService>();
 builder.Services.AddSingleton<IPluginsService, PluginsService>();
-builder.Services.AddSingleton<IProjectManagementService, ProjectManagementService>();
 builder.Services.AddSingleton<IEngineHost, EngineHost>();
-builder.Services.AddSingleton<IEngineFactory, EngineFactory>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
-builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
 
-builder.Services.AddScoped<IJwtConsumer, JwtConsumer>();
-builder.Services.AddScoped<IFlowService, FlowService>();
-
-builder.Services.AddTransient<IProjectSettingsService, ProjectSettingsService>();
+builder.Services.AddTransient<IJwtConsumer, JwtConsumer>();
+// Repositories
+builder.Services.AddTransient<IProjectRepository, ProjectRepository>();
+// Environment / Configuration
+builder.Services.AddTransient<IEnvironment, AyBorg.SDK.Common.Environment>();
+builder.Services.AddTransient<IServiceConfiguration, ServiceConfiguration>();
+// Mapper / Converter
+builder.Services.AddTransient<IRuntimeMapper, RuntimeMapper>();
+builder.Services.AddTransient<IRpcMapper, RpcMapper>();
+builder.Services.AddTransient<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
+builder.Services.AddTransient<IRuntimeConverterService, RuntimeConverterService>();
+// Runtime / Project
+builder.Services.AddTransient<IFlowService, FlowService>();
+builder.Services.AddTransient<IEngineFactory, EngineFactory>();
 builder.Services.AddTransient<IStorageService, StorageService>();
+builder.Services.AddTransient<INotifyService, NotifyService>();
+builder.Services.AddTransient<IProjectManagementService, ProjectManagementService>();
+builder.Services.AddTransient<IProjectSettingsService, ProjectSettingsService>();
+// Audit
+builder.Services.AddTransient<IAuditProviderService, AuditProviderService>();
 
 WebApplication app = builder.Build();
 

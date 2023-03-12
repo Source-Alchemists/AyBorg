@@ -39,7 +39,7 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
             count++;
             if (count > _timeoutMsPort.Value && _timeoutMsPort.Value != -1)
             {
-                _logger.LogWarning("Timeout while waiting for message");
+                _logger.LogWarning(new EventId((int)EventLogType.Result), "Timeout while waiting for message");
                 return false;
             }
         }
@@ -51,7 +51,10 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
     {
         if (_subscription != null && _lastTopic != _topicPort.Value)
         {
-            _logger.LogTrace("Unsubscribing from topic {topic}", _lastTopic);
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Unsubscribing from topic {topic}", _lastTopic);
+            }
             _subscription.MessageReceived -= OnMessageReceived;
             await _mqttClientProvider.UnsubscribeAsync(_subscription);
             _subscription = null!;
@@ -61,7 +64,10 @@ public abstract class BaseMqttReceiveStep : BaseMqttStep, IInitializable
         {
             _subscription = await _mqttClientProvider.SubscribeAsync(_topicPort.Value);
             _subscription.MessageReceived += OnMessageReceived;
-            _logger.LogTrace("Subscribed to topic {topic}", _topicPort.Value);
+            if (_logger.IsEnabled(LogLevel.Trace))
+            {
+                _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Subscribed to topic {topic}", _topicPort.Value);
+            }
         }
 
         _lastTopic = _topicPort.Value;

@@ -71,7 +71,7 @@ public sealed class ImageLoad : IStepBody, IDisposable
             string[] imageFileNames = supportedFiles.ToArray();
             if (imageFileNames.Length == 0)
             {
-                _logger.LogWarning("No images found in folder {folder}", _folderPort.Value);
+                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "No images found in folder {folder}", _folderPort.Value);
                 return new KeyValuePair<string, Image>(string.Empty, null!);
             }
 

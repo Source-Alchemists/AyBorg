@@ -1,14 +1,33 @@
 html {
     height: 100vh;
 }
+
 body {
     height: 100vh;
     font-size: 0.9rem;
-    font-family: Nunito,sans-serif;
+    font-family: Nunito, sans-serif;
 }
 
-label, legend {
+label,
+legend {
     color: var(--mud-palette-text-primary);
+}
+
+.mud-full-width {
+    width: calc(100%);
+}
+.mud-full-height {
+    height: calc(100%);
+}
+
+.mud-drawer {
+    position: fixed !important;
+}
+
+.mud-card-header {
+    border-bottom: 4px solid;
+    border-image-slice: 1;
+    border-image-source: linear-gradient(to left, var(--mud-palette-primary), var(--mud-palette-secondary));
 }
 
 /*Blazor error message*/

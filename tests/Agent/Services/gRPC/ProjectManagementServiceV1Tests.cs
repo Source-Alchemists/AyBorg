@@ -2,8 +2,8 @@ using System.Security.Claims;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Services.gRPC;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Authorization;
-using AyBorg.SDK.Data.DAL;
 using AyBorg.SDK.Projects;
 using Grpc.Core;
 using Moq;
@@ -22,7 +22,7 @@ public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManag
     [Theory]
     [InlineData(2, true)]
     [InlineData(2, false)]
-    public async ValueTask Test_GetProjectMetas(int expectedMetasCount, bool hasActiveProject)
+    public async Task Test_GetProjectMetas(int expectedMetasCount, bool hasActiveProject)
     {
         // Arrange
         var request = new GetProjectMetasRequest
@@ -52,7 +52,7 @@ public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManag
     [InlineData(Roles.Auditor, false, false, false)]
     [InlineData(Roles.Administrator, true, true, false)]
     [InlineData(Roles.Administrator, true, false, true)]
-    public async ValueTask Test_ActivateProject(string userRole, bool isAllowed, bool hasInvalidProjectId, bool isChangeFailing)
+    public async Task Test_ActivateProject(string userRole, bool isAllowed, bool hasInvalidProjectId, bool isChangeFailing)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -89,11 +89,11 @@ public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManag
     [InlineData(Roles.Auditor, false, false, false)]
     [InlineData(Roles.Administrator, true, true, false)]
     [InlineData(Roles.Administrator, true, false, true)]
-    public async ValueTask Test_ApproveProject(string userRole, bool isAllowed, bool hasInvalidProjectId, bool isSaveFailing)
+    public async Task Test_ApproveProject(string userRole, bool isAllowed, bool hasInvalidProjectId, bool isSaveFailing)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
-        _mockProjectManagementService.Setup(m => m.TrySaveNewVersionAsync(It.IsAny<Guid>(),
+        _mockProjectManagementService.Setup(m => m.TrySaveAsync(It.IsAny<Guid>(),
                                                                             It.IsAny<ProjectState>(),
                                                                             It.IsAny<string>(),
                                                                             It.IsAny<string>(),
@@ -130,7 +130,7 @@ public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManag
     [InlineData(Roles.Engineer, true)]
     [InlineData(Roles.Reviewer, false)]
     [InlineData(Roles.Auditor, false)]
-    public async ValueTask Test_CreateProject(string userRole, bool isAllowed)
+    public async Task Test_CreateProject(string userRole, bool isAllowed)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -161,7 +161,7 @@ public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManag
     [InlineData(Roles.Auditor, false, false, false)]
     [InlineData(Roles.Administrator, true, true, false)]
     [InlineData(Roles.Administrator, true, false, true)]
-    public async ValueTask Test_DeleteProject(string userRole, bool isAllowed, bool hasInvalidProjectId, bool isDeleteFailing)
+    public async Task Test_DeleteProject(string userRole, bool isAllowed, bool hasInvalidProjectId, bool isDeleteFailing)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
@@ -202,18 +202,18 @@ public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManag
     [InlineData(Roles.Administrator, true, false, true, ProjectState.Draft, false, false)]
     [InlineData(Roles.Administrator, true, false, false, ProjectState.Review, false, false)]
     [InlineData(Roles.Administrator, true, false, false, ProjectState.Draft, false, true)]
-    public async ValueTask Test_SaveProject(string userRole, bool isAllowed, bool hasInvalidProjectId, bool isSaveFailing, ProjectState projectState, bool hasActiveProject, bool hasEmptyProjectId)
+    public async Task Test_SaveProject(string userRole, bool isAllowed, bool hasInvalidProjectId, bool isSaveFailing, ProjectState projectState, bool hasActiveProject, bool hasEmptyProjectId)
     {
         // Arrange
         var projectId = Guid.NewGuid();
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
-        _mockProjectManagementService.Setup(m => m.TrySaveNewVersionAsync(It.IsAny<Guid>(),
+        _mockProjectManagementService.Setup(m => m.TrySaveAsync(It.IsAny<Guid>(),
                                                                             It.IsAny<ProjectState>(),
                                                                             It.IsAny<string>(),
                                                                             It.IsAny<string>(),
                                                                             It.IsAny<string>()))
                                                                             .ReturnsAsync(new ProjectManagementResult { IsSuccessful = !isSaveFailing });
-        _mockProjectManagementService.Setup(m => m.TrySaveActiveAsync()).ReturnsAsync(new ProjectManagementResult { IsSuccessful = !isSaveFailing });
+        _mockProjectManagementService.Setup(m => m.TrySaveActiveAsync(It.IsAny<string>())).ReturnsAsync(new ProjectManagementResult { IsSuccessful = !isSaveFailing });
         _mockProjectManagementService.Setup(m => m.ActiveProjectId).Returns(projectId);
         _mockProjectManagementService.Setup(m => m.GetAllMetasAsync()).ReturnsAsync(new List<ProjectMetaRecord> {
             new ProjectMetaRecord { Id = projectId, ServiceUniqueName = "Test", IsActive = hasActiveProject, State = projectState }

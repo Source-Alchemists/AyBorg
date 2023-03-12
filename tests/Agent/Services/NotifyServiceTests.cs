@@ -1,8 +1,10 @@
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Agent.Services;
+using AyBorg.Agent.Tests.Helpers;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
-using Microsoft.Extensions.Logging.Abstractions;
+using Google.Protobuf.WellKnownTypes;
+using Grpc.Core;
 using Moq;
 
 namespace AyBorg.Agent.Tests.Services;
@@ -15,11 +17,14 @@ public class NotifyServiceTests
 
     public NotifyServiceTests()
     {
+        _mockServiceConfiguration.Setup(m => m.UniqueName).Returns("Service");
+        AsyncUnaryCall<Empty> mockCall = GrpcCallHelpers.CreateAsyncUnaryCall(new Empty());
+        _mockClient.Setup(m => m.CreateNotificationFromAgentAsync(It.IsAny<NotifyMessage>(), null, null, It.IsAny<CancellationToken>())).Returns(mockCall);
         _service = new NotifyService(_mockServiceConfiguration.Object, _mockClient.Object);
     }
 
     [Fact]
-    public async ValueTask Test_SendEngineStateAsync()
+    public async Task Test_SendEngineStateAsync()
     {
         // Arrange
         EngineMeta engineMeta = CreateEngineMeta();
@@ -32,7 +37,7 @@ public class NotifyServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_SendIterationFinishedAsync()
+    public async Task Test_SendIterationFinishedAsync()
     {
         // Act
         await _service.SendIterationFinishedAsync(Guid.NewGuid());
@@ -42,7 +47,7 @@ public class NotifyServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_SendAutomationFlowChangedAsync()
+    public async Task Test_SendAutomationFlowChangedAsync()
     {
         // Act
         await _service.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs());
@@ -53,7 +58,8 @@ public class NotifyServiceTests
 
     public static EngineMeta CreateEngineMeta()
     {
-        return new EngineMeta {
+        return new EngineMeta
+        {
             Id = Guid.NewGuid(),
             State = EngineState.Running,
             ExecutionType = EngineExecutionType.SingleRun

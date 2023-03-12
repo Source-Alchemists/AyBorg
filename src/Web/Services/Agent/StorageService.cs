@@ -1,5 +1,4 @@
 using Ayborg.Gateway.Agent.V1;
-using AyBorg.Web.Services.AppState;
 
 namespace AyBorg.Web.Services.Agent;
 

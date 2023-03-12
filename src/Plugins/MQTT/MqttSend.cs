@@ -33,7 +33,7 @@ public sealed class MqttSend : BaseMqttSendStep, IStepBody
         }
         catch (Exception e)
         {
-            _logger.LogWarning(e, "Error while sending message to MQTT");
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), e, "Error while sending message to MQTT");
             return false;
         }
     }

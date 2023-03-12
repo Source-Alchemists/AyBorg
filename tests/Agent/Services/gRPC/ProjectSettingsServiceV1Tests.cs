@@ -2,6 +2,7 @@ using System.Security.Claims;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Services.gRPC;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Authorization;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -21,10 +22,10 @@ public class ProjectSettingsServiceV1Tests : BaseGrpcServiceTests<ProjectSetting
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async ValueTask Test_GetProjectSettings(bool hasInvalidProjectId)
+    public async Task Test_GetProjectSettings(bool hasInvalidProjectId)
     {
         // Arrange
-        _mockProjectSettingsService.Setup(m => m.GetSettingsRecordAsync(It.IsAny<Guid>())).ReturnsAsync(new SDK.Data.DAL.ProjectSettingsRecord
+        _mockProjectSettingsService.Setup(m => m.GetSettingsRecordAsync(It.IsAny<Guid>())).ReturnsAsync(new ProjectSettingsRecord
         {
             IsForceResultCommunicationEnabled = true
         });
@@ -54,7 +55,7 @@ public class ProjectSettingsServiceV1Tests : BaseGrpcServiceTests<ProjectSetting
     [InlineData(Roles.Auditor, false, false, false)]
     [InlineData(Roles.Administrator, true, true, false)]
     [InlineData(Roles.Administrator, true, false, true)]
-    public async ValueTask Test_UpdateProjectSettings(string userRole, bool isAllowed, bool hasInvalidProjectId, bool isUpdateFailing)
+    public async Task Test_UpdateProjectSettings(string userRole, bool isAllowed, bool hasInvalidProjectId, bool isUpdateFailing)
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });

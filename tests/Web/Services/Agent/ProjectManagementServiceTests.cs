@@ -1,7 +1,5 @@
 using System.Security.Principal;
 using Ayborg.Gateway.Agent.V1;
-using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services.AppState;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Tests.Helpers;
 using Google.Protobuf.WellKnownTypes;
@@ -10,7 +8,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace AyBorg.Web.Tests.Services.Agent;
+namespace AyBorg.Web.Services.Agent.Tests;
 
 public class ProjectManagementServiceTests
 {
@@ -35,7 +33,7 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetMetasAsync()
+    public async Task Test_GetMetasAsync()
     {
         // Arrange
         var response = new GetProjectMetasResponse();
@@ -55,7 +53,20 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_GetActiveMetaAsync()
+    public async Task Test_GetMetasAsync_Failed()
+    {
+        // Arrange
+        _mockProjectManagementClient.Setup(m => m.GetProjectMetasAsync(It.IsAny<GetProjectMetasRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
+
+        // Act
+        IEnumerable<Shared.Models.Agent.ProjectMeta> result = await _service.GetMetasAsync();
+
+        // Assert
+        Assert.Empty(result);
+    }
+
+    [Fact]
+    public async Task Test_GetActiveMetaAsync()
     {
         // Arrange
         var response = new GetProjectMetasResponse();
@@ -83,7 +94,20 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_CreateAsync()
+    public async Task Test_GetActiveMetaAsync_Failed()
+    {
+        // Arrange
+        _mockProjectManagementClient.Setup(m => m.GetProjectMetasAsync(It.IsAny<GetProjectMetasRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
+
+        // Act
+        Shared.Models.Agent.ProjectMeta result = await _service.GetActiveMetaAsync();
+
+        // Assert
+        Assert.Equal(new Shared.Models.Agent.ProjectMeta(), result);
+    }
+
+    [Fact]
+    public async Task Test_()
     {
         // Arrange
         var response = new CreateProjectResponse
@@ -105,7 +129,20 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryDeleteAsync()
+    public async Task Test_CreateAsync_Failed()
+    {
+        // Arrange
+        _mockProjectManagementClient.Setup(m => m.CreateProjectAsync(It.IsAny<CreateProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
+
+        // Act
+        Shared.Models.Agent.ProjectMeta result = await _service.CreateAsync("Test");
+
+        // Assert
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task Test_TryDeleteAsync()
     {
         // Arrange
         var response = new Empty();
@@ -120,7 +157,20 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryActivateAsync()
+    public async Task Test_TryDeleteAsync_Failed()
+    {
+        // Arrange
+        _mockProjectManagementClient.Setup(m => m.DeleteProjectAsync(It.IsAny<DeleteProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
+
+        // Act
+        bool result = await _service.TryDeleteAsync(new Shared.Models.Agent.ProjectMeta());
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task Test_TryActivateAsync()
     {
         // Arrange
         var response = new Empty();
@@ -135,7 +185,20 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TrySaveAsync()
+    public async Task Test_TryActivateAsync_Failed()
+    {
+        // Arrange
+        _mockProjectManagementClient.Setup(m => m.ActivateProjectAsync(It.IsAny<ActivateProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
+
+        // Act
+        bool result = await _service.TryActivateAsync(new Shared.Models.Agent.ProjectMeta());
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task Test_TrySaveAsync()
     {
         // Arrange
         var response = new Empty();
@@ -143,7 +206,8 @@ public class ProjectManagementServiceTests
         _mockProjectManagementClient.Setup(m => m.SaveProjectAsync(It.IsAny<SaveProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
 
         // Act
-        bool result = await _service.TrySaveAsync(new Shared.Models.Agent.ProjectMeta(), new Shared.Models.Agent.ProjectSaveInfo {
+        bool result = await _service.TrySaveAsync(new Shared.Models.Agent.ProjectMeta(), new Shared.Models.Agent.ProjectSaveInfo
+        {
             State = SDK.Projects.ProjectState.Draft,
             VersionName = "123",
             Comment = string.Empty
@@ -154,7 +218,25 @@ public class ProjectManagementServiceTests
     }
 
     [Fact]
-    public async ValueTask Test_TryApproveAsync()
+    public async Task Test_TrySaveAsync_Failed()
+    {
+        // Arrange
+        _mockProjectManagementClient.Setup(m => m.SaveProjectAsync(It.IsAny<SaveProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
+
+        // Act
+        bool result = await _service.TrySaveAsync(new Shared.Models.Agent.ProjectMeta(), new Shared.Models.Agent.ProjectSaveInfo
+        {
+            State = SDK.Projects.ProjectState.Draft,
+            VersionName = "123",
+            Comment = string.Empty
+        });
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public async Task Test_TryApproveAsync()
     {
         // Arrange
         var response = new Empty();
@@ -162,7 +244,8 @@ public class ProjectManagementServiceTests
         _mockProjectManagementClient.Setup(m => m.ApproveProjectAsync(It.IsAny<ApproveProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
 
         // Act
-        bool result = await _service.TryApproveAsync(Guid.NewGuid().ToString(), new Shared.Models.Agent.ProjectSaveInfo {
+        bool result = await _service.TryApproveAsync(new Shared.Models.Agent.ProjectMeta(), new Shared.Models.Agent.ProjectSaveInfo
+        {
             State = SDK.Projects.ProjectState.Review,
             VersionName = "123",
             Comment = string.Empty
@@ -170,5 +253,23 @@ public class ProjectManagementServiceTests
 
         // Assert
         Assert.True(result);
+    }
+
+    [Fact]
+    public async Task Test_TryApproveAsync_Failed()
+    {
+        // Arrange
+        _mockProjectManagementClient.Setup(m => m.ApproveProjectAsync(It.IsAny<ApproveProjectRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
+
+        // Act
+        bool result = await _service.TryApproveAsync(new Shared.Models.Agent.ProjectMeta(), new Shared.Models.Agent.ProjectSaveInfo
+        {
+            State = SDK.Projects.ProjectState.Draft,
+            VersionName = "123",
+            Comment = string.Empty
+        });
+
+        // Assert
+        Assert.False(result);
     }
 }

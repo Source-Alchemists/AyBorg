@@ -1,7 +1,7 @@
 using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.System.Runtime;
-using AyBorg.Web.Services.AppState;
 using Grpc.Core;
 
 namespace AyBorg.Web.Services.Agent;
@@ -51,7 +51,7 @@ public class RuntimeService : IRuntimeService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to get status");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to get status!");
             return null!;
         }
     }
@@ -65,6 +65,7 @@ public class RuntimeService : IRuntimeService
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Start run [{executionType}].", executionType);
             StartRunResponse response = await _runtimeClient.StartRunAsync(new StartRunRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -76,7 +77,7 @@ public class RuntimeService : IRuntimeService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to start run");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to start run");
             return null!;
         }
     }
@@ -89,6 +90,7 @@ public class RuntimeService : IRuntimeService
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Stop run.");
             StopRunResponse response = await _runtimeClient.StopRunAsync(new StopRunRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -99,7 +101,7 @@ public class RuntimeService : IRuntimeService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to stop run");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to stop run");
             return null!;
         }
     }
@@ -112,6 +114,7 @@ public class RuntimeService : IRuntimeService
     {
         try
         {
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Abort run.");
             AbortRunResponse response = await _runtimeClient.AbortRunAsync(new AbortRunRequest
             {
                 AgentUniqueName = _stateService.AgentState.UniqueName,
@@ -122,7 +125,7 @@ public class RuntimeService : IRuntimeService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(ex, "Failed to abort run");
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Failed to abort run");
             return null!;
         }
     }

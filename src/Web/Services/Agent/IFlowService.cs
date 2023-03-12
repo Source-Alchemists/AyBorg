@@ -17,20 +17,18 @@ public interface IFlowService
     ValueTask<IEnumerable<Link>> GetLinksAsync();
 
     /// <summary>
-    /// Adds the step asynchronous.
+    /// Adds the step.
     /// </summary>
-    /// <param name="stepId">The step identifier.</param>
-    /// <param name="x">The x.</param>
-    /// <param name="y">The y.</param>
-    /// <returns></returns>
-    ValueTask<Step> AddStepAsync(Guid stepId, int x, int y);
+    /// <param name="step">The step.</param>
+    /// <returns>Added step.</returns>
+    ValueTask<Step> AddStepAsync(Step step);
 
     /// <summary>
     /// Removes the step.
     /// </summary>
-    /// <param name="stepId">The step identifier.</param>
+    /// <param name="step">The step.</param>
     /// <returns></returns>
-    ValueTask<bool> TryRemoveStepAsync(Guid stepId);
+    ValueTask<bool> TryRemoveStepAsync(Step step);
 
     /// <summary>
     /// Moves the step.
@@ -44,17 +42,17 @@ public interface IFlowService
     /// <summary>
     /// Add link between ports.
     /// </summary>
-    /// <param name="sourcePortId">The source port identifier.</param>
-    /// <param name="targetPortId">The target port identifier.</param>
+    /// <param name="sourcePort">The source port.</param>
+    /// <param name="targetPort">The target port.</param>
     /// <returns></returns>
-    ValueTask<Guid?> AddLinkAsync(Guid sourcePortId, Guid targetPortId);
+    ValueTask<Guid?> AddLinkAsync(Port sourcePort, Port targetPort);
 
     /// <summary>
     /// Removes the link.
     /// </summary>
-    /// <param name="linkId">The link identifier.</param>
+    /// <param name="link">The link.</param>
     /// <returns></returns>
-    ValueTask<bool> TryRemoveLinkAsync(Guid linkId);
+    ValueTask<bool> TryRemoveLinkAsync(Link link);
 
     /// <summary>
     /// Gets the port for the given iteration.

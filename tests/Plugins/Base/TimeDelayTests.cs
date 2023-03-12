@@ -14,7 +14,7 @@ public class TimeDelayTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public async ValueTask Test_TryRunAsync(bool isCanceled)
+    public async Task Test_TryRunAsync(bool isCanceled)
     {
         // Arrange
         var numericPort = (NumericPort)_plugin.Ports.First(p => p.Name.Equals("Milliseconds"));

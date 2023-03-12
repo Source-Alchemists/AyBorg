@@ -6,23 +6,32 @@
 <MudDialogProvider/>
 <MudSnackbarProvider/>
 
+<MudScrollToTop>
+    <MudFab Color="Color.Primary" Icon="@Icons.Material.Filled.KeyboardArrowUp" />
+</MudScrollToTop>
+
 <AuthorizeView>
     <Authorized>
         <MudLayout Class="mud-height-full">
             <MudDrawerContainer Class="mud-height-full">
-                <MudAppBar Elevation="0">
+                <MudAppBar Elevation="0" Class="blur">
                     <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
                     <MudSpacer />
-                    <MudIcon Icon="@Icons.Filled.WbSunny" />
-                    <MudSwitch T="bool" Checked="@_isDarkMode" CheckedChanged="OnThemeSwitchChanged"></MudSwitch>
+                    <MudToggleIconButton Toggled="@_isDarkMode"
+                                            ToggledChanged="OnThemeChanged"
+                                            Title="Switch to Dark Theme"
+                                            Icon="@Icons.Material.Outlined.DarkMode"
+                                            ToggledTitle="Switch to Light Theme"
+                                            ToggledIcon="@Icons.Material.Filled.LightMode" />
                     <UserMenu />
                 </MudAppBar>
 
                 <MudDrawer @bind-Open="@_isDrawerOpen" Elevation="0" Variant="@DrawerVariant.Responsive">
                     <MudDrawerHeader>
-                        <MudText Typo="Typo.h5" hidden="@(!_isDrawerOpen)">AyBorg</MudText>
+                        <MudImage Src="icons/logo.svg" Width="40" Height="40" />
+                        <MudText Typo="Typo.h5" hidden="@(!_isDrawerOpen)" Class="ml-3 mt-2 brand-text" Color="Color.Primary">AyBorg</MudText>
                     </MudDrawerHeader>
-                    <MudNavMenu Bordered="true">
+                    <MudNavMenu Bordered="true" Color="Color.Primary">
                         <NavMenu />
                     </MudNavMenu>
                 </MudDrawer>

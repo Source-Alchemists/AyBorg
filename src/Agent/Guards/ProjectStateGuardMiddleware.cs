@@ -1,4 +1,5 @@
 using AyBorg.Agent.Services;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent.Guards;
@@ -36,8 +37,8 @@ public sealed class ProjectStateGuardMiddleware
             return;
         }
 
-        IEnumerable<SDK.Data.DAL.ProjectMetaRecord> projectMetas = await _projectManagementService.GetAllMetasAsync();
-        SDK.Data.DAL.ProjectMetaRecord? projectMeta = projectMetas.FirstOrDefault(meta => meta.Id == _projectManagementService.ActiveProjectId);
+        IEnumerable<ProjectMetaRecord> projectMetas = await _projectManagementService.GetAllMetasAsync();
+        ProjectMetaRecord? projectMeta = projectMetas.FirstOrDefault(meta => meta.Id == _projectManagementService.ActiveProjectId);
         if (projectMeta == null)
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;

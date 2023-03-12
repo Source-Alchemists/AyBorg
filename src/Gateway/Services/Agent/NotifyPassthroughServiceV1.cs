@@ -1,6 +1,7 @@
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Gateway.Models;
 using AyBorg.SDK.Communication.gRPC;
+using AyBorg.SDK.System;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
@@ -72,7 +73,7 @@ public sealed class NotifyPassthroughServiceV1 : Notify.NotifyBase
     {
         return Task.Factory.StartNew(() =>
         {
-            IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName("AyBorg.Web");
+            IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Web);
             foreach (ChannelInfo channel in channels.Where(c => c.IsAcceptingNotifications))
             {
                 while (channel.Notifications.Count >= 10)

@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="LiteDB" Version="5.0.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\SDK\src\Projects\AyBorg.SDK.Projects.csproj" />
+    <ProjectReference Include="..\..\SDK\src\System\AyBorg.SDK.System.csproj" />
+  </ItemGroup>
+</Project>

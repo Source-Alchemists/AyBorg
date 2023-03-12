@@ -1,8 +1,8 @@
 using System.Globalization;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Tests.Dummies;
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Data.DAL;
 using AyBorg.SDK.Projects;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -29,7 +29,7 @@ public class RuntimeConverterServiceTests
     [InlineData(true, PortBrand.Enum, PortBrand.Enum)]
     [InlineData(true, PortBrand.Rectangle, null)]
     [InlineData(true, PortBrand.Image, null)]
-    public async ValueTask Test_TryUpdatePortValueAsync(bool expectedSuccess, PortBrand portBrand, object value)
+    public async Task Test_TryUpdatePortValueAsync(bool expectedSuccess, PortBrand portBrand, object value)
     {
         // Arrange
         if (portBrand == PortBrand.Rectangle)

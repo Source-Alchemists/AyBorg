@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Routing;
 using Microsoft.JSInterop;
 using MudBlazor;
+using MudBlazor.Utilities;
 
 namespace AyBorg.Web.Shared;
 
@@ -17,16 +18,11 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
     private bool _isDrawerOpen = true;
     private bool _isDisposed = false;
 
-    private readonly MudTheme _theme = new()
-    {
-        Palette = new Palette()
-        {
-            Info = "#00BCD4",
-        }
-    };
+    private readonly MudTheme _theme = new();
 
     protected override void OnInitialized()
     {
+        CreateTheme();
         RouteName = NavigationManager.Uri;
         NavigationManager.LocationChanged += HandleLocationChanged;
     }
@@ -62,7 +58,7 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
         StateHasChanged();
     }
 
-    private async void OnThemeSwitchChanged(bool value)
+    private async void OnThemeChanged(bool value)
     {
         _isDarkMode = !_isDarkMode;
         await JsRuntime.InvokeVoidAsync("switchTheme", _isDarkMode);
@@ -72,5 +68,38 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
     private void DrawerToggle()
     {
         _isDrawerOpen = !_isDrawerOpen;
+    }
+
+    private void CreateTheme()
+    {
+
+        // Light Theme
+        _theme.Palette.Secondary = new MudColor("#af4ae2");
+        _theme.Palette.Info = new MudColor("#00BCD4");
+        _theme.Palette.InfoDarken = "#00a1b6";
+        _theme.Palette.AppbarText = new MudColor("#424242ff");
+        _theme.Palette.AppbarBackground = new MudColor("#00000000");
+        _theme.Palette.Background = new MudColor("#f9f9f9");
+        _theme.Palette.DrawerBackground = new MudColor("#f9f9f9");
+
+        // Dark Theme
+        _theme.PaletteDark.TextPrimary = new MudColor("#f0f0f0");
+        _theme.PaletteDark.Secondary = new MudColor("#af4ae2");
+        _theme.PaletteDark.Info = new MudColor("#00BCD4");
+        _theme.PaletteDark.InfoDarken = "#00a1b6";
+        _theme.PaletteDark.Background = new MudColor("#1a1a27ff");
+        _theme.PaletteDark.BackgroundGrey = new MudColor("#252532");
+        _theme.PaletteDark.DrawerBackground = new MudColor("#1a1a27ff");
+        _theme.PaletteDark.DrawerText = new MudColor("#f0f0f0");
+        _theme.PaletteDark.AppbarBackground = new MudColor("#1a1a27cc");
+        _theme.PaletteDark.AppbarText = new MudColor("#f0f0f0");
+        _theme.PaletteDark.Surface = new MudColor("#1e1e2dff");
+
+        _theme.Shadows.Elevation[1] = "0 2px 4px -1px rgba(6, 24, 44, 0.2)";
+        _theme.LayoutProperties.DefaultBorderRadius = "6px";
+
+        _theme.Typography.H6.FontSize = "1.125rem";
+        _theme.Typography.H6.FontWeight = 700;
+        _theme.Typography.H6.LineHeight = 2d;
     }
 }
