@@ -1,11 +1,8 @@
 ﻿@using SDK.Authorization
-@* <MudNavLink Href="dashboard" Icon="@Icons.Filled.Dashboard" Match="NavLinkMatch.All">
-    Dashboard
-</MudNavLink> *@
 
 <AuthorizeView Roles="Administrator, Engineer, Reviewer">
     <Authorized>
-        <MudNavGroup Title="Agents" Icon="@Icons.Filled.Workspaces" IconColor="Color.Primary" Expanded="true">
+        <MudNavGroup Title="Agents" Icon="@Icons.Filled.Workspaces" IconColor="Color.Primary" Expanded="true" hidden="@(!_isAnyAgentAvailable)">
             <MudNavLink Href="agents/overview"  Match="NavLinkMatch.All">
                 Overview
             </MudNavLink>
@@ -24,20 +21,15 @@
     </Authorized>
 </AuthorizeView>
 
-@if(_isAnalyticsVisible)
-{
 <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
     <Authorized>
-        <MudNavLink Icon="@Icons.Material.Filled.Analytics" IconColor="Color.Primary" href="analytics">Analytics</MudNavLink>
+        <MudNavLink Icon="@Icons.Material.Filled.Analytics" IconColor="Color.Primary" href="analytics" hidden="@(!_isAnalyticsAvailable)">Analytics</MudNavLink>
     </Authorized>
 </AuthorizeView>
-}
 
-@if(_isAuditVisible)
-{
 <AuthorizeView Roles="Administrator, Auditor">
     <Authorized>
-        <MudNavGroup Title="Audit" Icon="@Icons.Material.Filled.Assignment" IconColor="Color.Primary" Expanded="true">
+        <MudNavGroup Title="Audit" Icon="@Icons.Material.Filled.Assignment" IconColor="Color.Primary" Expanded="true" hidden="@(!_isAuditAvailable)">
             <MudNavLink Href="audit/reports/create" Match="NavLinkMatch.All" >
                 Create Report
             </MudNavLink>
@@ -47,7 +39,6 @@
         </MudNavGroup>
     </Authorized>
 </AuthorizeView>
-}
 
 <AuthorizeView Roles="@Roles.Administrator">
     <Authorized>
