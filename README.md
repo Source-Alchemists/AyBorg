@@ -4,6 +4,8 @@
 
 :star:  We appreciate your star, it helps!
 
+![Logo](doc/img/logo.svg)
+
 Hey there! Are you tired of complex and expensive Industrial IoT solutions that only add to your headaches? Introducing AyBorg, the powerful and scalable no-code/low-code platform for your production processes.
 
 Our platform is free, open-source and provides a service-oriented architecture that can be easily adapted to your needs. With AyBorg, you'll have the power to build and customize your own industrial applications without needing to write a single line of code. Simply drag and drop elements, connect the ports and voila! You've got a fully functioning application that can be easily scaled and customized as your business grows.
@@ -14,11 +16,47 @@ With AyBorg, you don't have to worry about being locked into one vendor. Our pla
 
 So what are you waiting for? Say goodbye to complex and expensive solutions, and hello to the power of AyBorg. Get started today!
 
-## Steps
+## Agents
 
-Steps are called the plugins, provding methods executed in the runtime flow:
+### Editor
 
-![FlowScreenshot01](doc/img/FlowScreenshot01.png)
+![AgentEditor](doc/img/agent-editor.png)
+
+### Work with multiple agents
+
+![AgentOverview](doc/img/agent-overview.png)
+
+### Project overview
+
+![ProjectOverview](doc/img/agent-projects.png)
+
+## Analytics
+
+![Analytics](doc/img/analytics.png)
+
+## Audit
+
+### Create new audit report
+
+![AuditChangesets](doc/img/audit-changesets.png)
+
+### Audit changes (diff)
+
+![AuditDiff](doc/img/audit-diff.png)
+
+### Save your reports
+
+![AuditSavedReports](doc/img/audit-saved-reports.png)
+
+## Administration
+
+### Service overview
+
+![ServiceOverview](doc/img/admin-service-overview.png)
+
+### Usermanagement
+
+![Usermanagement](doc/img/admin-usermanagement.png)
 
 ## Getting started
 
