@@ -106,7 +106,7 @@ public static class AuditMapper
             Id = record.Id.ToString(),
             Timestamp = Timestamp.FromDateTime(record.Timestamp),
             ReportName = record.Name,
-            Comment = record.Comment
+            Comment = record.Comment ?? string.Empty
         };
 
         foreach (ChangesetRecord changeset in record.Changesets)
