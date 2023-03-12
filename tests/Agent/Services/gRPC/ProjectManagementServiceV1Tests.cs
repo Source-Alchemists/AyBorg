@@ -93,7 +93,7 @@ public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManag
     {
         // Arrange
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
-        _mockProjectManagementService.Setup(m => m.TrySaveNewVersionAsync(It.IsAny<Guid>(),
+        _mockProjectManagementService.Setup(m => m.TrySaveAsync(It.IsAny<Guid>(),
                                                                             It.IsAny<ProjectState>(),
                                                                             It.IsAny<string>(),
                                                                             It.IsAny<string>(),
@@ -207,7 +207,7 @@ public class ProjectManagementServiceV1Tests : BaseGrpcServiceTests<ProjectManag
         // Arrange
         var projectId = Guid.NewGuid();
         _mockContextUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", userRole) });
-        _mockProjectManagementService.Setup(m => m.TrySaveNewVersionAsync(It.IsAny<Guid>(),
+        _mockProjectManagementService.Setup(m => m.TrySaveAsync(It.IsAny<Guid>(),
                                                                             It.IsAny<ProjectState>(),
                                                                             It.IsAny<string>(),
                                                                             It.IsAny<string>(),

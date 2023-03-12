@@ -208,7 +208,7 @@ public sealed class ProjectManagementServiceTests
         _mockProjectRepository.Setup(r => r.TryRemoveRangeAsync(It.IsAny<IEnumerable<ProjectMetaRecord>>())).ReturnsAsync(isRemoveSuccessful);
 
         // Act
-        ProjectManagementResult result = await _service.TrySaveNewVersionAsync(projectId, newProjectState, "1.2.3", "Test_comment", approver);
+        ProjectManagementResult result = await _service.TrySaveAsync(projectId, newProjectState, "1.2.3", approver!, "Test_comment");
 
         // Assert
         Assert.Equal(expectedSuccess, result.IsSuccessful);

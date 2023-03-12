@@ -294,34 +294,27 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
     }
 
-    public async ValueTask<ProjectManagementResult> TrySaveNewVersionAsync(Guid projectMetaDbId, ProjectState projectState, string newVersionName, string comment, string? approver = null)
+    public async ValueTask<ProjectManagementResult> TrySaveAsync(Guid projectMetaDbId, ProjectState projectState, string newVersionName, string approver, string comment)
     {
         try
         {
-            ProjectMetaRecord? previousProjectMetaRecord = await _projectRepository.FindMetaAsync(projectMetaDbId);
-            if (previousProjectMetaRecord == null)
+            var informations = new Informations(approver!, approver!, comment, newVersionName);
+            ProjectRecord previousProjectRecord = await _projectRepository.FindAsync(projectMetaDbId);
+            if (previousProjectRecord == null)
             {
                 throw new KeyNotFoundException("No project found to save.");
             }
 
             // Moving from draft to review state
-            if (previousProjectMetaRecord.State == ProjectState.Draft)
+            if (previousProjectRecord.Meta.State == ProjectState.Draft)
             {
-                return await TrySaveDraftToReviewAsync(previousProjectMetaRecord, newVersionName, comment);
+                return await TrySaveDraftToReviewAsync(previousProjectRecord, informations);
             }
 
             // Moving back to draft state
-            if (previousProjectMetaRecord.State == ProjectState.Review && projectState == ProjectState.Draft)
+            if (previousProjectRecord.Meta.State == ProjectState.Review && projectState == ProjectState.Draft)
             {
-                previousProjectMetaRecord.State = projectState;
-                previousProjectMetaRecord.Comment = comment;
-                if (!await _projectRepository.TryUpdateAsync(previousProjectMetaRecord))
-                {
-                    throw new ProjectException("Could not update project.");
-                }
-
-                _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Project [{projectMetaRecord.Name}] changed to [Draft].", previousProjectMetaRecord.Name);
-                return new ProjectManagementResult(true, null, previousProjectMetaRecord.DbId);
+                return await TrySaveReviewAsDraftAsync(previousProjectRecord, projectState, informations);
             }
 
             if (projectState == ProjectState.Ready && string.IsNullOrEmpty(approver))
@@ -330,7 +323,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
 
             // Moving to ready state
-            return await SaveProjectAsReady(projectMetaDbId, projectState, newVersionName, comment, approver, previousProjectMetaRecord);
+            return await TrySaveReviewAsReadyAsync(previousProjectRecord, informations);
         }
         catch (Exception ex)
         {
@@ -339,20 +332,91 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
     }
 
-    private async ValueTask<ProjectManagementResult> SaveProjectAsReady(Guid projectMetaDbId, ProjectState projectState, string newVersionName, string comment, string? approver, ProjectMetaRecord previousProjectMetaRecord)
+    private async ValueTask<ProjectManagementResult> TrySaveDraftToReviewAsync(ProjectRecord projectRecord, Informations informations)
     {
         try
         {
-            ProjectRecord previousProjectRecord = await _projectRepository.FindAsync(projectMetaDbId);
-            ProjectMetaRecord projectMetaRecord = previousProjectMetaRecord with
+            long previousVersionIteration = projectRecord.Meta.VersionIteration;
+            projectRecord.Meta.State = ProjectState.Review;
+            projectRecord.Meta.Comment = informations.Comment;
+            projectRecord.Meta.VersionName = informations.VersionName;
+            projectRecord.Meta.VersionIteration++;
+            projectRecord.Meta.UpdatedDate = DateTime.UtcNow;
+
+            Guid auditToken = await _auditProviderService.AddAsync(projectRecord, informations.User);
+            if (auditToken.Equals(Guid.Empty))
+            {
+                throw new ProjectException("Could not add audit information.");
+            }
+
+            if (!await _projectRepository.TryUpdateAsync(projectRecord.Meta))
+            {
+                if (!await _auditProviderService.TryInvalidateAsync(auditToken))
+                {
+                    throw new ProjectException("Could not invalidate audit information.");
+                }
+
+                throw new ProjectException("Could not save project.");
+            }
+
+            // Remove all drafts from the history.
+            IEnumerable<ProjectMetaRecord> metas = (await _projectRepository.GetAllMetasAsync())
+                                                    .Where(pm => !pm.DbId.Equals(projectRecord.Meta.DbId)
+                                                            && pm.Id.Equals(projectRecord.Meta.Id)
+                                                            && pm.State.Equals(ProjectState.Draft)
+                                                            && pm.VersionIteration.Equals(previousVersionIteration));
+            if (!await _projectRepository.TryRemoveRangeAsync(metas))
+            {
+                throw new ProjectException("Could not remove drafts from history.");
+            }
+
+            _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Project [{projectMetaRecord.Name}] changed to [Review].", projectRecord.Meta.Name);
+            return new ProjectManagementResult(true, null, projectRecord.Meta.DbId);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(new EventId((int)EventLogType.ProjectState), ex, "Could not save project as review.");
+            return new ProjectManagementResult(false, "Could not save project as review.");
+        }
+    }
+
+    private async ValueTask<ProjectManagementResult> TrySaveReviewAsDraftAsync(ProjectRecord projectRecord, ProjectState projectState, Informations informations)
+    {
+        projectRecord.Meta.State = projectState;
+        projectRecord.Meta.Comment = informations.Comment;
+        Guid auditToken = await _auditProviderService.AddAsync(projectRecord, informations.User);
+
+        if (auditToken.Equals(Guid.Empty))
+        {
+            throw new ProjectException("Could not add audit information.");
+        }
+
+        if (!await _projectRepository.TryUpdateAsync(projectRecord.Meta))
+        {
+            if (!await _auditProviderService.TryInvalidateAsync(auditToken))
+            {
+                throw new ProjectException("Could not invalidate audit information.");
+            }
+            throw new ProjectException("Could not update project.");
+        }
+
+        _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Project [{projectMetaRecord.Name}] changed to [Draft].", projectRecord.Meta.Name);
+        return new ProjectManagementResult(true, null, projectRecord.Meta.DbId);
+    }
+
+    private async ValueTask<ProjectManagementResult> TrySaveReviewAsReadyAsync(ProjectRecord previousProjectRecord, Informations informations)
+    {
+        try
+        {
+            ProjectMetaRecord projectMetaRecord = previousProjectRecord.Meta with
             {
                 DbId = Guid.NewGuid(),
-                State = projectState,
-                VersionName = newVersionName,
-                VersionIteration = previousProjectMetaRecord.VersionIteration + 1,
-                Comment = comment,
+                State = ProjectState.Ready,
+                VersionName = informations.VersionName,
+                VersionIteration = previousProjectRecord.Meta.VersionIteration + 1,
+                Comment = informations.Comment,
                 UpdatedDate = DateTime.UtcNow,
-                ApprovedBy = approver
+                ApprovedBy = informations.Approver
             };
 
             if (previousProjectRecord.Meta.IsActive)
@@ -381,8 +445,23 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
             ReconstructSteps(previousProjectRecord, projectRecord);
 
-            await _projectRepository.AddAsync(projectRecord);
-            if (_engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(previousProjectMetaRecord.Id))
+            Guid auditToken = await _auditProviderService.AddAsync(projectRecord, informations.Approver);
+            if (auditToken.Equals(Guid.Empty))
+            {
+                throw new ProjectException("Could not add audit information.");
+            }
+
+            if (await _projectRepository.AddAsync(projectRecord) == null)
+            {
+                if (!await _auditProviderService.TryInvalidateAsync(auditToken))
+                {
+                    throw new ProjectException("Could not invalidate audit information.");
+                }
+
+                throw new ProjectException("Could not save project.");
+            }
+
+            if (_engineHost.ActiveProject != null && _engineHost.ActiveProject.Meta.Id.Equals(previousProjectRecord.Meta.Id))
             {
                 _engineHost.ActiveProject.Settings.IsForceResultCommunicationEnabled = false;
             }
@@ -437,42 +516,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
     }
 
-    private async ValueTask<ProjectManagementResult> TrySaveDraftToReviewAsync(ProjectMetaRecord projectMetaRecord, string versionName, string comment)
-    {
-        try
-        {
-            long previousVersionIteration = projectMetaRecord.VersionIteration;
-            projectMetaRecord.State = ProjectState.Review;
-            projectMetaRecord.Comment = comment;
-            projectMetaRecord.VersionName = versionName;
-            projectMetaRecord.VersionIteration++;
-            projectMetaRecord.UpdatedDate = DateTime.UtcNow;
-
-            if (!await _projectRepository.TryUpdateAsync(projectMetaRecord))
-            {
-                throw new ProjectException("Could not update project.");
-            }
-
-            // Remove all drafts from the history.
-            IEnumerable<ProjectMetaRecord> metas = (await _projectRepository.GetAllMetasAsync())
-                                                    .Where(pm => !pm.DbId.Equals(projectMetaRecord.DbId)
-                                                            && pm.Id.Equals(projectMetaRecord.Id)
-                                                            && pm.State.Equals(ProjectState.Draft)
-                                                            && pm.VersionIteration.Equals(previousVersionIteration));
-            if (!await _projectRepository.TryRemoveRangeAsync(metas))
-            {
-                throw new ProjectException("Could not remove drafts from history.");
-            }
-
-            _logger.LogInformation(new EventId((int)EventLogType.ProjectState), "Project [{projectMetaRecord.Name}] changed to [Review].", projectMetaRecord.Name);
-            return new ProjectManagementResult(true, null, projectMetaRecord.DbId);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(new EventId((int)EventLogType.ProjectState), ex, "Could not save project as review.");
-            return new ProjectManagementResult(false, "Could not save project as review.");
-        }
-    }
+    private record Informations(string User, string Approver, string Comment, string VersionName);
 }
 
 public record struct ProjectManagementResult(bool IsSuccessful, string? Message, Guid? ProjectMetaDbId = null);
