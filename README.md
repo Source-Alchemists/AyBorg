@@ -18,23 +18,35 @@ So what are you waiting for? Say goodbye to complex and expensive solutions, and
 
 ## Agents
 
+AyBorg's **Agents** are specially designed services for automating processes. Using the **AyBorg.Gateway**, they can seamlessly communicate with other areas of the application. These powerful tools are ideal for optimizing your workflow and can help increase your efficiency.
+
 ### Editor
+
+Our user-friendly editor makes it a breeze to program your own workflows using simple drag and drop of steps/plugins into the data flow.
 
 ![AgentEditor](doc/img/agent-editor.png)
 
 ### Work with multiple agents
 
+Experience unparalleled flexibility in your workflow! Work with as many agents as you want and distribute them across different systems. Thanks to seamless communication via the MQTT protocol, your creativity knows no bounds. Whether it's simple or complex scenarios, our agents enable you to perfectly realize your ideas!
+
 ![AgentOverview](doc/img/agent-overview.png)
 
 ### Project overview
+
+The project overview lays out all the projects and their current status. That way, you can see in a jiffy which projects have been given the green light for production.
 
 ![ProjectOverview](doc/img/agent-projects.png)
 
 ## Analytics
 
+Get an overview of all events at a glance, whether it's user interaction, system event, or exception. It is important that you can understand and control your system at all times.
+
 ![Analytics](doc/img/analytics.png)
 
 ## Audit
+
+In industries such as **medicine**, **pharmaceuticals**, and **food**, it is becoming increasingly important to conduct automated processes in an auditable system. Such a system is particularly essential in highly regulated areas such as **[FDA 21 CFR Part 11](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfcfr/cfrsearch.cfm)**. AyBorg has focused on ensuring high auditability and can therefore be used in these areas as well.
 
 ### Create new audit report
 
@@ -60,13 +72,15 @@ So what are you waiting for? Say goodbye to complex and expensive solutions, and
 
 ## Getting started
 
-Because AyBorg is orchastrated into multipe microservices, you need to start each service separately.
+Because AyBorg is orchastrated into multipe services, you need to start each service separately.
 In most cases the following setup makes sense:
 
 1. A MQTT broker (e.g. [Eclipse-Mosquitto](https://mosquitto.org))
 2. AyBorg.Gateway
-3. AyBorg.Web
-4. One or more [AyBorg.Agent(s)](doc/agent/agent.md)
+3. AyBorg.Analytics
+4. AyBorg.Audit
+5. AyBorg.Web
+6. One or more [AyBorg.Agent(s)](doc/agent/agent.md)
 
 The default appsettings give you a good starting point and will also work locally, but for real scenarios, you will need to change the settings.
 
