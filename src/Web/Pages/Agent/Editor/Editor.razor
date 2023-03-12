@@ -15,7 +15,7 @@ else
 <AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
 @if (_isProjectLoaded)
 {
-    <MudToolBar Class="px-0">
+<MudToolBar Class="px-0">
     <MudTooltip Text="Draft" hidden="@(_projectState != ProjectState.Draft)">
         <MudIcon Icon="@Icons.Filled.GppBad" Size="Size.Large" Color="Color.Error" />
     </MudTooltip>

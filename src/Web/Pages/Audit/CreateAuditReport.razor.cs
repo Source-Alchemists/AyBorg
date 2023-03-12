@@ -16,6 +16,7 @@ public partial class CreateAuditReport : ComponentBase
     private readonly Dictionary<ServiceOption, AuditChangesetTable> _changesetTables = new();
     private Dictionary<ServiceOption, List<AuditChangeset>> _filteredGroupedChangesets = new();
     private bool _isLoading = true;
+    private bool _areChangesetsAvailable = false;
     private bool _isFilterHidden = false;
     private ServiceOption[] _selectableServiceOptions = Array.Empty<ServiceOption>();
     private IEnumerable<ServiceOption> _selectedOptions = new HashSet<ServiceOption>();
@@ -49,6 +50,7 @@ public partial class CreateAuditReport : ComponentBase
             return;
         }
 
+        _areChangesetsAvailable = true;
         DateTime minTimestamp = unsortedChangesets.Min(c => c.Timestamp).ToUniversalTime();
         DateTime maxTimestamp = unsortedChangesets.Max(c => c.Timestamp).ToUniversalTime();
         _dateRange = new DateRange(minTimestamp, maxTimestamp);

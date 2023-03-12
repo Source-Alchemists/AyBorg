@@ -6,12 +6,21 @@
 <PageTitle>AyBorg - Audit Report</PageTitle>
 
 <div class="page-loading-bar">
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)"/>
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
 </div>
-<div hidden="@_isFilterHidden">
+
+@if (!_areChangesetsAvailable)
+{
+    <PagePlaceholder>
+        <MudAlert Severity="Severity.Info" ContentAlignment="HorizontalAlignment.Center"><strong>No changesets</strong> available.</MudAlert>
+    </PagePlaceholder>
+}
+
+<div hidden="@(_isFilterHidden || !_areChangesetsAvailable)">
     <MudToolBar Class="mud-full-width">
         <MudDateRangePicker Label="Date Range" Editable="true" @bind-DateRange="_dateRange" Class="mr-5" />
-        <MudSelect T="ServiceOption" Label="Services" MultiSelection="true" SelectAll="true" ToStringFunc="@_serviceSelectionConveter" @bind-SelectedValues="_selectedOptions" Class="mr-5">
+        <MudSelect T="ServiceOption" Label="Services" MultiSelection="true" SelectAll="true"
+            ToStringFunc="@_serviceSelectionConveter" @bind-SelectedValues="_selectedOptions" Class="mr-5">
             @foreach (var option in _selectableServiceOptions)
             {
                 <MudSelectItem T="ServiceOption" Value="@option">@option.Label</MudSelectItem>
@@ -27,7 +36,7 @@
 
     @if (!_filteredGroupedChangesets.Keys.Any())
     {
-        <MudAlert Severity="Severity.Info" ContentAlignment="HorizontalAlignment.Center">No changesets to compare.</MudAlert>
+        <MudAlert Severity="Severity.Info" ContentAlignment="HorizontalAlignment.Center"><strong>No changesets</strong> to compare.</MudAlert>
     }
 
     @foreach (var service in _filteredGroupedChangesets.Keys)
@@ -51,14 +60,15 @@
 @if (_isFilterHidden)
 {
     <MudToolBar Class="mud-full-width">
-        <MudTooltip Text="Back">
-            <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small" OnClick="PreviewBackClicked" />
-        </MudTooltip>
-        <MudSpacer />
-        <MudTooltip Text="Save report">
-            <MudIconButton Icon="@Icons.Material.Filled.SaveAlt" Title="Save report" Color="Color.Primary" OnClick="@SaveClicked" />
-        </MudTooltip>
-
-    </MudToolBar>
-    <CompareView SelectedChangesets="_selectedChangesets" Loaded="CompareViewLoaded" />
+    <MudTooltip Text="Back">
+        <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small"
+            OnClick="PreviewBackClicked" />
+    </MudTooltip>
+    <MudSpacer />
+    <MudTooltip Text="Save report">
+        <MudIconButton Icon="@Icons.Material.Filled.SaveAlt" Title="Save report" Color="Color.Primary"
+            OnClick="@SaveClicked" />
+    </MudTooltip>
+</MudToolBar>
+<CompareView SelectedChangesets="_selectedChangesets" Loaded="CompareViewLoaded" />
 }
