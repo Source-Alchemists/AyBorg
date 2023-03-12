@@ -46,6 +46,13 @@ public partial class SavedAuditReports : ComponentBase
             tmpReports.Add(report);
         }
         _auditReports.AddRange(tmpReports.OrderByDescending(r => r.Timestamp));
+        if(!_auditReports.Any())
+        {
+            // Nothing to load
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
+            return;
+        }
         _filteredAuditReports.AddRange(_auditReports);
         DateTime min = _auditReports.Min(r => r.Timestamp);
         DateTime max = _auditReports.Max(r => r.Timestamp);
