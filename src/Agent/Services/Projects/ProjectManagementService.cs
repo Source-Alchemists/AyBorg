@@ -516,7 +516,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         }
     }
 
-    private record Informations(string User, string Approver, string Comment, string VersionName);
+    private sealed record Informations(string User, string Approver, string Comment, string VersionName);
 }
 
 public record struct ProjectManagementResult(bool IsSuccessful, string? Message, Guid? ProjectMetaDbId = null);
