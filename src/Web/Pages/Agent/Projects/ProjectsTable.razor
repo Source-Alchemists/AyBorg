@@ -36,7 +36,7 @@
                     </MudMenuItem>
                 }
                 @if (@context.State == SDK.Projects.ProjectState.Review) {
-                    <MudMenuItem Icon="@Icons.Filled.Cancel" IconColor="Color.Secondary" @onclick="(args) => OnAbandonClicked(args, context)">
+                    <MudMenuItem Icon="@Icons.Filled.Cancel" IconColor="Color.Error" @onclick="(args) => OnAbandonClicked(args, context)">
                             Abandon
                     </MudMenuItem>
                     <AuthorizeView Roles="Administrator, Reviewer" Context="other">
