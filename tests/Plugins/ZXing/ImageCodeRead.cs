@@ -25,7 +25,7 @@ namespace AyBorg.Plugins.ZXing.Tests
 
             // Assert
             Assert.True(result);
-            Assert.Equal("ABC-abc-1234", (readerBarcode.Ports.Single(x => x.Name == "Code") as StringPort)!.Value);
+            Assert.Equal("ABC-abc-1234", (readerBarcode.Ports.Single(x => x.Name == "Codes") as StringCollectionPort)!.Value.First());
         }
 
         [Fact]
@@ -43,7 +43,7 @@ namespace AyBorg.Plugins.ZXing.Tests
 
             // Assert
             Assert.True(result);
-            Assert.Equal("ABC-abc-1234", (readerBarcode.Ports.Single(x => x.Name == "Code") as StringPort)!.Value);
+            Assert.Equal("ABC-abc-1234", (readerBarcode.Ports.Single(x => x.Name == "Codes") as StringCollectionPort)!.Value.First());
         }
 
         [Fact]
@@ -61,7 +61,7 @@ namespace AyBorg.Plugins.ZXing.Tests
 
             // Assert
             Assert.True(result);
-            Assert.Equal("ABC-abc-1234", (readerBarcode.Ports.Single(x => x.Name == "Code") as StringPort)!.Value);
+            Assert.Equal("ABC-abc-1234", (readerBarcode.Ports.Single(x => x.Name == "Codes") as StringCollectionPort)!.Value.First());
         }
 
         [Fact]
@@ -79,7 +79,7 @@ namespace AyBorg.Plugins.ZXing.Tests
 
             // Assert
             Assert.True(result);
-            Assert.Equal("https://123TestTest567", (readerBarcode.Ports.Single(x => x.Name == "Code") as StringPort)!.Value);
+            Assert.Equal("https://123TestTest567", (readerBarcode.Ports.Single(x => x.Name == "Codes") as StringCollectionPort)!.Value.First());
         }
 
         [Fact]
@@ -97,7 +97,7 @@ namespace AyBorg.Plugins.ZXing.Tests
 
             // Assert
             Assert.False(result);
-            Assert.Equal(string.Empty, (readerBarcode.Ports.Single(x => x.Name == "Code") as StringPort)!.Value);
+            Assert.Empty((readerBarcode.Ports.Single(x => x.Name == "Codes") as StringCollectionPort)!.Value);
         }
 
         [Fact]
@@ -115,7 +115,7 @@ namespace AyBorg.Plugins.ZXing.Tests
 
             // Assert
             Assert.False(result);
-            Assert.Equal(string.Empty, (readerBarcode.Ports.Single(x => x.Name == "Code") as StringPort)!.Value);
+            Assert.Empty((readerBarcode.Ports.Single(x => x.Name == "Codes") as StringCollectionPort)!.Value);
         }
     }
 }
