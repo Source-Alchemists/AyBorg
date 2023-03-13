@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using AyBorg.Plugins.ZXing.Models;
 using AyBorg.SDK.Common;
@@ -16,7 +17,7 @@ namespace AyBorg.Plugins.ZXing
         private readonly BooleanPort _allowAutoRotatePort = new("Auto rotate", PortDirection.Input, false);
         private readonly BooleanPort _allowTryInvertPort = new("Auto invert", PortDirection.Input, false);
         private readonly BooleanPort _allowTryHarderPort = new("Harder", PortDirection.Input, false);
-        private readonly StringPort _codePort = new("Code", PortDirection.Output, string.Empty);
+        private readonly StringCollectionPort _codesPort = new("Codes", PortDirection.Output, new ReadOnlyCollection<string>(new List<string>()));
         private readonly BarcodeReaderGeneric _nativeReader = new();
 
         private byte[] _tmpBuffer = null!;
@@ -32,7 +33,7 @@ namespace AyBorg.Plugins.ZXing
             {
                 _imagePort,
                 _formatPort,
-                _codePort,
+                _codesPort,
                 _allowAutoRotatePort,
                 _allowTryInvertPort,
                 _allowTryHarderPort
@@ -56,7 +57,7 @@ namespace AyBorg.Plugins.ZXing
             _nativeReader.Options.TryInverted = _allowTryInvertPort.Value;
             _nativeReader.Options.TryHarder = _allowTryHarderPort.Value;
 
-            Result? value = _nativeReader.Decode(rgbLumSrc);
+            Result[]? value = _nativeReader.DecodeMultiple(rgbLumSrc);
 
             if (value is null)
             {
@@ -67,23 +68,23 @@ namespace AyBorg.Plugins.ZXing
                 return ValueTask.FromResult(false);
             }
 
-            _codePort.Value = value.Text;
+            _codesPort.Value = new ReadOnlyCollection<string>(value.Select(v => v.Text).ToList());
             if (_logger.IsEnabled(LogLevel.Trace))
             {
-                _logger.LogTrace(new EventId((int)EventLogType.Result), "Code string: '{_codePort.Value}'", _codePort.Value);
-            } 
+                _logger.LogTrace(new EventId((int)EventLogType.Result), "Code string: '{_codePort.Value}'", _codesPort.Value);
+            }
             return ValueTask.FromResult(true);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static IList<BarcodeFormat> GetBarcodeFormats(Enum enumObj)
         {
-            if(enumObj.Equals(CodeFormats.All_Barcodes) || enumObj.Equals(CodeFormats.All_MatrixBarcodes) || (enumObj.Equals(CodeFormats.All)))
+            if (enumObj.Equals(CodeFormats.All_Barcodes) || enumObj.Equals(CodeFormats.All_MatrixBarcodes) || (enumObj.Equals(CodeFormats.All)))
             {
                 return Enum.GetValues(typeof(CodeFormats))
                     .Cast<CodeFormats>()
                     .Where(flag => ((CodeFormats)enumObj).HasFlag(flag))
-                    .Select( flag => { Enum.TryParse(flag.ToString(), out BarcodeFormat c); return c;})
+                    .Select(flag => { _ = Enum.TryParse(flag.ToString(), out BarcodeFormat c); return c; })
                     .ToList();
             }
             else
@@ -91,6 +92,6 @@ namespace AyBorg.Plugins.ZXing
                 _ = Enum.TryParse(enumObj.ToString(), out BarcodeFormat barcodeFormat);
                 return new List<BarcodeFormat> { barcodeFormat };
             }
-        }      
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Collections.ObjectModel;
+using AutoMapper;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
@@ -12,11 +13,11 @@ namespace AyBorg.Data.Agent.Tests;
 
 public class RuntimeStorageMapperTests
 {
+    private readonly RuntimeToStorageMapper _mapper = new();
     [Fact]
     public void MapStepProxyWithInvalidPort()
     {
         // Arrange
-        var mapper = new RuntimeToStorageMapper();
         Mock<IStepProxy> mockedStepProxy = CreateStepProxyMock();
 
         var mockedPort1 = new Mock<IPort>();
@@ -31,14 +32,13 @@ public class RuntimeStorageMapperTests
         mockedStepProxy.Setup(x => x.Ports).Returns(ports);
 
         // Act / Assert
-        Assert.Throws<AutoMapperMappingException>(() => mapper.Map(mockedStepProxy.Object));
+        Assert.Throws<AutoMapperMappingException>(() => _mapper.Map(mockedStepProxy.Object));
     }
 
     [Fact]
     public void MapStepProxyWithMultiplePorts()
     {
         // Arrange
-        var mapper = new RuntimeToStorageMapper();
         Mock<IStepProxy> mockedStepProxy = CreateStepProxyMock();
 
         var ports = new List<IPort>
@@ -50,7 +50,7 @@ public class RuntimeStorageMapperTests
         mockedStepProxy.Setup(x => x.Ports).Returns(ports);
 
         // Act
-        StepRecord result = mapper.Map(mockedStepProxy.Object);
+        StepRecord result = _mapper.Map(mockedStepProxy.Object);
 
         // Assert
         Assert.Equal(100, result.X);
@@ -69,7 +69,6 @@ public class RuntimeStorageMapperTests
     public void MapStepProxyWithOneIntegerPort()
     {
         // Arrange
-        var mapper = new RuntimeToStorageMapper();
         Mock<IStepProxy> mockedStepProxy = CreateStepProxyMock();
 
         var ports = new List<IPort>
@@ -80,7 +79,7 @@ public class RuntimeStorageMapperTests
         mockedStepProxy.Setup(x => x.Ports).Returns(ports);
 
         // Act
-        StepRecord result = mapper.Map(mockedStepProxy.Object);
+        StepRecord result = _mapper.Map(mockedStepProxy.Object);
 
         // Assert
         Assert.Equal(100, result.X);
@@ -96,7 +95,6 @@ public class RuntimeStorageMapperTests
     public void MapStepProxyWithOneStringPort()
     {
         // Arrange
-        var mapper = new RuntimeToStorageMapper();
         Mock<IStepProxy> mockedStepProxy = CreateStepProxyMock();
 
         var ports = new List<IPort>
@@ -107,7 +105,7 @@ public class RuntimeStorageMapperTests
         mockedStepProxy.Setup(x => x.Ports).Returns(ports);
 
         // Act
-        StepRecord result = mapper.Map(mockedStepProxy.Object);
+        StepRecord result = _mapper.Map(mockedStepProxy.Object);
 
         // Assert
         Assert.Equal(100, result.X);
@@ -123,8 +121,6 @@ public class RuntimeStorageMapperTests
     public void MapProjectWithLinkedStepProxy()
     {
         // Arrange
-        var mapper = new RuntimeToStorageMapper();
-
         Mock<IStepProxy> mockedStepProxy1 = CreateStepProxyMock();
         var step1outputPort = new NumericPort("Output", PortDirection.Output, 123);
         mockedStepProxy1.Setup(x => x.Ports).Returns(new List<IPort> { step1outputPort });
@@ -149,7 +145,7 @@ public class RuntimeStorageMapperTests
         };
 
         // Act
-        ProjectRecord result = mapper.Map(project);
+        ProjectRecord result = _mapper.Map(project);
 
         // Assert
         Assert.Equal(2, result.Steps.Count);
@@ -163,7 +159,6 @@ public class RuntimeStorageMapperTests
     public void MapProject()
     {
         // Arrange
-        var mapper = new RuntimeToStorageMapper();
         Mock<IStepProxy> mockedStepProxy1 = CreateStepProxyMock("Step1", 1, 2);
         Mock<IStepProxy> mockedStepProxy2 = CreateStepProxyMock("Step2", 3, 4);
         var project = new Project
@@ -173,7 +168,7 @@ public class RuntimeStorageMapperTests
         };
 
         // Act
-        ProjectRecord result = mapper.Map(project);
+        ProjectRecord result = _mapper.Map(project);
 
         // Assert
         Assert.Equal("Testproject", result.Meta.Name);
@@ -184,13 +179,12 @@ public class RuntimeStorageMapperTests
     public void TestMapStepWithFolderPort()
     {
         // Arrange
-        var mapper = new RuntimeToStorageMapper();
         var folderPort = new FolderPort("FolderPort", PortDirection.Input, "/testFolder");
         Mock<IStepProxy> mockedStepProxy = CreateStepProxyMock();
         mockedStepProxy.Setup(x => x.Ports).Returns(new List<IPort> { folderPort });
 
         // Act
-        StepRecord result = mapper.Map(mockedStepProxy.Object);
+        StepRecord result = _mapper.Map(mockedStepProxy.Object);
 
         // Assert
         Assert.Single(result.Ports);
@@ -203,13 +197,12 @@ public class RuntimeStorageMapperTests
     public void TestMapStepWithEmptyImagePort()
     {
         // Arrange
-        var mapper = new RuntimeToStorageMapper();
         var imagePort = new ImagePort("ImagePort", PortDirection.Input, null!);
         Mock<IStepProxy> mockedStepProxy = CreateStepProxyMock();
         mockedStepProxy.Setup(x => x.Ports).Returns(new List<IPort> { imagePort });
 
         // Act
-        StepRecord result = mapper.Map(mockedStepProxy.Object);
+        StepRecord result = _mapper.Map(mockedStepProxy.Object);
 
         // Assert
         Assert.Single(result.Ports);
@@ -222,7 +215,6 @@ public class RuntimeStorageMapperTests
     public void TestMapStepWithFilledImagePort()
     {
         // Arrange
-        var mapper = new RuntimeToStorageMapper();
         var pixelBuffer = new PixelBuffer<L8>(2, 2, new L8[] { 0x00, 0x01, 0x80, 0xFF });
         var image = new Image(pixelBuffer);
         using var imagePort = new ImagePort("ImagePort", PortDirection.Input, image);
@@ -230,7 +222,7 @@ public class RuntimeStorageMapperTests
         mockedStepProxy.Setup(x => x.Ports).Returns(new List<IPort> { imagePort });
 
         // Act
-        StepRecord result = mapper.Map(mockedStepProxy.Object);
+        StepRecord result = _mapper.Map(mockedStepProxy.Object);
 
         // Assert
         Assert.Single(result.Ports);
@@ -242,6 +234,25 @@ public class RuntimeStorageMapperTests
         Assert.Equal(image.Size, imageRecord.Size);
         Assert.Equal(image.PixelFormat, imageRecord.PixelFormat);
         Assert.Equal(string.Empty, imageRecord.Value);
+    }
+
+    [Fact]
+    public void Test_MapStringCollectionPort()
+    {
+        // Arrange
+        var collection = new List<string> {
+            "Test1",
+            "Test2",
+            "Test3"
+        };
+        var port = new StringCollectionPort("TestPort", PortDirection.Input, new ReadOnlyCollection<string>(collection));
+
+        // Act
+        PortRecord result = _mapper.Map(port);
+
+        // Assert
+        Assert.Equal("TestPort", result.Name);
+        Assert.Equal("[\"Test1\",\"Test2\",\"Test3\"]", result.Value);
     }
 
     private static Mock<IStepProxy> CreateStepProxyMock(string typeName = "MockedStep", int x = 100, int y = 200)

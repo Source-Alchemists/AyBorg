@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
@@ -78,6 +79,9 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
                 return UpdateRectanglePortValue(rectanglePort, value);
             case ImagePort imagePort:
                 return UpdateImagePortValue(imagePort);
+            // Collections
+            case StringCollectionPort stringCollectionPort:
+                return UpdateStringCollectionPortValue(stringCollectionPort, value);
         }
 
         _logger.LogError("Port type {PortType} is not supported", port.GetType().Name);
@@ -162,6 +166,16 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         }
         port.Value = new Rectangle(record.X, record.Y, record.Width, record.Height);
 
+        return true;
+    }
+
+    private static bool UpdateStringCollectionPortValue(StringCollectionPort port, object value)
+    {
+        List<string> record = JsonSerializer.Deserialize<List<string>>(value.ToString()!, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        })!;
+        port.Value = new ReadOnlyCollection<string>(record);
         return true;
     }
 

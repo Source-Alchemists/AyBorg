@@ -32,9 +32,21 @@ public sealed class RuntimeToStorageMapper : IRuntimeToStorageMapper
             config.CreateMap<ImagePort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new ImageToRecordConverter()));
             config.CreateMap<RectanglePort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new RectangleToRecordConverter()));
             config.CreateMap<EnumPort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new EnumToRecordConverter()));
+            // Port collections
+            config.CreateMap<StringCollectionPort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<string>()));
         });
 
-        _mapper = new AutoMapper.Mapper(config);
+        _mapper = new Mapper(config);
+    }
+
+    /// <summary>
+    /// Maps the specified port.
+    /// </summary>
+    /// <param name="port">The port.</param>
+    /// <returns></returns>
+    public PortRecord Map(IPort port)
+    {
+        return _mapper.Map<PortRecord>(port);
     }
 
     /// <summary>
