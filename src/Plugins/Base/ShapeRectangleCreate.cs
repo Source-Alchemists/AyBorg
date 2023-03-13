@@ -14,7 +14,7 @@ public sealed class ShapeRectangleCreate : IStepBody
 
     public string DefaultName => "Shape.Rectangle.Create";
 
-    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.ImageShapes };
+    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.ImageShapes };
 
     public IEnumerable<IPort> Ports { get; }
 

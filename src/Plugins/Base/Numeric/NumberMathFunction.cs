@@ -12,7 +12,7 @@ public sealed class NumberMathFunction : IStepBody
 
     public string DefaultName => "Number.Math.Function";
 
-    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.Math };
+    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Math };
 
     public IEnumerable<IPort> Ports { get; }
 

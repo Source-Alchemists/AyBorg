@@ -24,7 +24,7 @@ namespace AyBorg.Plugins.ZXing
 
         public string DefaultName => "Image.Code.Read";
 
-        public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
+        public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
         public ImageCodeRead(ILogger<ImageCodeRead> logger)
         {

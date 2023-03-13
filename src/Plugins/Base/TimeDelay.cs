@@ -10,7 +10,7 @@ public sealed class TimeDelay : IStepBody
     /// <inheritdoc />
     public string DefaultName => "Time.Delay";
 
-    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.Time };
+    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Time };
 
     /// <summary>
     /// Initializes a new instance of the <see cref="Delay"/> class.

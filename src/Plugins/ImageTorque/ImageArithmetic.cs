@@ -16,7 +16,7 @@ public sealed class ImageArithemtic : IStepBody, IDisposable
 
     public string DefaultName => "Image.Arithmetic";
 
-    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.Math };
+    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.Math };
 
     public IEnumerable<IPort> Ports { get; }
 

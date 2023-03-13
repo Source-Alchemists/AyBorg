@@ -56,7 +56,7 @@ public sealed class StepProxy : IStepProxy
     /// <summary>
     /// Gets the categories.
     /// </summary>
-    public IEnumerable<string> Categories { get; }
+    public IReadOnlyCollection<string> Categories { get; }
 
     /// <summary>
     /// Gets the links.

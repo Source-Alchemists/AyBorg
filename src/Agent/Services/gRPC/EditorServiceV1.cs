@@ -244,6 +244,10 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             }
 
             PortLink newPortLink = await _flowService.LinkPortsAsync(sourceId, targetId);
+            if(newPortLink == null)
+            {
+                throw new RpcException(new Status(StatusCode.NotFound, "Invalid link"));
+            }
             return new LinkFlowPortsResponse
             {
                 LinkId = newPortLink.Id.ToString()

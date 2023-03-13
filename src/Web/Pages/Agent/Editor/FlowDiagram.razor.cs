@@ -331,6 +331,13 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         }
 
         Guid? newLinkId = await FlowService.AddLinkAsync(sourcePort.Port, targetPort.Port);
+        if(newLinkId == null)
+        {
+            Snackbar.Add("Link is not compatible", Severity.Warning);
+            _diagram.Links.Remove(tmpLink);
+            return;
+        }
+
         Link newLink = await FlowService.GetLinkAsync((Guid)newLinkId);
         if (newLink != null && !tmpLink.Id.Equals(newLink.Id.ToString()))
         {

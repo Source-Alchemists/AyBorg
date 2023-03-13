@@ -15,7 +15,7 @@ public sealed class ImageScale : IStepBody, IDisposable
 
     public string DefaultName => "Image.Scale";
 
-    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
+    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
     public IEnumerable<IPort> Ports { get; }
 

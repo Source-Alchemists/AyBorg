@@ -19,7 +19,7 @@ public sealed class ImageSave : IStepBody
 
     public string DefaultName => "Image.Save";
 
-    public IEnumerable<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
+    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
     public IEnumerable<IPort> Ports { get; }
 

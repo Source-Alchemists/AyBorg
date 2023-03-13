@@ -20,7 +20,7 @@ public class DummyStep : IStepBody
     }
 
     public string DefaultName => "Dummy";
-    public IEnumerable<string> Categories { get; } = new List<string>();
+    public IReadOnlyCollection<string> Categories { get; } = new List<string>();
     public IEnumerable<IPort> Ports { get; }
     public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
