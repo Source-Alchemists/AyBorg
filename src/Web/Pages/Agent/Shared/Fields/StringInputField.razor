@@ -4,6 +4,6 @@
 {
 <EditFieldButton Label="@Port.Name" Value="@Port.Value" Disabled="@(Port.IsLinkConvertable || Disabled)" Clicked="@OnEditFieldClicked" />
 }
-<div Margin="Margin.Is3.OnX" Class="mud-full-width"  hidden="@(!IsEditFieldVisible)">
+<div class="mud-full-width"  hidden="@(!IsEditFieldVisible)">
     <MudTextField @bind-Value="@_value" Class="flow-input-body" OnKeyUp="@OnKeyUp" OnBlur="OnFocusOut" />
 </div>

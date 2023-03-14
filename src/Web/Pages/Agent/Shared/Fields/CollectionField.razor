@@ -1,0 +1,20 @@
+<div class="mud-full-width" style="min-height: 337px; max-height: 337px">
+    <MudBadge Content="@(_values.Count())" Color="Color.Secondary">
+        <MudText>@Port.Name</MudText>
+    </MudBadge>
+    <div class="mud-full-width overflow-scroll" style="min-height: 270px; max-height: 270px">
+        <MudList Class="py-0" Dense>
+            @foreach (var item in @_values)
+            {
+                <MudListItem Class="flow-input-body">
+                    @if (Port.Brand == SDK.Common.Ports.PortBrand.StringCollection)
+                    {
+                        <StringInput PortBrand="Port.Brand" Value="@item" Disabled="@(Port.IsLinkConvertable || Disabled)" />
+                    }
+                </MudListItem>
+            }
+        </MudList>
+    </div>
+    <MudButton StartIcon="@Icons.Material.Filled.AddBox" Class="mud-full-width" Color="Color.Default"
+        Variant="Variant.Filled" DisableElevation="true" Disabled="@(Port.IsLinkConvertable || Disabled)">Item</MudButton>
+</div>

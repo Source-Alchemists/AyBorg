@@ -47,7 +47,6 @@ public class FlowNode : NodeModel
     public void Update(Step newStep)
     {
         Step.ExecutionTimeMs = newStep.ExecutionTimeMs;
-        Position = new Point(newStep.X, newStep.Y);
         foreach (FlowPort targetFlowPort in Ports.Cast<FlowPort>())
         {
             Port sourcePort = newStep.Ports!.FirstOrDefault(p => p.Id.Equals(targetFlowPort.Port.Id))!;

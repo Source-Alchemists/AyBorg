@@ -119,7 +119,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                 Step newStep = await FlowService.GetStepAsync(node.Step.Id, iterationId);
                 if (newStep != null)
                 {
-                    node.Update(newStep);
+                    await InvokeAsync(() => node.Update(newStep));
                 }
                 else
                 {

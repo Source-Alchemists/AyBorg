@@ -125,7 +125,6 @@
     font-size: .875rem;
     font-weight: 500;
     letter-spacing: .0892857143em;
-    text-transform: uppercase;
     border-radius: 4px;
     transition: all .3s cubic-bezier(.4,0,.2,1);
 }
