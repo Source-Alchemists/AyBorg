@@ -165,7 +165,7 @@ public class FlowServiceTests
         AsyncUnaryCall<GetFlowLinksResponse> callGetFlowLinks = GrpcCallHelpers.CreateAsyncUnaryCall(getFlowLinksResponse);
         _mockEditorClient.Setup(m => m.GetFlowLinksAsync(It.IsAny<GetFlowLinksRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(callGetFlowLinks);
 
-        _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link());
+        _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<LinkDto>())).Returns(new Link { Id = Guid.NewGuid() });
 
         // Act
         Link result = await _service.GetLinkAsync(Guid.NewGuid());
@@ -173,11 +173,11 @@ public class FlowServiceTests
         // Assert
         if (hasLink)
         {
-            Assert.NotNull(result);
+            Assert.NotEqual(Guid.Empty, result.Id);
         }
         else
         {
-            Assert.Null(result);
+            Assert.Equal(Guid.Empty, result.Id);
         }
     }
 
