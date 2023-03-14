@@ -339,11 +339,11 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         }
 
         Link newLink = await FlowService.GetLinkAsync((Guid)newLinkId);
-        if (newLink != null && !tmpLink.Id.Equals(newLink.Id.ToString()))
+        if (!tmpLink.Id.Equals(newLink.Id.ToString()))
         {
             _diagram.Links.Remove(tmpLink);
         }
-        if (newLink == null)
+        if (newLink.Id.Equals(Guid.Empty))
         {
             Logger.LogWarning("Failed to add link from {Id} to {Id}", sourcePort.Port.Id, targetPort.Port.Id);
             Snackbar.Add("Link is not compatible", Severity.Warning);
@@ -397,7 +397,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         IEnumerable<Link> links = await FlowService.GetLinksAsync();
         var targetPort = (FlowPort)link.TargetPort;
         Link orgLink = links.FirstOrDefault(l => l.Id.ToString().Equals(link.Id));
-        if (orgLink == null) return; // Nothing to do. Already removed.
+        if (orgLink.Id.Equals(Guid.Empty)) return; // Nothing to do. Already removed.
         if (!await FlowService.TryRemoveLinkAsync(orgLink))
         {
             _diagram.Links.Add(link);

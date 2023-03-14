@@ -134,7 +134,7 @@ public class FlowService : IFlowService
         if (resultLink == null)
         {
             _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), "Could not find link with id [{linkId}]!", linkId);
-            return null!;
+            return new Link();
         }
 
         return _rpcMapper.FromRpc(resultLink);
