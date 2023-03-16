@@ -1,10 +1,10 @@
 # AyBorg
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Source-Alchemists_AyBorg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Source-Alchemists_AyBorg) [![Twitter Follow](https://img.shields.io/twitter/follow/ayborg_io?logo=twitter&style=flat-square)](https://twitter.com/ayborg_io?ref_src=twsrc%5Etfw)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Source-Alchemists_AyBorg&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=Source-Alchemists_AyBorg)
 
 :star:  We appreciate your star, it helps!
 
-![Logo](doc/img/logo.svg)
+![Logo](docs/img/logo.svg)
 
 Hey there! Are you tired of complex and expensive Industrial IoT solutions that only add to your headaches? Introducing AyBorg, the powerful and scalable no-code/low-code platform for your production processes.
 
@@ -24,25 +24,25 @@ AyBorg's **Agents** are specially designed services for automating processes. Us
 
 Our user-friendly editor makes it a breeze to program your own workflows using simple drag and drop of steps/plugins into the data flow.
 
-![AgentEditor](doc/img/agent-editor.png)
+![AgentEditor](docs/img/agent-editor.png)
 
 ### Work with multiple agents
 
 Experience unparalleled flexibility in your workflow! Work with as many agents as you want and distribute them across different systems. Thanks to seamless communication via the MQTT protocol, your creativity knows no bounds. Whether it's simple or complex scenarios, our agents enable you to perfectly realize your ideas!
 
-![AgentOverview](doc/img/agent-overview.png)
+![AgentOverview](docs/img/agent-overview.png)
 
 ### Project overview
 
 The project overview lays out all the projects and their current status. That way, you can see in a jiffy which projects have been given the green light for production.
 
-![ProjectOverview](doc/img/agent-projects.png)
+![ProjectOverview](docs/img/agent-projects.png)
 
 ## Analytics
 
 Get an overview of all events at a glance, whether it's user interaction, system event, or exception. It is important that you can understand and control your system at all times.
 
-![Analytics](doc/img/analytics.png)
+![Analytics](docs/img/analytics.png)
 
 ## Audit
 
@@ -50,25 +50,25 @@ In industries such as **medicine**, **pharmaceuticals**, and **food**, it is bec
 
 ### Create new audit report
 
-![AuditChangesets](doc/img/audit-changesets.png)
+![AuditChangesets](docs/img/audit-changesets.png)
 
 ### Audit changes (diff)
 
-![AuditDiff](doc/img/audit-diff.png)
+![AuditDiff](docs/img/audit-diff.png)
 
 ### Save your reports
 
-![AuditSavedReports](doc/img/audit-saved-reports.png)
+![AuditSavedReports](docs/img/audit-saved-reports.png)
 
 ## Administration
 
 ### Service overview
 
-![ServiceOverview](doc/img/admin-service-overview.png)
+![ServiceOverview](docs/img/admin-service-overview.png)
 
 ### Usermanagement
 
-![Usermanagement](doc/img/admin-usermanagement.png)
+![Usermanagement](docs/img/admin-usermanagement.png)
 
 ## Getting started
 
@@ -80,7 +80,7 @@ In most cases the following setup makes sense:
 3. AyBorg.Analytics
 4. AyBorg.Audit
 5. AyBorg.Web
-6. One or more [AyBorg.Agent(s)](doc/agent/agent.md)
+6. One or more [AyBorg.Agent(s)](docs/agent/agent.md)
 
 The default appsettings give you a good starting point and will also work locally, but for real scenarios, you will need to change the settings.
 
@@ -102,12 +102,12 @@ The default appsettings give you a good starting point and will also work locall
 
 Services can be added any time. The AyBorg.Gateway will detect the new service and establish the communication.
 
-![BlockDiagram](doc/img/block_diagram.png)
+![BlockDiagram](docs/img/block_diagram.png)
 
 ### Using AyBorg.Agent as MQTT Consumer/Producer
 
 Typically, you will send the processed results to an MQTT broker so that other services (e.g. another AyBorg.Agent) can further process the data.
-![BlockDiagram](doc/img/block_diagram2.png)
+![BlockDiagram](docs/img/block_diagram2.png)
 
 ## Want to contribute?
 
