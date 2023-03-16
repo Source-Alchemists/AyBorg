@@ -50,7 +50,7 @@
 					<EnumInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
 					break;
                 case PortBrand.StringCollection:
-                    <CollectionField Port="port.Port" Disabled="@port.Locked" />
+                    <CollectionField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
                     break;
 				default:
 					break;

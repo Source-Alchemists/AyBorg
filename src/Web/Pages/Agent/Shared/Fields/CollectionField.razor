@@ -16,5 +16,6 @@
         </MudList>
     </div>
     <MudButton StartIcon="@Icons.Material.Filled.AddBox" Class="mud-full-width" Color="Color.Default"
-        Variant="Variant.Filled" DisableElevation="true" Disabled="@(Port.IsLinkConvertable || Disabled)">Item</MudButton>
+        Variant="Variant.Filled" DisableElevation="true" Disabled="@(Port.IsLinkConvertable || Disabled)"
+        OnClick="AddItemClicked">Item</MudButton>
 </div>

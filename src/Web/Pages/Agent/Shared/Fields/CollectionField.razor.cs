@@ -13,6 +13,8 @@ public partial class CollectionField : ComponentBase
 
     [Parameter] public bool Disabled { get; set; }
 
+    [Parameter] public EventCallback<ValueChangedEventArgs> ValueChanged { get; set; }
+
     protected override void OnParametersSet()
     {
         base.OnParametersSet();
@@ -25,6 +27,24 @@ public partial class CollectionField : ComponentBase
             default:
                 throw new InvalidOperationException($"Port {Port.Name} is not a collection.");
 
+        }
+    }
+
+    private async Task AddItemClicked()
+    {
+        object newCollection = AddEmptyItemToCollection(Port);
+        await ValueChanged.InvokeAsync(new ValueChangedEventArgs(Port, newCollection));
+    }
+
+    private static object AddEmptyItemToCollection(Port port)
+    {
+        switch(port.Brand)
+        {
+            case PortBrand.StringCollection:
+                var oldValues = (ReadOnlyCollection<string>)port.Value!;
+                return new ReadOnlyCollection<string>(oldValues.Append(null!).ToList());
+            default:
+                throw new InvalidOperationException($"Port {port.Name} is not a collection.");
         }
     }
 }

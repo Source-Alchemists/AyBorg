@@ -171,11 +171,18 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
     private static bool UpdateStringCollectionPortValue(StringCollectionPort port, object value)
     {
-        List<string> record = JsonSerializer.Deserialize<List<string>>(value.ToString()!, new JsonSerializerOptions
+        if (value is ReadOnlyCollection<string> collection)
         {
-            PropertyNameCaseInsensitive = true
-        })!;
-        port.Value = new ReadOnlyCollection<string>(record);
+            port.Value = new ReadOnlyCollection<string>(collection);
+        }
+        else
+        {
+            List<string> record = JsonSerializer.Deserialize<List<string>>(value.ToString()!, new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            })!;
+            port.Value = new ReadOnlyCollection<string>(record);
+        }
         return true;
     }
 
