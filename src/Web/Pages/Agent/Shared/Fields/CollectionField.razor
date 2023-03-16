@@ -4,12 +4,14 @@
     </MudBadge>
     <div class="mud-full-width overflow-scroll" style="min-height: 270px; max-height: 270px">
         <MudList Class="py-0" Dense>
-            @foreach (var item in @_values)
+            @for (int i = 0; i < _values.Count; i++)
             {
+                var index = i;
                 <MudListItem Class="flow-input-body">
                     @if (Port.Brand == SDK.Common.Ports.PortBrand.StringCollection)
                     {
-                        <StringInput PortBrand="Port.Brand" Value="@item" Disabled="@(Port.IsLinkConvertable || Disabled)" />
+                        <StringInput PortBrand="Port.Brand" Value="@_values[index]" CollectionIndex="index"
+                    ValueChanged="InputValueChanged" Disabled="@(Port.IsLinkConvertable || Disabled)" />
                     }
                 </MudListItem>
             }

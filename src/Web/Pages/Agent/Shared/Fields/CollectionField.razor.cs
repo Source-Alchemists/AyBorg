@@ -36,13 +36,32 @@ public partial class CollectionField : ComponentBase
         await ValueChanged.InvokeAsync(new ValueChangedEventArgs(Port, newCollection));
     }
 
+    private async Task InputValueChanged(ValueChangedEventArgs args)
+    {
+        object brandType = CreateBrandType(Port, _values, (BaseInput.InputChange)args.Value!);
+        await ValueChanged.InvokeAsync(new ValueChangedEventArgs(Port, brandType));
+    }
+
     private static object AddEmptyItemToCollection(Port port)
     {
-        switch(port.Brand)
+        switch (port.Brand)
         {
             case PortBrand.StringCollection:
                 var oldValues = (ReadOnlyCollection<string>)port.Value!;
                 return new ReadOnlyCollection<string>(oldValues.Append(null!).ToList());
+            default:
+                throw new InvalidOperationException($"Port {port.Name} is not a collection.");
+        }
+    }
+
+    private static object CreateBrandType(Port port, List<object> oldValues, BaseInput.InputChange change)
+    {
+        switch (port.Brand)
+        {
+            case PortBrand.StringCollection:
+                string[] newValues = oldValues.Cast<string>().ToArray();
+                newValues[change.Index] = (string)change.Value;
+                return new ReadOnlyCollection<string>(newValues);
             default:
                 throw new InvalidOperationException($"Port {port.Name} is not a collection.");
         }
