@@ -32,7 +32,14 @@ public partial class CollectionField : ComponentBase
 
     private async Task AddItemClicked()
     {
-        object newCollection = AddEmptyItemToCollection(Port);
+        object newCollection = AddEmptyItemTo(Port);
+        await ValueChanged.InvokeAsync(new ValueChangedEventArgs(Port, newCollection));
+    }
+
+    private async Task RemoveItemClicked(int index)
+    {
+        _values.RemoveAt(index);
+        object newCollection = RemoveItemAt(Port, index);
         await ValueChanged.InvokeAsync(new ValueChangedEventArgs(Port, newCollection));
     }
 
@@ -42,7 +49,7 @@ public partial class CollectionField : ComponentBase
         await ValueChanged.InvokeAsync(new ValueChangedEventArgs(Port, brandType));
     }
 
-    private static object AddEmptyItemToCollection(Port port)
+    private static object AddEmptyItemTo(Port port)
     {
         switch (port.Brand)
         {
@@ -51,6 +58,21 @@ public partial class CollectionField : ComponentBase
                 return new ReadOnlyCollection<string>(oldValues.Append(null!).ToList());
             default:
                 throw new InvalidOperationException($"Port {port.Name} is not a collection.");
+        }
+    }
+
+    private static object RemoveItemAt(Port port, int index)
+    {
+        switch (port.Brand)
+        {
+            case PortBrand.StringCollection:
+                var oldValues = new List<string>((ReadOnlyCollection<string>)port.Value!);
+                var oldList = oldValues.ToList();
+                oldList.RemoveAt(index);
+                return new ReadOnlyCollection<string>(oldList);
+            default:
+                throw new InvalidOperationException($"Port {port.Name} is not a collection.");
+
         }
     }
 

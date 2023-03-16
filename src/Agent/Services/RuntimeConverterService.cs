@@ -88,24 +88,28 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         return await ValueTask.FromResult(false);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool UpdateNumericPortValue(NumericPort port, object value)
     {
         port.Value = Convert.ToDouble(value, CultureInfo.InvariantCulture);
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool UpdateStringPortValue(StringPort port, object value)
     {
         port.Value = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool UpdateBooleanPortValue(BooleanPort port, object value)
     {
         port.Value = Convert.ToBoolean(value, CultureInfo.InvariantCulture);
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool UpdateEnumPortValue(EnumPort port, object value)
     {
         EnumRecord record;
@@ -135,12 +139,14 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool UpdateImagePortValue(ImagePort port)
     {
         port.Value = null!; // Nothing to do, images will be created at runtime.
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool UpdateRectanglePortValue(RectanglePort port, object value)
     {
         if (value is Rectangle rectangle)
@@ -169,20 +175,41 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         return true;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private static bool UpdateStringCollectionPortValue(StringCollectionPort port, object value)
     {
+        List<string> record;
         if (value is ReadOnlyCollection<string> collection)
         {
-            port.Value = new ReadOnlyCollection<string>(collection);
+            record = new ReadOnlyCollection<string>(collection).ToList();
         }
         else
         {
-            List<string> record = JsonSerializer.Deserialize<List<string>>(value.ToString()!, new JsonSerializerOptions
+            record = JsonSerializer.Deserialize<List<string>>(value.ToString()!, new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
             })!;
-            port.Value = new ReadOnlyCollection<string>(record);
         }
+
+        // Check for null strings as we only allow empty strings, not null.
+        if (record.Any(r => r == null))
+        {
+            var newCollection = new List<string>();
+            foreach (string s in record)
+            {
+                if (s == null)
+                {
+                    newCollection.Add(string.Empty);
+                }
+                else
+                {
+                    newCollection.Add(s);
+                }
+            }
+            record = newCollection;
+        }
+
+        port.Value = new ReadOnlyCollection<string>(record);
         return true;
     }
 

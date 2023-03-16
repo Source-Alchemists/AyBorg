@@ -7,12 +7,19 @@
             @for (int i = 0; i < _values.Count; i++)
             {
                 var index = i;
-                <MudListItem Class="flow-input-body">
-                    @if (Port.Brand == SDK.Common.Ports.PortBrand.StringCollection)
-                    {
-                        <StringInput PortBrand="Port.Brand" Value="@_values[index]" CollectionIndex="index"
-                    ValueChanged="InputValueChanged" Disabled="@(Port.IsLinkConvertable || Disabled)" />
-                    }
+                <MudListItem Class="flow-input-body px-0">
+                    <MudStack Row>
+                        @if (Port.Brand == SDK.Common.Ports.PortBrand.StringCollection)
+                        {
+                            <StringInput PortBrand="Port.Brand" Value="@_values[index]" CollectionIndex="index"
+                        ValueChanged="InputValueChanged" Disabled="@(Port.IsLinkConvertable || Disabled)" />
+                        }
+                        <MudBadge Content="index" Color="Color.Tertiary" Origin="Origin.CenterLeft">
+                            <MudTooltip Text="Remove item">
+                                <MudIconButton Icon="@Icons.Material.Filled.Remove" Color="Color.Error" Disabled="@(Port.IsLinkConvertable || Disabled)" OnClick="@(() => RemoveItemClicked(index))" />
+                            </MudTooltip>
+                        </MudBadge>
+                    </MudStack>
                 </MudListItem>
             }
         </MudList>
