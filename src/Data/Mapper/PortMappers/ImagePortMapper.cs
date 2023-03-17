@@ -6,10 +6,10 @@ namespace AyBorg.Data.Mapper;
 
 public sealed class ImagePortMapper : IPortMapper<Image>
 {
-    public object ToNativeValueObject(object value, Type? type = null) => ToNativeValueObject(value);
+    public object ToNativeValueObject(object value, Type? type = null) => ToNativeValue(value);
     public Image ToNativeValue(object value, Type? type = null) => null!;
     public void Update(IPort port, object value) => ((ImagePort)port).Value = ToNativeValue(value);
-    public Port ToRecord(IPort port)
+    public Port ToModel(IPort port)
     {
         var typedPort = (ImagePort)port;
         Port record = GenericPortMapper.ToRecord(typedPort);

@@ -20,7 +20,7 @@ public sealed class NumericCollectionPortMapper : IPortMapper<ReadOnlyCollection
         }
     }
     public void Update(IPort port, object value) => ((NumericCollectionPort)port).Value = ToNativeValue(value);
-    public Port ToRecord(IPort port)
+    public Port ToModel(IPort port)
     {
         var typedPort = (NumericCollectionPort)port;
         Port record = GenericPortMapper.ToRecord(typedPort);

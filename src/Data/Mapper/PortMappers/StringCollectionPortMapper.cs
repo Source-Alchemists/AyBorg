@@ -42,7 +42,7 @@ public class StringCollectionPortMapper : IPortMapper<ReadOnlyCollection<string>
     }
 
     public void Update(IPort port, object value) => ((StringCollectionPort)port).Value = ToNativeValue(value);
-    public Port ToRecord(IPort port)
+    public Port ToModel(IPort port)
     {
         var typedPort = (StringCollectionPort)port;
         Port record = GenericPortMapper.ToRecord(typedPort);

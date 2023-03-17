@@ -33,6 +33,6 @@ public class RuntimeMapper : IRuntimeMapper
     public Port FromRuntime(IPort runtimePort)
     {
         IPortMapper portMapper = PortMapperFactory.CreateMapper(runtimePort);
-        return portMapper.ToRecord(runtimePort);
+        return portMapper.ToModel(runtimePort);
     }
 }

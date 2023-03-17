@@ -2,13 +2,12 @@ using System.Text.Json;
 using AyBorg.Data.Agent;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
-using ImageTorque;
 
 namespace AyBorg.Data.Mapper;
 
 public sealed class RectanglePortMapper : IPortMapper<ImageTorque.Rectangle>
 {
-    public object ToNativeValueObject(object value, Type? type = null) => ToNativeValueObject(value);
+    public object ToNativeValueObject(object value, Type? type = null) => ToNativeValue(value);
     public ImageTorque.Rectangle ToNativeValue(object value, Type? type = null)
     {
         if (value is ImageTorque.Rectangle rectangle)
@@ -16,7 +15,7 @@ public sealed class RectanglePortMapper : IPortMapper<ImageTorque.Rectangle>
             return rectangle;
         }
 
-        if (value is SDK.Common.Models.Rectangle rectangleModel)
+        if (value is Rectangle rectangleModel)
         {
             return new ImageTorque.Rectangle(rectangleModel.X, rectangleModel.Y, rectangleModel.Width, rectangleModel.Height);
         }
@@ -25,7 +24,7 @@ public sealed class RectanglePortMapper : IPortMapper<ImageTorque.Rectangle>
         return new ImageTorque.Rectangle(record.X, record.Y, record.Width, record.Height);
     }
     public void Update(IPort port, object value) => ((RectanglePort)port).Value = ToNativeValue(value);
-    public Port ToRecord(IPort port)
+    public Port ToModel(IPort port)
     {
         var typedPort = (RectanglePort)port;
         Port record = GenericPortMapper.ToRecord(typedPort);

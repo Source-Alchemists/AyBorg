@@ -40,7 +40,7 @@ public sealed class EnumPortMapper : IPortMapper<System.Enum>
         typedPort.Value = ToNativeValue(value, typedPort.Value.GetType());
     }
 
-    public Port ToRecord(IPort port)
+    public Port ToModel(IPort port)
     {
         var typedPort = (EnumPort)port;
         Port record = GenericPortMapper.ToRecord(typedPort);
