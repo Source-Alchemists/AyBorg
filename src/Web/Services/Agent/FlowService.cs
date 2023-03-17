@@ -367,8 +367,14 @@ public class FlowService : IFlowService
                 if (memoryOwner == null)
                 {
                     memoryOwner = MemoryPool<byte>.Shared.Rent((int)chunk.FullStreamLength);
-                    resultImage.Width = chunk.FullWidth;
-                    resultImage.Height = chunk.FullHeight;
+                    resultImage = resultImage with
+                    {
+                        Meta = new ImageMeta
+                        {
+                            Width = chunk.FullWidth,
+                            Height = chunk.FullHeight
+                        }
+                    };
                 }
 
                 Memory<byte> targetMemorySlice = memoryOwner.Memory.Slice(offset, chunk.Data.Length);
@@ -378,7 +384,7 @@ public class FlowService : IFlowService
 
             if (memoryOwner != null)
             {
-                resultImage.Base64 = Convert.ToBase64String(memoryOwner.Memory.Span);
+                resultImage = resultImage with { Base64 = Convert.ToBase64String(memoryOwner.Memory.Span) };
             }
         }
         finally

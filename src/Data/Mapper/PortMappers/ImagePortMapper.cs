@@ -18,9 +18,12 @@ public sealed class ImagePortMapper : IPortMapper<Image>
         {
             cacheImage = new CacheImage
             {
-                Width = typedPort.Value.Width,
-                Height = typedPort.Value.Height,
-                PixelFormat = typedPort.Value.PixelFormat,
+                Meta = new ImageMeta
+                {
+                    Width = typedPort.Value.Width,
+                    Height = typedPort.Value.Height,
+                    PixelFormat = typedPort.Value.PixelFormat,
+                },
                 OriginalImage = new Image(typedPort.Value)
             };
         }

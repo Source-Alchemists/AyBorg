@@ -21,7 +21,7 @@ public partial class EnumInputField : BaseInputField
 
     private async void OnSelectedValuesChanged(IEnumerable<string> values)
     {
-        _value.Name = values.FirstOrDefault();
+        _value = _value with { Name = values.FirstOrDefault() };
         await NotifyValueChangedAsync(_value);
     }
 }
