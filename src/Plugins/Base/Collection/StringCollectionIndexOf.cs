@@ -34,7 +34,7 @@ public sealed class StringCollectionIndexOf : IStepBody
         _outputIndex.Value = _inputCollection.Value.IndexOf(_inputSearchValue.Value);
         if (_outputIndex.Value == -1)
         {
-            _logger.LogError(new EventId((int)EventLogType.Plugin), "Value {value} not found in collection", _inputSearchValue.Value);
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Value {value} not found in collection", _inputSearchValue.Value);
             return ValueTask.FromResult(false);
         }
         return ValueTask.FromResult(true);

@@ -29,6 +29,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Data\Migrations\Agent\SqlLite\AyBorg.Data.Agent.Migrations.SqlLite.csproj" />
     <ProjectReference Include="..\Data\Migrations\Agent\PostgreSql\AyBorg.Data.Agent.Migrations.PostgreSql.csproj" />
+    <ProjectReference Include="..\Data\Mapper\AyBorg.Data.Mapper.csproj" />
   </ItemGroup>
 
   <ItemGroup>

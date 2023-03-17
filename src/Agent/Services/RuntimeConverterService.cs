@@ -1,18 +1,16 @@
-using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Runtime.CompilerServices;
-using System.Text.Json;
 using AyBorg.Data.Agent;
+using AyBorg.Data.Mapper;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
-using ImageTorque;
 
 [assembly: InternalsVisibleTo("AyBorg.Agent.Tests")]
 namespace AyBorg.Agent.Services;
 
 internal sealed class RuntimeConverterService : IRuntimeConverterService
 {
+    // private static readonly JsonSerializerOptions s_jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true };
     private readonly ILogger<RuntimeConverterService> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IPluginsService _pluginsService;
@@ -65,152 +63,9 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
     /// <returns></returns>
     public async ValueTask<bool> TryUpdatePortValueAsync(IPort port, object value)
     {
-        switch (port)
-        {
-            case NumericPort numericPort:
-                return UpdateNumericPortValue(numericPort, value);
-            case StringPort stringPort: // Also covers FolderPort
-                return UpdateStringPortValue(stringPort, value);
-            case BooleanPort booleanPort:
-                return UpdateBooleanPortValue(booleanPort, value);
-            case EnumPort enumPort:
-                return UpdateEnumPortValue(enumPort, value);
-            case RectanglePort rectanglePort:
-                return UpdateRectanglePortValue(rectanglePort, value);
-            case ImagePort imagePort:
-                return UpdateImagePortValue(imagePort);
-            // Collections
-            case StringCollectionPort stringCollectionPort:
-                return UpdateStringCollectionPortValue(stringCollectionPort, value);
-        }
-
-        _logger.LogError("Port type {PortType} is not supported", port.GetType().Name);
-        return await ValueTask.FromResult(false);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool UpdateNumericPortValue(NumericPort port, object value)
-    {
-        port.Value = Convert.ToDouble(value, CultureInfo.InvariantCulture);
-        return true;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool UpdateStringPortValue(StringPort port, object value)
-    {
-        port.Value = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
-        return true;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool UpdateBooleanPortValue(BooleanPort port, object value)
-    {
-        port.Value = Convert.ToBoolean(value, CultureInfo.InvariantCulture);
-        return true;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool UpdateEnumPortValue(EnumPort port, object value)
-    {
-        EnumRecord record;
-        if (value is Enum enumValue)
-        {
-            record = new EnumRecord
-            {
-                Name = enumValue.ToString(),
-                Names = Enum.GetNames(enumValue.GetType())
-            };
-        }
-        else if (value is SDK.Common.Models.Enum enumBinding)
-        {
-            record = new EnumRecord
-            {
-                Name = enumBinding.Name!,
-                Names = enumBinding.Names!
-            };
-        }
-        else
-        {
-            record = JsonSerializer.Deserialize<EnumRecord>(value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-        }
-
-        port.Value = (Enum)Enum.Parse(port.Value.GetType(), record.Name);
-
-        return true;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool UpdateImagePortValue(ImagePort port)
-    {
-        port.Value = null!; // Nothing to do, images will be created at runtime.
-        return true;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool UpdateRectanglePortValue(RectanglePort port, object value)
-    {
-        if (value is Rectangle rectangle)
-        {
-            port.Value = rectangle;
-            return true;
-        }
-
-        if (value is SDK.Common.Models.Rectangle rectangleModel)
-        {
-            port.Value = new Rectangle(rectangleModel.X, rectangleModel.Y, rectangleModel.Width, rectangleModel.Height);
-            return true;
-        }
-
-        var options = new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        };
-        RectangleRecord? record = JsonSerializer.Deserialize<RectangleRecord>(value.ToString()!, options);
-        if (record == null)
-        {
-            return false;
-        }
-        port.Value = new Rectangle(record.X, record.Y, record.Width, record.Height);
-
-        return true;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static bool UpdateStringCollectionPortValue(StringCollectionPort port, object value)
-    {
-        List<string> record;
-        if (value is ReadOnlyCollection<string> collection)
-        {
-            record = new ReadOnlyCollection<string>(collection).ToList();
-        }
-        else
-        {
-            record = JsonSerializer.Deserialize<List<string>>(value.ToString()!, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            })!;
-        }
-
-        // Check for null strings as we only allow empty strings, not null.
-        if (record.Any(r => r == null))
-        {
-            var newCollection = new List<string>();
-            foreach (string s in record)
-            {
-                if (s == null)
-                {
-                    newCollection.Add(string.Empty);
-                }
-                else
-                {
-                    newCollection.Add(s);
-                }
-            }
-            record = newCollection;
-        }
-
-        port.Value = new ReadOnlyCollection<string>(record);
-        return true;
+        IPortMapper mapper = PortMapperFactory.CreateMapper(port);
+        mapper.Update(port, value);
+        return await ValueTask.FromResult(true);
     }
 
     private async ValueTask<ICollection<IStepProxy>> ConvertStepsAsync(ICollection<StepRecord> stepRecords)
