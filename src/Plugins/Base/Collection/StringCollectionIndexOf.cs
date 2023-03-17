@@ -14,7 +14,7 @@ public sealed class StringCollectionIndexOf : IStepBody
 
     public string DefaultName => "String.Collection.IndexOf";
 
-    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Function };
+    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Collection };
 
     public IEnumerable<IPort> Ports { get; }
 

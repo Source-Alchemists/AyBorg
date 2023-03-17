@@ -14,7 +14,7 @@ public sealed class StringCollectionElementAt : IStepBody
 
     public string DefaultName => "String.Collection.ElementAt";
 
-    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Function };
+    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Collection };
 
     public IEnumerable<IPort> Ports { get; }
 
@@ -36,11 +36,15 @@ public sealed class StringCollectionElementAt : IStepBody
             _outputValue.Value = _inputCollection.Value.ElementAt(Convert.ToInt32(_inputIndex.Value));
             return ValueTask.FromResult(true);
         }
-        catch (Exception ex)
+        catch (ArgumentOutOfRangeException ex)
         {
-            _logger.LogError(new EventId((int)EventLogType.Plugin), ex, "Could not find element at index {index}", _inputIndex.Value);
+            _logger.LogError(new EventId((int)EventLogType.Plugin), ex, "Index {index} is out of range", _inputIndex.Value);
             return ValueTask.FromResult(false);
-
+        }
+        catch (OverflowException ex)
+        {
+            _logger.LogError(new EventId((int)EventLogType.Plugin), ex, "Index {index} is too large", _inputIndex.Value);
+            return ValueTask.FromResult(false);
         }
     }
 
