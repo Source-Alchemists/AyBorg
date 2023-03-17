@@ -1,27 +1,36 @@
 using System.Text.Json;
 using AyBorg.Data.Agent;
+using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
 
 namespace AyBorg.Data.Mapper;
 
-public sealed class RectanglePortMapper : IPortMapper<Rectangle>
+public sealed class RectanglePortMapper : IPortMapper<ImageTorque.Rectangle>
 {
     public object ToNativeObject(object value, Type? type = null) => ToNativeObject(value);
-    public Rectangle ToNativeType(object value, Type? type = null)
+    public ImageTorque.Rectangle ToNativeType(object value, Type? type = null)
     {
-        if (value is Rectangle rectangle)
+        if (value is ImageTorque.Rectangle rectangle)
         {
             return rectangle;
         }
 
         if (value is SDK.Common.Models.Rectangle rectangleModel)
         {
-            return new Rectangle(rectangleModel.X, rectangleModel.Y, rectangleModel.Width, rectangleModel.Height);
+            return new ImageTorque.Rectangle(rectangleModel.X, rectangleModel.Y, rectangleModel.Width, rectangleModel.Height);
         }
 
         RectangleRecord record = JsonSerializer.Deserialize<RectangleRecord>(value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
-        return new Rectangle(record.X, record.Y, record.Width, record.Height);
+        return new ImageTorque.Rectangle(record.X, record.Y, record.Width, record.Height);
     }
     public void Update(IPort port, object value) => ((RectanglePort)port).Value = ToNativeType(value);
+    public Port ToRecord(IPort port)
+    {
+        var typedPort = (RectanglePort)port;
+        Port record = GenericPortMapper.ToRecord(typedPort);
+        record.IsLinkConvertable = typedPort.IsLinkConvertable;
+        record.Value = typedPort.Value;
+        return record;
+    }
 }

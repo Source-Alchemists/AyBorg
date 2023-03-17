@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 
 namespace AyBorg.Data.Mapper;
@@ -41,4 +42,12 @@ public class StringCollectionPortMapper : IPortMapper<ReadOnlyCollection<string>
     }
 
     public void Update(IPort port, object value) => ((StringCollectionPort)port).Value = ToNativeType(value);
+    public Port ToRecord(IPort port)
+    {
+        var typedPort = (StringCollectionPort)port;
+        Port record = GenericPortMapper.ToRecord(typedPort);
+        record.IsLinkConvertable = typedPort.IsLinkConvertable;
+        record.Value = JsonSerializer.Serialize(typedPort.Value, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        return record;
+    }
 }
