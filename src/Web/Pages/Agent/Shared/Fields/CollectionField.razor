@@ -14,7 +14,7 @@
                             <StringInput PortBrand="Port.Brand" Value="@_values[index]" CollectionIndex="index"
                         ValueChanged="InputValueChanged" Disabled="@(Port.IsLinkConvertable || Disabled)" />
                         }
-                        <MudBadge Content="index" Color="Color.Tertiary" Origin="Origin.CenterLeft">
+                        <MudBadge Content="index" Color="Color.Info" Origin="Origin.CenterLeft">
                             <MudTooltip Text="Remove item">
                                 <MudIconButton Icon="@Icons.Material.Filled.Remove" Color="Color.Error" Disabled="@(Port.IsLinkConvertable || Disabled)" OnClick="@(() => RemoveItemClicked(index))" />
                             </MudTooltip>
