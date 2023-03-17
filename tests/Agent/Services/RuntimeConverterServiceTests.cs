@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using System.Globalization;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Tests.Dummies;
@@ -22,19 +23,29 @@ public class RuntimeConverterServiceTests
     }
 
     [Theory]
-    [InlineData(true, PortBrand.Boolean, true)]
-    [InlineData(true, PortBrand.String, "abc")]
-    [InlineData(true, PortBrand.Folder, "/abc")]
-    [InlineData(true, PortBrand.Numeric, 456)]
-    [InlineData(true, PortBrand.Enum, PortBrand.Enum)]
-    [InlineData(true, PortBrand.Rectangle, null)]
-    [InlineData(true, PortBrand.Image, null)]
-    public async Task Test_TryUpdatePortValueAsync(bool expectedSuccess, PortBrand portBrand, object value)
+    [InlineData(true, PortBrand.Boolean, true, true)]
+    [InlineData(true, PortBrand.String, "abc", "abc")]
+    [InlineData(true, PortBrand.Folder, "/abc", "/abc")]
+    [InlineData(true, PortBrand.Numeric, 456, 456)]
+    [InlineData(true, PortBrand.Enum, PortBrand.Enum, PortBrand.Enum)]
+    [InlineData(true, PortBrand.Rectangle, null, null)]
+    [InlineData(true, PortBrand.Rectangle, "{\"X\":5,\"Y\":6,\"Width\":7,\"Height\":8}", null)]
+    [InlineData(true, PortBrand.Image, null, null)]
+    [InlineData(true, PortBrand.StringCollection, null, null)]
+    [InlineData(true, PortBrand.StringCollection, "[\"Test1\",\"Test2\"]", null)]
+    public async Task Test_TryUpdatePortValueAsync(bool expectedSuccess, PortBrand portBrand, object value, object expectedValue)
     {
         // Arrange
         if (portBrand == PortBrand.Rectangle)
         {
-            value = new ImageTorque.Rectangle { X = 5, Y = 6, Width = 7, Height = 8 };
+            expectedValue = new ImageTorque.Rectangle { X = 5, Y = 6, Width = 7, Height = 8 };
+            value ??= expectedValue;
+        }
+
+        if(portBrand == PortBrand.StringCollection)
+        {
+            expectedValue = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
+            value ??= expectedValue;
         }
 
         IPort port = null!;
@@ -61,6 +72,9 @@ public class RuntimeConverterServiceTests
             case PortBrand.Image:
                 port = new ImagePort("Port", PortDirection.Input, null!);
                 break;
+            case PortBrand.StringCollection:
+                port = new StringCollectionPort("Port", PortDirection.Input, new ReadOnlyCollection<string>(Array.Empty<string>()));
+                break;
         }
 
         // Act
@@ -71,27 +85,46 @@ public class RuntimeConverterServiceTests
         switch (portBrand)
         {
             case PortBrand.String:
-                Assert.Equal(value, ((StringPort)port).Value);
+                Assert.Equal(expectedValue, ((StringPort)port).Value);
                 break;
             case PortBrand.Folder:
-                Assert.Equal(value, ((FolderPort)port).Value);
+                Assert.Equal(expectedValue, ((FolderPort)port).Value);
                 break;
             case PortBrand.Numeric:
-                Assert.Equal(Convert.ToDouble(value), ((NumericPort)port).Value);
+                Assert.Equal(Convert.ToDouble(expectedValue), ((NumericPort)port).Value);
                 break;
             case PortBrand.Boolean:
-                Assert.Equal(value, ((BooleanPort)port).Value);
+                Assert.Equal(expectedValue, ((BooleanPort)port).Value);
                 break;
             case PortBrand.Enum:
-                Assert.Equal(value, ((EnumPort)port).Value);
+                Assert.Equal(expectedValue, ((EnumPort)port).Value);
                 break;
             case PortBrand.Rectangle:
-                Assert.Equal(value, ((RectanglePort)port).Value);
+                Assert.Equal(expectedValue, ((RectanglePort)port).Value);
                 break;
             case PortBrand.Image:
                 Assert.Null(((ImagePort)port).Value);
                 break;
+            case PortBrand.StringCollection:
+                Assert.Equal(expectedValue, ((StringCollectionPort)port).Value);
+                break;
         }
+    }
+
+    [Fact]
+    public async Task Test_UpdateStringCollection_WidthNullValue()
+    {
+        // Arrange
+        var expectedValue = new ReadOnlyCollection<string>(new List<string>{ string.Empty, string.Empty });
+        var value = new ReadOnlyCollection<string>(new List<string> { null!, null! });
+        var port = new StringCollectionPort("Port", PortDirection.Input, new ReadOnlyCollection<string>(Array.Empty<string>()));
+
+        // Act
+        bool result = await _service.TryUpdatePortValueAsync(port, value);
+
+        // Assert
+        Assert.True(result);
+        Assert.Equal(expectedValue, port.Value);
     }
 
     [Fact]

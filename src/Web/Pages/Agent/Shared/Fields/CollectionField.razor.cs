@@ -22,7 +22,7 @@ public partial class CollectionField : ComponentBase
         switch (Port.Brand)
         {
             case PortBrand.StringCollection:
-                _values = new List<object>((ReadOnlyCollection<string>)Port.Value!).Cast<object>().ToList();
+                _values = new List<object>((ReadOnlyCollection<string>)Port.Value!).ToList();
                 break;
             default:
                 throw new InvalidOperationException($"Port {Port.Name} is not a collection.");
