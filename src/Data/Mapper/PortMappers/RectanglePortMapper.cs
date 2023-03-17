@@ -8,8 +8,8 @@ namespace AyBorg.Data.Mapper;
 
 public sealed class RectanglePortMapper : IPortMapper<ImageTorque.Rectangle>
 {
-    public object ToNativeObject(object value, Type? type = null) => ToNativeObject(value);
-    public ImageTorque.Rectangle ToNativeType(object value, Type? type = null)
+    public object ToNativeValueObject(object value, Type? type = null) => ToNativeValueObject(value);
+    public ImageTorque.Rectangle ToNativeValue(object value, Type? type = null)
     {
         if (value is ImageTorque.Rectangle rectangle)
         {
@@ -24,7 +24,7 @@ public sealed class RectanglePortMapper : IPortMapper<ImageTorque.Rectangle>
         RectangleRecord record = JsonSerializer.Deserialize<RectangleRecord>(value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
         return new ImageTorque.Rectangle(record.X, record.Y, record.Width, record.Height);
     }
-    public void Update(IPort port, object value) => ((RectanglePort)port).Value = ToNativeType(value);
+    public void Update(IPort port, object value) => ((RectanglePort)port).Value = ToNativeValue(value);
     public Port ToRecord(IPort port)
     {
         var typedPort = (RectanglePort)port;

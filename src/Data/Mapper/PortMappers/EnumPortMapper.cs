@@ -7,8 +7,8 @@ namespace AyBorg.Data.Mapper;
 
 public sealed class EnumPortMapper : IPortMapper<System.Enum>
 {
-    public object ToNativeObject(object value, Type? type = null) => ToNativeType(value);
-    public System.Enum ToNativeType(object value, Type? type = null)
+    public object ToNativeValueObject(object value, Type? type = null) => ToNativeValue(value);
+    public System.Enum ToNativeValue(object value, Type? type = null)
     {
         EnumRecord record;
         if (value is System.Enum enumValue)
@@ -37,7 +37,7 @@ public sealed class EnumPortMapper : IPortMapper<System.Enum>
     public void Update(IPort port, object value)
     {
         var typedPort = (EnumPort)port;
-        typedPort.Value = ToNativeType(value, typedPort.Value.GetType());
+        typedPort.Value = ToNativeValue(value, typedPort.Value.GetType());
     }
 
     public Port ToRecord(IPort port)

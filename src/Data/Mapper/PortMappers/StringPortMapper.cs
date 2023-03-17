@@ -6,9 +6,9 @@ namespace AyBorg.Data.Mapper;
 
 public class StringPortMapper : IPortMapper<string>
 {
-    public object ToNativeObject(object value, Type? type = null) => ToNativeType(value);
-    public string ToNativeType(object value, Type? type = null) => Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
-    public void Update(IPort port, object value) => ((StringPort)port).Value = ToNativeType(value);
+    public object ToNativeValueObject(object value, Type? type = null) => ToNativeValue(value);
+    public string ToNativeValue(object value, Type? type = null) => Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
+    public void Update(IPort port, object value) => ((StringPort)port).Value = ToNativeValue(value);
     public Port ToRecord(IPort port)
     {
         var typedPort = (StringPort)port;

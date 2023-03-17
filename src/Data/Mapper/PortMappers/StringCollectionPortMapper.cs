@@ -7,8 +7,8 @@ namespace AyBorg.Data.Mapper;
 
 public class StringCollectionPortMapper : IPortMapper<ReadOnlyCollection<string>>
 {
-    public object ToNativeObject(object value, Type? type = null) => ToNativeType(value);
-    public ReadOnlyCollection<string> ToNativeType(object value, Type? type = null)
+    public object ToNativeValueObject(object value, Type? type = null) => ToNativeValue(value);
+    public ReadOnlyCollection<string> ToNativeValue(object value, Type? type = null)
     {
         List<string> record;
         if (value is ReadOnlyCollection<string> collection)
@@ -41,7 +41,7 @@ public class StringCollectionPortMapper : IPortMapper<ReadOnlyCollection<string>
         return new ReadOnlyCollection<string>(record);
     }
 
-    public void Update(IPort port, object value) => ((StringCollectionPort)port).Value = ToNativeType(value);
+    public void Update(IPort port, object value) => ((StringCollectionPort)port).Value = ToNativeValue(value);
     public Port ToRecord(IPort port)
     {
         var typedPort = (StringCollectionPort)port;
