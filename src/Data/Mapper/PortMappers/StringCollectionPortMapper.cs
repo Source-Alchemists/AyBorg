@@ -45,9 +45,15 @@ public class StringCollectionPortMapper : IPortMapper<ReadOnlyCollection<string>
     public Port ToModel(IPort port)
     {
         var typedPort = (StringCollectionPort)port;
-        Port record = GenericPortMapper.ToRecord(typedPort);
-        record.IsLinkConvertable = typedPort.IsLinkConvertable;
-        record.Value = JsonSerializer.Serialize(typedPort.Value, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
-        return record;
+        return new Port
+        {
+            Id = port.Id,
+            Name = port.Name,
+            Direction = port.Direction,
+            Brand = port.Brand,
+            IsConnected = port.IsConnected,
+            IsLinkConvertable = typedPort.IsLinkConvertable,
+            Value = JsonSerializer.Serialize(typedPort.Value, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
+        };
     }
 }

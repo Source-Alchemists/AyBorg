@@ -48,11 +48,12 @@ public class FlowService : IFlowService
         foreach (StepDto? s in response.Steps)
         {
             Step stepModel = _rpcMapper.FromRpc(s);
+            var ports = new List<Port>();
             foreach (Port portModel in stepModel.Ports!)
             {
-                await LazyLoadAsync(portModel, null);
+                ports.Add(await LazyLoadAsync(portModel, null));
             }
-            result.Add(stepModel);
+            result.Add(stepModel with { Ports = ports });
         }
 
         return result;
@@ -85,6 +86,7 @@ public class FlowService : IFlowService
         Step stepModel = _rpcMapper.FromRpc(resultStep);
         if (updatePorts)
         {
+            var ports = new List<Port>();
             foreach (Port portModel in stepModel.Ports!)
             {
                 if (portModel.Direction == SDK.Common.Ports.PortDirection.Output && skipOutputPorts)
@@ -92,8 +94,10 @@ public class FlowService : IFlowService
                     // Nothing to do as we only need to update input ports
                     continue;
                 }
-                await LazyLoadAsync(portModel, iterationId);
+                ports.Add(await LazyLoadAsync(portModel, iterationId));
             }
+
+            stepModel = stepModel with { Ports = ports };
         }
         return stepModel;
     }
@@ -299,8 +303,7 @@ public class FlowService : IFlowService
         }
 
         Port portModel = _rpcMapper.FromRpc(resultPort);
-        await LazyLoadAsync(portModel, iterationId);
-        return portModel;
+        return await LazyLoadAsync(portModel, iterationId);
     }
 
     /// <summary>
@@ -327,7 +330,7 @@ public class FlowService : IFlowService
         }
     }
 
-    private async ValueTask LazyLoadAsync(Port portModel, Guid? iterationId)
+    private async ValueTask<Port> LazyLoadAsync(Port portModel, Guid? iterationId)
     {
         if (portModel.Brand == SDK.Common.Ports.PortBrand.Image && portModel.Direction == SDK.Common.Ports.PortDirection.Input)
         {
@@ -341,8 +344,10 @@ public class FlowService : IFlowService
 
             });
 
-            portModel.Value = await CreateImageFromChunksAsync(imageResponse, true);
+            return portModel with { Value = await CreateImageFromChunksAsync(imageResponse, true) };
         }
+
+        return portModel;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

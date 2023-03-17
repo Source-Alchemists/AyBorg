@@ -12,9 +12,15 @@ public class BooleanPortMapper : IPortMapper<bool>
     public Port ToModel(IPort port)
     {
         var typedPort = (BooleanPort)port;
-        Port record = GenericPortMapper.ToRecord(typedPort);
-        record.IsLinkConvertable = typedPort.IsLinkConvertable;
-        record.Value = typedPort.Value;
-        return record;
+        return new Port
+        {
+            Id = port.Id,
+            Name = port.Name,
+            Direction = port.Direction,
+            Brand = port.Brand,
+            IsConnected = port.IsConnected,
+            IsLinkConvertable = typedPort.IsLinkConvertable,
+            Value = typedPort.Value
+        };
     }
 }

@@ -10,7 +10,6 @@ namespace AyBorg.Agent.Services;
 
 internal sealed class RuntimeConverterService : IRuntimeConverterService
 {
-    // private static readonly JsonSerializerOptions s_jsonSerializerOptions = new() { PropertyNameCaseInsensitive = true };
     private readonly ILogger<RuntimeConverterService> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IPluginsService _pluginsService;

@@ -1,6 +1,6 @@
-﻿using AyBorg.SDK.Common.Models;
-using AyBorg.Diagrams.Core.Geometry;
+﻿using AyBorg.Diagrams.Core.Geometry;
 using AyBorg.Diagrams.Core.Models;
+using AyBorg.SDK.Common.Models;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
@@ -47,6 +47,7 @@ public class FlowNode : NodeModel
     public void Update(Step newStep)
     {
         Step.ExecutionTimeMs = newStep.ExecutionTimeMs;
+
         foreach (FlowPort targetFlowPort in Ports.Cast<FlowPort>())
         {
             Port sourcePort = newStep.Ports!.FirstOrDefault(p => p.Id.Equals(targetFlowPort.Port.Id))!;
@@ -54,8 +55,7 @@ public class FlowNode : NodeModel
             {
                 continue;
             }
-
-            targetFlowPort.Port.Value = sourcePort.Value;
+            targetFlowPort.Update(targetFlowPort.Port with { Value = sourcePort.Value });
         }
 
         StepChanged?.Invoke();

@@ -33,7 +33,7 @@ public partial class DirectoryInputField : BaseInputField
         if (!result.Cancelled)
         {
             _value = result.Data.ToString()!;
-            Port.Value = _value;
+            Port = Port with { Value = _value };
             await NotifyValueChangedAsync(_value);
         }
     }

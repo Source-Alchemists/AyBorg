@@ -78,11 +78,15 @@ public class FlowNodeTests
             isCalled = true;
         };
 
-        Step newStep = isNullPort ? step with { ExecutionTimeMs = 1, Ports = new List<Port> { new Port {} } } : step with { ExecutionTimeMs = 1 };
+        var ports = new List<Port>();
         if(!isNullPort)
         {
-            step.Ports.First().Value = "456";
+            ports.Add(step.Ports.First() with { Value = "456" });
         }
+
+        Step newStep = isNullPort ? step with { ExecutionTimeMs = 1, Ports = new List<Port> { new Port() }}
+                                  : step with { ExecutionTimeMs = 1, Ports = ports };
+
 
         // Act
         flowNode.Update(newStep);

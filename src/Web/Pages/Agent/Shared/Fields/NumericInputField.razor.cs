@@ -14,7 +14,8 @@ public partial class NumericInputField : BaseInputField
         {
             _value = value;
         }
-        Port.Value = _value;
+
+        Port = Port with { Value = _value };
         return Task.CompletedTask;
     }
 

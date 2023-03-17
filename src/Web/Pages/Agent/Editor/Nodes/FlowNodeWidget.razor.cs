@@ -40,7 +40,7 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
     private async Task OnPortValueChangedAsync(ValueChangedEventArgs e)
     {
         FlowPort port = Node.Ports.Cast<FlowPort>().First(p => p.Port.Id == e.Port.Id);
-        port.Port.Value = e.Value;
+        port.Update(port.Port with { Value = e.Value });
         await FlowService.TrySetPortValueAsync(port.Port);
     }
 

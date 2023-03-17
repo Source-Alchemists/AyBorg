@@ -11,16 +11,16 @@ public partial class RectangleInputField : BaseInputField
     private bool _isWidthEditing = false;
     private bool _isHeightEditing = false;
 
-    protected override Task OnParametersSetAsync()
+    protected override void OnParametersSet()
     {
-        if (Port.Value == null) return Task.CompletedTask;
+        if (Port.Value == null) return;
         if (Port.Value is Rectangle value)
         {
             _value = value;
-            return Task.CompletedTask;
+            return;
         }
-        Port.Value = _value;
-        return base.OnParametersSetAsync();
+
+        Port = Port with { Value = _value };
     }
 
     private async void OnKeyUp(KeyboardEventArgs e)
