@@ -40,7 +40,7 @@ public class StringCollectionElementAtTests {
         collectionPort.Value = new ReadOnlyCollection<string>(new List<string>{"Test1", "Test2"});
         indexPort.Value = 2;
 
-        // Act / Assert
+        // Act
         bool result = await plugin.TryRunAsync(CancellationToken.None);
 
         // Assert
@@ -59,7 +59,7 @@ public class StringCollectionElementAtTests {
         collectionPort.Value = new ReadOnlyCollection<string>(new List<string>{"Test1", "Test2"});
         indexPort.Value = double.MaxValue;
 
-        // Act / Assert
+        // Act
         bool result = await plugin.TryRunAsync(CancellationToken.None);
 
         // Assert
@@ -77,7 +77,7 @@ public class StringCollectionElementAtTests {
 
         collectionPort.Value = new ReadOnlyCollection<string>(Array.Empty<string>());
 
-        // Act / Assert
+        // Act
         bool result = await plugin.TryRunAsync(CancellationToken.None);
 
         // Assert
