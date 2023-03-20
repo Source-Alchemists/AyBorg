@@ -22,7 +22,16 @@ public partial class CollectionField : ComponentBase
         switch (Port.Brand)
         {
             case PortBrand.StringCollection:
-                _values = new List<object>((ReadOnlyCollection<string>)Port.Value!).ToList();
+                _values = new List<object>((ReadOnlyCollection<string>)Port.Value!);
+                break;
+            case PortBrand.NumericCollection:
+                var tmpDoubleCollection = (ReadOnlyCollection<double>)Port.Value!;
+                var resultList = new List<object>();
+                foreach (double tmpDouble in tmpDoubleCollection)
+                {
+                    resultList.Add(tmpDouble);
+                }
+                _values = resultList;
                 break;
             default:
                 throw new InvalidOperationException($"Port {Port.Name} is not a collection.");
@@ -54,8 +63,15 @@ public partial class CollectionField : ComponentBase
         switch (port.Brand)
         {
             case PortBrand.StringCollection:
-                var oldValues = (ReadOnlyCollection<string>)port.Value!;
-                return new ReadOnlyCollection<string>(oldValues.Append(null!).ToList());
+                {
+                    var oldValues = (ReadOnlyCollection<string>)port.Value!;
+                    return new ReadOnlyCollection<string>(oldValues.Append(null!).ToList());
+                }
+            case PortBrand.NumericCollection:
+                {
+                    var oldValues = (ReadOnlyCollection<double>)port.Value!;
+                    return new ReadOnlyCollection<double>(oldValues.Append(0).ToList());
+                }
             default:
                 throw new InvalidOperationException($"Port {port.Name} is not a collection.");
         }
@@ -66,10 +82,20 @@ public partial class CollectionField : ComponentBase
         switch (port.Brand)
         {
             case PortBrand.StringCollection:
-                var oldValues = new List<string>((ReadOnlyCollection<string>)port.Value!);
-                var oldList = oldValues.ToList();
-                oldList.RemoveAt(index);
-                return new ReadOnlyCollection<string>(oldList);
+                {
+                    var oldValues = new List<string>((ReadOnlyCollection<string>)port.Value!);
+                    var oldList = oldValues.ToList();
+                    oldList.RemoveAt(index);
+                    return new ReadOnlyCollection<string>(oldList);
+                }
+            case PortBrand.NumericCollection:
+                {
+                    var oldValues = new List<double>((ReadOnlyCollection<double>)port.Value!);
+                    var oldList = oldValues.ToList();
+                    oldList.RemoveAt(index);
+                    return new ReadOnlyCollection<double>(oldList);
+                }
+
             default:
                 throw new InvalidOperationException($"Port {port.Name} is not a collection.");
 
@@ -81,9 +107,17 @@ public partial class CollectionField : ComponentBase
         switch (port.Brand)
         {
             case PortBrand.StringCollection:
-                string[] newValues = oldValues.Cast<string>().ToArray();
-                newValues[change.Index] = (string)change.Value;
-                return new ReadOnlyCollection<string>(newValues);
+                {
+                    string[] newValues = oldValues.Cast<string>().ToArray();
+                    newValues[change.Index] = (string)change.Value;
+                    return new ReadOnlyCollection<string>(newValues);
+                }
+            case PortBrand.NumericCollection:
+                {
+                    double[] newValues = oldValues.Cast<double>().ToArray();
+                    newValues[change.Index] = (double)change.Value;
+                    return new ReadOnlyCollection<double>(newValues);
+                }
             default:
                 throw new InvalidOperationException($"Port {port.Name} is not a collection.");
         }

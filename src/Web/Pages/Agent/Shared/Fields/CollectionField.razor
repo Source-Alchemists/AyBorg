@@ -1,3 +1,5 @@
+@using SDK.Common.Ports
+
 <div class="mud-full-width" style="min-height: 337px; max-height: 337px">
     <MudBadge Content="@(_values.Count())" Color="Color.Secondary">
         <MudText>@Port.Name</MudText>
@@ -9,10 +11,18 @@
                 var index = i;
                 <MudListItem Class="flow-input-body px-0">
                     <MudStack Row>
-                        @if (Port.Brand == SDK.Common.Ports.PortBrand.StringCollection)
+                        @switch (Port.Brand)
                         {
-                            <StringInput PortBrand="Port.Brand" Value="@_values[index]" CollectionIndex="index"
-                        ValueChanged="InputValueChanged" Disabled="@(Port.IsLinkConvertable || Disabled)" />
+                            case PortBrand.StringCollection:
+                                <StringInput PortBrand="Port.Brand" Value="@_values[index]" CollectionIndex="index"
+                                            ValueChanged="InputValueChanged" Disabled="@(Port.IsLinkConvertable || Disabled)" />
+                                break;
+                            case PortBrand.NumericCollection:
+                                <NumericInput PortBrand="Port.Brand" Value="@_values[index]" CollectionIndex="index"
+                                            ValueChanged="InputValueChanged" Disabled="@(Port.IsLinkConvertable || Disabled)" />
+                                break;
+                            default:
+                                break;
                         }
                         <MudBadge Content="index" Color="Color.Info" Origin="Origin.CenterLeft">
                             <MudTooltip Text="Remove item">
