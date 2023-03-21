@@ -4,7 +4,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AyBorg.Plugins.Base.Collection.Tests;
 
-public class StringCollectionIndexOfTests {
+public class StringCollectionIndexOfTests
+{
     private static readonly NullLogger<StringCollectionIndexOf> s_nullLogger = new();
 
     [Fact]
@@ -16,7 +17,7 @@ public class StringCollectionIndexOfTests {
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (NumericPort)plugin.Ports.First(p => p.Name.Equals("Index"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(new List<string>{"Test1", "Test2"});
+        collectionPort.Value = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
         searchValuePort.Value = "Test2";
 
         // Act
@@ -36,7 +37,7 @@ public class StringCollectionIndexOfTests {
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (NumericPort)plugin.Ports.First(p => p.Name.Equals("Index"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(new List<string>{"Test1", "Test2"});
+        collectionPort.Value = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
         searchValuePort.Value = "Test3";
 
         // Act

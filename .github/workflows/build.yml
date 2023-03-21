@@ -6,6 +6,9 @@ on:
       - v-*
       - feature/*
       - issue/*
+    paths:
+      - 'src/**'
+      - 'tests/**'
   pull_request:
     types: [opened, synchronize, reopened]
 jobs:

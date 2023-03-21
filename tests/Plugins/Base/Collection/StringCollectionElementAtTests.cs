@@ -4,8 +4,8 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace AyBorg.Plugins.Base.Collection.Tests;
 
-public class StringCollectionElementAtTests {
-
+public class StringCollectionElementAtTests
+{
     private static readonly NullLogger<StringCollectionElementAt> s_nullLogger = new();
 
     [Fact]
@@ -17,7 +17,7 @@ public class StringCollectionElementAtTests {
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (StringPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(new List<string>{"Test1", "Test2"});
+        collectionPort.Value = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
         indexPort.Value = 1;
 
         // Act
@@ -37,7 +37,7 @@ public class StringCollectionElementAtTests {
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (StringPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(new List<string>{"Test1", "Test2"});
+        collectionPort.Value = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
         indexPort.Value = 2;
 
         // Act
@@ -56,7 +56,7 @@ public class StringCollectionElementAtTests {
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (StringPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(new List<string>{"Test1", "Test2"});
+        collectionPort.Value = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
         indexPort.Value = double.MaxValue;
 
         // Act
