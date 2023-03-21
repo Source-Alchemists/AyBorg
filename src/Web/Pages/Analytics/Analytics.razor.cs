@@ -74,9 +74,10 @@ public partial class Analytics : ComponentBase
     {
         _isLoading = true;
         int count = 0;
+        var tmpEvents = new List<EventLogEntry>();
         await foreach (EventLogEntry entry in EventLogService.GetEventsAsync())
         {
-            _eventRecords.Insert(0, entry);
+            // _eventRecords.Insert(0, entry);
             // Smoother loading animation
             count++;
             if (count > 10)
@@ -84,7 +85,12 @@ public partial class Analytics : ComponentBase
                 await InvokeAsync(StateHasChanged);
                 count = 0;
             }
+            tmpEvents.Add(entry);
         }
+
+        _eventRecords.AddRange(tmpEvents);
+        await InvokeAsync(StateHasChanged);
+
         _isLoading = false;
     }
 
