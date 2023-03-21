@@ -21,4 +21,33 @@ public class NumericCollectionPortMapperTests
         Assert.Equal(port.Direction, portModel.Direction);
         Assert.Equal(JsonSerializer.Serialize(port.Value, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }), portModel.Value);
     }
+
+    [Fact]
+    public void Test_ToNative()
+    {
+        // Arrange
+        var mapper = new NumericCollectionPortMapper();
+        var port = new NumericCollectionPort("Test", PortDirection.Input, new ReadOnlyCollection<double>(new List<double> { 1, 2 }));
+
+        // Act
+        ReadOnlyCollection<double> nativeValue = mapper.ToNativeValue(port.Value);
+
+        // Assert
+        Assert.Equal(port.Value, nativeValue);
+    }
+
+    [Fact]
+    public void Test_ToNative_FromJson()
+    {
+        // Arrange
+        var mapper = new NumericCollectionPortMapper();
+        var port = new NumericCollectionPort("Test", PortDirection.Input, new ReadOnlyCollection<double>(new List<double> { 1, 2 }));
+        string json = JsonSerializer.Serialize(port.Value, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+
+        // Act
+        ReadOnlyCollection<double> nativeValue = mapper.ToNativeValue(json);
+
+        // Assert
+        Assert.Equal(new ReadOnlyCollection<double>(new List<double> { 1, 2 }), nativeValue);
+    }
 }
