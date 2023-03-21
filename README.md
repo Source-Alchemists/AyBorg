@@ -6,15 +6,11 @@
 
 ![Logo](docs/img/logo.svg)
 
-Hey there! Are you tired of complex and expensive Industrial IoT solutions that only add to your headaches? Introducing AyBorg, the powerful and scalable no-code/low-code platform for your production processes.
+With AyBorg, you'll have the power to build and customize your own industrial applications without needing to write a single line of code. Simply drag and drop elements, connect the ports and voila!
 
-Our platform is free, open-source and provides a service-oriented architecture that can be easily adapted to your needs. With AyBorg, you'll have the power to build and customize your own industrial applications without needing to write a single line of code. Simply drag and drop elements, connect the ports and voila! You've got a fully functioning application that can be easily scaled and customized as your business grows.
+We've got your back when it comes to monitoring your production goods too. Our platform has a focus on mage processing, making it easier for you to keep an eye on your production. And if you need to add some extra features, our platform can be easily extended with plugins.
 
-We've got your back when it comes to monitoring your production goods too. Our platform has a focus on using camera systems for image processing, making it easier for you to keep an eye on your production. And if you need to add some extra features, our platform can be easily extended with plugins.
-
-With AyBorg, you don't have to worry about being locked into one vendor. Our platform is open-source, meaning you have the freedom to adapt and modify it as you see fit. And because it's free, you'll be saving money compared to closed source solutions. Plus, with our built-in auditing functionality, you'll have even more control over your processes and data, leading to improved efficiency and cost savings.
-
-So what are you waiting for? Say goodbye to complex and expensive solutions, and hello to the power of AyBorg. Get started today!
+With our built-in auditing functionality, you'll have even more control over your processes and data, leading to improved efficiency and cost savings.
 
 **:bangbang: AyBorg is still in its early stages of development and our API is still fluid and may change. If you happen to come across any bugs, please don't hesitate to report them - we'd be grateful for your help!**
 
