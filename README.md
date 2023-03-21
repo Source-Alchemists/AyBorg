@@ -16,6 +16,8 @@ With AyBorg, you don't have to worry about being locked into one vendor. Our pla
 
 So what are you waiting for? Say goodbye to complex and expensive solutions, and hello to the power of AyBorg. Get started today!
 
+**:bangbang: AyBorg is still in its early stages of development and our API is still fluid and may change. If you happen to come across any bugs, please don't hesitate to report them - we'd be grateful for your help!**
+
 ## Agents
 
 AyBorg's **Agents** are specially designed services for automating processes. Using the **AyBorg.Gateway**, they can seamlessly communicate with other areas of the application. These powerful tools are ideal for optimizing your workflow and can help increase your efficiency.
