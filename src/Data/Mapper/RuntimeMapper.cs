@@ -25,7 +25,7 @@ public class RuntimeMapper : IRuntimeMapper
             X = stepProxy.X,
             Y = stepProxy.Y,
             ExecutionTimeMs = stepProxy.ExecutionTimeMs,
-            MetaInfo = stepProxy.MetaInfo,
+            MetaInfo = stepProxy.MetaInfo with {},
             Ports = ports
         };
     }
