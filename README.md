@@ -22,7 +22,8 @@ AyBorg's **Agents** are specially designed services for automating processes. Us
 
 Our user-friendly editor makes it a breeze to program your own workflows using simple drag and drop of steps/plugins into the data flow.
 
-![AgentEditor](docs/img/agent-editor.png)
+![Agent editor dark](docs/img/agent-editor.png)
+![Agent editor light](docs/img/agent-editor-alt.png)
 
 ### Work with multiple agents
 
@@ -40,7 +41,8 @@ The project overview lays out all the projects and their current status. That wa
 
 Get an overview of all events at a glance, whether it's user interaction, system event, or exception. It is important that you can understand and control your system at all times.
 
-![Analytics](docs/img/analytics.png)
+![Analytics dark](docs/img/analytics.png)
+![Analytics light](docs/img/analytics-alt.png)
 
 ## Audit
 
@@ -62,11 +64,13 @@ In industries such as **medicine**, **pharmaceuticals**, and **food**, it is bec
 
 ### Service overview
 
-![ServiceOverview](docs/img/admin-service-overview.png)
+![Service overview](docs/img/admin-service-overview.png)
+![Service overview](docs/img/admin-service-overview-alt.png)
 
 ### Usermanagement
 
-![Usermanagement](docs/img/admin-usermanagement.png)
+![Usermanagement dark](docs/img/admin-usermanagement.png)
+![Usermanagement light](docs/img/admin-usermanagement-alt.png)
 
 ## Getting started
 
