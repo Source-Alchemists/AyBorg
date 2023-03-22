@@ -8,7 +8,7 @@
 
 With AyBorg, you'll have the power to build and customize your own industrial applications without needing to write a single line of code. Simply drag and drop elements, connect the ports and voila!
 
-We've got your back when it comes to monitoring your production goods too. Our platform has a focus on mage processing, making it easier for you to keep an eye on your production. And if you need to add some extra features, our platform can be easily extended with plugins.
+We've got your back when it comes to monitoring your production goods too. Our platform has a focus on image processing, making it easier for you to keep an eye on your production. And if you need to add some extra features, our platform can be easily extended with plugins.
 
 With our built-in auditing functionality, you'll have even more control over your processes and data, leading to improved efficiency and cost savings.
 
