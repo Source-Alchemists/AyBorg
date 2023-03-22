@@ -29,13 +29,15 @@ Our user-friendly editor makes it a breeze to program your own workflows using s
 
 Experience unparalleled flexibility in your workflow! Work with as many agents as you want and distribute them across different systems. Thanks to seamless communication via the MQTT protocol, your creativity knows no bounds. Whether it's simple or complex scenarios, our agents enable you to perfectly realize your ideas!
 
-![AgentOverview](docs/img/agent-overview.png)
+![Agent overview dark](docs/img/agent-overview.png)
+![Agent overview light](docs/img/agent-overview-alt.png)
 
 ### Project overview
 
 The project overview lays out all the projects and their current status. That way, you can see in a jiffy which projects have been given the green light for production.
 
-![ProjectOverview](docs/img/agent-projects.png)
+![Project overview dark](docs/img/agent-projects.png)
+![Project overview light](docs/img/agent-projects-alt.png)
 
 ## Analytics
 
@@ -50,15 +52,22 @@ In industries such as **medicine**, **pharmaceuticals**, and **food**, it is bec
 
 ### Create new audit report
 
-![AuditChangesets](docs/img/audit-changesets.png)
+![Audit changesets dark](docs/img/audit-changesets.png)
+![Audit changesets light](docs/img/audit-changesets-alt.png)
 
 ### Audit changes (diff)
 
-![AuditDiff](docs/img/audit-diff.png)
+![Audit diff dark](docs/img/audit-diff.png)
+![Audit diff light](docs/img/audit-diff-alt.png)
 
 ### Save your reports
 
-![AuditSavedReports](docs/img/audit-saved-reports.png)
+AyBorg provides the ability to store and access **audit reports** at any time. By storing these reports, administrators and auditors can review past events and ensure that the system has been functioning properly.
+
+The ability to store and access audit reports offers a valuable way to monitor the system and **ensure compliance with requirements and standards**. Additionally, this can aid in troubleshooting by making it easier to identify the exact timing and cause of a problem.
+
+![Audit saved reports dark](docs/img/audit-saved-reports.png)
+![Audit saved reports light](docs/img/audit-saved-reports-alt.png)
 
 ## Administration
 
@@ -68,6 +77,8 @@ In industries such as **medicine**, **pharmaceuticals**, and **food**, it is bec
 ![Service overview](docs/img/admin-service-overview-alt.png)
 
 ### Usermanagement
+
+AyBorg has a **role-based user management system** that allows for precise control and management of access rights and functionalities within the application. With this approach, users can be organized into different roles, each with distinct permissions and access rights to various areas of the application.
 
 ![Usermanagement dark](docs/img/admin-usermanagement.png)
 ![Usermanagement light](docs/img/admin-usermanagement-alt.png)
