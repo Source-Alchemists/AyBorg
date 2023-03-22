@@ -213,7 +213,7 @@ internal sealed class Pathfinder : IPathfinder
     private static async ValueTask<IEnumerable<IStepProxy>> FindForkStepsAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
     {
         // Split steps are steps with multiple outgoing links
-        IEnumerable<IStepProxy> splitSteps = steps.Where(s => s.Ports.Any(p => p.Direction == PortDirection.Output && links.Where(l => l.SourceId.Equals(p.Id)).Count() > 1));
+        IEnumerable<IStepProxy> splitSteps = steps.Where(s => s.Ports.Any(p => p.Direction == PortDirection.Output && links.Count(l => l.SourceId.Equals(p.Id)) > 1));
 
         return await ValueTask.FromResult(splitSteps);
     }

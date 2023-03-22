@@ -77,7 +77,6 @@ public partial class Analytics : ComponentBase
         var tmpEvents = new List<EventLogEntry>();
         await foreach (EventLogEntry entry in EventLogService.GetEventsAsync())
         {
-            // _eventRecords.Insert(0, entry);
             // Smoother loading animation
             count++;
             if (count > 10)
