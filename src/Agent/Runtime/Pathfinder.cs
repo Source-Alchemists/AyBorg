@@ -173,7 +173,7 @@ internal sealed class Pathfinder : IPathfinder
     {
         // Possible endpoints are steps without outgoing links
         var hashSet = new HashSet<IStepProxy>();
-        foreach (IStepProxy? s in steps.Where(s => !s.Ports.Where(p => p.Direction == PortDirection.Output).Any()))
+        foreach (IStepProxy? s in steps.Where(s => !s.Ports.Any(p => p.Direction == PortDirection.Output)))
         {
             hashSet.Add(s);
         }
@@ -190,7 +190,7 @@ internal sealed class Pathfinder : IPathfinder
     {
         var hashSet = new HashSet<IStepProxy>();
         // Possible startpoints are steps without incoming links
-        foreach (IStepProxy? s in steps.Where(s => !s.Ports.Where(p => p.Direction == PortDirection.Input).Any()))
+        foreach (IStepProxy? s in steps.Where(s => !s.Ports.Any(p => p.Direction == PortDirection.Input)))
         {
             hashSet.Add(s);
         }
@@ -198,7 +198,6 @@ internal sealed class Pathfinder : IPathfinder
         {
             hashSet.Add(s);
         }
-        // var stepsWithoutIncomingPorts = steps.Where(s => s.Ports.Where(p => p.Direction == PortDirection.Input && !links.Any(l => l.TargetId.Equals(p.Id))).Any());
 
         return await ValueTask.FromResult(hashSet);
     }
@@ -206,7 +205,7 @@ internal sealed class Pathfinder : IPathfinder
     private static async ValueTask<IEnumerable<IStepProxy>> FindMergeStepsAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
     {
         // Merge steps are steps with multiple incoming links
-        IEnumerable<IStepProxy> mergeSteps = steps.Where(s => s.Ports.Where(p => links.Where(l => l.TargetId.Equals(p.Id)).Any()).Count() > 1);
+        IEnumerable<IStepProxy> mergeSteps = steps.Where(s => s.Ports.Count(p => links.Any(l => l.TargetId.Equals(p.Id))) > 1);
 
         return await ValueTask.FromResult(mergeSteps);
     }
@@ -214,7 +213,7 @@ internal sealed class Pathfinder : IPathfinder
     private static async ValueTask<IEnumerable<IStepProxy>> FindForkStepsAsync(IEnumerable<IStepProxy> steps, IEnumerable<PortLink> links)
     {
         // Split steps are steps with multiple outgoing links
-        IEnumerable<IStepProxy> splitSteps = steps.Where(s => s.Ports.Where(p => p.Direction == PortDirection.Output && links.Where(l => l.SourceId.Equals(p.Id)).Count() > 1).Any());
+        IEnumerable<IStepProxy> splitSteps = steps.Where(s => s.Ports.Any(p => p.Direction == PortDirection.Output && links.Where(l => l.SourceId.Equals(p.Id)).Count() > 1));
 
         return await ValueTask.FromResult(splitSteps);
     }
