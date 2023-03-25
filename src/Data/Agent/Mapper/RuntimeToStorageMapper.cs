@@ -3,6 +3,7 @@ using AutoMapper;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Projects;
+using ImageTorque;
 
 namespace AyBorg.Data.Agent;
 
@@ -35,6 +36,7 @@ public sealed class RuntimeToStorageMapper : IRuntimeToStorageMapper
             // Port collections
             config.CreateMap<StringCollectionPort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<string>()));
             config.CreateMap<NumericCollectionPort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<double>()));
+            config.CreateMap<RectangleCollectionPort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<Rectangle>()));
         });
 
         _mapper = new Mapper(config);

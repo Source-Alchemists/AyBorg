@@ -13,7 +13,7 @@ public class StringCollectionPortMapper : IPortMapper<ReadOnlyCollection<string>
         List<string> record;
         if (value is ReadOnlyCollection<string> collection)
         {
-            record = new ReadOnlyCollection<string>(collection).ToList();
+            record = collection.ToList();
         }
         else
         {

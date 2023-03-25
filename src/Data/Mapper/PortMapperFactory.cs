@@ -17,6 +17,7 @@ public static class PortMapperFactory
             PortBrand.Image => new ImagePortMapper(),
             PortBrand.StringCollection => new StringCollectionPortMapper(),
             PortBrand.NumericCollection => new NumericCollectionPortMapper(),
+            PortBrand.RectangleCollection => new RectangleCollectionPortMapper(),
             _ => throw new ArgumentException($"No mapper exists for port brand {port.Brand}."),
         };
     }
