@@ -31,16 +31,26 @@ public class RectangleCollectionPortMapperTests
     {
         // Arrange
         var mapper = new RectangleCollectionPortMapper();
-        var port = new RectangleCollectionPort("Test", PortDirection.Input, new ReadOnlyCollection<Rectangle>(new List<Rectangle> {
-            new Rectangle { X = 1, Y = 2, Width = 3, Height = 4},
-            new Rectangle { X = 5, Y = 6, Width = 7, Height = 8}
-         }));
+        var value = new ReadOnlyCollection<SDK.Common.Models.Rectangle>(new List<SDK.Common.Models.Rectangle> {
+            new SDK.Common.Models.Rectangle { X = 1, Y = 2, Width = 3, Height = 4},
+            new SDK.Common.Models.Rectangle { X = 5, Y = 6, Width = 7, Height = 8}
+         });
 
         // Act
-        ReadOnlyCollection<Rectangle> nativeValue = mapper.ToNativeValue(port.Value);
+        ReadOnlyCollection<Rectangle> nativeValue = mapper.ToNativeValue(value);
 
         // Assert
-        Assert.Equal(port.Value, nativeValue);
+        Assert.Equal(value.Count, nativeValue.Count);
+        int index = 0;
+        foreach(Rectangle n in nativeValue)
+        {
+            SDK.Common.Models.Rectangle v = value.ElementAt(index);
+            Assert.Equal(v.X, n.X);
+            Assert.Equal(v.Y, n.Y);
+            Assert.Equal(v.Width, n.Width);
+            Assert.Equal(v.Height, n.Height);
+            index++;
+        }
     }
 
     [Fact]
