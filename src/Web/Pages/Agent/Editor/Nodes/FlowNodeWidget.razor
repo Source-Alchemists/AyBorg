@@ -51,6 +51,7 @@
 					break;
                 case PortBrand.StringCollection:
                 case PortBrand.NumericCollection:
+                case PortBrand.RectangleCollection:
                     <CollectionField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
                     break;
 				default:

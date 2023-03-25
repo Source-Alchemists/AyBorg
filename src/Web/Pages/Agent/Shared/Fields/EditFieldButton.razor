@@ -1,16 +1,28 @@
 <div Class="mud-full-width py-1 m-0">
     <MudButton Color="Color.Default" DisableElevation="true" Variant="Variant.Filled" Class="mud-width-full m-0"
-            OnClick="OnEditFiedClicked" Disabled="Disabled">
-        <div Class="w50 ta-start">
-            <MudText>@Label</MudText>
-        </div>
-        <div Class="w50 ta-end">
+        OnClick="OnEditFiedClicked" Disabled="Disabled">
+
+        @if (Label != string.Empty)
+        {
+            <div Class="w50 ta-start">
+                <MudText>@Label</MudText>
+            </div>
+            <div Class="w50 ta-end">
+                <MudTooltip Text="@(Value?.ToString())" Style="width: 200px">
+                    <div Style="max-width: 110px; max-height: 30px" Class="pt-2 to-ellipsis">
+                        @Value
+                    </div>
+                </MudTooltip>
+            </div>
+        }
+        else
+        {
             <MudTooltip Text="@(Value?.ToString())" Style="width: 200px">
-                <div Style="max-width: 110px; max-height: 30px" Class="pt-2 to-ellipsis">
-                @Value
+                <div Style="max-width: 200px; max-height: 30px" Class="pt-2 to-ellipsis">
+                    @Value
                 </div>
             </MudTooltip>
-        </div>
+        }
     </MudButton>
 </div>
 

@@ -54,12 +54,16 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
             case PortBrand.String:
             case PortBrand.Folder:
             case PortBrand.Numeric:
+            case PortBrand.Boolean:
+            case PortBrand.StringCollection:
+            case PortBrand.NumericCollection:
                 typeClass = "field";
                 break;
             case PortBrand.Image:
                 typeClass = "image";
                 break;
             case PortBrand.Rectangle:
+            case PortBrand.RectangleCollection:
                 typeClass = "shape";
                 break;
         }

@@ -21,6 +21,10 @@
                                 <NumericInput PortBrand="Port.Brand" Value="@_values[index]" CollectionIndex="index"
                                             ValueChanged="InputValueChanged" Disabled="@(Port.IsLinkConvertable || Disabled)" />
                                 break;
+                            case PortBrand.RectangleCollection:
+                                <RectangleInput PortBrand="Port.Brand" Value="@_values[index]" CollectionIndex="index"
+                                            ValueChanged="InputValueChanged" Disabled="@(Port.IsLinkConvertable || Disabled)" />
+                                break;
                             default:
                                 break;
                         }

@@ -7,7 +7,7 @@
         </MudTreeView>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Secondary" OnClick="@OnCancelClicked">Cancel</MudButton>
-        <MudButton Color="Color.Primary" Disabled="@(_selectedItem == null)" OnClick="@OnChooseClicked">Choose</MudButton>
+        <MudButton OnClick="@OnCancelClicked">Cancel</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" Disabled="@(_selectedItem == null)" OnClick="@OnChooseClicked">Choose</MudButton>
     </DialogActions>
 </MudDialog>

@@ -24,9 +24,13 @@ public class RectangleCollectionPortMapper : IPortMapper<ReadOnlyCollection<Rect
     public ReadOnlyCollection<Rectangle> ToNativeValue(object value, Type? type = null)
     {
         List<Rectangle> record;
-        if (value is ReadOnlyCollection<Rectangle> collection)
+        if (value is ReadOnlyCollection<SDK.Common.Models.Rectangle> collection)
         {
-            record = collection.ToList();
+            record = new List<Rectangle>();
+            foreach (SDK.Common.Models.Rectangle rec in collection)
+            {
+                record.Add(new Rectangle { X = rec.X, Y = rec.Y, Width = rec.Width, Height = rec.Height });
+            }
         }
         else
         {

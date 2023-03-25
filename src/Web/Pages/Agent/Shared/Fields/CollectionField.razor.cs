@@ -19,24 +19,13 @@ public partial class CollectionField : ComponentBase
     {
         base.OnParametersSet();
 
-        switch (Port.Brand)
+        _values = Port.Brand switch
         {
-            case PortBrand.StringCollection:
-                _values = new List<object>((ReadOnlyCollection<string>)Port.Value!);
-                break;
-            case PortBrand.NumericCollection:
-                var tmpDoubleCollection = (ReadOnlyCollection<double>)Port.Value!;
-                var resultList = new List<object>();
-                foreach (double tmpDouble in tmpDoubleCollection)
-                {
-                    resultList.Add(tmpDouble);
-                }
-                _values = resultList;
-                break;
-            default:
-                throw new InvalidOperationException($"Port {Port.Name} is not a collection.");
-
-        }
+            PortBrand.StringCollection => new List<object>((ReadOnlyCollection<string>)Port.Value!),
+            PortBrand.NumericCollection => ConvertNumericCollection(Port.Value!),
+            PortBrand.RectangleCollection => ConvertRectangleCollection(Port.Value!),
+            _ => throw new InvalidOperationException($"Port {Port.Name} is not a collection."),
+        };
     }
 
     private async Task AddItemClicked()
@@ -72,6 +61,11 @@ public partial class CollectionField : ComponentBase
                     var oldValues = (ReadOnlyCollection<double>)port.Value!;
                     return new ReadOnlyCollection<double>(oldValues.Append(0).ToList());
                 }
+            case PortBrand.RectangleCollection:
+                {
+                    var oldValues = (ReadOnlyCollection<Rectangle>)port.Value!;
+                    return new ReadOnlyCollection<Rectangle>(oldValues.Append(new Rectangle()).ToList());
+                }
             default:
                 throw new InvalidOperationException($"Port {port.Name} is not a collection.");
         }
@@ -94,6 +88,13 @@ public partial class CollectionField : ComponentBase
                     var oldList = oldValues.ToList();
                     oldList.RemoveAt(index);
                     return new ReadOnlyCollection<double>(oldList);
+                }
+            case PortBrand.RectangleCollection:
+                {
+                    var oldValues = new List<Rectangle>((ReadOnlyCollection<Rectangle>)port.Value!);
+                    var oldList = oldValues.ToList();
+                    oldList.RemoveAt(index);
+                    return new ReadOnlyCollection<Rectangle>(oldList);
                 }
 
             default:
@@ -118,8 +119,38 @@ public partial class CollectionField : ComponentBase
                     newValues[change.Index] = (double)change.Value;
                     return new ReadOnlyCollection<double>(newValues);
                 }
+            case PortBrand.RectangleCollection:
+                {
+                    Rectangle[] newValues = oldValues.Cast<Rectangle>().ToArray();
+                    newValues[change.Index] = (Rectangle)change.Value;
+                    return new ReadOnlyCollection<Rectangle>(newValues);
+                }
             default:
                 throw new InvalidOperationException($"Port {port.Name} is not a collection.");
         }
+    }
+
+    private static List<object> ConvertNumericCollection(object value)
+    {
+        var tmpCollection = (ReadOnlyCollection<double>)value;
+        var resultList = new List<object>();
+        foreach (double tmp in tmpCollection)
+        {
+            resultList.Add(tmp);
+        }
+
+        return resultList;
+    }
+
+    private static List<object> ConvertRectangleCollection(object value)
+    {
+        var tmpCollection = (ReadOnlyCollection<Rectangle>)value;
+        var resultList = new List<object>();
+        foreach (Rectangle tmp in tmpCollection)
+        {
+            resultList.Add(tmp);
+        }
+
+        return resultList;
     }
 }

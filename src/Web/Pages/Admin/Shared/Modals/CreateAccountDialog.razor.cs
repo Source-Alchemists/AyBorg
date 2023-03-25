@@ -12,7 +12,7 @@ public partial class CreateAccountDialog : ComponentBase
     [Inject] RoleManager<IdentityRole> RoleManager { get; set; } = null!;
     [Inject] UserManager<IdentityUser> UserManager { get; set; } = null!;
     [Inject] IJSRuntime JSRuntime { get; set; } = null!;
-    
+
     private readonly List<Role> _roles = new();
     private string _userName = null!;
     private string _userEmail = null!;
@@ -45,13 +45,13 @@ public partial class CreateAccountDialog : ComponentBase
             {
                 Email = _userEmail
             };
-            var result = await UserManager.CreateAsync(user, _password);
+            IdentityResult result = await UserManager.CreateAsync(user, _password);
             if (result.Succeeded)
             {
-                foreach(var role in _roles.Where(r => r.Checked))
+                foreach (Role? role in _roles.Where(r => r.Checked))
                 {
-                    var roleResult = await UserManager.AddToRoleAsync(user, role.IdentityRole.Name!);
-                    if(!roleResult.Succeeded)
+                    IdentityResult roleResult = await UserManager.AddToRoleAsync(user, role.IdentityRole.Name!);
+                    if (!roleResult.Succeeded)
                     {
                         _serviceErrors = roleResult.Errors.Select(e => e.Description).ToArray();
                         return;
@@ -64,6 +64,6 @@ public partial class CreateAccountDialog : ComponentBase
             {
                 _serviceErrors = result.Errors.Select(e => e.Description).ToArray();
             }
-        }   
+        }
     }
 }
