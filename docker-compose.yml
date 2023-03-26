@@ -1,0 +1,38 @@
+version: '3.9'
+services:
+  gateway:
+    container_name: gateway-1
+    build:
+      dockerfile: src/Gateway/Dockerfile
+    ports:
+      - 6000:6000
+    extra_hosts:
+      localhost: 192.168.0.47
+
+  analytics:
+    container_name: analytics-1
+    build:
+      dockerfile: src/Analytics/Dockerfile
+    ports:
+      - 6001:6001
+
+  audit:
+    container_name: audit-1
+    build:
+      dockerfile: src/Audit/Dockerfile
+    ports:
+      - 6002:6002
+
+  web:
+    container_name: web-1
+    build:
+      dockerfile: src/Web/Dockerfile
+    ports:
+      - 6010:6010
+      - 6011:6011
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_Kestrel__Certificates__Default__Password=1234
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/demo-cert.pfx
+    volumes:
+      - ./misc/demo:/https:ro

@@ -31,7 +31,7 @@ builder.Services.AddGrpc();
 builder.Services.AddGrpcClient<EventLog.EventLogClient>(options =>
 {
     options.ChannelOptionsActions.Add(o => o.UnsafeUseInsecureChannelCallCredentials = true);
-    options.Address = new Uri(builder.Configuration.GetValue("Kestrel:Endpoints:gRPC:Url", "http://localhost:5000")!);
+    options.Address = new Uri(builder.Configuration.GetValue("AyBorg:Service:Url", "http://localhost:5000")!);
 });
 
 builder.AddAyBorgAnalyticsLogger();
@@ -44,6 +44,12 @@ builder.Services.AddSingleton<IKeeperService, KeeperService>();
 builder.Services.AddScoped<IJwtConsumer, JwtConsumer>();
 
 WebApplication app = builder.Build();
+
+Console.WriteLine("Running with following settings:");
+foreach (KeyValuePair<string, string?> config in builder.Configuration.AsEnumerable())
+{
+    Console.WriteLine($"{config.Key} = {config.Value}");
+}
 
 app.UseAuthorization();
 app.UseJwtMiddleware();

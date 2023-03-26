@@ -11,6 +11,7 @@ builder.Services.AddGrpc();
 builder.Services.AddGrpcClient<Ayborg.Gateway.V1.Register.RegisterClient>(options =>
 {
     string? gatewayUrl = builder.Configuration.GetValue("AyBorg:Gateway:Url", "http://localhost:5000");
+    Console.WriteLine($"Gateway connection: {gatewayUrl}");
     options.Address = new Uri(gatewayUrl!);
 });
 
