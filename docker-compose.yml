@@ -6,8 +6,6 @@ services:
       dockerfile: src/Gateway/Dockerfile
     ports:
       - 6000:6000
-    extra_hosts:
-      localhost: 192.168.0.47
 
   analytics:
     container_name: analytics-1

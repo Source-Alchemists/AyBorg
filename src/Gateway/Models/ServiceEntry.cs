@@ -10,7 +10,7 @@ public record ServiceEntry : ServiceEntryRecord
     /// <summary>
     /// Gets or sets the version.
     /// </summary>
-    public string Version { get; set; } = string.Empty;
+    public string Version { get; init; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the last connection time (UTC).

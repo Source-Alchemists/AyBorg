@@ -18,12 +18,13 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
 
     public override async Task<StatusResponse> Register(RegisterRequest request, ServerCallContext context)
     {
+        string callerUrl = GetClientAddress(request, context);
         var newServiceEntry = new ServiceEntry
         {
             Name = request.Name,
             UniqueName = request.UniqueName,
             Type = request.Type,
-            Url = request.Url,
+            Url =  callerUrl,
             Version = request.Version
         };
 
@@ -111,5 +112,20 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
                 Version = s.Version
             }) }
         };
+    }
+
+    private static string GetClientAddress(RegisterRequest request, ServerCallContext context)
+    {
+        HttpContext httpContext = context.GetHttpContext();
+        string clientAddress = context.Peer;
+        if (clientAddress.Contains("ipv6", StringComparison.InvariantCultureIgnoreCase))
+        {
+            clientAddress = clientAddress.Replace("ipv6:", string.Empty);
+        }
+
+        clientAddress = clientAddress.Remove(clientAddress.LastIndexOf(':'));
+        clientAddress = $"{clientAddress}{request.Url.Substring(request.Url.LastIndexOf(':'))}";
+
+        return httpContext.Request.IsHttps ? $"https://{clientAddress}" : $"http://{clientAddress}";
     }
 }
