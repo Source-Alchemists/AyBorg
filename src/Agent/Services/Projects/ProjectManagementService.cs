@@ -216,7 +216,8 @@ internal sealed class ProjectManagementService : IProjectManagementService
 
             if (!projectMetas.Any())
             {
-                throw new ProjectException("Failed to load active project.");
+                _logger.LogWarning(new EventId((int)EventLogType.ProjectState), "No active project found.");
+                return new ProjectManagementResult(false, "No active project found.");
             }
 
             ProjectMetaRecord projectMeta = projectMetas.First();

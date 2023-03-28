@@ -1,7 +1,15 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS BUILD
 COPY ["./src", "/src"]
-WORKDIR /src/Gateway
+WORKDIR /src/Agent
 RUN dotnet publish -c release -o ../../artifacts
+WORKDIR /src/Plugins/Base
+RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.Base
+WORKDIR /src/Plugins/ImageTorque
+RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.ImageTorque
+WORKDIR /src/Plugins/MQTT
+RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.MQTT
+WORKDIR /src/Plugins/ZXing
+RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.ZXing
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS RUNTIME
 EXPOSE 6000:6000
@@ -27,6 +35,8 @@ RUN chown -cR $USERNAME /bin/AyBorg
 WORKDIR /bin/AyBorg
 USER $USERNAME
 ENV "ASPNETCORE_URLS"=""
-ENV "Kestrel:Endpoints:gRPC:Url"="http://*:6000"
-ENV "AyBorg:Service:Url"="http://gateway-1:6000"
-ENTRYPOINT ["dotnet", "AyBorg.Gateway.dll"]
+ENV "Kestrel:Endpoints:gRPC:Url"="http://*:6020"
+ENV "AyBorg:Service:Url"="http://agent:6020"
+ENV "AyBorg:Gateway:Url"="http://gateway-1:6000"
+ENV "AyBorg:Plugins:Folder"="/bin/AyBorg/plugins"
+ENTRYPOINT ["dotnet", "AyBorg.Agent.dll"]

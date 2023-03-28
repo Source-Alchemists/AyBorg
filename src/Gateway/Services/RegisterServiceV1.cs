@@ -18,7 +18,13 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
 
     public override async Task<StatusResponse> Register(RegisterRequest request, ServerCallContext context)
     {
-        string callerUrl = GetClientAddress(request, context);
+        string callerUrl = request.Url;
+        if(request.Url.Contains("{AUTO}", StringComparison.InvariantCultureIgnoreCase))
+        {
+            // The url in the service configuration is set to 'AUTO' so we get the IP from the caller.
+            callerUrl = GetClientAddress(request, context);
+        }
+
         var newServiceEntry = new ServiceEntry
         {
             Name = request.Name,

@@ -97,30 +97,25 @@ In most cases the following setup makes sense:
 
 The default appsettings give you a good starting point and will also work locally, but for real scenarios, you will need to change the settings.
 
-> AyBorg default user "**SystemAdmin**" with password "**SystemAdmin123!**".
-
+> AyBorg default user "**SystemAdmin**" with password "**SystemAdmin123!**". \
 > :warning: **The default password should be changed immediately!**
 
-## Default Ports
+### Default Ports
 
 | Service          | HTTP | HTTPS | gRPC |
 | ---------------- | ---- | ----- | ---- |
-| AyBorg.Gateway   |      |       | 5000 |
-| AyBorg.Analytics |      |       | 5001 |
-| AyBorg.Audit     |      |       | 5002 |
-| AyBorg.Web       | 5010 | 5011  |      |
-| AyBorg.Agent     |      |       | 5020 |
+| AyBorg.Gateway   |      |       | 6000 |
+| AyBorg.Analytics |      |       | 6001 |
+| AyBorg.Audit     |      |       | 6002 |
+| AyBorg.Web       | 6010 | 6011  |      |
+| AyBorg.Agent     |      |       | 6020 |
 
-## Example setups
+## Docker compose
 
-Services can be added any time. The AyBorg.Gateway will detect the new service and establish the communication.
+We provide a ready to use Docker compose setup for demo purpose.
 
-![BlockDiagram](docs/img/block_diagram.png)
-
-### Using AyBorg.Agent as MQTT Consumer/Producer
-
-Typically, you will send the processed results to an MQTT broker so that other services (e.g. another AyBorg.Agent) can further process the data.
-![BlockDiagram](docs/img/block_diagram2.png)
+Just run `docker compose up` from the repository root directory. \
+You can then open AyBorg at `https://localhost:6011`.
 
 ## Want to contribute?
 

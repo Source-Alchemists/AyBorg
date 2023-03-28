@@ -1,9 +1,25 @@
 version: '3.9'
+networks:
+  backend:
+    driver: bridge
+
 services:
+  mqttbroker:
+    container_name: mqttbroker-1
+    image: eclipse-mosquitto:2.0.15
+    networks:
+      - backend
+    ports:
+      - 1883:1883
+    volumes:
+      - ./misc/demo/mosquitto/config:/mosquitto/config:ro
+
   gateway:
     container_name: gateway-1
     build:
       dockerfile: src/Gateway/Dockerfile
+    networks:
+      - backend
     ports:
       - 6000:6000
 
@@ -11,20 +27,31 @@ services:
     container_name: analytics-1
     build:
       dockerfile: src/Analytics/Dockerfile
-    ports:
-      - 6001:6001
+    depends_on:
+      gateway:
+        condition: service_started
+    networks:
+      - backend
 
   audit:
     container_name: audit-1
     build:
       dockerfile: src/Audit/Dockerfile
-    ports:
-      - 6002:6002
+    depends_on:
+      gateway:
+        condition: service_started
+    networks:
+      - backend
 
   web:
     container_name: web-1
     build:
       dockerfile: src/Web/Dockerfile
+    depends_on:
+      gateway:
+        condition: service_started
+    networks:
+      - backend
     ports:
       - 6010:6010
       - 6011:6011
@@ -34,3 +61,93 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/demo-cert.pfx
     volumes:
       - ./misc/demo:/https:ro
+
+  agent-1:
+    container_name: agent-internal-1
+    build:
+      dockerfile: src/Agent/Dockerfile
+    depends_on:
+      gateway:
+        condition: service_started
+      mqttbroker:
+        condition: service_started
+    networks:
+      - backend
+    environment:
+      - Kestrel:Endpoints:gRPC:Url=http://agent-internal-1:6020
+      - AyBorg:Service:Url=http://agent-internal-1:6020
+      - AyBorg:Service:DisplayName=Agent.Internal-1
+      - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-1
+      - MQTT:Host=mqttbroker-1
+
+  agent-2:
+    container_name: agent-internal-2
+    build:
+      dockerfile: src/Agent/Dockerfile
+    depends_on:
+      gateway:
+        condition: service_started
+      mqttbroker:
+        condition: service_started
+    networks:
+      - backend
+    environment:
+      - Kestrel:Endpoints:gRPC:Url=http://agent-internal-2:6020
+      - AyBorg:Service:Url=http://agent-internal-2:6020
+      - AyBorg:Service:DisplayName=Agent.Internal-2
+      - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-2
+      - MQTT:Host=mqttbroker-1
+
+  agent-3:
+    container_name: agent-internal-3
+    build:
+      dockerfile: src/Agent/Dockerfile
+    depends_on:
+      gateway:
+        condition: service_started
+      mqttbroker:
+        condition: service_started
+    networks:
+      - backend
+    environment:
+      - Kestrel:Endpoints:gRPC:Url=http://agent-internal-3:6020
+      - AyBorg:Service:Url=http://agent-internal-3:6020
+      - AyBorg:Service:DisplayName=Agent.Internal-3
+      - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-3
+      - MQTT:Host=mqttbroker-1
+
+  agent-4:
+    container_name: agent-internal-4
+    build:
+      dockerfile: src/Agent/Dockerfile
+    depends_on:
+      gateway:
+        condition: service_started
+      mqttbroker:
+        condition: service_started
+    networks:
+      - backend
+    environment:
+      - Kestrel:Endpoints:gRPC:Url=http://agent-internal-4:6020
+      - AyBorg:Service:Url=http://agent-internal-4:6020
+      - AyBorg:Service:DisplayName=Agent.Internal-4
+      - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-4
+      - MQTT:Host=mqttbroker-1
+
+  agent-5:
+    container_name: agent-internal-5
+    build:
+      dockerfile: src/Agent/Dockerfile
+    depends_on:
+      gateway:
+        condition: service_started
+      mqttbroker:
+        condition: service_started
+    networks:
+      - backend
+    environment:
+      - Kestrel:Endpoints:gRPC:Url=http://agent-internal-5:6020
+      - AyBorg:Service:Url=http://agent-internal-5:6020
+      - AyBorg:Service:DisplayName=Agent.Internal-5
+      - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-5
+      - MQTT:Host=mqttbroker-1
