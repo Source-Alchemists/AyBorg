@@ -28,8 +28,6 @@ RUN groupadd --gid $USER_GID $USERNAME \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 
-RUN apt-get install -y dnsutils
-
 COPY --from=BUILD /artifacts ./bin/AyBorg
 RUN chown -cR $USERNAME /bin/AyBorg
 WORKDIR /bin/AyBorg
