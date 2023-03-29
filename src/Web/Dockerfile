@@ -1,7 +1,7 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS BUILD
 COPY ["./src", "/src"]
 WORKDIR /src/Web
-RUN rm *.db
+RUN if test -n "$(find . -maxdepth 1 -name '*.db' -print -quit)"; then rm *.db; fi
 RUN dotnet publish -c release -o ../../artifacts
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS RUNTIME
