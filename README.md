@@ -22,29 +22,25 @@ AyBorg's **Agents** are specially designed services for automating processes. Us
 
 Our user-friendly editor makes it a breeze to program your own workflows using simple drag and drop of steps/plugins into the data flow.
 
-![Agent editor dark](docs/img/agent-editor.png)
-![Agent editor light](docs/img/agent-editor-alt.png)
+![Agent editor](docs/img/agent-editor-comb.png)
 
 ### Work with multiple agents
 
 Experience unparalleled flexibility in your workflow! Work with as many agents as you want and distribute them across different systems. Thanks to seamless communication via the MQTT protocol, your creativity knows no bounds. Whether it's simple or complex scenarios, our agents enable you to perfectly realize your ideas!
 
-![Agent overview dark](docs/img/agent-overview.png)
-![Agent overview light](docs/img/agent-overview-alt.png)
+![Agent overview](docs/img/agent-overview-comb.png)
 
 ### Project overview
 
 The project overview lays out all the projects and their current status. That way, you can see in a jiffy which projects have been given the green light for production.
 
-![Project overview dark](docs/img/agent-projects.png)
-![Project overview light](docs/img/agent-projects-alt.png)
+![Project overview](docs/img/agent-projects-comb.png)
 
 ## Analytics
 
 Get an overview of all events at a glance, whether it's user interaction, system event, or exception. It is important that you can understand and control your system at all times.
 
-![Analytics dark](docs/img/analytics.png)
-![Analytics light](docs/img/analytics-alt.png)
+![Analytics](docs/img/analytics-comb.png)
 
 ## Audit
 
@@ -52,13 +48,11 @@ In industries such as **medicine**, **pharmaceuticals**, and **food**, it is bec
 
 ### Create new audit report
 
-![Audit changesets dark](docs/img/audit-changesets.png)
-![Audit changesets light](docs/img/audit-changesets-alt.png)
+![Audit changesets](docs/img/audit-changesets-comb.png)
 
 ### Audit changes (diff)
 
-![Audit diff dark](docs/img/audit-diff.png)
-![Audit diff light](docs/img/audit-diff-alt.png)
+![Audit diff](docs/img/audit-diff-comb.png)
 
 ### Save your reports
 
@@ -66,22 +60,19 @@ AyBorg provides the ability to store and access **audit reports** at any time. B
 
 The ability to store and access audit reports offers a valuable way to monitor the system and **ensure compliance with requirements and standards**. Additionally, this can aid in troubleshooting by making it easier to identify the exact timing and cause of a problem.
 
-![Audit saved reports dark](docs/img/audit-saved-reports.png)
-![Audit saved reports light](docs/img/audit-saved-reports-alt.png)
+![Audit saved reports](docs/img/audit-saved-reports-comb.png)
 
 ## Administration
 
 ### Service overview
 
-![Service overview](docs/img/admin-service-overview.png)
-![Service overview](docs/img/admin-service-overview-alt.png)
+![Service overview](docs/img/admin-service-overview-comb.png)
 
 ### Usermanagement
 
 AyBorg has a **role-based user management system** that allows for precise control and management of access rights and functionalities within the application. With this approach, users can be organized into different roles, each with distinct permissions and access rights to various areas of the application.
 
-![Usermanagement dark](docs/img/admin-usermanagement.png)
-![Usermanagement light](docs/img/admin-usermanagement-alt.png)
+![Usermanagement](docs/img/admin-usermanagement-comb.png)
 
 ## Getting started
 
@@ -97,30 +88,25 @@ In most cases the following setup makes sense:
 
 The default appsettings give you a good starting point and will also work locally, but for real scenarios, you will need to change the settings.
 
-> AyBorg default user "**SystemAdmin**" with password "**SystemAdmin123!**".
-
+> AyBorg default user "**SystemAdmin**" with password "**SystemAdmin123!**". \
 > :warning: **The default password should be changed immediately!**
 
-## Default Ports
+### Default Ports
 
 | Service          | HTTP | HTTPS | gRPC |
 | ---------------- | ---- | ----- | ---- |
-| AyBorg.Gateway   |      |       | 5000 |
-| AyBorg.Analytics |      |       | 5001 |
-| AyBorg.Audit     |      |       | 5002 |
-| AyBorg.Web       | 5010 | 5011  |      |
-| AyBorg.Agent     |      |       | 5020 |
+| AyBorg.Gateway   |      |       | 6000 |
+| AyBorg.Analytics |      |       | 6001 |
+| AyBorg.Audit     |      |       | 6002 |
+| AyBorg.Web       | 6010 | 6011  |      |
+| AyBorg.Agent     |      |       | 6020 |
 
-## Example setups
+## Docker compose
 
-Services can be added any time. The AyBorg.Gateway will detect the new service and establish the communication.
+We provide a ready to use Docker compose setup for demo purpose.
 
-![BlockDiagram](docs/img/block_diagram.png)
-
-### Using AyBorg.Agent as MQTT Consumer/Producer
-
-Typically, you will send the processed results to an MQTT broker so that other services (e.g. another AyBorg.Agent) can further process the data.
-![BlockDiagram](docs/img/block_diagram2.png)
+Just run `docker compose up` from the repository root directory. \
+You can then open AyBorg at `https://localhost:6011`.
 
 ## Want to contribute?
 

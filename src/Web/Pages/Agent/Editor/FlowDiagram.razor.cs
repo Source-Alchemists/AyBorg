@@ -140,10 +140,11 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             var flowChangeArgs = (AgentAutomationFlowChangeArgs)obj;
 
             // Add steps
+            IEnumerable<FlowNode> flowNodes = _diagram.Nodes.Cast<FlowNode>();
             foreach (string stepIdStr in flowChangeArgs.AddedSteps)
             {
                 Guid stepId = Guid.Parse(stepIdStr);
-                if (_diagram.Nodes.Cast<FlowNode>().Any(n => n.Step.Id.Equals(stepId)))
+                if (flowNodes.Any(n => n.Step.Id.Equals(stepId)))
                 {
                     // Already exists
                     continue;

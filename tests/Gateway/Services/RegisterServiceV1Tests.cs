@@ -36,6 +36,29 @@ public class RegisterServiceV1Tests : BaseGrpcServiceTests<RegisterServiceV1, Re
         Assert.Equal(string.Empty, result.ErrorMessage);
     }
 
+    [Fact]
+    public async Task Test_Register_AutoAddress()
+    {
+        // Arrange
+        var expectedId = Guid.NewGuid();
+        _mockKeeperService.Setup(s => s.RegisterAsync(It.IsAny<ServiceEntry>())).ReturnsAsync(expectedId);
+        var request = new RegisterRequest
+        {
+            Name = "Test",
+            UniqueName = "Test-1",
+            Type = "TestType",
+            Url = "http://{AUTO}:5000",
+            Version = "1.0.0"
+        };
+
+        // Act
+        StatusResponse result = await _service.Register(request, _serverCallContext);
+
+        // Assert
+        Assert.Equal(expectedId.ToString(), result.Id);
+        Assert.Equal(string.Empty, result.ErrorMessage);
+    }
+
     [Theory]
     [InlineData(true, true)]
     [InlineData(true, false)]

@@ -79,7 +79,7 @@ public partial class Analytics : ComponentBase
         {
             // Smoother loading animation
             count++;
-            if (count > 10)
+            if (count > 50)
             {
                 await InvokeAsync(StateHasChanged);
                 count = 0;
@@ -87,7 +87,7 @@ public partial class Analytics : ComponentBase
             tmpEvents.Add(entry);
         }
 
-        _eventRecords.AddRange(tmpEvents);
+        _eventRecords.AddRange(tmpEvents.OrderByDescending(e => e.Timestamp));
         await InvokeAsync(StateHasChanged);
 
         _isLoading = false;
