@@ -24,7 +24,7 @@ public class TestServerCallContext : ServerCallContext
 
         protected override string MethodCore => "MethodName";
         protected override string HostCore => "HostName";
-        protected override string PeerCore => "PeerName";
+        protected override string PeerCore => "ipv6:[ffff:127.0.0.1:5000]";
         protected override DateTime DeadlineCore { get; }
         protected override Metadata RequestHeadersCore => _requestHeaders;
         protected override CancellationToken CancellationTokenCore => _cancellationToken;
