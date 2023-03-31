@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Text.RegularExpressions;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
@@ -7,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.ImageTorque.AI;
 
-public class ImageAiCodeDetect : IStepBody, IDisposable
+public partial class ImageAiCodeDetect : IStepBody, IDisposable
 {
     private readonly ILogger<ImageAiCodeDetect> _logger;
     private readonly ImagePort _imagePort = new("Image", PortDirection.Input);
@@ -37,14 +38,14 @@ public class ImageAiCodeDetect : IStepBody, IDisposable
             _scoredPort
         };
 
-        _detector = new YoloDetector<YoloV5CodeDetectorModel>(Path.Combine("./resources", "codeDetector.onnx"));
+        _detector = new YoloDetector<YoloV5CodeDetectorModel>(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)!, "./resources", "codeDetector.onnx"));
     }
 
     public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         try
         {
-            string[] searchLabels = _searchLabelsPort.Value.Split(',');
+            string[] searchLabels = WhitespaceRegex().Replace(_searchLabelsPort.Value, string.Empty).Split(',');
             List<YoloPrediction> predictions = _detector.Predict(_imagePort.Value);
             var rectangles = new List<Rectangle>();
             var labels = new List<string>();
@@ -96,4 +97,7 @@ public class ImageAiCodeDetect : IStepBody, IDisposable
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
+
+    [GeneratedRegex("\\s+")]
+    private static partial Regex WhitespaceRegex();
 }
