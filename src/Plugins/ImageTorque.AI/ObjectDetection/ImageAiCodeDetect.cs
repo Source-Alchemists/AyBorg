@@ -78,15 +78,6 @@ public class ImageAiCodeDetect : IStepBody, IDisposable
         catch (NullReferenceException ex)
         {
             _logger.LogError(new EventId((int)EventLogType.Plugin), ex, "{Message}", ex.Message);
-
-        }
-        catch (DirectoryNotFoundException ex)
-        {
-            _logger.LogError(new EventId((int)EventLogType.Plugin), ex, "{Message}", ex.Message);
-        }
-        catch (FileNotFoundException ex)
-        {
-            _logger.LogError(new EventId((int)EventLogType.Plugin), ex, "{Message}", ex.Message);
         }
 
         return ValueTask.FromResult(false);

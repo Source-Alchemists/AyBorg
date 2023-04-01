@@ -7,6 +7,7 @@ namespace AyBorg.Plugins.ImageTorque.AI;
 public class ImageAiCodeDetectTests
 {
     private static readonly NullLogger<ImageAiCodeDetect> s_logger = new();
+
     [Fact]
     public async Task Test_DetectPZNx3()
     {
@@ -29,5 +30,19 @@ public class ImageAiCodeDetectTests
         Assert.Equal(3, scoresPort.Value.Count);
 
         Assert.All(labelsPort.Value, v => v.Equals("1d_code"));
+    }
+
+    [Fact]
+    public async Task Test_Null_Image()
+    {
+        // Arrange
+        using var plugin = new ImageAiCodeDetect(s_logger);
+        var imagePort = (ImagePort)plugin.Ports.First(p => p.Name.Equals("Image"));
+
+        // Act
+        bool result = await plugin.TryRunAsync(CancellationToken.None);
+
+        // Assert
+        Assert.False(result);
     }
 }
