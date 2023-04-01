@@ -44,35 +44,43 @@ namespace AyBorg.Plugins.ZXing
 
         public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
         {
-            ReadOnlySpan<byte> imageBuffer = _imagePort.Value.AsPacked<Rgb24>().Buffer;
-            if (_tmpBuffer == null || _tmpBuffer.Length != imageBuffer.Length)
+            try
             {
-                _tmpBuffer = new byte[imageBuffer.Length];
-            }
-            imageBuffer.CopyTo(_tmpBuffer.AsSpan());
-            var rgbLumSrc = new RGBLuminanceSource(_tmpBuffer, _imagePort.Value.Width, _imagePort.Value.Height);
-
-            _nativeReader.Options.PossibleFormats = GetBarcodeFormats(_formatPort.Value);
-            _nativeReader.AutoRotate = _allowAutoRotatePort.Value;
-            _nativeReader.Options.TryInverted = _allowTryInvertPort.Value;
-            _nativeReader.Options.TryHarder = _allowTryHarderPort.Value;
-
-            Result[]? value = _nativeReader.DecodeMultiple(rgbLumSrc);
-
-            if (value is null)
-            {
-                _codesPort.Value = new ReadOnlyCollection<string>(Array.Empty<string>());
-                if (_logger.IsEnabled(LogLevel.Trace))
+                ReadOnlySpan<byte> imageBuffer = _imagePort.Value.AsPacked<Rgb24>().Buffer;
+                if (_tmpBuffer == null || _tmpBuffer.Length != imageBuffer.Length)
                 {
-                    _logger.LogTrace(new EventId((int)EventLogType.Result), "Could not find a code.");
+                    _tmpBuffer = new byte[imageBuffer.Length];
                 }
-            }
-            else
-            {
-                _codesPort.Value = new ReadOnlyCollection<string>(value.Select(v => v.Text).ToList());
-            }
+                imageBuffer.CopyTo(_tmpBuffer.AsSpan());
+                var rgbLumSrc = new RGBLuminanceSource(_tmpBuffer, _imagePort.Value.Width, _imagePort.Value.Height);
 
-            return ValueTask.FromResult(true);
+                _nativeReader.Options.PossibleFormats = GetBarcodeFormats(_formatPort.Value);
+                _nativeReader.AutoRotate = _allowAutoRotatePort.Value;
+                _nativeReader.Options.TryInverted = _allowTryInvertPort.Value;
+                _nativeReader.Options.TryHarder = _allowTryHarderPort.Value;
+
+                Result[]? value = _nativeReader.DecodeMultiple(rgbLumSrc);
+
+                if (value is null)
+                {
+                    _codesPort.Value = new ReadOnlyCollection<string>(Array.Empty<string>());
+                    if (_logger.IsEnabled(LogLevel.Trace))
+                    {
+                        _logger.LogTrace(new EventId((int)EventLogType.Result), "Could not find a code.");
+                    }
+                }
+                else
+                {
+                    _codesPort.Value = new ReadOnlyCollection<string>(value.Select(v => v.Text).ToList());
+                }
+
+                return ValueTask.FromResult(true);
+            }
+            catch (NullReferenceException ex)
+            {
+                _logger.LogError(new EventId((int)EventLogType.Plugin), ex, "{Message}", ex.Message);
+                return ValueTask.FromResult(false);‚
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
