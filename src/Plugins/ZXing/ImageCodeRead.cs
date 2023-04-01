@@ -79,7 +79,7 @@ namespace AyBorg.Plugins.ZXing
             catch (NullReferenceException ex)
             {
                 _logger.LogError(new EventId((int)EventLogType.Plugin), ex, "{Message}", ex.Message);
-                return ValueTask.FromResult(false);‚
+                return ValueTask.FromResult(false);
             }
         }
 
