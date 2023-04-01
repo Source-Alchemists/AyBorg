@@ -61,18 +61,17 @@ namespace AyBorg.Plugins.ZXing
 
             if (value is null)
             {
+                _codesPort.Value = new ReadOnlyCollection<string>(Array.Empty<string>());
                 if (_logger.IsEnabled(LogLevel.Trace))
                 {
                     _logger.LogTrace(new EventId((int)EventLogType.Result), "Could not find a code.");
                 }
-                return ValueTask.FromResult(false);
+            }
+            else
+            {
+                _codesPort.Value = new ReadOnlyCollection<string>(value.Select(v => v.Text).ToList());
             }
 
-            _codesPort.Value = new ReadOnlyCollection<string>(value.Select(v => v.Text).ToList());
-            if (_logger.IsEnabled(LogLevel.Trace))
-            {
-                _logger.LogTrace(new EventId((int)EventLogType.Result), "Code string: '{_codePort.Value}'", _codesPort.Value);
-            }
             return ValueTask.FromResult(true);
         }
 

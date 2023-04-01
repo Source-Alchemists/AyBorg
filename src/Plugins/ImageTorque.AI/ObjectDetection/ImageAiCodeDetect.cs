@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Text.RegularExpressions;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
@@ -8,11 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.ImageTorque.AI;
 
-public partial class ImageAiCodeDetect : IStepBody, IDisposable
+public class ImageAiCodeDetect : IStepBody, IDisposable
 {
     private readonly ILogger<ImageAiCodeDetect> _logger;
     private readonly ImagePort _imagePort = new("Image", PortDirection.Input);
-    private readonly StringPort _searchLabelsPort = new("Search labels", PortDirection.Input, "1d_code, 2d_code");
+    private readonly EnumPort _searchType = new("Type", PortDirection.Input, CodeType.All);
+    private readonly NumericPort _thresholdPort = new("Threshold", PortDirection.Input, 0.6, 0.1, 1d);
     private readonly RectangleCollectionPort _regionsPort = new("Regions", PortDirection.Output, new ReadOnlyCollection<Rectangle>(Array.Empty<Rectangle>()));
     private readonly StringCollectionPort _labelsPort = new("Labels", PortDirection.Output, new ReadOnlyCollection<string>(Array.Empty<string>()));
     private readonly NumericCollectionPort _scoredPort = new("Scores", PortDirection.Output, new ReadOnlyCollection<double>(Array.Empty<double>()));
@@ -32,7 +32,8 @@ public partial class ImageAiCodeDetect : IStepBody, IDisposable
         Ports = new List<IPort>
         {
             _imagePort,
-            _searchLabelsPort,
+            _searchType,
+            _thresholdPort,
             _regionsPort,
             _labelsPort,
             _scoredPort
@@ -45,7 +46,6 @@ public partial class ImageAiCodeDetect : IStepBody, IDisposable
     {
         try
         {
-            string[] searchLabels = WhitespaceRegex().Replace(_searchLabelsPort.Value, string.Empty).Split(',');
             List<YoloPrediction> predictions = _detector.Predict(_imagePort.Value);
             var rectangles = new List<Rectangle>();
             var labels = new List<string>();
@@ -53,7 +53,16 @@ public partial class ImageAiCodeDetect : IStepBody, IDisposable
 
             foreach (YoloPrediction pred in predictions)
             {
-                if (searchLabels.Any() && !searchLabels.Contains(pred.Label.Name)) continue;
+                if (_searchType.Value.Equals(CodeType.Code1D) && !pred.Label.Name.Equals("1d_code", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    continue;
+                }
+                else if (_searchType.Value.Equals(CodeType.Code2D) && !pred.Label.Name.Equals("2d_code", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    continue;
+                }
+
+                if (pred.Score < _thresholdPort.Value) continue;
 
                 rectangles.Add(pred.Rectangle);
                 labels.Add(pred.Label.Name);
@@ -98,6 +107,10 @@ public partial class ImageAiCodeDetect : IStepBody, IDisposable
         GC.SuppressFinalize(this);
     }
 
-    [GeneratedRegex("\\s+")]
-    private static partial Regex WhitespaceRegex();
+    public enum CodeType
+    {
+        All = 0,
+        Code1D = 1,
+        Code2D = 2
+    }
 }

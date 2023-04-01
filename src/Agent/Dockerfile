@@ -6,6 +6,8 @@ WORKDIR /src/Plugins/Base
 RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.Base
 WORKDIR /src/Plugins/ImageTorque
 RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.ImageTorque
+WORKDIR /src/Plugins/ImageTorque.AI
+RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.ImageTorque.AI
 WORKDIR /src/Plugins/MQTT
 RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.MQTT
 WORKDIR /src/Plugins/ZXing
