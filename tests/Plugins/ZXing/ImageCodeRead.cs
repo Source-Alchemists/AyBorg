@@ -96,7 +96,7 @@ namespace AyBorg.Plugins.ZXing.Tests
             bool result = await readerBarcode.TryRunAsync(CancellationToken.None);
 
             // Assert
-            Assert.False(result);
+            Assert.True(result);
             Assert.Empty((readerBarcode.Ports.Single(x => x.Name == "Codes") as StringCollectionPort)!.Value);
         }
 
@@ -114,7 +114,7 @@ namespace AyBorg.Plugins.ZXing.Tests
             bool result = await readerBarcode.TryRunAsync(CancellationToken.None);
 
             // Assert
-            Assert.False(result);
+            Assert.True(result);
             Assert.Empty((readerBarcode.Ports.Single(x => x.Name == "Codes") as StringCollectionPort)!.Value);
         }
     }

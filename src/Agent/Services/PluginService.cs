@@ -2,6 +2,7 @@
 using AyBorg.Data.Agent;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Projects;
+using McMaster.NETCore.Plugins;
 
 namespace AyBorg.Agent.Services;
 internal sealed class PluginsService : IPluginsService
@@ -60,7 +61,9 @@ internal sealed class PluginsService : IPluginsService
                 {
                     _logger.LogTrace("Detected directory '{pd}'.", pd);
                     // use load from assembly to load other dependencies from same folder
-                    var assembly = Assembly.LoadFrom($"{Path.Combine(pd, dllName)}");
+                    string assemblyPath = $"{Path.Combine(pd, dllName)}";
+                    Assembly assembly = PluginLoader.CreateFromAssemblyFile(assemblyPath, c => c.PreferSharedTypes = true)
+                                                    .LoadDefaultAssembly();
                     if (!TryLoadPlugins(assembly))
                     {
                         _logger.LogTrace("No plugins detected.");
