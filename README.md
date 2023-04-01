@@ -4,7 +4,7 @@
 
 :star:  We appreciate your star, it helps!
 
-![Logo](docs/img/logo.svg)
+![Title](docs/img/title.png)
 
 With AyBorg, you'll have the power to build and customize your own industrial applications without needing to write a single line of code. Simply drag and drop elements, connect the ports and voila!
 
