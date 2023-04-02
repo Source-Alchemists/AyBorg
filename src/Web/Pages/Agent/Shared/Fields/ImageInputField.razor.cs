@@ -40,13 +40,13 @@ public partial class ImageInputField : BaseInputField
         _labelRectangles.Clear();
         float scaleFactorX = _imagePosition.FactorX;
         float scaleFactorY = _imagePosition.FactorY;
-        foreach(FlowPort shapePort in ShapePorts)
+        foreach(Port shapePort in ShapePorts.Select(p => p.Port))
         {
-            if(shapePort.Port.Value is Rectangle rectangle)
+            if(shapePort.Value is Rectangle rectangle)
             {
                 AddRectangle(scaleFactorX, scaleFactorY, rectangle);
             }
-            else if(shapePort.Port.Value is ReadOnlyCollection<Rectangle> rectangeCollection)
+            else if(shapePort.Value is ReadOnlyCollection<Rectangle> rectangeCollection)
             {
                 foreach (Rectangle rect in rectangeCollection)
                 {
@@ -88,11 +88,11 @@ public partial class ImageInputField : BaseInputField
 
     private record struct ImagePosition(float X, float Y, float Width, float Height, float OrgWidth, float OrgHeight)
     {
-        public float FactorX => (float)Width / OrgWidth;
-        public float FactorY => (float)Height / OrgHeight;
+        public float FactorX => Width / OrgWidth;
+        public float FactorY => Height / OrgHeight;
     }
 
-    private record LabelRectangle(float X, float Y, float Width, float Height)
+    private sealed record LabelRectangle(float X, float Y, float Width, float Height)
     {
         public string Color { get; } = "#af4ae2ff";
         public string FillColor { get; } = "transparent";

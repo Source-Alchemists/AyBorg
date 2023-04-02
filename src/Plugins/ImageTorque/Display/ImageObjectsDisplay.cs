@@ -3,7 +3,7 @@ using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
 
-namespace AyBorg.Plugins.Base.Display;
+namespace AyBorg.Plugins.ImageTorque.Display;
 
 public sealed class ImageObjectsDisplay : IStepBody
 {

@@ -110,5 +110,5 @@ public class ImageAiCodeDetect : IStepBody, IDisposable
         Code2D = 2
     }
 
-    private record Result(Rectangle Rectangle, string Label, double Score);
+    private sealed record Result(Rectangle Rectangle, string Label, double Score);
 }
