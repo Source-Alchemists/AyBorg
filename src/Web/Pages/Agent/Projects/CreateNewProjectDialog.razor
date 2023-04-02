@@ -1,4 +1,4 @@
-﻿<MudDialog>
+﻿<MudDialog Style="width: 300px">
     <DialogContent>
         <MudTextField Label="Project name" @bind-Value="_newProject.Name" Required="true" />
         @if(_errors.Any())
@@ -17,6 +17,6 @@
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="@OnCloseClicked">Close</MudButton>
-        <MudButton Color="Color.Primary" OnClick="@OnValidSubmit">Create</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@OnValidSubmit">Create</MudButton>
     </DialogActions>
 </MudDialog>
