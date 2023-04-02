@@ -369,7 +369,9 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                     Data = UnsafeByteOperations.UnsafeWrap(slice),
                     FullWidth = originalImage.Width,
                     FullHeight = originalImage.Height,
-                    FullStreamLength = fullStreamLength
+                    FullStreamLength = fullStreamLength,
+                    ScaledWidth = targetImage.Width,
+                    ScaledHeight = targetImage.Height
                 }, cancellationToken);
             }
         }

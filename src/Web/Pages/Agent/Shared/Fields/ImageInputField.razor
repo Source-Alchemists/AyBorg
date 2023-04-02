@@ -2,16 +2,32 @@
 
 <div Class="flow-node-field mud-full-width px-1">
     <span>@Port.Name</span>
-    <div class="mud-width-full" Style="height: 200px">
-        @if (!string.IsNullOrEmpty(_imageUrl) && _imageWidth > 0 && _imageHeight > 0)
+    <div class="mud-width-full" Style="height: 250px">
+        @if (!string.IsNullOrEmpty(_imageUrl) && _imagePosition.Width > 0 && _imagePosition.Height > 0)
         {
             <div class="mud-height-full mud-width-full d-flex justify-center">
                 <MudTooltip Text="@ImageTooltip">
-                    <MudImage class="mud-height-full mud-width-full" Src="@_imageUrl" ObjectPosition="ObjectPosition.Center" ObjectFit="ObjectFit.ScaleDown" />
+                    <svg width="CANVAS_WIDTH" height="@SVG_HEIGHT">
+                        <defs>
+                            <mask id="@_maskId">
+                                @foreach (var rectangle in _labelRectangles)
+                                {
+                                    <rect x="@_imagePosition.X" y="@_imagePosition.Y" width="@_imagePosition.Width" height="@_imagePosition.Height" fill="white" />
+                                    <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height" fill="black" />
+                                }
+                            </mask>
+                        </defs>
+                        <image href="@_imageUrl" x="@_imagePosition.X" y="@_imagePosition.Y" width="@_imagePosition.Width" height="@_imagePosition.Height" />
+                        <rect x="@_imagePosition.X" y="@_imagePosition.Y" width="@_imagePosition.Width" height="@_imagePosition.Height" fill="#00000091" mask="url(#@_maskId)" />
+                        @foreach (var rectangle in _labelRectangles)
+                        {
+                            <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height" style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:2" />
+                        }
+                    </svg>
                 </MudTooltip>
             </div>
-        } 
-        else 
+        }
+        else
         {
             <span>No image</span>
         }
