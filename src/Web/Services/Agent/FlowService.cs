@@ -373,7 +373,9 @@ public class FlowService : IFlowService
                         {
                             Width = chunk.FullWidth,
                             Height = chunk.FullHeight
-                        }
+                        },
+                        ScaledWidth = chunk.ScaledWidth,
+                        ScaledHeight = chunk.ScaledHeight
                     };
                 }
 

@@ -14,17 +14,21 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
     [Inject] IFlowService FlowService { get; set; } = null!;
     private string NodeClass => Node.Selected ? "flow node box selected" : "flow node box";
 
-    private IEnumerable<PortModel> _outputPorts = new List<PortModel>();
-    private IEnumerable<PortModel> _inputPorts = new List<PortModel>();
+    private IReadOnlyCollection<PortModel> _outputPorts = Array.Empty<PortModel>();
+    private IReadOnlyCollection<PortModel> _inputPorts = Array.Empty<PortModel>();
+    private IReadOnlyCollection<FlowPort> _rectangleInputPorts = Array.Empty<FlowPort>();
     private bool _disposedValue;
 
     protected override Task OnInitializedAsync()
     {
-        _inputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Left); // Left for input
-        _outputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Right); // Right for output
+        _inputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Left).ToArray(); // Left for input
+        _outputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Right).ToArray(); // Right for output
+
+        IEnumerable<FlowPort> inputFlowPorts = _inputPorts.Cast<FlowPort>();
+        _rectangleInputPorts = inputFlowPorts.Where(p => p.Brand == PortBrand.Rectangle || p.Brand == PortBrand.RectangleCollection).ToArray();
 
         Node.StepChanged += OnChangedAsync;
-        foreach (FlowPort ip in _inputPorts.Cast<FlowPort>())
+        foreach (FlowPort ip in inputFlowPorts)
         {
             ip.PortChanged += OnChangedAsync;
         }

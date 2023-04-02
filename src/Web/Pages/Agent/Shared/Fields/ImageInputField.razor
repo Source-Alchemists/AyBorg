@@ -1,19 +1,38 @@
 @inherits BaseInputField
 
-<div Class="flow-node-field mud-full-width px-1">
+<div Class="flow-node-field mud-full-width px-1 mb-4">
     <span>@Port.Name</span>
-    <div class="mud-width-full" Style="height: 200px">
-        @if (!string.IsNullOrEmpty(_imageUrl) && _imageWidth > 0 && _imageHeight > 0)
+    <div class="mud-width-full" Style="height: 250px">
+        @if (!string.IsNullOrEmpty(_imageUrl) && _imagePosition.Width > 0 && _imagePosition.Height > 0)
         {
             <div class="mud-height-full mud-width-full d-flex justify-center">
                 <MudTooltip Text="@ImageTooltip">
-                    <MudImage class="mud-height-full mud-width-full" Src="@_imageUrl" ObjectPosition="ObjectPosition.Center" ObjectFit="ObjectFit.ScaleDown" />
+                    <svg width="@SVG_WIDTH" height="@SVG_HEIGHT">
+                        <defs>
+                            <mask id="@_maskId">
+                                @if(_labelRectangles.Any())
+                                {
+                                    <rect x="@_imagePosition.X" y="@_imagePosition.Y" width="@_imagePosition.Width" height="@_imagePosition.Height" fill="white" />
+                                }
+                                @foreach (var rectangle in _labelRectangles)
+                                {
+                                    <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height" fill="black" />
+                                }
+                            </mask>
+                        </defs>
+                        <image href="@_imageUrl" x="@_imagePosition.X" y="@_imagePosition.Y" width="@_imagePosition.Width" height="@_imagePosition.Height" />
+                        <rect x="@_imagePosition.X" y="@_imagePosition.Y" width="@_imagePosition.Width" height="@_imagePosition.Height" fill="#00000091" mask="url(#@_maskId)" />
+                        @foreach (var rectangle in _labelRectangles)
+                        {
+                            <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height" style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:2" />
+                        }
+                    </svg>
                 </MudTooltip>
             </div>
-        } 
-        else 
+        }
+        else
         {
-            <span>No image</span>
+            <MudImage Src="icons/logo.svg" Style="width: 100%; height: 100%; filter: grayscale(1); opacity: 0.5" />
         }
     </div>
 </div>

@@ -8,6 +8,8 @@ public sealed record Image
 {
     public int Width => Meta.Width;
     public int Height => Meta.Height;
+    public int ScaledWidth { get; init; }
+    public int ScaledHeight { get; init; }
     public PixelFormat PixelFormat => Meta.PixelFormat;
     public ImageMeta Meta { get; init; }
     public string Base64 { get; init; } = string.Empty;

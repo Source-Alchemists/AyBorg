@@ -47,6 +47,7 @@ public class ImageAiCodeDetect : IStepBody, IDisposable
         try
         {
             List<YoloPrediction> predictions = _detector.Predict(_imagePort.Value);
+            var results = new List<Result>();
             var rectangles = new List<Rectangle>();
             var labels = new List<string>();
             var scores = new List<double>();
@@ -64,14 +65,18 @@ public class ImageAiCodeDetect : IStepBody, IDisposable
 
                 if (pred.Score < _thresholdPort.Value) continue;
 
+                results.Add(new Result(pred.Rectangle, pred.Label.Name, pred.Score));
+
                 rectangles.Add(pred.Rectangle);
                 labels.Add(pred.Label.Name);
                 scores.Add(pred.Score);
             }
 
-            _regionsPort.Value = new ReadOnlyCollection<Rectangle>(rectangles);
-            _labelsPort.Value = new ReadOnlyCollection<string>(labels);
-            _scoredPort.Value = new ReadOnlyCollection<double>(scores);
+            results = results.OrderByDescending(r => r.Score).ToList();
+
+            _regionsPort.Value = new ReadOnlyCollection<Rectangle>(results.Select(r => r.Rectangle).ToList());
+            _labelsPort.Value = new ReadOnlyCollection<string>(results.Select(r => r.Label).ToList());
+            _scoredPort.Value = new ReadOnlyCollection<double>(results.Select(r => r.Score).ToList());
 
             return ValueTask.FromResult(true);
         }
@@ -104,4 +109,6 @@ public class ImageAiCodeDetect : IStepBody, IDisposable
         Code1D = 1,
         Code2D = 2
     }
+
+    private sealed record Result(Rectangle Rectangle, string Label, double Score);
 }
