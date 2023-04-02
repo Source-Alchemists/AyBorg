@@ -82,7 +82,14 @@ AyBorg has a **role-based user management system** that allows for precise contr
 `cd AyBorg` \
 `./syncSubmodules.sh`
 
-### Services
+### Docker compose
+
+We provide a ready to use Docker compose setup for demo purpose.
+
+Just run `docker compose up` from the repository root directory. \
+You can then open AyBorg at `https://localhost:6011`.
+
+### Manually
 
 Because AyBorg is orchastrated into multipe services, you need to start each service separately.
 In most cases the following setup makes sense:
@@ -93,6 +100,8 @@ In most cases the following setup makes sense:
 4. AyBorg.Audit
 5. AyBorg.Web
 6. One or more [AyBorg.Agent(s)](docs/agent/agent.md)
+
+### Default credentials
 
 The default appsettings give you a good starting point and will also work locally, but for real scenarios, you will need to change the settings.
 
@@ -108,13 +117,6 @@ The default appsettings give you a good starting point and will also work locall
 | AyBorg.Audit     |      |       | 6002 |
 | AyBorg.Web       | 6010 | 6011  |      |
 | AyBorg.Agent     |      |       | 6020 |
-
-## Docker compose
-
-We provide a ready to use Docker compose setup for demo purpose.
-
-Just run `docker compose up` from the repository root directory. \
-You can then open AyBorg at `https://localhost:6011`.
 
 ## Want to contribute?
 
