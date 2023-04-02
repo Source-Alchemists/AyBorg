@@ -1,3 +1,4 @@
+using System.Collections.ObjectModel;
 using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Shared.Models;
@@ -26,8 +27,8 @@ public partial class ImageInputField : BaseInputField
         else if (Port.Value is Image image)
         {
             _imagePosition = new(
-                (SVG_WIDTH - image.ScaledWidth) / 2,
-                (SVG_HEIGHT - image.ScaledHeight) / 2,
+                (SVG_WIDTH - image.ScaledWidth) / 2f,
+                (SVG_HEIGHT - image.ScaledHeight) / 2f,
                 image.ScaledWidth,
                 image.ScaledHeight,
                 image.Width,
@@ -43,18 +44,30 @@ public partial class ImageInputField : BaseInputField
         {
             if(shapePort.Port.Value is Rectangle rectangle)
             {
-                float rectWidth = rectangle.Width * scaleFactorX;
-                float rectHeight = rectangle.Height * scaleFactorY;
-                _labelRectangles.Add(new LabelRectangle(
-                                            _imagePosition.X + (rectangle.X * scaleFactorX) - (rectWidth / 2),
-                                            _imagePosition.Y + (rectangle.Y * scaleFactorY) - (rectHeight / 2),
-                                            rectWidth,
-                                            rectHeight
-                ));
+                AddRectangle(scaleFactorX, scaleFactorY, rectangle);
+            }
+            else if(shapePort.Port.Value is ReadOnlyCollection<Rectangle> rectangeCollection)
+            {
+                foreach (Rectangle rect in rectangeCollection)
+                {
+                    AddRectangle(scaleFactorX, scaleFactorY, rect);
+                }
             }
         }
 
         base.OnParametersSet();
+    }
+
+    private void AddRectangle(float scaleFactorX, float scaleFactorY, Rectangle rectangle)
+    {
+        float rectWidth = rectangle.Width * scaleFactorX;
+        float rectHeight = rectangle.Height * scaleFactorY;
+        _labelRectangles.Add(new LabelRectangle(
+                                    _imagePosition.X + (rectangle.X * scaleFactorX) - (rectWidth / 2),
+                                    _imagePosition.Y + (rectangle.Y * scaleFactorY) - (rectHeight / 2),
+                                    rectWidth,
+                                    rectHeight
+        ));
     }
 
     private void SetImageUrl(Image image)
@@ -73,7 +86,7 @@ public partial class ImageInputField : BaseInputField
         }
     }
 
-    private record struct ImagePosition(int X, int Y, int Width, int Height, int OrgWidth, int OrgHeight)
+    private record struct ImagePosition(float X, float Y, float Width, float Height, float OrgWidth, float OrgHeight)
     {
         public float FactorX => (float)Width / OrgWidth;
         public float FactorY => (float)Height / OrgHeight;

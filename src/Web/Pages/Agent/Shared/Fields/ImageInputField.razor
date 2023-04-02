@@ -7,12 +7,15 @@
         {
             <div class="mud-height-full mud-width-full d-flex justify-center">
                 <MudTooltip Text="@ImageTooltip">
-                    <svg width="CANVAS_WIDTH" height="@SVG_HEIGHT">
+                    <svg width="@SVG_WIDTH" height="@SVG_HEIGHT">
                         <defs>
                             <mask id="@_maskId">
-                                @foreach (var rectangle in _labelRectangles)
+                                @if(_labelRectangles.Any())
                                 {
                                     <rect x="@_imagePosition.X" y="@_imagePosition.Y" width="@_imagePosition.Width" height="@_imagePosition.Height" fill="white" />
+                                }
+                                @foreach (var rectangle in _labelRectangles)
+                                {
                                     <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height" fill="black" />
                                 }
                             </mask>
@@ -29,7 +32,7 @@
         }
         else
         {
-            <span>No image</span>
+            <MudImage Src="icons/logo.svg" Style="width: 100%; height: 100%; filter: grayscale(1); opacity: 0.5" />
         }
     </div>
 </div>
