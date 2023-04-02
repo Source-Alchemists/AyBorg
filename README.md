@@ -76,6 +76,14 @@ AyBorg has a **role-based user management system** that allows for precise contr
 
 ## Getting started
 
+### Git clone
+
+`git clone https://github.com/Source-Alchemists/AyBorg.git` \
+`cd AyBorg` \
+`./syncSubmodules.sh`
+
+### Services
+
 Because AyBorg is orchastrated into multipe services, you need to start each service separately.
 In most cases the following setup makes sense:
 
