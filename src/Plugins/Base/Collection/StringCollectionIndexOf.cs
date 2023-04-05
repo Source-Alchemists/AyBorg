@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using Microsoft.Extensions.Logging;
@@ -8,7 +7,7 @@ namespace AyBorg.Plugins.Base.Collection;
 public sealed class StringCollectionIndexOf : IStepBody
 {
     private readonly ILogger<StringCollectionIndexOf> _logger;
-    private readonly StringCollectionPort _inputCollection = new("Collection", PortDirection.Input, new ReadOnlyCollection<string>(Array.Empty<string>()));
+    private readonly StringCollectionPort _inputCollection = new("Collection", PortDirection.Input);
     private readonly StringPort _inputSearchValue = new("Value", PortDirection.Input, string.Empty);
     private readonly NumericPort _outputIndex = new("Index", PortDirection.Output, 0);
 

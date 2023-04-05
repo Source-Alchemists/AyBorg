@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using Microsoft.Extensions.Logging;
@@ -7,7 +6,7 @@ namespace AyBorg.Plugins.Base.Collection;
 
 public sealed class NumericCollectionElementAt : CollectionElementAt, IStepBody
 {
-    private readonly NumericCollectionPort _inputCollection = new("Collection", PortDirection.Input, new ReadOnlyCollection<double>(Array.Empty<double>()));
+    private readonly NumericCollectionPort _inputCollection = new("Collection", PortDirection.Input);
     private readonly NumericPort _outputValue = new("Result", PortDirection.Output, 0);
 
     public string DefaultName => "Numeric.Collection.ElementAt";

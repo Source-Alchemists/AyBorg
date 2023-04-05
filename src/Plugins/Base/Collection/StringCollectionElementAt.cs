@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using Microsoft.Extensions.Logging;
@@ -7,7 +6,7 @@ namespace AyBorg.Plugins.Base.Collection;
 
 public sealed class StringCollectionElementAt : CollectionElementAt, IStepBody
 {
-    private readonly StringCollectionPort _inputCollection = new("Collection", PortDirection.Input, new ReadOnlyCollection<string>(Array.Empty<string>()));
+    private readonly StringCollectionPort _inputCollection = new("Collection", PortDirection.Input);
     private readonly StringPort _outputValue = new("Result", PortDirection.Output, string.Empty);
 
     public string DefaultName => "String.Collection.ElementAt";

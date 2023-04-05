@@ -1,17 +1,17 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Text.Json;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 
 namespace AyBorg.Data.Mapper;
 
-public class StringCollectionPortMapper : IPortMapper<ReadOnlyCollection<string>>
+public class StringCollectionPortMapper : IPortMapper<ImmutableList<string>>
 {
     public object ToNativeValueObject(object value, Type? type = null) => ToNativeValue(value);
-    public ReadOnlyCollection<string> ToNativeValue(object value, Type? type = null)
+    public ImmutableList<string> ToNativeValue(object value, Type? type = null)
     {
         List<string> record;
-        if (value is ReadOnlyCollection<string> collection)
+        if (value is ImmutableList<string> collection)
         {
             record = collection.ToList();
         }
@@ -38,7 +38,7 @@ public class StringCollectionPortMapper : IPortMapper<ReadOnlyCollection<string>
             record = newCollection;
         }
 
-        return new ReadOnlyCollection<string>(record);
+        return record.ToImmutableList();
     }
 
     public void Update(IPort port, object value) => ((StringCollectionPort)port).Value = ToNativeValue(value);

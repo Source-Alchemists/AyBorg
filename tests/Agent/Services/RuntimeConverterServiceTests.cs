@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Globalization;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Tests.Dummies;
@@ -44,7 +44,7 @@ public class RuntimeConverterServiceTests
 
         if(portBrand == PortBrand.StringCollection)
         {
-            expectedValue = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
+            expectedValue = new List<string> { "Test1", "Test2" }.ToImmutableList();
             value ??= expectedValue;
         }
 
@@ -73,7 +73,7 @@ public class RuntimeConverterServiceTests
                 port = new ImagePort("Port", PortDirection.Input, null!);
                 break;
             case PortBrand.StringCollection:
-                port = new StringCollectionPort("Port", PortDirection.Input, new ReadOnlyCollection<string>(Array.Empty<string>()));
+                port = new StringCollectionPort("Port", PortDirection.Input, ImmutableList<string>.Empty);
                 break;
         }
 
@@ -115,9 +115,9 @@ public class RuntimeConverterServiceTests
     public async Task Test_UpdateStringCollection_WidthNullValue()
     {
         // Arrange
-        var expectedValue = new ReadOnlyCollection<string>(new List<string>{ string.Empty, string.Empty });
-        var value = new ReadOnlyCollection<string>(new List<string> { null!, null! });
-        var port = new StringCollectionPort("Port", PortDirection.Input, new ReadOnlyCollection<string>(Array.Empty<string>()));
+        var expectedValue = new List<string>{ string.Empty, string.Empty }.ToImmutableList();
+        var value = new List<string> { null!, null! }.ToImmutableList();
+        var port = new StringCollectionPort("Port", PortDirection.Input, ImmutableList<string>.Empty);
 
         // Act
         bool result = await _service.TryUpdatePortValueAsync(port, value);

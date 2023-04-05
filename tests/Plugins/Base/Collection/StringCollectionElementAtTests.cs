@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using AyBorg.SDK.Common.Ports;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -17,7 +17,7 @@ public class StringCollectionElementAtTests
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (StringPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
+        collectionPort.Value = new List<string> { "Test1", "Test2" }.ToImmutableList();
         indexPort.Value = 1;
 
         // Act
@@ -37,7 +37,7 @@ public class StringCollectionElementAtTests
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (StringPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
+        collectionPort.Value = new List<string> { "Test1", "Test2" }.ToImmutableList();
         indexPort.Value = 2;
 
         // Act
@@ -56,7 +56,7 @@ public class StringCollectionElementAtTests
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (StringPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
+        collectionPort.Value = new List<string> { "Test1", "Test2" }.ToImmutableList();
         indexPort.Value = double.MaxValue;
 
         // Act
@@ -75,7 +75,7 @@ public class StringCollectionElementAtTests
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (StringPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(Array.Empty<string>());
+        collectionPort.Value = ImmutableList<string>.Empty;
 
         // Act
         bool result = await plugin.TryRunAsync(CancellationToken.None);

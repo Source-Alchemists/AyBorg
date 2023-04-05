@@ -1,4 +1,3 @@
-using System.Collections.ObjectModel;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
@@ -8,7 +7,7 @@ namespace AyBorg.Plugins.Base.Collection;
 
 public sealed class RectangleCollectionElementAt : CollectionElementAt, IStepBody
 {
-    private readonly RectangleCollectionPort _inputCollection = new("Collection", PortDirection.Input, new ReadOnlyCollection<Rectangle>(Array.Empty<Rectangle>()));
+    private readonly RectangleCollectionPort _inputCollection = new("Collection", PortDirection.Input);
     private readonly RectanglePort _outputValue = new("Result", PortDirection.Output, new Rectangle());
 
     public string DefaultName => "Rectangle.Collection.ElementAt";

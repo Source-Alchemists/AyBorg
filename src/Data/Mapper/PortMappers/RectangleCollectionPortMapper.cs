@@ -1,11 +1,11 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Text.Json;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
 
 namespace AyBorg.Data.Mapper;
 
-public class RectangleCollectionPortMapper : IPortMapper<ReadOnlyCollection<Rectangle>>
+public class RectangleCollectionPortMapper : IPortMapper<ImmutableList<Rectangle>>
 {
     public SDK.Common.Models.Port ToModel(IPort port)
     {
@@ -21,10 +21,10 @@ public class RectangleCollectionPortMapper : IPortMapper<ReadOnlyCollection<Rect
             Value = JsonSerializer.Serialize(typedPort.Value, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })
         };
     }
-    public ReadOnlyCollection<Rectangle> ToNativeValue(object value, Type? type = null)
+    public ImmutableList<Rectangle> ToNativeValue(object value, Type? type = null)
     {
         List<Rectangle> record;
-        if (value is ReadOnlyCollection<SDK.Common.Models.Rectangle> collection)
+        if (value is ImmutableList<SDK.Common.Models.Rectangle> collection)
         {
             record = new List<Rectangle>();
             foreach (SDK.Common.Models.Rectangle rec in collection)
@@ -37,7 +37,7 @@ public class RectangleCollectionPortMapper : IPortMapper<ReadOnlyCollection<Rect
             record = JsonSerializer.Deserialize<List<Rectangle>>(value.ToString()!, new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
         }
 
-        return new ReadOnlyCollection<Rectangle>(record);
+        return record.ToImmutableList();
     }
     public object ToNativeValueObject(object value, Type? type = null) => ToNativeValue(value);
     public void Update(IPort port, object value) => ((RectangleCollectionPort)port).Value = ToNativeValue(value);

@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using AyBorg.SDK.Common.Ports;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -17,7 +17,7 @@ public class StringCollectionIndexOfTests
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (NumericPort)plugin.Ports.First(p => p.Name.Equals("Index"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
+        collectionPort.Value = new List<string> { "Test1", "Test2" }.ToImmutableList();
         searchValuePort.Value = "Test2";
 
         // Act
@@ -37,7 +37,7 @@ public class StringCollectionIndexOfTests
         var collectionPort = (StringCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (NumericPort)plugin.Ports.First(p => p.Name.Equals("Index"));
 
-        collectionPort.Value = new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" });
+        collectionPort.Value = new List<string> { "Test1", "Test2" }.ToImmutableList();
         searchValuePort.Value = "Test3";
 
         // Act
