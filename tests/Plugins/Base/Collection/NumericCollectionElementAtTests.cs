@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using AyBorg.SDK.Common.Ports;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -17,7 +17,7 @@ public class NumericCollectionElementAtTests
         var collectionPort = (NumericCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (NumericPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<double>(new List<double> { 1, 2 });
+        collectionPort.Value = new List<double> { 1, 2 }.ToImmutableList();
         indexPort.Value = 1;
 
         // Act
@@ -37,7 +37,7 @@ public class NumericCollectionElementAtTests
         var collectionPort = (NumericCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (NumericPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<double>(new List<double> { 1, 2 });
+        collectionPort.Value = new List<double> { 1, 2 }.ToImmutableList();
         indexPort.Value = 2;
 
         // Act
@@ -56,7 +56,7 @@ public class NumericCollectionElementAtTests
         var collectionPort = (NumericCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (NumericPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<double>(new List<double> { 1, 2 });
+        collectionPort.Value = new List<double> { 1, 2 }.ToImmutableList();
         indexPort.Value = double.MaxValue;
 
         // Act
@@ -75,7 +75,7 @@ public class NumericCollectionElementAtTests
         var collectionPort = (NumericCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (NumericPort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<double>(Array.Empty<double>());
+        collectionPort.Value = ImmutableList<double>.Empty;
 
         // Act
         bool result = await plugin.TryRunAsync(CancellationToken.None);

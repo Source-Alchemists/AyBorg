@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Immutable;
 using AutoMapper;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
@@ -245,7 +245,7 @@ public class RuntimeStorageMapperTests
             "Test2",
             "Test3"
         };
-        var port = new StringCollectionPort("TestPort", PortDirection.Input, new ReadOnlyCollection<string>(collection));
+        var port = new StringCollectionPort("TestPort", PortDirection.Input, collection.ToImmutableList());
 
         // Act
         PortRecord result = _mapper.Map(port);

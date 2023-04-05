@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Text.Json;
 using AyBorg.SDK.Common.Ports;
 
@@ -11,7 +11,7 @@ public class StringCollectionPortMapperTests
     {
         // Arrange
         var mapper = new StringCollectionPortMapper();
-        var port = new StringCollectionPort("Test", PortDirection.Input, new ReadOnlyCollection<string>(new List<string> { "Test1", "Test2" }));
+        var port = new StringCollectionPort("Test", PortDirection.Input, new List<string> { "Test1", "Test2" }.ToImmutableList());
 
         // Act
         SDK.Common.Models.Port portModel = mapper.ToModel(port);

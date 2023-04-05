@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Runtime.CompilerServices;
 using AyBorg.Plugins.ZXing.Models;
 using AyBorg.SDK.Common;
@@ -17,7 +17,7 @@ namespace AyBorg.Plugins.ZXing
         private readonly BooleanPort _allowAutoRotatePort = new("Auto rotate", PortDirection.Input, false);
         private readonly BooleanPort _allowTryInvertPort = new("Auto invert", PortDirection.Input, false);
         private readonly BooleanPort _allowTryHarderPort = new("Harder", PortDirection.Input, false);
-        private readonly StringCollectionPort _codesPort = new("Codes", PortDirection.Output, new ReadOnlyCollection<string>(new List<string>()));
+        private readonly StringCollectionPort _codesPort = new("Codes", PortDirection.Output);
         private readonly BarcodeReaderGeneric _nativeReader = new();
 
         private byte[] _tmpBuffer = null!;
@@ -63,7 +63,7 @@ namespace AyBorg.Plugins.ZXing
 
                 if (value is null)
                 {
-                    _codesPort.Value = new ReadOnlyCollection<string>(Array.Empty<string>());
+                    _codesPort.Value = ImmutableList<string>.Empty;
                     if (_logger.IsEnabled(LogLevel.Trace))
                     {
                         _logger.LogTrace(new EventId((int)EventLogType.Result), "Could not find a code.");
@@ -71,7 +71,7 @@ namespace AyBorg.Plugins.ZXing
                 }
                 else
                 {
-                    _codesPort.Value = new ReadOnlyCollection<string>(value.Select(v => v.Text).ToList());
+                    _codesPort.Value = value.Select(v => v.Text).ToImmutableList();
                 }
 
                 return ValueTask.FromResult(true);

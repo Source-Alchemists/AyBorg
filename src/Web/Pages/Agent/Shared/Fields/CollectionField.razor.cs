@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using Microsoft.AspNetCore.Components;
@@ -7,7 +7,7 @@ namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class CollectionField : ComponentBase
 {
-    private List<object> _values = null!;
+    private ImmutableList<object> _values = null!;
 
     [Parameter, EditorRequired] public Port Port { get; set; } = null!;
 
@@ -21,7 +21,7 @@ public partial class CollectionField : ComponentBase
 
         _values = Port.Brand switch
         {
-            PortBrand.StringCollection => new List<object>((ReadOnlyCollection<string>)Port.Value!),
+            PortBrand.StringCollection => ImmutableList<object>.Empty.AddRange((IEnumerable<string>)Port.Value!),
             PortBrand.NumericCollection => ConvertNumericCollection(Port.Value!),
             PortBrand.RectangleCollection => ConvertRectangleCollection(Port.Value!),
             _ => throw new InvalidOperationException($"Port {Port.Name} is not a collection."),
@@ -36,7 +36,7 @@ public partial class CollectionField : ComponentBase
 
     private async Task RemoveItemClicked(int index)
     {
-        _values.RemoveAt(index);
+        _values = _values.RemoveAt(index);
         object newCollection = RemoveItemAt(Port, index);
         await ValueChanged.InvokeAsync(new ValueChangedEventArgs(Port, newCollection));
     }
@@ -53,18 +53,18 @@ public partial class CollectionField : ComponentBase
         {
             case PortBrand.StringCollection:
                 {
-                    var oldValues = (ReadOnlyCollection<string>)port.Value!;
-                    return new ReadOnlyCollection<string>(oldValues.Append(null!).ToList());
+                    var oldValues = (IEnumerable<string>)port.Value!;
+                    return oldValues.ToImmutableList().Append(null!);
                 }
             case PortBrand.NumericCollection:
                 {
-                    var oldValues = (ReadOnlyCollection<double>)port.Value!;
-                    return new ReadOnlyCollection<double>(oldValues.Append(0).ToList());
+                    var oldValues = (IEnumerable<double>)port.Value!;
+                    return oldValues.ToImmutableList().Append(0);
                 }
             case PortBrand.RectangleCollection:
                 {
-                    var oldValues = (ReadOnlyCollection<Rectangle>)port.Value!;
-                    return new ReadOnlyCollection<Rectangle>(oldValues.Append(new Rectangle()).ToList());
+                    var oldValues = (IEnumerable<Rectangle>)port.Value!;
+                    return oldValues.ToImmutableList().Append(new Rectangle());
                 }
             default:
                 throw new InvalidOperationException($"Port {port.Name} is not a collection.");
@@ -77,24 +77,18 @@ public partial class CollectionField : ComponentBase
         {
             case PortBrand.StringCollection:
                 {
-                    var oldValues = new List<string>((ReadOnlyCollection<string>)port.Value!);
-                    var oldList = oldValues.ToList();
-                    oldList.RemoveAt(index);
-                    return new ReadOnlyCollection<string>(oldList);
+                    var oldValues = (ImmutableList<string>)port.Value!;
+                    return oldValues.RemoveAt(index);
                 }
             case PortBrand.NumericCollection:
                 {
-                    var oldValues = new List<double>((ReadOnlyCollection<double>)port.Value!);
-                    var oldList = oldValues.ToList();
-                    oldList.RemoveAt(index);
-                    return new ReadOnlyCollection<double>(oldList);
+                    var oldValues = (ImmutableList<double>)port.Value!;
+                    return oldValues.RemoveAt(index);
                 }
             case PortBrand.RectangleCollection:
                 {
-                    var oldValues = new List<Rectangle>((ReadOnlyCollection<Rectangle>)port.Value!);
-                    var oldList = oldValues.ToList();
-                    oldList.RemoveAt(index);
-                    return new ReadOnlyCollection<Rectangle>(oldList);
+                    var oldValues = (ImmutableList<Rectangle>)port.Value!;
+                    return oldValues.RemoveAt(index);
                 }
 
             default:
@@ -103,7 +97,7 @@ public partial class CollectionField : ComponentBase
         }
     }
 
-    private static object CreateBrandType(Port port, List<object> oldValues, BaseInput.InputChange change)
+    private static object CreateBrandType(Port port, ImmutableList<object> oldValues, BaseInput.InputChange change)
     {
         switch (port.Brand)
         {
@@ -111,44 +105,44 @@ public partial class CollectionField : ComponentBase
                 {
                     string[] newValues = oldValues.Cast<string>().ToArray();
                     newValues[change.Index] = (string)change.Value;
-                    return new ReadOnlyCollection<string>(newValues);
+                    return newValues.ToImmutableList();
                 }
             case PortBrand.NumericCollection:
                 {
                     double[] newValues = oldValues.Cast<double>().ToArray();
                     newValues[change.Index] = (double)change.Value;
-                    return new ReadOnlyCollection<double>(newValues);
+                    return newValues.ToImmutableList();
                 }
             case PortBrand.RectangleCollection:
                 {
                     Rectangle[] newValues = oldValues.Cast<Rectangle>().ToArray();
                     newValues[change.Index] = (Rectangle)change.Value;
-                    return new ReadOnlyCollection<Rectangle>(newValues);
+                    return newValues.ToImmutableList();
                 }
             default:
                 throw new InvalidOperationException($"Port {port.Name} is not a collection.");
         }
     }
 
-    private static List<object> ConvertNumericCollection(object value)
+    private static ImmutableList<object> ConvertNumericCollection(object value)
     {
-        var tmpCollection = (ReadOnlyCollection<double>)value;
-        var resultList = new List<object>();
+        var tmpCollection = (IEnumerable<double>)value;
+        ImmutableList<object> resultList = ImmutableList<object>.Empty;
         foreach (double tmp in tmpCollection)
         {
-            resultList.Add(tmp);
+            resultList = resultList.Add(tmp);
         }
 
         return resultList;
     }
 
-    private static List<object> ConvertRectangleCollection(object value)
+    private static ImmutableList<object> ConvertRectangleCollection(object value)
     {
-        var tmpCollection = (ReadOnlyCollection<Rectangle>)value;
-        var resultList = new List<object>();
+        var tmpCollection = (IEnumerable<Rectangle>)value;
+        ImmutableList<object> resultList = ImmutableList<object>.Empty;
         foreach (Rectangle tmp in tmpCollection)
         {
-            resultList.Add(tmp);
+            resultList = resultList.Add(tmp);
         }
 
         return resultList;

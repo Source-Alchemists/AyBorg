@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Text.Json;
 using AyBorg.SDK.Common.Ports;
 
@@ -11,7 +11,7 @@ public class NumericCollectionPortMapperTests
     {
         // Arrange
         var mapper = new NumericCollectionPortMapper();
-        var port = new NumericCollectionPort("Test", PortDirection.Input, new ReadOnlyCollection<double>(new List<double> { 1, 2 }));
+        var port = new NumericCollectionPort("Test", PortDirection.Input, new List<double> { 1, 2 }.ToImmutableList());
 
         // Act
         SDK.Common.Models.Port portModel = mapper.ToModel(port);
@@ -27,10 +27,10 @@ public class NumericCollectionPortMapperTests
     {
         // Arrange
         var mapper = new NumericCollectionPortMapper();
-        var port = new NumericCollectionPort("Test", PortDirection.Input, new ReadOnlyCollection<double>(new List<double> { 1, 2 }));
+        var port = new NumericCollectionPort("Test", PortDirection.Input, new List<double> { 1, 2 }.ToImmutableList());
 
         // Act
-        ReadOnlyCollection<double> nativeValue = mapper.ToNativeValue(port.Value);
+        ImmutableList<double> nativeValue = mapper.ToNativeValue(port.Value);
 
         // Assert
         Assert.Equal(port.Value, nativeValue);
@@ -41,13 +41,13 @@ public class NumericCollectionPortMapperTests
     {
         // Arrange
         var mapper = new NumericCollectionPortMapper();
-        var port = new NumericCollectionPort("Test", PortDirection.Input, new ReadOnlyCollection<double>(new List<double> { 1, 2 }));
+        var port = new NumericCollectionPort("Test", PortDirection.Input, new List<double> { 1, 2 }.ToImmutableList());
         string json = JsonSerializer.Serialize(port.Value, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         // Act
-        ReadOnlyCollection<double> nativeValue = mapper.ToNativeValue(json);
+        ImmutableList<double> nativeValue = mapper.ToNativeValue(json);
 
         // Assert
-        Assert.Equal(new ReadOnlyCollection<double>(new List<double> { 1, 2 }), nativeValue);
+        Assert.Equal(new List<double> { 1, 2 }.ToImmutableList(), nativeValue);
     }
 }

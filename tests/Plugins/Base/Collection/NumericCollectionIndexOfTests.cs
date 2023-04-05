@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using AyBorg.SDK.Common.Ports;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -17,7 +17,7 @@ public class NumericCollectionIndexOfTests
         var collectionPort = (NumericCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (NumericPort)plugin.Ports.First(p => p.Name.Equals("Index"));
 
-        collectionPort.Value = new ReadOnlyCollection<double>(new List<double> { 1, 2 });
+        collectionPort.Value = new List<double> { 1, 2 }.ToImmutableList();
         searchValuePort.Value = 2;
 
         // Act
@@ -37,7 +37,7 @@ public class NumericCollectionIndexOfTests
         var collectionPort = (NumericCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (NumericPort)plugin.Ports.First(p => p.Name.Equals("Index"));
 
-        collectionPort.Value = new ReadOnlyCollection<double>(new List<double> { 1, 2 });
+        collectionPort.Value = new List<double> { 1, 2 }.ToImmutableList();
         searchValuePort.Value = 3;
 
         // Act

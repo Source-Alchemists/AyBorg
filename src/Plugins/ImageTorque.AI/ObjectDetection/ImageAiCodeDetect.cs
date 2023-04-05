@@ -1,4 +1,4 @@
-﻿using System.Collections.ObjectModel;
+﻿using System.Collections.Immutable;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
@@ -13,9 +13,9 @@ public class ImageAiCodeDetect : IStepBody, IDisposable
     private readonly ImagePort _imagePort = new("Image", PortDirection.Input);
     private readonly EnumPort _searchType = new("Type", PortDirection.Input, CodeType.All);
     private readonly NumericPort _thresholdPort = new("Threshold", PortDirection.Input, 0.6, 0.1, 1d);
-    private readonly RectangleCollectionPort _regionsPort = new("Regions", PortDirection.Output, new ReadOnlyCollection<Rectangle>(Array.Empty<Rectangle>()));
-    private readonly StringCollectionPort _labelsPort = new("Labels", PortDirection.Output, new ReadOnlyCollection<string>(Array.Empty<string>()));
-    private readonly NumericCollectionPort _scoredPort = new("Scores", PortDirection.Output, new ReadOnlyCollection<double>(Array.Empty<double>()));
+    private readonly RectangleCollectionPort _regionsPort = new("Regions", PortDirection.Output);
+    private readonly StringCollectionPort _labelsPort = new("Labels", PortDirection.Output);
+    private readonly NumericCollectionPort _scoredPort = new("Scores", PortDirection.Output);
     private readonly YoloDetector<YoloV5CodeDetectorModel> _detector;
     private bool _disposedValue;
 
@@ -74,9 +74,9 @@ public class ImageAiCodeDetect : IStepBody, IDisposable
 
             results = results.OrderByDescending(r => r.Score).ToList();
 
-            _regionsPort.Value = new ReadOnlyCollection<Rectangle>(results.Select(r => r.Rectangle).ToList());
-            _labelsPort.Value = new ReadOnlyCollection<string>(results.Select(r => r.Label).ToList());
-            _scoredPort.Value = new ReadOnlyCollection<double>(results.Select(r => r.Score).ToList());
+            _regionsPort.Value = results.Select(r => r.Rectangle).ToImmutableList();
+            _labelsPort.Value = results.Select(r => r.Label).ToImmutableList();
+            _scoredPort.Value = results.Select(r => r.Score).ToImmutableList();
 
             return ValueTask.FromResult(true);
         }

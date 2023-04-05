@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -18,9 +18,9 @@ public class RectangleCollectionElementAtTests
         var collectionPort = (RectangleCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (RectanglePort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<Rectangle>(new List<Rectangle> {
+        collectionPort.Value = new List<Rectangle> {
             new Rectangle { X = 1, Y = 2, Width = 3, Height = 4 },
-            new Rectangle { X = 5, Y = 6, Width = 7, Height = 8 } });
+            new Rectangle { X = 5, Y = 6, Width = 7, Height = 8 } }.ToImmutableList();
         indexPort.Value = 1;
 
         // Act
@@ -40,9 +40,9 @@ public class RectangleCollectionElementAtTests
         var collectionPort = (RectangleCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (RectanglePort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<Rectangle>(new List<Rectangle> {
+        collectionPort.Value = new List<Rectangle> {
             new Rectangle { X = 1, Y = 2, Width = 3, Height = 4 },
-            new Rectangle { X = 5, Y = 6, Width = 7, Height = 8 } });
+            new Rectangle { X = 5, Y = 6, Width = 7, Height = 8 } }.ToImmutableList();
         indexPort.Value = 2;
 
         // Act
@@ -61,9 +61,9 @@ public class RectangleCollectionElementAtTests
         var collectionPort = (RectangleCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (RectanglePort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<Rectangle>(new List<Rectangle> {
+        collectionPort.Value = new List<Rectangle> {
             new Rectangle { X = 1, Y = 2, Width = 3, Height = 4 },
-            new Rectangle { X = 5, Y = 6, Width = 7, Height = 8 } });
+            new Rectangle { X = 5, Y = 6, Width = 7, Height = 8 } }.ToImmutableList();
         indexPort.Value = double.MaxValue;
 
         // Act
@@ -82,7 +82,7 @@ public class RectangleCollectionElementAtTests
         var collectionPort = (RectangleCollectionPort)plugin.Ports.First(p => p.Name.Equals("Collection"));
         var resultPort = (RectanglePort)plugin.Ports.First(p => p.Name.Equals("Result"));
 
-        collectionPort.Value = new ReadOnlyCollection<Rectangle>(Array.Empty<Rectangle>());
+        collectionPort.Value = ImmutableList<Rectangle>.Empty;
 
         // Act
         bool result = await plugin.TryRunAsync(CancellationToken.None);

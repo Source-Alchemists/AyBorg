@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using System.Text.Json;
 using AyBorg.SDK.Common.Ports;
 using ImageTorque;
@@ -12,10 +12,10 @@ public class RectangleCollectionPortMapperTests
     {
         // Arrange
         var mapper = new RectangleCollectionPortMapper();
-        var port = new RectangleCollectionPort("Test", PortDirection.Input, new ReadOnlyCollection<Rectangle>(new List<Rectangle> {
+        var port = new RectangleCollectionPort("Test", PortDirection.Input, new List<Rectangle> {
             new Rectangle { X = 1, Y = 2, Width = 3, Height = 4},
             new Rectangle { X = 5, Y = 6, Width = 7, Height = 8}
-         }));
+         }.ToImmutableList());
 
         // Act
         SDK.Common.Models.Port portModel = mapper.ToModel(port);
@@ -31,13 +31,13 @@ public class RectangleCollectionPortMapperTests
     {
         // Arrange
         var mapper = new RectangleCollectionPortMapper();
-        var value = new ReadOnlyCollection<SDK.Common.Models.Rectangle>(new List<SDK.Common.Models.Rectangle> {
+        var value = new List<SDK.Common.Models.Rectangle> {
             new SDK.Common.Models.Rectangle { X = 1, Y = 2, Width = 3, Height = 4},
             new SDK.Common.Models.Rectangle { X = 5, Y = 6, Width = 7, Height = 8}
-         });
+         }.ToImmutableList();
 
         // Act
-        ReadOnlyCollection<Rectangle> nativeValue = mapper.ToNativeValue(value);
+        ImmutableList<Rectangle> nativeValue = mapper.ToNativeValue(value);
 
         // Assert
         Assert.Equal(value.Count, nativeValue.Count);
@@ -58,19 +58,19 @@ public class RectangleCollectionPortMapperTests
     {
         // Arrange
         var mapper = new RectangleCollectionPortMapper();
-        var port = new RectangleCollectionPort("Test", PortDirection.Input, new ReadOnlyCollection<Rectangle>(new List<Rectangle> {
+        var port = new RectangleCollectionPort("Test", PortDirection.Input, new List<Rectangle> {
             new Rectangle { X = 1, Y = 2, Width = 3, Height = 4},
             new Rectangle { X = 5, Y = 6, Width = 7, Height = 8}
-         }));
+         }.ToImmutableList());
         string json = JsonSerializer.Serialize(port.Value, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
         // Act
-        ReadOnlyCollection<Rectangle> nativeValue = mapper.ToNativeValue(json);
+        ImmutableList<Rectangle> nativeValue = mapper.ToNativeValue(json);
 
         // Assert
-        Assert.Equal(new ReadOnlyCollection<Rectangle>(new List<Rectangle> {
+        Assert.Equal(new List<Rectangle> {
             new Rectangle { X = 1, Y = 2, Width = 3, Height = 4},
             new Rectangle { X = 5, Y = 6, Width = 7, Height = 8}
-        }), nativeValue);
+        }.ToImmutableList(), nativeValue);
     }
 }
