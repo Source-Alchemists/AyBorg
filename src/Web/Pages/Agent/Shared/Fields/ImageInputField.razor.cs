@@ -1,4 +1,4 @@
-using System.Collections.ObjectModel;
+using System.Collections.Immutable;
 using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Shared.Models;
@@ -46,7 +46,7 @@ public partial class ImageInputField : BaseInputField
             {
                 AddRectangle(scaleFactorX, scaleFactorY, rectangle);
             }
-            else if(shapePort.Value is ReadOnlyCollection<Rectangle> rectangeCollection)
+            else if(shapePort.Value is ImmutableList<Rectangle> rectangeCollection)
             {
                 foreach (Rectangle rect in rectangeCollection)
                 {
