@@ -22,6 +22,8 @@ services:
       - backend
     ports:
       - 6000:6000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   analytics:
     container_name: analytics-1

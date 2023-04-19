@@ -78,9 +78,8 @@ AyBorg has a **role-based user management system** that allows for precise contr
 
 ### Git clone
 
-`git clone https://github.com/Source-Alchemists/AyBorg.git` \
-`cd AyBorg` \
-`./syncSubmodules.sh`
+`git clone https://github.com/Source-Alchemists/AyBorg.git --recursive` \
+`cd AyBorg`
 
 ### Docker compose
 
