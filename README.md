@@ -6,33 +6,37 @@
 
 ![Title](docs/img/title.png)
 
-With AyBorg, you'll have the power to build and customize your own industrial applications without needing to write a single line of code. Simply drag and drop elements, connect the ports and voila!
+With AyBorg you have the power to build and customise your own automation applications without writing a single line of code. Just drag and drop elements, connect the ports and voila!
 
-We've got your back when it comes to monitoring your production goods too. Our platform has a focus on image processing, making it easier for you to keep an eye on your production. And if you need to add some extra features, our platform can be easily extended with plugins.
+![Workflow](docs/img/workflow.gif)
 
-With our built-in auditing functionality, you'll have even more control over your processes and data, leading to improved efficiency and cost savings.
+Our platform focuses on computer vision, making it easier for you to keep an eye on your automation process.
+
+We offer seamless integration with third-party plug-ins, so you can add custom functionality.
+
+With our built-in auditing functionality, you'll have more control over your processes and data, leading to improved efficiency.
 
 **:bangbang: AyBorg is still in its early stages of development and our API is still fluid and may change. If you happen to come across any bugs, please don't hesitate to report them - we'd be grateful for your help!**
 
 ## Agents
 
-AyBorg's **Agents** are specially designed services for automating processes. Using the **AyBorg.Gateway**, they can seamlessly communicate with other areas of the application. These powerful tools are ideal for optimizing your workflow and can help increase your efficiency.
+AyBorg's **Agents** are specially designed services for automating processes. Using the **AyBorg.Gateway**, they can communicate with other areas of the application. These powerful tools are ideal for optimizing your workflow and can help increase your efficiency.
 
 ### Editor
 
-Our user-friendly editor makes it a breeze to program your own workflows using simple drag and drop of steps/plugins into the data flow.
+Our editor makes it a breeze to program your own workflows using simple drag and drop of steps/plugins into the data flow.
 
 ![Agent editor](docs/img/agent-editor-comb.png)
 
 ### Work with multiple agents
 
-Experience unparalleled flexibility in your workflow! Work with as many agents as you want and distribute them across different systems. Thanks to seamless communication via the MQTT protocol, your creativity knows no bounds. Whether it's simple or complex scenarios, our agents enable you to perfectly realize your ideas!
+Work with as many agents as you want and distribute them across different systems. Thanks to seamless communication via the MQTT protocol, your creativity knows no bounds. Whether it's simple or complex scenarios, our agents enable you to perfectly realize your ideas!
 
 ![Agent overview](docs/img/agent-overview-comb.png)
 
 ### Project overview
 
-The project overview lays out all the projects and their current status. That way, you can see in a jiffy which projects have been given the green light for production.
+The project overview lays out all the projects and their current status. That way, you can see which projects have been given the green light for production.
 
 ![Project overview](docs/img/agent-projects-comb.png)
 
@@ -83,12 +87,12 @@ AyBorg has a **role-based user management system** that allows for precise contr
 
 ### Docker compose
 
-We provide a ready to use Docker compose setup for demo purpose.
+We provide a ready to use Docker compose setup.
 
 Just run `docker compose up` from the repository root directory. \
 You can then open AyBorg at `https://localhost:6011`.
 
-### Manually
+### (Optional) Manually
 
 Because AyBorg is orchastrated into multipe services, you need to start each service separately.
 In most cases the following setup makes sense:
