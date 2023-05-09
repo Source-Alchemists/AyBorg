@@ -1,7 +1,4 @@
-using System.Collections.Immutable;
-using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
-using ImageTorque;
 using ImageTorque.AI.Yolo;
 using Microsoft.Extensions.Logging;
 
@@ -9,19 +6,18 @@ namespace AyBorg.Plugins.ImageTorque.AI;
 
 public class ImageAiVialDetect : ImageAiDetectBase, IDisposable
 {
-    private readonly ILogger<ImageAiVialDetect> _logger;
+    private readonly EnumPort _searchType = new("Type", PortDirection.Input, ObjectType.All);
     private readonly YoloDetector<YoloV5VialDetectorModel> _detector;
     private bool _disposedValue;
 
     public override string DefaultName => "Image.AI.Vial.Detect";
 
-    public ImageAiVialDetect(ILogger<ImageAiVialDetect> logger)
+    public ImageAiVialDetect(ILogger<ImageAiVialDetect> logger) : base(logger)
     {
-        _logger = logger;
-
         Ports = new List<IPort>
         {
             _imagePort,
+            _searchType,
             _thresholdPort,
             _regionsPort,
             _labelsPort,
@@ -31,42 +27,20 @@ public class ImageAiVialDetect : ImageAiDetectBase, IDisposable
         _detector = new YoloDetector<YoloV5VialDetectorModel>(Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location)!, "./resources", "vialDetect.onnx"));
     }
 
-    public override ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
+    protected override bool SkipFilter(YoloPrediction prediction)
     {
-        try
+        if (_searchType.Value.Equals(ObjectType.Vial) && !prediction.Label.Name.Equals("Vial", StringComparison.InvariantCultureIgnoreCase))
         {
-            List<YoloPrediction> predictions = _detector.Predict(_imagePort.Value);
-            var results = new List<Result>();
-            var rectangles = new List<Rectangle>();
-            var labels = new List<string>();
-            var scores = new List<double>();
-
-            foreach (YoloPrediction pred in predictions)
-            {
-                if (pred.Score < _thresholdPort.Value) continue;
-
-                results.Add(new Result(pred.Rectangle, pred.Label.Name, pred.Score));
-
-                rectangles.Add(pred.Rectangle);
-                labels.Add(pred.Label.Name);
-                scores.Add(pred.Score);
-            }
-
-            results = results.OrderByDescending(r => r.Score).ToList();
-
-            _regionsPort.Value = results.Select(r => r.Rectangle).ToImmutableList();
-            _labelsPort.Value = results.Select(r => r.Label).ToImmutableList();
-            _scoredPort.Value = results.Select(r => r.Score).ToImmutableList();
-
-            return ValueTask.FromResult(true);
+            return true;
         }
-        catch (NullReferenceException ex)
+        else if (_searchType.Value.Equals(ObjectType.Cap) && !prediction.Label.Name.Equals("Cap", StringComparison.InvariantCultureIgnoreCase))
         {
-            _logger.LogError(new EventId((int)EventLogType.Plugin), ex, "{Message}", ex.Message);
+            return true;
         }
-
-        return ValueTask.FromResult(false);
+        return false;
     }
+
+    protected override List<YoloPrediction> Predict() => _detector.Predict(_imagePort.Value);
 
     private void Dispose(bool disposing)
     {
@@ -81,5 +55,12 @@ public class ImageAiVialDetect : ImageAiDetectBase, IDisposable
     {
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
+    }
+
+    public enum ObjectType
+    {
+        All = 0,
+        Vial = 1,
+        Cap = 2
     }
 }
