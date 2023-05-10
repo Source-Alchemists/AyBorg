@@ -70,6 +70,96 @@ public static class AgentCompareService
 
         result.AddRange(CompareSteps(projectAuditRecordA, projectAuditRecordB));
 
+        CompareLinks(projectAuditRecordA, projectAuditRecordB, result);
+
+        return result;
+    }
+
+    private static IEnumerable<ChangeRecord> CompareSteps(ProjectAuditRecord projectAuditRecordA, ProjectAuditRecord projectAuditRecordB)
+    {
+        var result = new List<ChangeRecord>();
+        var comparedSteps = new HashSet<StepAuditRecord>();
+
+        foreach (StepAuditRecord stepB in projectAuditRecordB.Steps)
+        {
+            StepAuditRecord? stepA = projectAuditRecordA.Steps.FirstOrDefault(s => s.Id.Equals(stepB.Id));
+            if (stepA == null)
+            {
+                // Step is new
+                result.AddRange(AddNewStep(stepB, projectAuditRecordA.Id, projectAuditRecordB.Id));
+                comparedSteps.Add(stepB);
+                continue;
+            }
+
+            result.AddRange(CompareSteps(stepA, stepB, projectAuditRecordA, projectAuditRecordB));
+            comparedSteps.Add(stepA);
+            comparedSteps.Add(stepB);
+        }
+
+        foreach (StepAuditRecord stepA in projectAuditRecordA.Steps.Where(s => !comparedSteps.Any(c => c.Id.Equals(s))))
+        {
+            StepAuditRecord? stepB = projectAuditRecordB.Steps.FirstOrDefault(s => s.Id.Equals(stepA.Id));
+            if (stepB == null)
+            {
+                // Step removed
+                result.AddRange(RemoveOldStep(stepA, projectAuditRecordA.Id, projectAuditRecordB.Id));
+            }
+        }
+
+        return result;
+    }
+
+    private static IEnumerable<ChangeRecord> CompareSteps(StepAuditRecord stepA, StepAuditRecord stepB, ProjectAuditRecord projectAuditRecordA, ProjectAuditRecord projectAuditRecordB)
+    {
+        var result = new List<ChangeRecord>();
+        var comparedPorts = new HashSet<PortAuditRecord>();
+        foreach (PortAuditRecord portB in stepB.Ports)
+        {
+            PortAuditRecord? portA = stepA.Ports.FirstOrDefault(p => p.Id.Equals(portB.Id));
+
+            // Skip if port was linked, as we don't want to track linked values
+            if(projectAuditRecordB.Links.Any(l => l.TargetId.Equals(portB.Id)))
+            {
+                continue;
+            }
+
+            if (portA == null)
+            {
+                // New port
+                result.Add(CreatePortChange(portA!, portB, stepB.Name, projectAuditRecordA.Id, projectAuditRecordB.Id));
+                comparedPorts.Add(portB);
+                continue;
+            }
+
+            if (portA.Value != portB.Value)
+            {
+                result.Add(CreatePortChange(portA, portB, stepB.Name, projectAuditRecordA.Id, projectAuditRecordB.Id));
+                comparedPorts.Add(portA);
+                comparedPorts.Add(portB);
+            }
+        }
+
+        foreach (PortAuditRecord? portA in stepA.Ports.Where(p => !comparedPorts.Any(c => c.Id.Equals(p.Id))))
+        {
+            PortAuditRecord? portB = stepB.Ports.FirstOrDefault(p => p.Id.Equals(portA.Id));
+            // Skip if port was linked, as we don't want to track linked values
+            if(projectAuditRecordA.Links.Any(l => l.TargetId.Equals(portA.Id)))
+            {
+                continue;
+            }
+
+            if (portB == null)
+            {
+                // Port removed
+                result.Add(CreatePortChange(portA, portB!, stepB.Name, projectAuditRecordA.Id, projectAuditRecordB.Id));
+            }
+        }
+
+        return result;
+    }
+
+    private static void CompareLinks(ProjectAuditRecord projectAuditRecordA, ProjectAuditRecord projectAuditRecordB, List<ChangeRecord> result)
+    {
         foreach (LinkAuditRecord linkRecordB in projectAuditRecordB.Links)
         {
             LinkAuditRecord? linkRecordA = projectAuditRecordA.Links.FirstOrDefault(l => l.Id.Equals(linkRecordB.Id));
@@ -97,78 +187,6 @@ public static class AgentCompareService
             // Removed link
             result.Add(CreateRemovedLink(linkRecordA, projectAuditRecordA, projectAuditRecordB));
         }
-
-        return result;
-    }
-
-    private static IEnumerable<ChangeRecord> CompareSteps(ProjectAuditRecord projectAuditRecordA, ProjectAuditRecord projectAuditRecordB)
-    {
-        var result = new List<ChangeRecord>();
-        var comparedSteps = new HashSet<StepAuditRecord>();
-
-        foreach (StepAuditRecord stepB in projectAuditRecordB.Steps)
-        {
-            StepAuditRecord? stepA = projectAuditRecordA.Steps.FirstOrDefault(s => s.Id.Equals(stepB.Id));
-            if (stepA == null)
-            {
-                // Step is new
-                result.AddRange(AddNewStep(stepB, projectAuditRecordA.Id, projectAuditRecordB.Id));
-                comparedSteps.Add(stepB);
-                continue;
-            }
-
-            result.AddRange(CompareSteps(stepA, stepB, projectAuditRecordA.Id, projectAuditRecordB.Id));
-            comparedSteps.Add(stepA);
-            comparedSteps.Add(stepB);
-        }
-
-        foreach (StepAuditRecord stepA in projectAuditRecordA.Steps.Where(s => !comparedSteps.Any(c => c.Id.Equals(s))))
-        {
-            StepAuditRecord? stepB = projectAuditRecordB.Steps.FirstOrDefault(s => s.Id.Equals(stepA.Id));
-            if (stepB == null)
-            {
-                // Step removed
-                result.AddRange(RemoveOldStep(stepA, projectAuditRecordA.Id, projectAuditRecordB.Id));
-            }
-        }
-
-        return result;
-    }
-
-    private static IEnumerable<ChangeRecord> CompareSteps(StepAuditRecord stepA, StepAuditRecord stepB, Guid projectAuditRecordA, Guid projectAuditRecordB)
-    {
-        var result = new List<ChangeRecord>();
-        var comparedPorts = new HashSet<PortAuditRecord>();
-        foreach (PortAuditRecord portB in stepB.Ports)
-        {
-            PortAuditRecord? portA = stepA.Ports.FirstOrDefault(p => p.Id.Equals(portB.Id));
-            if (portA == null)
-            {
-                // New port
-                result.Add(CreatePortChange(portA!, portB, stepB.Name, projectAuditRecordA, projectAuditRecordB));
-                comparedPorts.Add(portB);
-                continue;
-            }
-
-            if (portA.Value != portB.Value)
-            {
-                result.Add(CreatePortChange(portA, portB, stepB.Name, projectAuditRecordA, projectAuditRecordB));
-                comparedPorts.Add(portA);
-                comparedPorts.Add(portB);
-            }
-        }
-
-        foreach (PortAuditRecord? portA in stepA.Ports.Where(p => !comparedPorts.Any(c => c.Id.Equals(p.Id))))
-        {
-            PortAuditRecord? portB = stepB.Ports.FirstOrDefault(p => p.Id.Equals(portA.Id));
-            if (portB == null)
-            {
-                // Port removed
-                result.Add(CreatePortChange(portA, portB!, stepB.Name, projectAuditRecordA, projectAuditRecordB));
-            }
-        }
-
-        return result;
     }
 
     private static IEnumerable<ChangeRecord> AddNewProject(ProjectAuditRecord projectAuditRecord)
