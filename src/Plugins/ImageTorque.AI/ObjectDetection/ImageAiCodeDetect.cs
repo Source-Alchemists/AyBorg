@@ -53,7 +53,7 @@ public sealed class ImageAiCodeDetect : ImageAiDetectBase, IDisposable
 
     public void Dispose()
     {
-        Dispose(disposing: true);
+        Dispose(true);
         GC.SuppressFinalize(this);
     }
 

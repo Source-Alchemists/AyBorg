@@ -21,7 +21,7 @@ public abstract class ImageAiDetectBase : IStepBody
     protected abstract bool SkipFilter(YoloPrediction prediction);
     protected abstract List<YoloPrediction> Predict();
 
-    public ImageAiDetectBase(ILogger<ImageAiDetectBase> logger)
+    protected ImageAiDetectBase(ILogger<ImageAiDetectBase> logger)
     {
         _logger = logger;
     }
