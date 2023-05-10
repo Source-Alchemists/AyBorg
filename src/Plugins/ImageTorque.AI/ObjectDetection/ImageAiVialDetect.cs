@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.ImageTorque.AI;
 
-public class ImageAiVialDetect : ImageAiDetectBase, IDisposable
+public sealed class ImageAiVialDetect : ImageAiDetectBase, IDisposable
 {
     private readonly EnumPort _searchType = new("Type", PortDirection.Input, ObjectType.All);
     private readonly YoloDetector<YoloV5VialDetectorModel> _detector;
