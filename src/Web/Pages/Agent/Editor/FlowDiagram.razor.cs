@@ -455,11 +455,26 @@ public partial class FlowDiagram : ComponentBase, IDisposable
 
     private void OnZoomInClicked() => _diagram.SetZoom(_diagram.Zoom + 0.1);
     private void OnZoomOutClicked() => _diagram.SetZoom(_diagram.Zoom - 0.1);
-    private void OnZoomResetClicked() => _diagram.SetZoom(1.0);
+    private void OnZoomResetClicked() {
+        _diagram.SetZoom(1.0);
+        OnCenterViewClicked();
+    }
 
     private async void OnZoomChanged()
     {
         await StateService.AutomationFlowState.SetZoomAsync(_diagram.Zoom);
+    }
+
+    private void OnCenterViewClicked()
+    {
+        IEnumerable<Diagrams.Core.Geometry.Point> positions = _diagram.Nodes.Select(n => n.Position);
+        double posX = positions.Average(p => p.X);
+        double posY = positions.Average(p => p.Y);
+        posX *= _diagram.Zoom;
+        posY *= _diagram.Zoom;
+        double centX = _diagram.Container.Center.X * _diagram.Zoom / 2;
+        double centY = _diagram.Container.Center.Y * _diagram.Zoom / 2;
+        _diagram.SetPan(-posX + centX, -posY + centY);
     }
 
     private async void OnPanChanged()
