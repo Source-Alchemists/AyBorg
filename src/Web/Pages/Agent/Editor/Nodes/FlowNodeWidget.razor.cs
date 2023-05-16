@@ -1,8 +1,8 @@
-using AyBorg.SDK.Common.Ports;
-using AyBorg.Web.Pages.Agent.Shared.Fields;
-using AyBorg.Web.Services.Agent;
 using AyBorg.Diagrams.Core.Models;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.Web.Pages.Agent.Shared;
 using Microsoft.AspNetCore.Components;
+using MudBlazor;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
@@ -10,25 +10,21 @@ namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
 public partial class FlowNodeWidget : ComponentBase, IDisposable
 {
-    [Parameter] public FlowNode Node { get; set; } = null!;
-    [Inject] IFlowService FlowService { get; set; } = null!;
+    [Parameter] public FlowNode Node { get; init; } = null!;
+    [Inject] IDialogService DialogService { get; init; } = null!;
     private string NodeClass => Node.Selected ? "flow node box selected" : "flow node box";
 
-    private IReadOnlyCollection<PortModel> _outputPorts = Array.Empty<PortModel>();
-    private IReadOnlyCollection<PortModel> _inputPorts = Array.Empty<PortModel>();
-    private IReadOnlyCollection<FlowPort> _rectangleInputPorts = Array.Empty<FlowPort>();
+    private IReadOnlyCollection<FlowPort> _outputPorts = Array.Empty<FlowPort>();
+    private IReadOnlyCollection<FlowPort> _inputPorts = Array.Empty<FlowPort>();
     private bool _disposedValue;
 
     protected override Task OnInitializedAsync()
     {
-        _inputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Left).ToArray(); // Left for input
-        _outputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Right).ToArray(); // Right for output
-
-        IEnumerable<FlowPort> inputFlowPorts = _inputPorts.Cast<FlowPort>();
-        _rectangleInputPorts = inputFlowPorts.Where(p => p.Brand == PortBrand.Rectangle || p.Brand == PortBrand.RectangleCollection).ToArray();
+        _inputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Left).Cast<FlowPort>().ToArray(); // Left for input
+        _outputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Right).Cast<FlowPort>().ToArray(); // Right for output
 
         Node.StepChanged += OnChangedAsync;
-        foreach (FlowPort ip in inputFlowPorts)
+        foreach (FlowPort ip in _inputPorts)
         {
             ip.PortChanged += OnChangedAsync;
         }
@@ -39,13 +35,6 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
     private async void OnChangedAsync()
     {
         await InvokeAsync(StateHasChanged);
-    }
-
-    private async Task OnPortValueChangedAsync(ValueChangedEventArgs e)
-    {
-        FlowPort port = Node.Ports.Cast<FlowPort>().First(p => p.Port.Id == e.Port.Id);
-        port.Update(port.Port with { Value = e.Value });
-        await FlowService.TrySetPortValueAsync(port.Port);
     }
 
     private static string GetPortClass(PortModel port)
@@ -75,9 +64,27 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
         return $"flow {directionClass} {typeClass}";
     }
 
-    private void OnRemoveNode()
+    private void OnRemoveNodeClicked()
     {
         Node.Delete();
+    }
+
+    private async void OnStepFullScreenClicked()
+    {
+        var dialogOptions = new DialogOptions
+        {
+            FullScreen = true,
+            CloseButton = true,
+            CloseOnEscapeKey = true,
+            NoHeader = true
+        };
+        var dialogParameters = new DialogParameters
+        {
+            { "Node", Node }
+        };
+        IDialogReference dialog = DialogService.Show<StepDialog>($"Step: {Node.Step.Name}", dialogParameters, dialogOptions);
+        DialogResult result = await dialog.Result;
+        await InvokeAsync(StateHasChanged);
     }
 
     protected virtual void Dispose(bool disposing)
@@ -87,7 +94,7 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
             if (disposing)
             {
                 Node.StepChanged -= OnChangedAsync;
-                foreach (FlowPort ip in _inputPorts.Cast<FlowPort>())
+                foreach (FlowPort ip in _inputPorts)
                 {
                     ip.PortChanged -= OnChangedAsync;
                 }

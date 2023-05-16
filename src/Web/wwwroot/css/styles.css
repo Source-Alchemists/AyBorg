@@ -88,6 +88,10 @@
     height: calc(100% - 70px);
 }
 
+.dialog-alternative {
+    background-color: var(--mud-palette-background);
+}
+
 /*Blazor diagram*/
 .diagram-container {
     width: 100%;

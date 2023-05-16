@@ -1,0 +1,94 @@
+<MudCard Class="mud-full-height">
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudImage Src="icons/logo.svg" Width="40" Height="40" />
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText>@Node.Step.Name</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Close" OnClick="OnCloseClicked" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent Class="dialog-alternative" Style="height: calc(100% - 50px)">
+        <MudGrid Class="mud-full-height">
+            @* Inputs *@
+            <MudItem xs="3" Class="mud-full-height">
+                <MudCard Class="mud-full-height">
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudIcon Icon="@Icons.Material.Filled.Input" />
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText>Inputs</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent Class="overflow-auto" Style="height: calc(100% - 65px)">
+                        <MudList>
+                            @foreach (var port in _inputPorts.Where(p => p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
+                            {
+                                <MudListItem>
+                                    <PortResolver Node="@Node" Port="@port" Ports="@_inputPorts" />
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            @* Visual content *@
+            <MudItem xs="6" Class="mud-full-height">
+                <MudCard Class="mud-full-height">
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudIcon Icon="@Icons.Material.Filled.Image" />
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText>Visual content</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudTabs Centered="true">
+                            @foreach (var imagePort in _inputPorts.Where(p => p.Brand ==
+                            SDK.Common.Ports.PortBrand.Image))
+                            {
+                                <MudTabPanel Icon="@Icons.Material.Filled.Input" Text=@imagePort.Name>
+                                    <PortResolver Node="@Node" Port="@imagePort" Ports="@_inputPorts" />
+                                </MudTabPanel>
+                            }
+                            @foreach (var imagePort in _outputPorts.Where(p => p.Brand ==
+                            SDK.Common.Ports.PortBrand.Image))
+                            {
+                                <MudTabPanel Icon="@Icons.Material.Filled.Output" Text=@imagePort.Name>
+                                    <PortResolver Node="@Node" Port="@imagePort" Ports="@_outputPorts" />
+                                </MudTabPanel>
+                            }
+                        </MudTabs>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+            @* Outputs *@
+            <MudItem xs="3" Class="mud-full-height">
+                <MudCard Class="mud-full-height">
+                    <MudCardHeader>
+                        <CardHeaderAvatar>
+                            <MudIcon Icon="@Icons.Material.Filled.Output" />
+                        </CardHeaderAvatar>
+                        <CardHeaderContent>
+                            <MudText>Outputs</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent Class="overflow-auto" Style="height: calc(100% - 65px)">
+                        <MudList>
+                            @foreach (var port in _outputPorts.Where(p => p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
+                            {
+                                <MudListItem>
+                                    <PortResolver Node="@Node" Port="@port" Ports="@_outputPorts" />
+                                </MudListItem>
+                            }
+                        </MudList>
+                    </MudCardContent>
+                </MudCard>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>

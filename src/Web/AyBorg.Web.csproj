@@ -29,6 +29,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="AyBorg.Diagrams" Version="0.1.0" />
+    <PackageReference Include="Toolbelt.Blazor.HotKeys2" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

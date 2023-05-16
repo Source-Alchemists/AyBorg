@@ -1,48 +1,24 @@
-<div Class="mud-full-width py-1 m-0">
-    <MudButton Color="Color.Default" DisableElevation="true" Variant="Variant.Filled" Class="mud-width-full m-0"
-        OnClick="OnEditFiedClicked" Disabled="Disabled">
-
-        @if (Label != string.Empty)
-        {
-            <div Class="w50 ta-start">
-                <MudText>@Label</MudText>
-            </div>
-            <div Class="w50 ta-end">
-                <MudTooltip Text="@(Value?.ToString())" Style="width: 200px">
-                    <div Style="max-width: 110px; max-height: 30px" Class="pt-2 to-ellipsis">
+<div @ref="_containerRef" Class="mud-full-width py-1 m-0">
+    <MudTooltip Text="@(Value?.ToString())" RootClass="mud-full-width">
+        <MudButton Color="Color.Default" DisableElevation="true" Variant="Variant.Filled"
+            Class="mud-width-full m-0" OnClick="OnEditFiedClicked" Disabled="Disabled">
+            @if (Label != string.Empty)
+            {
+                <div Class="w50 ta-start">
+                    <MudText>@Label</MudText>
+                </div>
+                <div Class="w50 ta-end">
+                    <div Class="pt-2 to-ellipsis value label-value">
                         @Value
                     </div>
-                </MudTooltip>
-            </div>
-        }
-        else
-        {
-            <MudTooltip Text="@(Value?.ToString())" Style="width: 200px">
-                <div Style="max-width: 200px; max-height: 30px" Class="pt-2 to-ellipsis">
+                </div>
+            }
+            else
+            {
+                <div Class="mud-full-width pt-2 to-ellipsis value">
                     @Value
                 </div>
-            </MudTooltip>
-        }
-    </MudButton>
+            }
+        </MudButton>
+    </MudTooltip>
 </div>
-
-@code {
-    [Parameter]
-    [EditorRequired]
-    public string Label { get; set; } = string.Empty;
-
-    [Parameter]
-    [EditorRequired]
-    public object Value { get; set; } = new object();
-
-    [Parameter]
-    public bool Disabled { get; set; }
-
-    [Parameter]
-    public EventCallback Clicked { get; set; }
-
-    private async void OnEditFiedClicked()
-    {
-        await Clicked.InvokeAsync();
-    }
-}
