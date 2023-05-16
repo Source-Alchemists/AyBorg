@@ -20,6 +20,14 @@
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.center-y {
+    position: relative;
+    top: 50%;
+    --webkit-transform: translateY(-50%);
+    --ms-transform: translateY(-50%);
+    --moz-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
 
 @keyframes fadein {
     from    { opacity: 0; }

@@ -1,7 +1,7 @@
-<div @ref="_containerRef" Class="mud-full-width py-1 m-0">
+<div Class="mud-full-width py-1 m-0">
     <MudTooltip Text="@(Value?.ToString())" RootClass="mud-full-width">
         <MudButton Color="Color.Default" DisableElevation="true" Variant="Variant.Filled"
-            Class="mud-width-full m-0" OnClick="OnEditFiedClicked" Disabled="Disabled">
+            Class="mud-full-width m-0" OnClick="OnEditFiedClicked" Disabled="Disabled">
             @if (Label != string.Empty)
             {
                 <div Class="w50 ta-start">

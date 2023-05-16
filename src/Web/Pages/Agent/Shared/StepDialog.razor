@@ -46,20 +46,20 @@
                             <MudText>Visual content</MudText>
                         </CardHeaderContent>
                     </MudCardHeader>
-                    <MudCardContent>
-                        <MudTabs Centered="true">
+                    <MudCardContent Style="height: calc(100% - 65px)">
+                        <MudTabs Centered="true" Class="mud-full-height">
                             @foreach (var imagePort in _inputPorts.Where(p => p.Brand ==
                             SDK.Common.Ports.PortBrand.Image))
                             {
-                                <MudTabPanel Icon="@Icons.Material.Filled.Input" Text=@imagePort.Name>
-                                    <PortResolver Node="@Node" Port="@imagePort" Ports="@_inputPorts" />
+                                <MudTabPanel Icon="@Icons.Material.Filled.Input" Text="@imagePort.Name" Style="height: 100%">
+                                    <PortResolver Node="@Node" Port="@imagePort" Ports="@_inputPorts"  AlternativeMode/>
                                 </MudTabPanel>
                             }
                             @foreach (var imagePort in _outputPorts.Where(p => p.Brand ==
                             SDK.Common.Ports.PortBrand.Image))
                             {
-                                <MudTabPanel Icon="@Icons.Material.Filled.Output" Text=@imagePort.Name>
-                                    <PortResolver Node="@Node" Port="@imagePort" Ports="@_outputPorts" />
+                                <MudTabPanel Icon="@Icons.Material.Filled.Output" Text="@imagePort.Name" Style="height: 100%">
+                                    <PortResolver Node="@Node" Port="@imagePort" Ports="@_outputPorts"  AlternativeMode/>
                                 </MudTabPanel>
                             }
                         </MudTabs>

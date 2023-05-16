@@ -1,13 +1,16 @@
 @inherits BaseInputField
 
-<div Class="flow-node-field mud-full-width px-1 mb-4">
-    <span>@Port.Name</span>
-    <div class="mud-width-full" Style="height: 250px">
+<div Class="flow-node-field mud-full-width mud-full-height px-1 mb-4">
+    @if(!AlternativeMode)
+    {
+        <span>@Port.Name</span>
+    }
+    <div class="mud-full-width mud-full-height">
         @if (!string.IsNullOrEmpty(_imageUrl) && _imagePosition.Width > 0 && _imagePosition.Height > 0)
         {
-            <div class="mud-height-full mud-width-full d-flex justify-center">
+            <div @ref="@_imageContainer" class="@_imageContainerClasses">
                 <MudTooltip Text="@ImageTooltip">
-                    <svg width="@SVG_WIDTH" height="@SVG_HEIGHT">
+                    <svg width="@_imageWidth" height="@_imageHeight">
                         <defs>
                             <mask id="@_maskId">
                                 @if(_labelRectangles.Any())

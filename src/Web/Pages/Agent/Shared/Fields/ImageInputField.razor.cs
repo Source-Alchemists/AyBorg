@@ -3,12 +3,15 @@ using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class ImageInputField : BaseInputField
 {
     [Parameter, EditorRequired] public IReadOnlyCollection<FlowPort> ShapePorts { get; init; } = null!;
+    [Parameter] public bool AlternativeMode { get; init; } = false;
+    [Inject] public IJSRuntime JSRuntime { get; init; } = null!;
 
     private readonly string _maskId = $"mask_{Guid.NewGuid()}";
     private readonly List<LabelRectangle> _labelRectangles = new();
@@ -17,18 +20,35 @@ public partial class ImageInputField : BaseInputField
     private string? _imageUrl;
     private ImagePosition _imagePosition;
     private string ImageTooltip => $"Width: {_imagePosition.OrgWidth} Height: {_imagePosition.OrgHeight}";
+    private string _imageContainerClasses = "mud-full-width d-flex justify-center";
+    private ElementReference _imageContainer;
+    private int _imageWidth = 0;
+    private int _imageHeight = 0;
 
-    protected override void OnParametersSet()
+    protected override async Task OnParametersSetAsync()
     {
+        if(AlternativeMode)
+        {
+            _imageContainerClasses = "mud-full-width d-flex justify-center center-y";
+        }
+
         if (Port == null || Port.Value == null)
         {
             _imageUrl = string.Empty;
         }
         else if (Port.Value is Image image)
         {
+            if(AlternativeMode)
+            {
+                _imageWidth = image.Width;
+                _imageHeight = image.Height;
+            } else {
+                _imageWidth = SVG_WIDTH;
+                _imageHeight = SVG_HEIGHT;
+            }
             _imagePosition = new(
-                (SVG_WIDTH - image.ScaledWidth) / 2f,
-                (SVG_HEIGHT - image.ScaledHeight) / 2f,
+                (_imageWidth - image.ScaledWidth) / 2f,
+                (_imageHeight - image.ScaledHeight) / 2f,
                 image.ScaledWidth,
                 image.ScaledHeight,
                 image.Width,
@@ -55,7 +75,17 @@ public partial class ImageInputField : BaseInputField
             }
         }
 
-        base.OnParametersSet();
+        await base.OnParametersSetAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+         if(AlternativeMode)
+        {
+            BoundingClientRect boundingRectangle = await JSRuntime.InvokeAsync<BoundingClientRect>("getElementBoundingClientRect", _imageContainer);
+            double height = double.Round(boundingRectangle.Height);
+            Console.WriteLine(height);
+        }
+        await base.OnAfterRenderAsync(firstRender);
     }
 
     private void AddRectangle(float scaleFactorX, float scaleFactorY, Rectangle rectangle)

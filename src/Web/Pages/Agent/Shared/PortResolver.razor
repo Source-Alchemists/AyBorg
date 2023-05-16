@@ -16,7 +16,7 @@
         <DirectoryInputField Port="Port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" />
         break;
     case PortBrand.Image:
-        <ImageInputField Port="Port.Port" ShapePorts="_shapePorts" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" />
+        <ImageInputField Port="Port.Port" ShapePorts="_shapePorts" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" AlternativeMode="AlternativeMode" />
         break;
     case PortBrand.Rectangle:
         <RectangleInputField Port="Port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" />
