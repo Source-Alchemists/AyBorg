@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Models;
+using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.Web.Shared.Models;
 using Grpc.Core;
@@ -51,7 +52,14 @@ public class FlowService : IFlowService
             var ports = new List<Port>();
             foreach (Port portModel in stepModel.Ports!)
             {
-                ports.Add(await LazyLoadAsync(portModel, null));
+                if (portModel.Brand == PortBrand.Image && portModel.Direction == PortDirection.Input)
+                {
+                    ports.Add(await LazyLoadImagePortAsync(portModel, null));
+                }
+                else
+                {
+                    ports.Add(portModel);
+                }
             }
             result.Add(stepModel with { Ports = ports });
         }
@@ -89,12 +97,12 @@ public class FlowService : IFlowService
             var ports = new List<Port>();
             foreach (Port portModel in stepModel.Ports!)
             {
-                if (portModel.Direction == SDK.Common.Ports.PortDirection.Output && skipOutputPorts)
+                if (portModel.Direction == PortDirection.Output && skipOutputPorts)
                 {
                     // Nothing to do as we only need to update input ports
                     continue;
                 }
-                ports.Add(await LazyLoadAsync(portModel, iterationId));
+                ports.Add(await GetPortAsync(portModel.Id, iterationId));
             }
 
             stepModel = stepModel with { Ports = ports };
@@ -303,7 +311,14 @@ public class FlowService : IFlowService
         }
 
         Port portModel = _rpcMapper.FromRpc(resultPort);
-        return await LazyLoadAsync(portModel, iterationId);
+        if (portModel.Brand == PortBrand.Image)
+        {
+            return await LazyLoadImagePortAsync(portModel, iterationId);
+        }
+        else
+        {
+            return portModel;
+        }
     }
 
     /// <summary>
@@ -330,24 +345,19 @@ public class FlowService : IFlowService
         }
     }
 
-    private async ValueTask<Port> LazyLoadAsync(Port portModel, Guid? iterationId)
+    private async ValueTask<Port> LazyLoadImagePortAsync(Port portModel, Guid? iterationId)
     {
-        if (portModel.Brand == SDK.Common.Ports.PortBrand.Image && portModel.Direction == SDK.Common.Ports.PortDirection.Input)
+        // Need to transfer the image
+        AsyncServerStreamingCall<ImageChunkDto> imageResponse = _editorClient.GetImageStream(new GetImageStreamRequest
         {
-            // Need to transfer the image
-            AsyncServerStreamingCall<ImageChunkDto> imageResponse = _editorClient.GetImageStream(new GetImageStreamRequest
-            {
-                AgentUniqueName = _stateService.AgentState.UniqueName,
-                PortId = portModel.Id.ToString(),
-                IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString(),
-                AsThumbnail = true
+            AgentUniqueName = _stateService.AgentState.UniqueName,
+            PortId = portModel.Id.ToString(),
+            IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString(),
+            AsThumbnail = true
 
-            });
+        });
 
-            return portModel with { Value = await CreateImageFromChunksAsync(imageResponse, true) };
-        }
-
-        return portModel;
+        return portModel with { Value = await CreateImageFromChunksAsync(imageResponse, true) };
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

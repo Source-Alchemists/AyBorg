@@ -78,15 +78,15 @@ public partial class ImageInputField : BaseInputField
         await base.OnParametersSetAsync();
     }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender) {
-         if(AlternativeMode)
-        {
-            BoundingClientRect boundingRectangle = await JSRuntime.InvokeAsync<BoundingClientRect>("getElementBoundingClientRect", _imageContainer);
-            double height = double.Round(boundingRectangle.Height);
-            Console.WriteLine(height);
-        }
-        await base.OnAfterRenderAsync(firstRender);
-    }
+    // protected override async Task OnAfterRenderAsync(bool firstRender) {
+    //      if(AlternativeMode)
+    //     {
+    //         BoundingClientRect boundingRectangle = await JSRuntime.InvokeAsync<BoundingClientRect>("getElementBoundingClientRect", _imageContainer);
+    //         double height = double.Round(boundingRectangle.Height);
+    //         Console.WriteLine(height);
+    //     }
+    //     await base.OnAfterRenderAsync(firstRender);
+    // }
 
     private void AddRectangle(float scaleFactorX, float scaleFactorY, Rectangle rectangle)
     {

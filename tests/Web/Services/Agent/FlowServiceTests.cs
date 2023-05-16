@@ -87,7 +87,19 @@ public class FlowServiceTests
             getFlowStepsResponse.Steps.Add(new StepDto());
         }
 
+        var getFlowPortsResponse = new GetFlowPortsResponse();
+        getFlowPortsResponse.Ports.Add(new PortDto {
+            Id = Guid.NewGuid().ToString(),
+            Name = "Test_name",
+            Direction = (int)PortDirection.Output,
+            IsConnected = false,
+            IsLinkConvertable = true,
+            Brand = (int)PortBrand.String,
+            Value = "Test"
+        });
+
         AsyncUnaryCall<GetFlowStepsResponse> callGetFlowSteps = GrpcCallHelpers.CreateAsyncUnaryCall(getFlowStepsResponse);
+        AsyncUnaryCall<GetFlowPortsResponse> callGetFlowPorts = GrpcCallHelpers.CreateAsyncUnaryCall(getFlowPortsResponse);
         AsyncServerStreamingCall<ImageChunkDto> callGetImageStream = GrpcCallHelpers.CreateAsyncServerStreamingCall(new List<ImageChunkDto> {
             new ImageChunkDto {
                 Data = ByteString.CopyFromUtf8("Test"),
@@ -98,6 +110,7 @@ public class FlowServiceTests
         });
         _mockEditorClient.Setup(m => m.GetFlowStepsAsync(It.IsAny<GetFlowStepsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(callGetFlowSteps);
         _mockEditorClient.Setup(m => m.GetImageStream(It.IsAny<GetImageStreamRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(callGetImageStream);
+        _mockEditorClient.Setup(m => m.GetFlowPortsAsync(It.IsAny<GetFlowPortsRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(callGetFlowPorts);
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<StepDto>())).Returns(new Step
         {
             Ports = new List<Port> {
@@ -110,6 +123,7 @@ public class FlowServiceTests
                 }
             }
         });
+        _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<PortDto>())).Returns(new Port { Brand = PortBrand.Image });
 
 
         // Act
