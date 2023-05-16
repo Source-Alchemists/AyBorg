@@ -21,7 +21,6 @@ public partial class ImageInputField : BaseInputField
     private ImagePosition _imagePosition;
     private string ImageTooltip => $"Width: {_imagePosition.OrgWidth} Height: {_imagePosition.OrgHeight}";
     private string _imageContainerClasses = "mud-full-width d-flex justify-center";
-    private ElementReference _imageContainer;
     private int _imageWidth = 0;
     private int _imageHeight = 0;
 
@@ -77,16 +76,6 @@ public partial class ImageInputField : BaseInputField
 
         await base.OnParametersSetAsync();
     }
-
-    // protected override async Task OnAfterRenderAsync(bool firstRender) {
-    //      if(AlternativeMode)
-    //     {
-    //         BoundingClientRect boundingRectangle = await JSRuntime.InvokeAsync<BoundingClientRect>("getElementBoundingClientRect", _imageContainer);
-    //         double height = double.Round(boundingRectangle.Height);
-    //         Console.WriteLine(height);
-    //     }
-    //     await base.OnAfterRenderAsync(firstRender);
-    // }
 
     private void AddRectangle(float scaleFactorX, float scaleFactorY, Rectangle rectangle)
     {

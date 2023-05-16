@@ -8,7 +8,7 @@
     <div class="mud-full-width mud-full-height">
         @if (!string.IsNullOrEmpty(_imageUrl) && _imagePosition.Width > 0 && _imagePosition.Height > 0)
         {
-            <div @ref="@_imageContainer" class="@_imageContainerClasses">
+            <div class="@_imageContainerClasses">
                 <MudTooltip Text="@ImageTooltip">
                     <svg width="@_imageWidth" height="@_imageHeight">
                         <defs>

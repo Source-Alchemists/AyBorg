@@ -110,11 +110,11 @@ public partial class FlowDiagram : ComponentBase, IDisposable
 
     private async void IterationFinishedNotificationReceived(object obj)
     {
-        try
+        Guid iterationId = (Guid)obj;
+        IEnumerable<FlowNode> flowNodes = _diagram.Nodes.Cast<FlowNode>();
+        await Parallel.ForEachAsync(flowNodes, async (node, token) =>
         {
-            Guid iterationId = (Guid)obj;
-            IEnumerable<FlowNode> flowNodes = _diagram.Nodes.Cast<FlowNode>();
-            await Parallel.ForEachAsync(flowNodes, async (node, token) =>
+            try
             {
                 Step newStep = await FlowService.GetStepAsync(node.Step.Id, iterationId);
                 if (newStep != null)
@@ -125,12 +125,12 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                 {
                     Logger.LogWarning("Step not found");
                 }
-            });
-        }
-        catch (RpcException ex)
-        {
-            Logger.LogWarning(ex, "Failed to get step");
-        }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Error updating step");
+            }
+        });
     }
 
     private async void FlowChangedNotificationReceived(object obj)
@@ -332,7 +332,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         }
 
         Guid? newLinkId = await FlowService.AddLinkAsync(sourcePort.Port, targetPort.Port);
-        if(newLinkId == null)
+        if (newLinkId == null)
         {
             Snackbar.Add("Link is not compatible", Severity.Warning);
             _diagram.Links.Remove(tmpLink);
@@ -455,7 +455,8 @@ public partial class FlowDiagram : ComponentBase, IDisposable
 
     private void OnZoomInClicked() => _diagram.SetZoom(_diagram.Zoom + 0.1);
     private void OnZoomOutClicked() => _diagram.SetZoom(_diagram.Zoom - 0.1);
-    private void OnZoomResetClicked() {
+    private void OnZoomResetClicked()
+    {
         _diagram.SetZoom(1.0);
         OnCenterViewClicked();
     }

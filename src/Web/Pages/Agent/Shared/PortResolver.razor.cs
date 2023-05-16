@@ -17,7 +17,9 @@ public partial class PortResolver : ComponentBase {
     private IReadOnlyCollection<FlowPort> _shapePorts = Array.Empty<FlowPort>();
 
     protected override void OnParametersSet() {
-        _shapePorts = Ports.Where(p => p.Brand == PortBrand.Rectangle || p.Brand == PortBrand.RectangleCollection).ToArray();
+        _shapePorts = Ports.Where(p => (p.Brand == PortBrand.Rectangle
+                                    || p.Brand == PortBrand.RectangleCollection)
+                                    && p.Direction == Port.Direction).ToArray();
         base.OnParametersSet();
     }
 

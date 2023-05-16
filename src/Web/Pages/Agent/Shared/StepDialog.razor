@@ -25,10 +25,10 @@
                     </MudCardHeader>
                     <MudCardContent Class="overflow-auto" Style="height: calc(100% - 65px)">
                         <MudList>
-                            @foreach (var port in _inputPorts.Where(p => p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
+                            @foreach (var port in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
                             {
                                 <MudListItem>
-                                    <PortResolver Node="@Node" Port="@port" Ports="@_inputPorts" />
+                                    <PortResolver Node="@Node" Port="@port" Ports="@_ports" />
                                 </MudListItem>
                             }
                         </MudList>
@@ -48,18 +48,18 @@
                     </MudCardHeader>
                     <MudCardContent Style="height: calc(100% - 65px)">
                         <MudTabs Centered="true" Class="mud-full-height">
-                            @foreach (var imagePort in _inputPorts.Where(p => p.Brand ==
+                            @foreach (var imagePort in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Brand ==
                             SDK.Common.Ports.PortBrand.Image))
                             {
                                 <MudTabPanel Icon="@Icons.Material.Filled.Input" Text="@imagePort.Name" Style="height: 100%">
-                                    <PortResolver Node="@Node" Port="@imagePort" Ports="@_inputPorts"  AlternativeMode/>
+                                    <PortResolver Node="@Node" Port="@imagePort" Ports="@_ports"  AlternativeMode/>
                                 </MudTabPanel>
                             }
-                            @foreach (var imagePort in _outputPorts.Where(p => p.Brand ==
+                            @foreach (var imagePort in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Brand ==
                             SDK.Common.Ports.PortBrand.Image))
                             {
                                 <MudTabPanel Icon="@Icons.Material.Filled.Output" Text="@imagePort.Name" Style="height: 100%">
-                                    <PortResolver Node="@Node" Port="@imagePort" Ports="@_outputPorts"  AlternativeMode/>
+                                    <PortResolver Node="@Node" Port="@imagePort" Ports="@_ports"  AlternativeMode/>
                                 </MudTabPanel>
                             }
                         </MudTabs>
@@ -79,10 +79,10 @@
                     </MudCardHeader>
                     <MudCardContent Class="overflow-auto" Style="height: calc(100% - 65px)">
                         <MudList>
-                            @foreach (var port in _outputPorts.Where(p => p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
+                            @foreach (var port in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
                             {
                                 <MudListItem>
-                                    <PortResolver Node="@Node" Port="@port" Ports="@_outputPorts" />
+                                    <PortResolver Node="@Node" Port="@port" Ports="@_ports" />
                                 </MudListItem>
                             }
                         </MudList>
