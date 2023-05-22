@@ -54,7 +54,7 @@ public class FlowService : IFlowService
             {
                 if (portModel.Brand == PortBrand.Image && portModel.Direction == PortDirection.Input)
                 {
-                    ports.Add(await LazyLoadImagePortAsync(portModel, null));
+                    ports.Add(await LazyLoadImagePortAsync(portModel, null, true));
                 }
                 else
                 {
@@ -70,12 +70,12 @@ public class FlowService : IFlowService
     /// <summary>
     /// Gets the step.
     /// </summary>
-    /// <param name="stepId">The step id.</param>
+    /// <param name="originalStep">The original step.</param>
     /// <param name="iterationId">The iteration id.</param>
     /// <param name="updatePorts">if set to <c>true</c> [update ports].</param>
     /// <param name="skipOutputPorts">if set to <c>true</c> [skip output ports].</param>
     /// <returns>The step.</returns>
-    public async ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true)
+    public async ValueTask<Step> GetStepAsync(Step originalStep, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true, bool asThumbnail = true)
     {
         try
         {
@@ -84,13 +84,13 @@ public class FlowService : IFlowService
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
             };
-            request.StepIds.Add(stepId.ToString());
+            request.StepIds.Add(originalStep.Id.ToString());
             GetFlowStepsResponse response = await _editorClient.GetFlowStepsAsync(request);
             StepDto? resultStep = response.Steps.FirstOrDefault();
             if (resultStep == null)
             {
-                _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), "Could not find step with id [{stepId}] in iteration [{iterationId}]!", stepId, iterationId);
-                return null!;
+                _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), "Could not find step with id [{stepId}] in iteration [{iterationId}]!", originalStep.Id, iterationId);
+                return new Step();
             }
 
             Step stepModel = _rpcMapper.FromRpc(resultStep);
@@ -104,7 +104,7 @@ public class FlowService : IFlowService
                         // Nothing to do as we only need to update input ports
                         continue;
                     }
-                    ports.Add(await GetPortAsync(portModel.Id, iterationId));
+                    ports.Add(await GetPortAsync(portModel.Id, iterationId, asThumbnail));
                 }
 
                 stepModel = stepModel with { Ports = ports };
@@ -114,7 +114,7 @@ public class FlowService : IFlowService
         catch (RpcException ex)
         {
             _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting step!");
-            return null!;
+            return new Step();
         }
     }
 
@@ -303,7 +303,7 @@ public class FlowService : IFlowService
     /// <param name="portId">The port identifier.</param>
     /// <param name="iterationId">The iteration identifier.</param>
     /// <returns></returns>
-    public async ValueTask<Port> GetPortAsync(Guid portId, Guid? iterationId = null)
+    public async ValueTask<Port> GetPortAsync(Guid portId, Guid? iterationId = null, bool asThumbnail = true)
     {
         try
         {
@@ -317,13 +317,13 @@ public class FlowService : IFlowService
             PortDto? resultPort = response.Ports.FirstOrDefault();
             if (resultPort == null)
             {
-                return null!;
+                return new Port();
             }
 
             Port portModel = _rpcMapper.FromRpc(resultPort);
             if (portModel.Brand == PortBrand.Image)
             {
-                return await LazyLoadImagePortAsync(portModel, iterationId);
+                return await LazyLoadImagePortAsync(portModel, iterationId, asThumbnail);
             }
             else
             {
@@ -333,7 +333,11 @@ public class FlowService : IFlowService
         catch (RpcException ex)
         {
             _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting port!");
-            return null!;
+            return new Port();
+        }catch(NullReferenceException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting port!");
+            return new Port();
         }
     }
 
@@ -361,19 +365,27 @@ public class FlowService : IFlowService
         }
     }
 
-    private async ValueTask<Port> LazyLoadImagePortAsync(Port portModel, Guid? iterationId)
+    private async ValueTask<Port> LazyLoadImagePortAsync(Port portModel, Guid? iterationId, bool asThumbnail)
     {
-        // Need to transfer the image
-        AsyncServerStreamingCall<ImageChunkDto> imageResponse = _editorClient.GetImageStream(new GetImageStreamRequest
+        try
         {
-            AgentUniqueName = _stateService.AgentState.UniqueName,
-            PortId = portModel.Id.ToString(),
-            IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString(),
-            AsThumbnail = true
+            // Need to transfer the image
+            AsyncServerStreamingCall<ImageChunkDto> imageResponse = _editorClient.GetImageStream(new GetImageStreamRequest
+            {
+                AgentUniqueName = _stateService.AgentState.UniqueName,
+                PortId = portModel.Id.ToString(),
+                IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString(),
+                AsThumbnail = asThumbnail
 
-        });
+            });
 
-        return portModel with { Value = await CreateImageFromChunksAsync(imageResponse, true) };
+            return portModel with { Value = await CreateImageFromChunksAsync(imageResponse, true) };
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting image port!");
+            return portModel;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

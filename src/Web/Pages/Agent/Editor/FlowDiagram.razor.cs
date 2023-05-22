@@ -116,8 +116,8 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         {
             try
             {
-                Step newStep = await FlowService.GetStepAsync(node.Step.Id, iterationId);
-                if (newStep != null)
+                Step newStep = await FlowService.GetStepAsync(node.Step, iterationId);
+                if (newStep.Id != Guid.Empty)
                 {
                     await InvokeAsync(() => node.Update(newStep));
                 }
@@ -149,7 +149,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                     // Already exists
                     continue;
                 }
-                Step newStep = await FlowService.GetStepAsync(stepId);
+                Step newStep = await FlowService.GetStepAsync(new Step { Id = stepId });
                 await InvokeAsync(() => CreateAndAddNode(newStep));
             }
 
@@ -215,7 +215,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                     continue;
                 }
 
-                Step newStep = await FlowService.GetStepAsync(stepId, updatePorts: false);
+                Step newStep = await FlowService.GetStepAsync(new Step { Id = stepId }, updatePorts: false);
                 await InvokeAsync(() =>
                 {
                     node.Update(newStep);

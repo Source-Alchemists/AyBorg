@@ -52,7 +52,7 @@ public partial class StepDialog : ComponentBase, IDisposable
 
     private async ValueTask UpdateNode(Guid? iterationId)
     {
-        Step fullStep = await FlowService.GetStepAsync(Node.Step.Id, iterationId, true, false);
+        Step fullStep = await FlowService.GetStepAsync(Node.Step, iterationId, true, false, false);
 
         foreach (Port port in fullStep.Ports)
         {

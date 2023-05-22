@@ -50,7 +50,7 @@ public class FlowPort : PortModel
     /// </summary>
     public void Update(Port newPort)
     {
-        if (newPort == null) return;
+        if (newPort.Id == Guid.Empty) return;
         Port = newPort;
         PortChanged?.Invoke();
     }

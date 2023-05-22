@@ -83,7 +83,7 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
             { "Node", Node }
         };
         IDialogReference dialog = DialogService.Show<StepDialog>($"Step: {Node.Step.Name}", dialogParameters, dialogOptions);
-        DialogResult result = await dialog.Result;
+        await dialog.Result;
         await InvokeAsync(StateHasChanged);
     }
 

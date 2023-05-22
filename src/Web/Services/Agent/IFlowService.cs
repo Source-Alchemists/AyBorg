@@ -59,18 +59,20 @@ public interface IFlowService
     /// </summary>
     /// <param name="portId">The port identifier.</param>
     /// <param name="iterationId">The iteration identifier.</param>
+    /// <param name="asThumbnail">Whether to get the thumbnail.</param>
     /// <returns></returns>
-    ValueTask<Port> GetPortAsync(Guid portId, Guid? iterationId = null);
+    ValueTask<Port> GetPortAsync(Guid portId, Guid? iterationId = null, bool asThumbnail = true);
 
     /// <summary>
     /// Gets the step.
     /// </summary>
-    /// <param name="stepId">The step id.</param>
+    /// <param name="originalStep">The original step.</param>
     /// <param name="iterationId">The iteration id.</param>
     /// <param name="updatePorts">Whether to update the ports.</param>
     /// <param name="skipOutputPorts">Whether to skip output ports.</param>
+    /// <param name="asThumbnail">Whether to get the thumbnail.</param>
     /// <returns>The step.</returns>
-    ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true);
+    ValueTask<Step> GetStepAsync(Step originalStep, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true, bool asThumbnail = true);
 
     /// <summary>
     /// Gets the link.
