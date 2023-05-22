@@ -8,23 +8,24 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using Toolbelt.Blazor.HotKeys2;
 
-namespace AyBorg.Web.Pages.Agent.Shared;
+namespace AyBorg.Web.Pages.Agent.StepView;
 
 #nullable disable
 
-public partial class StepDialog : ComponentBase, IDisposable
+public partial class StepView : ComponentBase, IDisposable
 {
     private bool _disposedValue;
     private HotKeysContext _hotKeysContext = null!;
 
-    [CascadingParameter] MudDialogInstance MudDialog { get; init; }
-    [Parameter] public FlowNode Node { get; init; }
+    [Parameter] public string UniqueName { get; init; }
+    [Parameter] public string StepId { get; init; }
     [Inject] public HotKeys HotKeys { get; init; }
     [Inject] public IFlowService FlowService { get; init; }
-    [Inject] public INotifyService NotifyService { get; set; }
-    [Inject] public IStateService StateService { get; set; }
+    [Inject] public INotifyService NotifyService { get; init; }
 
-
+    private bool _isLoading = true;
+    private Step _step = new();
+    private FlowNode _node;
     private IReadOnlyCollection<FlowPort> _ports = Array.Empty<FlowPort>();
     private NotifyService.Subscription _iterationFinishedSubscription;
 
@@ -32,13 +33,6 @@ public partial class StepDialog : ComponentBase, IDisposable
     {
         base.OnInitialized();
         _hotKeysContext = HotKeys.CreateContext();
-        _hotKeysContext.Add(ModCode.None, Code.Escape, CloseDialog, "Close dialog");
-
-        _ports = Node.Ports.Cast<FlowPort>().ToArray();
-
-        if (_iterationFinishedSubscription != null) _iterationFinishedSubscription.Callback -= IterationFinishedNotificationReceived;
-        _iterationFinishedSubscription = NotifyService.Subscribe(StateService.AgentState.UniqueName, SDK.Communication.gRPC.NotifyType.AgentIterationFinished);
-        _iterationFinishedSubscription.Callback += IterationFinishedNotificationReceived;
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -46,13 +40,29 @@ public partial class StepDialog : ComponentBase, IDisposable
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+            var stepGuid = Guid.Parse(StepId);
+            _step = await FlowService.GetStepAsync(UniqueName, new Step { Id = stepGuid }, null, true, false, false);
+            _node = new FlowNode(_step);
+            var flowPorts = new List<FlowPort>();
+            foreach(Port port in _step.Ports)
+            {
+                flowPorts.Add(new FlowPort(_node, port));
+            }
+            _ports = flowPorts;
+
             await UpdateNode(null);
+
+            if (_iterationFinishedSubscription != null) _iterationFinishedSubscription.Callback -= IterationFinishedNotificationReceived;
+            _iterationFinishedSubscription = NotifyService.Subscribe(UniqueName, SDK.Communication.gRPC.NotifyType.AgentIterationFinished);
+            _iterationFinishedSubscription.Callback += IterationFinishedNotificationReceived;
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 
     private async ValueTask UpdateNode(Guid? iterationId)
     {
-        Step fullStep = await FlowService.GetStepAsync(Node.Step, iterationId, true, false, false);
+        Step fullStep = await FlowService.GetStepAsync(UniqueName, _step, iterationId, true, false, false);
 
         foreach (Port port in fullStep.Ports)
         {
@@ -79,10 +89,6 @@ public partial class StepDialog : ComponentBase, IDisposable
         Guid iterationId = (Guid)obj;
         await UpdateNode(iterationId);
     }
-
-    private void CloseDialog() => MudDialog.Close();
-
-    private void OnCloseClicked() => CloseDialog();
 
     protected virtual void Dispose(bool disposing)
     {

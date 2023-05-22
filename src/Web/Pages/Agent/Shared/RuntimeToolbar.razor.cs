@@ -10,14 +10,9 @@ namespace AyBorg.Web.Pages.Agent.Shared;
 
 public partial class RuntimeToolbar : ComponentBase, IDisposable
 {
-    [Parameter]
-    [EditorRequired]
-    public string ServiceUniqueName { get; set; }
-
+    [Parameter, EditorRequired] public string ServiceUniqueName { get; set; }
     [Inject] IRuntimeService RuntimeService { get; set; }
-
     [Inject] INotifyService NotifyService { get; set; }
-
     [Inject] ISnackbar Snackbar { get; set; }
 
     private string StopClass => _isAbortVisible ? "w50" : "mud-full-width";
@@ -33,7 +28,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
 
     protected override async Task OnParametersSetAsync()
     {
-        _status = await RuntimeService.GetStatusAsync();
+        _status = await RuntimeService.GetStatusAsync(ServiceUniqueName);
         UpdateButtonsState();
         if (_statusSubscription != null)
         {
@@ -103,7 +98,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        if (await RuntimeService.StartRunAsync(EngineExecutionType.SingleRun) == null)
+        if (await RuntimeService.StartRunAsync(ServiceUniqueName, EngineExecutionType.SingleRun) == null)
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
@@ -115,7 +110,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        if (await RuntimeService.StartRunAsync(EngineExecutionType.ContinuousRun) == null)
+        if (await RuntimeService.StartRunAsync(ServiceUniqueName, EngineExecutionType.ContinuousRun) == null)
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
@@ -127,7 +122,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        if (await RuntimeService.StopRunAsync() == null)
+        if (await RuntimeService.StopRunAsync(ServiceUniqueName) == null)
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();
@@ -139,7 +134,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
     {
         _areButtonsDisabled = true;
         _isButtonLoading = true;
-        if (await RuntimeService.AbortRunAsync() == null)
+        if (await RuntimeService.AbortRunAsync(ServiceUniqueName) == null)
         {
             _status.State = EngineState.Idle;
             UpdateButtonsState();

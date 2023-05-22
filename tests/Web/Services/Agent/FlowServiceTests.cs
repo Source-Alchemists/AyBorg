@@ -127,7 +127,7 @@ public class FlowServiceTests
 
 
         // Act
-        Step result = await _service.GetStepAsync(new Step(), Guid.NewGuid(), updatePorts, skipOutputPorts);
+        Step result = await _service.GetStepAsync(string.Empty, new Step(), Guid.NewGuid(), updatePorts, skipOutputPorts);
 
         // Assert
         if (hasStep)
@@ -301,7 +301,7 @@ public class FlowServiceTests
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<PortDto>())).Returns(new Port() { Id = Guid.NewGuid() });
 
         // Act
-        Port result = await _service.GetPortAsync(Guid.NewGuid(), Guid.NewGuid());
+        Port result = await _service.GetPortAsync(string.Empty, Guid.NewGuid(), Guid.NewGuid());
 
         // Assert
         if (!hasPort)

@@ -1,7 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Services;
-using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Tests.Helpers;
 using Grpc.Core;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -12,18 +10,12 @@ namespace AyBorg.Web.Tests.Services.Agent;
 public class RuntimeServiceTests
 {
     private static readonly NullLogger<RuntimeService> s_logger = new();
-    private readonly Mock<IStateService> _mockStateService = new();
     private readonly Mock<Runtime.RuntimeClient> _mockRuntimeClient = new();
     private readonly RuntimeService _service;
 
     public RuntimeServiceTests()
     {
-        _mockStateService.Setup(m => m.AgentState).Returns(new UiAgentState
-        {
-            UniqueName = "Test"
-        });
-
-        _service = new RuntimeService(s_logger, _mockStateService.Object, _mockRuntimeClient.Object);
+        _service = new RuntimeService(s_logger, _mockRuntimeClient.Object);
     }
 
     [Theory]
@@ -51,7 +43,7 @@ public class RuntimeServiceTests
         }
 
         // Act
-        SDK.System.Runtime.EngineMeta result = await _service.GetStatusAsync();
+        SDK.System.Runtime.EngineMeta result = await _service.GetStatusAsync(string.Empty);
 
         // Assert
         if (isSuccessful)
@@ -89,7 +81,7 @@ public class RuntimeServiceTests
         }
 
         // Act
-        SDK.System.Runtime.EngineMeta result = await _service.StartRunAsync(SDK.System.Runtime.EngineExecutionType.SingleRun);
+        SDK.System.Runtime.EngineMeta result = await _service.StartRunAsync(string.Empty, SDK.System.Runtime.EngineExecutionType.SingleRun);
 
         // Assert
         if (isSuccessful)
@@ -127,7 +119,7 @@ public class RuntimeServiceTests
         }
 
         // Act
-        SDK.System.Runtime.EngineMeta result = await _service.StopRunAsync();
+        SDK.System.Runtime.EngineMeta result = await _service.StopRunAsync(string.Empty);
 
         // Assert
         if (isSuccessful)
@@ -165,7 +157,7 @@ public class RuntimeServiceTests
         }
 
         // Act
-        SDK.System.Runtime.EngineMeta result = await _service.AbortRunAsync();
+        SDK.System.Runtime.EngineMeta result = await _service.AbortRunAsync(string.Empty);
 
         // Assert
         if (isSuccessful)

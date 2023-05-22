@@ -70,18 +70,19 @@ public class FlowService : IFlowService
     /// <summary>
     /// Gets the step.
     /// </summary>
+    /// <param name="agentUniqueName">Agent unique name.</param>
     /// <param name="originalStep">The original step.</param>
     /// <param name="iterationId">The iteration id.</param>
     /// <param name="updatePorts">if set to <c>true</c> [update ports].</param>
     /// <param name="skipOutputPorts">if set to <c>true</c> [skip output ports].</param>
     /// <returns>The step.</returns>
-    public async ValueTask<Step> GetStepAsync(Step originalStep, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true, bool asThumbnail = true)
+    public async ValueTask<Step> GetStepAsync(string agentUniqueName, Step originalStep, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true, bool asThumbnail = true)
     {
         try
         {
             var request = new GetFlowStepsRequest
             {
-                AgentUniqueName = _stateService.AgentState.UniqueName,
+                AgentUniqueName = agentUniqueName,
                 IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
             };
             request.StepIds.Add(originalStep.Id.ToString());
@@ -104,7 +105,7 @@ public class FlowService : IFlowService
                         // Nothing to do as we only need to update input ports
                         continue;
                     }
-                    ports.Add(await GetPortAsync(portModel.Id, iterationId, asThumbnail));
+                    ports.Add(await GetPortAsync(agentUniqueName, portModel.Id, iterationId, asThumbnail));
                 }
 
                 stepModel = stepModel with { Ports = ports };
@@ -300,16 +301,17 @@ public class FlowService : IFlowService
     /// <summary>
     /// Gets the port for the given iteration.
     /// </summary>
+    /// <param name="agentUniqueName">The agent unique name.</param>
     /// <param name="portId">The port identifier.</param>
     /// <param name="iterationId">The iteration identifier.</param>
     /// <returns></returns>
-    public async ValueTask<Port> GetPortAsync(Guid portId, Guid? iterationId = null, bool asThumbnail = true)
+    public async ValueTask<Port> GetPortAsync(string agentUniqueName, Guid portId, Guid? iterationId = null, bool asThumbnail = true)
     {
         try
         {
             var request = new GetFlowPortsRequest
             {
-                AgentUniqueName = _stateService.AgentState.UniqueName,
+                AgentUniqueName = agentUniqueName,
                 IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
             };
             request.PortIds.Add(portId.ToString());

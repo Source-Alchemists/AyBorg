@@ -9,7 +9,6 @@ namespace AyBorg.Web.Services.Agent;
 public class RuntimeService : IRuntimeService
 {
     private readonly ILogger<RuntimeService> _logger;
-    private readonly IStateService _stateService;
     private readonly Runtime.RuntimeClient _runtimeClient;
 
     /// <summary>
@@ -19,19 +18,11 @@ public class RuntimeService : IRuntimeService
     /// <param name="stateService">The state service.</param>
     /// <param name="runtimeClient">The runtime client.</param>
     public RuntimeService(ILogger<RuntimeService> logger,
-                            IStateService stateService,
                             Runtime.RuntimeClient runtimeClient)
     {
         _logger = logger;
-        _stateService = stateService;
         _runtimeClient = runtimeClient;
     }
-
-    /// <summary>
-    /// Gets the status.
-    /// </summary>
-    /// <returns>The status.</returns>
-    public ValueTask<EngineMeta> GetStatusAsync() => GetStatusAsync(_stateService.AgentState.UniqueName);
 
     /// <summary>
     /// Gets the status.
@@ -61,14 +52,14 @@ public class RuntimeService : IRuntimeService
     /// </summary>
     /// <param name="executionType">Type of the execution.</param>
     /// <returns>The status</returns>
-    public async ValueTask<EngineMeta> StartRunAsync(EngineExecutionType executionType)
+    public async ValueTask<EngineMeta> StartRunAsync(string serviceUniqueName, EngineExecutionType executionType)
     {
         try
         {
             _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Start run [{executionType}].", executionType);
             StartRunResponse response = await _runtimeClient.StartRunAsync(new StartRunRequest
             {
-                AgentUniqueName = _stateService.AgentState.UniqueName,
+                AgentUniqueName = serviceUniqueName,
                 EngineExecutionType = (int)executionType,
                 EngineId = string.Empty
             });
@@ -86,14 +77,14 @@ public class RuntimeService : IRuntimeService
     /// Stops the engine.
     /// </summary>
     /// <returns>The status</returns>
-    public async ValueTask<EngineMeta> StopRunAsync()
+    public async ValueTask<EngineMeta> StopRunAsync(string serviceUniqueName)
     {
         try
         {
             _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Stop run.");
             StopRunResponse response = await _runtimeClient.StopRunAsync(new StopRunRequest
             {
-                AgentUniqueName = _stateService.AgentState.UniqueName,
+                AgentUniqueName = serviceUniqueName,
                 EngineId = string.Empty
             });
 
@@ -110,14 +101,14 @@ public class RuntimeService : IRuntimeService
     /// Aborts the engine.
     /// </summary>
     /// <returns>The status</returns>
-    public async ValueTask<EngineMeta> AbortRunAsync()
+    public async ValueTask<EngineMeta> AbortRunAsync(string serviceUniqueName)
     {
         try
         {
             _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Abort run.");
             AbortRunResponse response = await _runtimeClient.AbortRunAsync(new AbortRunRequest
             {
-                AgentUniqueName = _stateService.AgentState.UniqueName,
+                AgentUniqueName = serviceUniqueName,
                 EngineId = string.Empty
             });
 

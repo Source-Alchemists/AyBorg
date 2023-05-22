@@ -116,7 +116,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         {
             try
             {
-                Step newStep = await FlowService.GetStepAsync(node.Step, iterationId);
+                Step newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, node.Step, iterationId);
                 if (newStep.Id != Guid.Empty)
                 {
                     await InvokeAsync(() => node.Update(newStep));
@@ -149,7 +149,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                     // Already exists
                     continue;
                 }
-                Step newStep = await FlowService.GetStepAsync(new Step { Id = stepId });
+                Step newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, new Step { Id = stepId });
                 await InvokeAsync(() => CreateAndAddNode(newStep));
             }
 
@@ -215,7 +215,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                     continue;
                 }
 
-                Step newStep = await FlowService.GetStepAsync(new Step { Id = stepId }, updatePorts: false);
+                Step newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, new Step { Id = stepId }, updatePorts: false);
                 await InvokeAsync(() =>
                 {
                     node.Update(newStep);
@@ -296,7 +296,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         if (linkModel.TargetPort != null)
         {
             var tp = (FlowPort)linkModel.TargetPort;
-            Port newPort = await FlowService.GetPortAsync(tp.Port.Id);
+            Port newPort = await FlowService.GetPortAsync(StateService.AgentState.UniqueName, tp.Port.Id);
             tp.Update(newPort);
         }
     }
@@ -405,7 +405,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             return;
         }
 
-        Port newPort = await FlowService.GetPortAsync(targetPort.Port.Id);
+        Port newPort = await FlowService.GetPortAsync(StateService.AgentState.UniqueName, targetPort.Port.Id);
         targetPort.Update(newPort);
     }
 

@@ -25,12 +25,12 @@ public partial class Editor : ComponentBase
     /// Gets or sets the service identifier.
     /// </summary>
     [Parameter]
-    public string ServiceId { get; set; } = string.Empty;
+    public string ServiceId { get; init; } = string.Empty;
 
-    [Inject] IRegistryService? RegistryService { get; set; }
-    [Inject] IProjectManagementService? ProjectManagementService { get; set; }
-    [Inject] IStateService StateService { get; set; } = null!;
-    [Inject] IDialogService DialogService { get; set; } = null!;
+    [Inject] IRegistryService? RegistryService { get; init; }
+    [Inject] IProjectManagementService? ProjectManagementService { get; init; }
+    [Inject] IStateService StateService { get; init; } = null!;
+    [Inject] IDialogService DialogService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; set; } = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -38,7 +38,6 @@ public partial class Editor : ComponentBase
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
-            _isLoading = true;
             _areSubComponentsHidden = true;
             await InvokeAsync(StateHasChanged);
             IEnumerable<ServiceInfoEntry> services = await RegistryService!.ReceiveServicesAsync();

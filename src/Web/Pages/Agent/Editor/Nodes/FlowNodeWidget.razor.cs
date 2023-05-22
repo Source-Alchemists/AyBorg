@@ -1,8 +1,7 @@
 using AyBorg.Diagrams.Core.Models;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.Web.Pages.Agent.Shared;
+using AyBorg.Web.Services;
 using Microsoft.AspNetCore.Components;
-using MudBlazor;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
@@ -11,7 +10,8 @@ namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 public partial class FlowNodeWidget : ComponentBase, IDisposable
 {
     [Parameter] public FlowNode Node { get; init; } = null!;
-    [Inject] IDialogService DialogService { get; init; } = null!;
+    [Inject] IStateService StateService { get; init; }
+    [Inject] NavigationManager NavigationManager { get; init; }
     private string NodeClass => Node.Selected ? "flow node box selected" : "flow node box";
 
     private IReadOnlyCollection<FlowPort> _outputPorts = Array.Empty<FlowPort>();
@@ -69,22 +69,9 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
         Node.Delete();
     }
 
-    private async void OnStepFullScreenClicked()
+    private void OnStepFullScreenClicked()
     {
-        var dialogOptions = new DialogOptions
-        {
-            FullScreen = true,
-            CloseButton = true,
-            CloseOnEscapeKey = true,
-            NoHeader = true
-        };
-        var dialogParameters = new DialogParameters
-        {
-            { "Node", Node }
-        };
-        IDialogReference dialog = DialogService.Show<StepDialog>($"Step: {Node.Step.Name}", dialogParameters, dialogOptions);
-        await dialog.Result;
-        await InvokeAsync(StateHasChanged);
+        NavigationManager.NavigateTo($"/agents/editor/{StateService.AgentState.UniqueName}/step/{Node.Step.Id}");
     }
 
     protected virtual void Dispose(bool disposing)
