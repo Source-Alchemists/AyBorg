@@ -3,6 +3,7 @@ using AyBorg.SDK.Common.Ports;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Shared;
 using Microsoft.AspNetCore.Components;
 using Toolbelt.Blazor.HotKeys2;
 
@@ -31,6 +32,17 @@ public partial class StepView : ComponentBase, IDisposable
     {
         base.OnInitialized();
         _hotKeysContext = HotKeys.CreateContext();
+        FlowService.PortValueChanged += OnPortValueChangedAsync;
+    }
+
+    private async void OnPortValueChangedAsync(object sender, PortValueChangedEventArgs args)
+    {
+        FlowPort targetPort = _ports.FirstOrDefault(p => p.Port.Id.Equals(args.Port.Id));
+        if (targetPort != null)
+        {
+            targetPort.Update(args.Port);
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -42,9 +54,11 @@ public partial class StepView : ComponentBase, IDisposable
             _step = await FlowService.GetStepAsync(UniqueName, new Step { Id = stepGuid }, null, true, false, false);
             _node = new FlowNode(_step);
             var flowPorts = new List<FlowPort>();
-            foreach(Port port in _step.Ports)
+
+            foreach (Port port in _step.Ports)
             {
-                flowPorts.Add(new FlowPort(_node, port));
+                var newPort = new FlowPort(_node, port);
+                flowPorts.Add(newPort);
             }
             _ports = flowPorts;
 
@@ -67,13 +81,13 @@ public partial class StepView : ComponentBase, IDisposable
             if (port.Direction == PortDirection.Input)
             {
                 FlowPort inputPort = _ports.FirstOrDefault(p => p.Port.Id.Equals(port.Id));
-                if(inputPort == null) continue;
+                if (inputPort == null) continue;
                 inputPort.Update(port);
             }
             else if (port.Direction == PortDirection.Output)
             {
                 FlowPort outputPort = _ports.FirstOrDefault(p => p.Port.Id.Equals(port.Id));
-                if(outputPort == null) continue;
+                if (outputPort == null) continue;
                 outputPort.Locked = true;
                 outputPort.Update(port);
             }

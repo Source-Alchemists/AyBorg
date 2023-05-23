@@ -1,9 +1,12 @@
 using AyBorg.SDK.Common.Models;
+using AyBorg.Web.Shared;
 
 namespace AyBorg.Web.Services.Agent;
 
 public interface IFlowService
 {
+    event EventHandler<PortValueChangedEventArgs> PortValueChanged;
+
     /// <summary>
     /// Gets the steps.
     /// </summary>

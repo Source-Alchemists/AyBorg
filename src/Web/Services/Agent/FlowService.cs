@@ -5,6 +5,7 @@ using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
+using AyBorg.Web.Shared;
 using AyBorg.Web.Shared.Models;
 using Grpc.Core;
 
@@ -16,6 +17,8 @@ public class FlowService : IFlowService
     private readonly IStateService _stateService;
     private readonly IRpcMapper _rpcMapper;
     private readonly Editor.EditorClient _editorClient;
+
+    public event EventHandler<PortValueChangedEventArgs> PortValueChanged = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FlowService"/> class.
@@ -358,6 +361,7 @@ public class FlowService : IFlowService
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 Port = _rpcMapper.ToRpc(port)
             });
+            PortValueChanged?.Invoke(this, new PortValueChangedEventArgs(port));
             return true;
         }
         catch (RpcException ex)
