@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Shared.Models;
+using AyBorg.Web.Shared.Utils;
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
@@ -34,7 +35,7 @@ public partial class ImageInputField : BaseInputField
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
-        _boundingClientRect = await JSRuntime.InvokeAsync<BoundingClientRect>("getElementBoundingClientRect", _imageContainerRef);
+        _boundingClientRect = await ElementUtils.GetBoundingClientRectangleAsync(JSRuntime, _imageContainerRef);
         _boundingClientRect = _boundingClientRect with { Width = _boundingClientRect.Width - 10 };
         await CalculateScaleFactorAndUpdateAsync();
     }

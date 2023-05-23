@@ -322,11 +322,16 @@ public class FlowServiceTests
         _mockEditorClient.Setup(m => m.UpdateFlowPortAsync(It.IsAny<UpdateFlowPortRequest>(), null, null, It.IsAny<CancellationToken>())).Returns(call);
 
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<PortDto>())).Returns(new Port());
+        bool called = false;
+        _service.PortValueChanged += (s, e) => {
+            called = true;
+        };
 
         // Act
         bool result = await _service.TrySetPortValueAsync(new Port());
 
         // Assert
         Assert.True(result);
+        Assert.True(called);
     }
 }
