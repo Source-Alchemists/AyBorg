@@ -69,14 +69,14 @@ else{
                     @foreach (var imagePort in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Brand ==
                     SDK.Common.Ports.PortBrand.Image))
                     {
-                        <MudTabPanel Icon="@Icons.Material.Filled.Input" Text="@imagePort.Name" Style="height: 100%">
+                        <MudTabPanel Icon="@Icons.Material.Filled.Input" Text="@imagePort.Name">
                             <PortResolver Node="@_node" Port="@imagePort" Ports="@_ports"  AlternativeMode/>
                         </MudTabPanel>
                     }
                     @foreach (var imagePort in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Brand ==
                     SDK.Common.Ports.PortBrand.Image))
                     {
-                        <MudTabPanel Icon="@Icons.Material.Filled.Output" Text="@imagePort.Name" Style="height: 100%">
+                        <MudTabPanel Icon="@Icons.Material.Filled.Output" Text="@imagePort.Name">
                             <PortResolver Node="@_node" Port="@imagePort" Ports="@_ports"  AlternativeMode/>
                         </MudTabPanel>
                     }

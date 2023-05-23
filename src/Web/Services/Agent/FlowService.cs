@@ -54,7 +54,7 @@ public class FlowService : IFlowService
             {
                 if (portModel.Brand == PortBrand.Image && portModel.Direction == PortDirection.Input)
                 {
-                    ports.Add(await LazyLoadImagePortAsync(portModel, null, true));
+                    ports.Add(await LazyLoadImagePortAsync(_stateService.AgentState.UniqueName, portModel, null, true));
                 }
                 else
                 {
@@ -325,7 +325,7 @@ public class FlowService : IFlowService
             Port portModel = _rpcMapper.FromRpc(resultPort);
             if (portModel.Brand == PortBrand.Image)
             {
-                return await LazyLoadImagePortAsync(portModel, iterationId, asThumbnail);
+                return await LazyLoadImagePortAsync(agentUniqueName, portModel, iterationId, asThumbnail);
             }
             else
             {
@@ -367,14 +367,14 @@ public class FlowService : IFlowService
         }
     }
 
-    private async ValueTask<Port> LazyLoadImagePortAsync(Port portModel, Guid? iterationId, bool asThumbnail)
+    private async ValueTask<Port> LazyLoadImagePortAsync(string agentUniqueName, Port portModel, Guid? iterationId, bool asThumbnail)
     {
         try
         {
             // Need to transfer the image
             AsyncServerStreamingCall<ImageChunkDto> imageResponse = _editorClient.GetImageStream(new GetImageStreamRequest
             {
-                AgentUniqueName = _stateService.AgentState.UniqueName,
+                AgentUniqueName = agentUniqueName,
                 PortId = portModel.Id.ToString(),
                 IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString(),
                 AsThumbnail = asThumbnail
