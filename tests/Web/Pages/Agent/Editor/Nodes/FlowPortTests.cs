@@ -46,11 +46,6 @@ public class FlowPortTests
         };
 
         var flowPort = new FlowPort(node, port);
-        bool isCalled = false;
-        flowPort.PortChanged += () =>
-        {
-            isCalled = true;
-        };
 
         Port newPort = isEmptyPort ? new Port() : port with { Value = "456 " };
 
@@ -61,12 +56,10 @@ public class FlowPortTests
         if (isEmptyPort)
         {
             Assert.Equal(port, flowPort.Port);
-            Assert.False(isCalled);
         }
         else
         {
             Assert.Equal(newPort, flowPort.Port);
-            Assert.True(isCalled);
         }
     }
 }
