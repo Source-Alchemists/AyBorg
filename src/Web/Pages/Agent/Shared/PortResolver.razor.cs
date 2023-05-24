@@ -29,7 +29,7 @@ public partial class PortResolver : ComponentBase
     {
         try
         {
-            FlowPort port = Ports.Cast<FlowPort>().First(p => p.Port.Id == e.Port.Id);
+            FlowPort port = Ports.First(p => p.Port.Id == e.Port.Id);
             SDK.Common.Models.Port newPort = port.Port with { Value = e.Value };
             port.Update(newPort);
             await FlowService.TrySetPortValueAsync(port.Port);
