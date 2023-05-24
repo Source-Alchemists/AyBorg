@@ -4,30 +4,30 @@
 @switch (Port.Brand)
 {
     case PortBrand.Numeric:
-        <NumericInputField Port="Port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" />
+        <NumericInputField Port="Port.Port" ValueChanged="@OnPortValueChangedAsync" Disabled="@Port.Locked" />
         break;
     case PortBrand.Boolean:
-        <BooleanInputField Port="Port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" />
+        <BooleanInputField Port="Port.Port" ValueChanged="@OnPortValueChangedAsync" Disabled="@Port.Locked" />
         break;
     case PortBrand.String:
-        <StringInputField Port="Port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" />
+        <StringInputField Port="Port.Port" ValueChanged="@OnPortValueChangedAsync" Disabled="@Port.Locked" />
         break;
     case PortBrand.Folder:
-        <DirectoryInputField Port="Port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" />
+        <DirectoryInputField Port="Port.Port" ValueChanged="@OnPortValueChangedAsync" Disabled="@Port.Locked" />
         break;
     case PortBrand.Image:
-        <ImageInputField Port="Port.Port" ShapePorts="_shapePorts" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" AlternativeMode="AlternativeMode" />
+        <ImageInputField Port="Port.Port" ShapePorts="_shapePorts" ValueChanged="@OnPortValueChangedAsync" Disabled="@Port.Locked" AlternativeMode="AlternativeMode" />
         break;
     case PortBrand.Rectangle:
-        <RectangleInputField Port="Port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" />
+        <RectangleInputField Port="Port.Port" ValueChanged="@OnPortValueChangedAsync" Disabled="@Port.Locked" />
         break;
     case PortBrand.Enum:
-        <EnumInputField Port="Port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" />
+        <EnumInputField Port="Port.Port" ValueChanged="@OnPortValueChangedAsync" Disabled="@Port.Locked" />
         break;
     case PortBrand.StringCollection:
     case PortBrand.NumericCollection:
     case PortBrand.RectangleCollection:
-        <CollectionField Port="Port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@Port.Locked" />
+        <CollectionField Port="Port.Port" ValueChanged="@OnPortValueChangedAsync" Disabled="@Port.Locked" />
         break;
     default:
         break;

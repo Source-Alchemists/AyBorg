@@ -1,6 +1,8 @@
 using AyBorg.Diagrams.Core.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.Web.Services;
+using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Shared;
 using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
@@ -9,7 +11,8 @@ namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
 
 public partial class FlowNodeWidget : ComponentBase, IDisposable
 {
-    [Parameter] public FlowNode Node { get; init; } = null!;
+    [Parameter] public FlowNode Node { get; init; }
+    [Inject] IFlowService FlowService { get; init; }
     [Inject] IStateService StateService { get; init; }
     [Inject] NavigationManager NavigationManager { get; init; }
     private string NodeClass => Node.Selected ? "flow node box selected" : "flow node box";
@@ -23,18 +26,21 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
         _inputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Left).Cast<FlowPort>().ToArray(); // Left for input
         _outputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Right).Cast<FlowPort>().ToArray(); // Right for output
 
-        Node.StepChanged += OnChangedAsync;
-        foreach (FlowPort ip in _inputPorts)
-        {
-            ip.PortChanged += OnChangedAsync;
-        }
+        Node.StepChanged += OnNodeChangedAsync;
+        FlowService.PortValueChanged += PortValueChanged;
 
         return base.OnInitializedAsync();
     }
 
-    private async void OnChangedAsync()
+    private async void OnNodeChangedAsync()
     {
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void PortValueChanged(object sender, PortValueChangedEventArgs args)
+    {
+        FlowPort targetPort = _inputPorts.FirstOrDefault(p => p.Port.Id.Equals(args.Port.Id));
+        targetPort?.Update(args.Port);
     }
 
     private static string GetPortClass(PortModel port)
@@ -80,11 +86,8 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
         {
             if (disposing)
             {
-                Node.StepChanged -= OnChangedAsync;
-                foreach (FlowPort ip in _inputPorts)
-                {
-                    ip.PortChanged -= OnChangedAsync;
-                }
+                Node.StepChanged -= OnNodeChangedAsync;
+                FlowService.PortValueChanged -= PortValueChanged;
             }
             _disposedValue = true;
         }

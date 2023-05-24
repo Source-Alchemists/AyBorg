@@ -27,11 +27,6 @@ public class FlowPort : PortModel
     public Port Port { get; private set; }
 
     /// <summary>
-    /// Called when a link is added or removed.
-    /// </summary>
-    public Action? PortChanged { get; set; }
-
-    /// <summary>
     /// Initializes a new instance of the <see cref="FlowPort"/> class.
     /// </summary>
     /// <param name="node">The node.</param>
@@ -52,6 +47,5 @@ public class FlowPort : PortModel
     {
         if (newPort.Id == Guid.Empty) return;
         Port = newPort;
-        PortChanged?.Invoke();
     }
 }

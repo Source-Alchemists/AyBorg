@@ -3,7 +3,6 @@ using AyBorg.SDK.Common.Ports;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
-using AyBorg.Web.Shared;
 using Microsoft.AspNetCore.Components;
 using Toolbelt.Blazor.HotKeys2;
 
@@ -32,17 +31,6 @@ public partial class StepView : ComponentBase, IDisposable
     {
         base.OnInitialized();
         _hotKeysContext = HotKeys.CreateContext();
-        FlowService.PortValueChanged += OnPortValueChangedAsync;
-    }
-
-    private async void OnPortValueChangedAsync(object sender, PortValueChangedEventArgs args)
-    {
-        FlowPort targetPort = _ports.FirstOrDefault(p => p.Port.Id.Equals(args.Port.Id));
-        if (targetPort != null)
-        {
-            targetPort.Update(args.Port);
-            await InvokeAsync(StateHasChanged);
-        }
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
