@@ -17,7 +17,7 @@ else
 {
 <MudToolBar Class="px-0">
     <MudGrid>
-        <MudItem xs="3">
+        <MudItem xs="4">
             <MudStack Row="true" Spacing="0">
             <MudTooltip Text="Draft" hidden="@(_projectState != ProjectState.Draft)">
                 <MudIcon Icon="@Icons.Filled.GppBad" Size="Size.Large" Color="Color.Error" />
@@ -35,14 +35,14 @@ else
             </MudStack>
         </MudItem>
 
-        <MudItem xs="6">
+        <MudItem xs="4">
             @if (!_areSubComponentsHidden)
             {
                 <RuntimeToolbar ServiceUniqueName="@_serviceUniqueName" />
             }
         </MudItem>
 
-        <MudItem xs="3">
+        <MudItem xs="4">
             <div style="float: right">
                 <MudTooltip Text="Save as draft">
                     <MudIconButton Icon="@Icons.Filled.SaveAlt" Color="Color.Primary" OnClick="@OnProjectSaveClicked"

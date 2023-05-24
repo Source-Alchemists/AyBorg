@@ -13,16 +13,16 @@ else{
 
 <MudToolBar Class="px-0">
     <MudGrid>
-        <MudItem xs="3">
+        <MudItem xs="4">
             <MudText Typo="Typo.h6" Class="pl-3">@_step.Name</MudText>
         </MudItem>
-        <MudItem xs="6">
+        <MudItem xs="4">
             <RuntimeToolbar ServiceUniqueName="@UniqueName" />
         </MudItem>
-        <MudItem xs="3" Class="overflow-y-auto" Style="height: 60px">
+        <MudItem xs="4" Class="overflow-y-auto" Style="height: 60px">
             @foreach (var category in _step.Categories)
             {
-                <MudChip Size="Size.Small" Text="@category" Disabled/>
+                <MudChip Size="Size.Small" Text="@category" Style="float: right" Disabled/>
             }
         </MudItem>
     </MudGrid>
