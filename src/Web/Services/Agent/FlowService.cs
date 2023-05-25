@@ -339,10 +339,6 @@ public class FlowService : IFlowService
         {
             _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting port!");
             return new Port();
-        }catch(NullReferenceException ex)
-        {
-            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting port!");
-            return new Port();
         }
     }
 

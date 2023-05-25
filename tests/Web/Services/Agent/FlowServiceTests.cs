@@ -88,7 +88,8 @@ public class FlowServiceTests
         }
 
         var getFlowPortsResponse = new GetFlowPortsResponse();
-        getFlowPortsResponse.Ports.Add(new PortDto {
+        getFlowPortsResponse.Ports.Add(new PortDto
+        {
             Id = Guid.NewGuid().ToString(),
             Name = "Test_name",
             Direction = (int)PortDirection.Output,
@@ -144,6 +145,19 @@ public class FlowServiceTests
         {
             Assert.Equal(Guid.Empty, result.Id);
         }
+    }
+
+    [Fact]
+    public async Task Test_GetStepAsync_RpcException()
+    {
+        // Arrange
+        _mockEditorClient.Setup(m => m.GetFlowStepsAsync(It.IsAny<GetFlowStepsRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
+
+        // Act
+        Step result = await _service.GetStepAsync(string.Empty, new Step(), Guid.NewGuid(), false, false);
+
+        // Assert
+        Assert.Equal(Guid.Empty, result.Id);
     }
 
     [Fact]
@@ -209,6 +223,19 @@ public class FlowServiceTests
 
         // Assert
         Assert.NotNull(result);
+    }
+
+    [Fact]
+    public async Task Test_AddStepAsync_RpcException()
+    {
+        // Arrange
+        _mockEditorClient.Setup(m => m.AddFlowStepAsync(It.IsAny<AddFlowStepRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
+
+        // Act
+        Step result = await _service.AddStepAsync(new Step());
+
+        // Assert
+        Assert.Null(result);
     }
 
     [Fact]
@@ -315,6 +342,19 @@ public class FlowServiceTests
     }
 
     [Fact]
+    public async Task Test_GetPortAsync_RpcException()
+    {
+        // Arrange
+        _mockEditorClient.Setup(m => m.GetFlowPortsAsync(It.IsAny<GetFlowPortsRequest>(), null, null, It.IsAny<CancellationToken>())).Throws(new RpcException(Status.DefaultCancelled));
+
+        // Act
+        Port result = await _service.GetPortAsync(string.Empty, Guid.NewGuid(), Guid.NewGuid());
+
+        // Assert
+        Assert.Equal(Guid.Empty, result.Id);
+    }
+
+    [Fact]
     public async Task Test_TrySetPortValueAsync()
     {
         // Arrange
@@ -323,7 +363,8 @@ public class FlowServiceTests
 
         _mockRpcMapper.Setup(m => m.FromRpc(It.IsAny<PortDto>())).Returns(new Port());
         bool called = false;
-        _service.PortValueChanged += (s, e) => {
+        _service.PortValueChanged += (s, e) =>
+        {
             called = true;
         };
 

@@ -53,6 +53,16 @@ else{
                         </MudListItem>
                     }
                 </MudList>
+                @if(!_ports.Any(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
+                {
+                    <div class="center relative">
+                        <LogoPlaceholder Watermark/>
+                        @if(!_isLoading)
+                        {
+                            <MudAlert Severity="Severity.Info">No <strong>input</strong> ports to display</MudAlert>
+                        }
+                    </div>
+                }
             </MudCardContent>
         </MudCard>
     </MudItem>
@@ -107,6 +117,16 @@ else{
                         </MudListItem>
                     }
                 </MudList>
+                @if(!_ports.Any(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
+                {
+                    <div class="center relative">
+                        <LogoPlaceholder Watermark/>
+                        @if(!_isLoading)
+                        {
+                            <MudAlert Severity="Severity.Info">No <strong>output</strong> ports to display</MudAlert>
+                        }
+                    </div>
+                }
             </MudCardContent>
         </MudCard>
     </MudItem>
