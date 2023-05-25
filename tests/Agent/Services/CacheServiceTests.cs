@@ -52,7 +52,7 @@ public class CacheServiceTests
         _service.CreateCache(iterationId, project);
 
         // Assert
-        Assert.Equal(2, _service.CacheSize);
+        Assert.Equal(4, _service.CacheSize);
     }
 
     [Theory]

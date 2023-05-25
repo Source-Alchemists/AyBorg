@@ -6,7 +6,7 @@ namespace AyBorg.Web.Pages.Agent.Shared;
 
 public partial class EditRectangleDialog : ComponentBase
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [CascadingParameter] MudDialogInstance MudDialog { get; init; } = null!;
     [Parameter] public Rectangle Rectangle { get; init; }
 
     private Rectangle _rectangle;

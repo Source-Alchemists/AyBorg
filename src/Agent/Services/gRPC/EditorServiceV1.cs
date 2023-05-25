@@ -290,12 +290,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid port id"));
         }
 
-        IPort port = _flowService.GetPort(portId);
-        if (port == null)
-        {
-            throw new RpcException(new Status(StatusCode.NotFound, "Port not found"));
-        }
-
+        IPort port = _flowService.GetPort(portId) ?? throw new RpcException(new Status(StatusCode.NotFound, "Port not found"));
         Port portModel;
         bool isOriginalPortModelCreated = false;
         if (iterationId != Guid.Empty)

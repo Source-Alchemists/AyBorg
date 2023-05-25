@@ -42,9 +42,16 @@ internal static class GrpcClientExtension
         {
             httpClientBuilder.AddCallCredentials(async (context, metaData, serviceProvider) =>
             {
-                ITokenProvider tokenProvider = serviceProvider.GetRequiredService<ITokenProvider>();
-                string token = await tokenProvider.GenerateTokenAsync();
-                metaData.Add("Authorization", $"Bearer {token}");
+                try
+                {
+                    ITokenProvider tokenProvider = serviceProvider.GetRequiredService<ITokenProvider>();
+                    string token = await tokenProvider.GenerateTokenAsync();
+                    metaData.Add("Authorization", $"Bearer {token}");
+                }
+                catch (ObjectDisposedException)
+                {
+                    // Nothing to do.
+                }
             });
         }
     }

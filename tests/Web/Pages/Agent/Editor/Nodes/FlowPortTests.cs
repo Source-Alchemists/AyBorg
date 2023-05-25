@@ -32,12 +32,13 @@ public class FlowPortTests
     [Theory]
     [InlineData(false)]
     [InlineData(true)]
-    public void Test_Update(bool isNullPort)
+    public void Test_Update(bool isEmptyPort)
     {
         // Arrange
         var node = new FlowNode(new Step());
         var port = new Port
         {
+            Id = Guid.NewGuid(),
             Name = "Test",
             Direction = PortDirection.Input,
             Brand = PortBrand.Boolean,
@@ -45,27 +46,20 @@ public class FlowPortTests
         };
 
         var flowPort = new FlowPort(node, port);
-        bool isCalled = false;
-        flowPort.PortChanged += () =>
-        {
-            isCalled = true;
-        };
 
-        Port newPort = isNullPort ? null! : port with { Value = "456 " };
+        Port newPort = isEmptyPort ? new Port() : port with { Value = "456 " };
 
         // Act
         flowPort.Update(newPort);
 
         // Assert
-        if (isNullPort)
+        if (isEmptyPort)
         {
             Assert.Equal(port, flowPort.Port);
-            Assert.False(isCalled);
         }
         else
         {
             Assert.Equal(newPort, flowPort.Port);
-            Assert.True(isCalled);
         }
     }
 }

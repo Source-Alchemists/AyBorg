@@ -46,9 +46,10 @@ public class FlowNodeTests
     }
 
     [Theory]
-    [InlineData(false)]
-    [InlineData(true)]
-    public void Test_Update(bool isNullPort)
+    [InlineData(false, false)]
+    [InlineData(false, true)]
+    [InlineData(true, false)]
+    public void Test_Update(bool isNullPort, bool hasDifferentId)
     {
         // Arrange
         var step = new Step
@@ -81,7 +82,8 @@ public class FlowNodeTests
         var ports = new List<Port>();
         if(!isNullPort)
         {
-            ports.Add(step.Ports.First() with { Value = "456" });
+            Port firstPort = step.Ports.First();
+            ports.Add(firstPort with { Value = "456", Id = hasDifferentId ? Guid.NewGuid() : firstPort.Id });
         }
 
         Step newStep = isNullPort ? step with { ExecutionTimeMs = 1, Ports = new List<Port> { new Port() }}
@@ -98,10 +100,13 @@ public class FlowNodeTests
             Assert.Equal(1, flowNode.Step.ExecutionTimeMs);
             Assert.Equal(step.Ports.First(), ((FlowPort)flowNode.Ports[0]).Port);
         }
-        else
+        else if(!isNullPort && !hasDifferentId)
         {
             Assert.Equal(1, flowNode.Step.ExecutionTimeMs);
             Assert.Equal("456", ((FlowPort)flowNode.Ports[0]).Port.Value);
+        } else {
+            Assert.Equal(1, flowNode.Step.ExecutionTimeMs);
+            Assert.Equal("123", ((FlowPort)flowNode.Ports[0]).Port.Value);
         }
     }
 

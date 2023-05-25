@@ -110,14 +110,14 @@ public partial class FlowDiagram : ComponentBase, IDisposable
 
     private async void IterationFinishedNotificationReceived(object obj)
     {
-        try
+        Guid iterationId = (Guid)obj;
+        IEnumerable<FlowNode> flowNodes = _diagram.Nodes.Cast<FlowNode>();
+        await Parallel.ForEachAsync(flowNodes, async (node, token) =>
         {
-            Guid iterationId = (Guid)obj;
-            IEnumerable<FlowNode> flowNodes = _diagram.Nodes.Cast<FlowNode>();
-            await Parallel.ForEachAsync(flowNodes, async (node, token) =>
+            try
             {
-                Step newStep = await FlowService.GetStepAsync(node.Step.Id, iterationId);
-                if (newStep != null)
+                Step newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, node.Step, iterationId);
+                if (newStep.Id != Guid.Empty)
                 {
                     await InvokeAsync(() => node.Update(newStep));
                 }
@@ -125,12 +125,12 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                 {
                     Logger.LogWarning("Step not found");
                 }
-            });
-        }
-        catch (RpcException ex)
-        {
-            Logger.LogWarning(ex, "Failed to get step");
-        }
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Error updating step");
+            }
+        });
     }
 
     private async void FlowChangedNotificationReceived(object obj)
@@ -149,7 +149,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                     // Already exists
                     continue;
                 }
-                Step newStep = await FlowService.GetStepAsync(stepId);
+                Step newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, new Step { Id = stepId });
                 await InvokeAsync(() => CreateAndAddNode(newStep));
             }
 
@@ -215,7 +215,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                     continue;
                 }
 
-                Step newStep = await FlowService.GetStepAsync(stepId, updatePorts: false);
+                Step newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, new Step { Id = stepId }, updatePorts: false);
                 await InvokeAsync(() =>
                 {
                     node.Update(newStep);
@@ -296,7 +296,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         if (linkModel.TargetPort != null)
         {
             var tp = (FlowPort)linkModel.TargetPort;
-            Port newPort = await FlowService.GetPortAsync(tp.Port.Id);
+            Port newPort = await FlowService.GetPortAsync(StateService.AgentState.UniqueName, tp.Port.Id);
             tp.Update(newPort);
         }
     }
@@ -332,7 +332,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         }
 
         Guid? newLinkId = await FlowService.AddLinkAsync(sourcePort.Port, targetPort.Port);
-        if(newLinkId == null)
+        if (newLinkId == null)
         {
             Snackbar.Add("Link is not compatible", Severity.Warning);
             _diagram.Links.Remove(tmpLink);
@@ -405,7 +405,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             return;
         }
 
-        Port newPort = await FlowService.GetPortAsync(targetPort.Port.Id);
+        Port newPort = await FlowService.GetPortAsync(StateService.AgentState.UniqueName, targetPort.Port.Id);
         targetPort.Update(newPort);
     }
 
@@ -455,7 +455,8 @@ public partial class FlowDiagram : ComponentBase, IDisposable
 
     private void OnZoomInClicked() => _diagram.SetZoom(_diagram.Zoom + 0.1);
     private void OnZoomOutClicked() => _diagram.SetZoom(_diagram.Zoom - 0.1);
-    private void OnZoomResetClicked() {
+    private void OnZoomResetClicked()
+    {
         _diagram.SetZoom(1.0);
         OnCenterViewClicked();
     }

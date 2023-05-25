@@ -19,15 +19,19 @@ legend {
 .mud-full-height {
     height: calc(100%);
 }
-
 .mud-drawer {
     position: fixed !important;
 }
-
 .mud-card-header {
     border-bottom: 4px solid;
     border-image-slice: 1;
     border-image-source: linear-gradient(to left, var(--mud-palette-primary), var(--mud-palette-secondary));
+}
+.mud-tabs-panels {
+    height: 100%;
+}
+.overflow-scroll {
+    overflow: auto;
 }
 
 /*Blazor error message*/

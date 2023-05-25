@@ -1,5 +1,5 @@
-﻿@using AyBorg.Web.Pages.Agent.Shared.Fields
-@using AyBorg.Diagrams.Components.Renderers
+﻿@using AyBorg.Diagrams.Components.Renderers
+@using AyBorg.Web.Pages.Agent.Shared
 @using SDK.Common.Ports
 
 <MudCard Class="@NodeClass">
@@ -7,7 +7,7 @@
 		<MudText>@Node!.Title</MudText>
 	</MudCardHeader>
 	<MudCardContent Class="pt-10 pb-0">
-		@foreach (var port in _outputPorts.Cast<FlowPort>())
+		@foreach (var port in _outputPorts)
 		{
 			<div Class="mud-full-width" Style="height: 40px">
 				<div Style="position: relative; float: right">
@@ -19,49 +19,24 @@
 			</div>
 
 		}
-		@foreach (var port in _inputPorts.Cast<FlowPort>())
+		@foreach (var port in _inputPorts)
 		{
 			<div Style="position: absolute; float: left; left: -6px">
 				<MudTooltip Text="@port.Brand.ToString()">
 					<PortRenderer Port="port" class="@GetPortClass(port)"></PortRenderer>
 				</MudTooltip>
 			</div>
-			@switch (port.Brand)
-			{
-				case PortBrand.Numeric:
-					<NumericInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
-					break;
-				case PortBrand.Boolean:
-					<BooleanInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
-					break;
-				case PortBrand.String:
-					<StringInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
-					break;
-				case PortBrand.Folder:
-					<DirectoryInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
-					break;
-				case PortBrand.Image:
-					<ImageInputField Port="port.Port" ShapePorts="_rectangleInputPorts" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
-					break;
-				case PortBrand.Rectangle:
-					<RectangleInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
-					break;
-				case PortBrand.Enum:
-					<EnumInputField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
-					break;
-                case PortBrand.StringCollection:
-                case PortBrand.NumericCollection:
-                case PortBrand.RectangleCollection:
-                    <CollectionField Port="port.Port" ValueChanged="OnPortValueChangedAsync" Disabled="@port.Locked" />
-                    break;
-				default:
-					break;
-			}
+            <PortResolver Port="@port" Ports="@_inputPorts" />
 		}
 	</MudCardContent>
 	<MudCardActions>
 		<div Class="mud-full-width" Style="height: 42px">
-			<MudIconButton Icon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@(OnRemoveNode)" Style="float: left" hidden="@(!Node.Selected || Node.Locked)" />
+            <MudTooltip Text="Full Screen" hidden="@(!Node.Selected || Node.Locked)">
+                <MudIconButton Icon="@Icons.Material.Filled.Fullscreen" Color="Color.Default" OnClick="@OnStepFullScreenClicked" Style="float: left" />
+            </MudTooltip>
+            <MudTooltip Text="Delete" hidden="@(!Node.Selected || Node.Locked)">
+			    <MudIconButton Icon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@OnRemoveNodeClicked" Style="float: left" />
+            </MudTooltip>
 			<span Style="float: right" Class="pr-3 pt-4">@Node!.Step!.ExecutionTimeMs ms</span>
 		</div>
 	</MudCardActions>

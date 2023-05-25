@@ -1,9 +1,12 @@
 using AyBorg.SDK.Common.Models;
+using AyBorg.Web.Shared;
 
 namespace AyBorg.Web.Services.Agent;
 
 public interface IFlowService
 {
+    event EventHandler<PortValueChangedEventArgs> PortValueChanged;
+
     /// <summary>
     /// Gets the steps.
     /// </summary>
@@ -57,20 +60,24 @@ public interface IFlowService
     /// <summary>
     /// Gets the port for the given iteration.
     /// </summary>
+    /// <param name="agentUniqueName">The agent unique name.</param>
     /// <param name="portId">The port identifier.</param>
     /// <param name="iterationId">The iteration identifier.</param>
+    /// <param name="asThumbnail">Whether to get the thumbnail.</param>
     /// <returns></returns>
-    ValueTask<Port> GetPortAsync(Guid portId, Guid? iterationId = null);
+    ValueTask<Port> GetPortAsync(string agentUniqueName, Guid portId, Guid? iterationId = null, bool asThumbnail = true);
 
     /// <summary>
     /// Gets the step.
     /// </summary>
-    /// <param name="stepId">The step id.</param>
+    /// <param name="agentUniqueName">The agent unique name.</param>
+    /// <param name="originalStep">The original step.</param>
     /// <param name="iterationId">The iteration id.</param>
     /// <param name="updatePorts">Whether to update the ports.</param>
     /// <param name="skipOutputPorts">Whether to skip output ports.</param>
+    /// <param name="asThumbnail">Whether to get the thumbnail.</param>
     /// <returns>The step.</returns>
-    ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true);
+    ValueTask<Step> GetStepAsync(string agentUniqueName, Step originalStep, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true, bool asThumbnail = true);
 
     /// <summary>
     /// Gets the link.

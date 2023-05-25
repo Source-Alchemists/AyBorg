@@ -3,7 +3,9 @@ using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Models;
+using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
+using AyBorg.Web.Shared;
 using AyBorg.Web.Shared.Models;
 using Grpc.Core;
 
@@ -15,6 +17,8 @@ public class FlowService : IFlowService
     private readonly IStateService _stateService;
     private readonly IRpcMapper _rpcMapper;
     private readonly Editor.EditorClient _editorClient;
+
+    public event EventHandler<PortValueChangedEventArgs> PortValueChanged = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="FlowService"/> class.
@@ -51,7 +55,14 @@ public class FlowService : IFlowService
             var ports = new List<Port>();
             foreach (Port portModel in stepModel.Ports!)
             {
-                ports.Add(await LazyLoadAsync(portModel, null));
+                if (portModel.Brand == PortBrand.Image && portModel.Direction == PortDirection.Input)
+                {
+                    ports.Add(await LazyLoadImagePortAsync(_stateService.AgentState.UniqueName, portModel, null, true));
+                }
+                else
+                {
+                    ports.Add(portModel);
+                }
             }
             result.Add(stepModel with { Ports = ports });
         }
@@ -62,44 +73,53 @@ public class FlowService : IFlowService
     /// <summary>
     /// Gets the step.
     /// </summary>
-    /// <param name="stepId">The step id.</param>
+    /// <param name="agentUniqueName">Agent unique name.</param>
+    /// <param name="originalStep">The original step.</param>
     /// <param name="iterationId">The iteration id.</param>
     /// <param name="updatePorts">if set to <c>true</c> [update ports].</param>
     /// <param name="skipOutputPorts">if set to <c>true</c> [skip output ports].</param>
     /// <returns>The step.</returns>
-    public async ValueTask<Step> GetStepAsync(Guid stepId, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true)
+    public async ValueTask<Step> GetStepAsync(string agentUniqueName, Step originalStep, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true, bool asThumbnail = true)
     {
-        var request = new GetFlowStepsRequest
+        try
         {
-            AgentUniqueName = _stateService.AgentState.UniqueName,
-            IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
-        };
-        request.StepIds.Add(stepId.ToString());
-        GetFlowStepsResponse response = await _editorClient.GetFlowStepsAsync(request);
-        StepDto? resultStep = response.Steps.FirstOrDefault();
-        if (resultStep == null)
-        {
-            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), "Could not find step with id [{stepId}] in iteration [{iterationId}]!", stepId, iterationId);
-            return null!;
-        }
-
-        Step stepModel = _rpcMapper.FromRpc(resultStep);
-        if (updatePorts)
-        {
-            var ports = new List<Port>();
-            foreach (Port portModel in stepModel.Ports!)
+            var request = new GetFlowStepsRequest
             {
-                if (portModel.Direction == SDK.Common.Ports.PortDirection.Output && skipOutputPorts)
-                {
-                    // Nothing to do as we only need to update input ports
-                    continue;
-                }
-                ports.Add(await LazyLoadAsync(portModel, iterationId));
+                AgentUniqueName = agentUniqueName,
+                IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
+            };
+            request.StepIds.Add(originalStep.Id.ToString());
+            GetFlowStepsResponse response = await _editorClient.GetFlowStepsAsync(request);
+            StepDto? resultStep = response.Steps.FirstOrDefault();
+            if (resultStep == null)
+            {
+                _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), "Could not find step with id [{stepId}] in iteration [{iterationId}]!", originalStep.Id, iterationId);
+                return new Step();
             }
 
-            stepModel = stepModel with { Ports = ports };
+            Step stepModel = _rpcMapper.FromRpc(resultStep);
+            if (updatePorts)
+            {
+                var ports = new List<Port>();
+                foreach (Port portModel in stepModel.Ports!)
+                {
+                    if (portModel.Direction == PortDirection.Output && skipOutputPorts)
+                    {
+                        // Nothing to do as we only need to update input ports
+                        continue;
+                    }
+                    ports.Add(await GetPortAsync(agentUniqueName, portModel.Id, iterationId, asThumbnail));
+                }
+
+                stepModel = stepModel with { Ports = ports };
+            }
+            return stepModel;
         }
-        return stepModel;
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting step!");
+            return new Step();
+        }
     }
 
     /// <summary>
@@ -284,26 +304,42 @@ public class FlowService : IFlowService
     /// <summary>
     /// Gets the port for the given iteration.
     /// </summary>
+    /// <param name="agentUniqueName">The agent unique name.</param>
     /// <param name="portId">The port identifier.</param>
     /// <param name="iterationId">The iteration identifier.</param>
     /// <returns></returns>
-    public async ValueTask<Port> GetPortAsync(Guid portId, Guid? iterationId = null)
+    public async ValueTask<Port> GetPortAsync(string agentUniqueName, Guid portId, Guid? iterationId = null, bool asThumbnail = true)
     {
-        var request = new GetFlowPortsRequest
+        try
         {
-            AgentUniqueName = _stateService.AgentState.UniqueName,
-            IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
-        };
-        request.PortIds.Add(portId.ToString());
-        GetFlowPortsResponse response = await _editorClient.GetFlowPortsAsync(request);
-        PortDto? resultPort = response.Ports.FirstOrDefault();
-        if (resultPort == null)
-        {
-            return null!;
-        }
+            var request = new GetFlowPortsRequest
+            {
+                AgentUniqueName = agentUniqueName,
+                IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString()
+            };
+            request.PortIds.Add(portId.ToString());
+            GetFlowPortsResponse response = await _editorClient.GetFlowPortsAsync(request);
+            PortDto? resultPort = response.Ports.FirstOrDefault();
+            if (resultPort == null)
+            {
+                return new Port();
+            }
 
-        Port portModel = _rpcMapper.FromRpc(resultPort);
-        return await LazyLoadAsync(portModel, iterationId);
+            Port portModel = _rpcMapper.FromRpc(resultPort);
+            if (portModel.Brand == PortBrand.Image)
+            {
+                return await LazyLoadImagePortAsync(agentUniqueName, portModel, iterationId, asThumbnail);
+            }
+            else
+            {
+                return portModel;
+            }
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting port!");
+            return new Port();
+        }
     }
 
     /// <summary>
@@ -321,6 +357,7 @@ public class FlowService : IFlowService
                 AgentUniqueName = _stateService.AgentState.UniqueName,
                 Port = _rpcMapper.ToRpc(port)
             });
+            PortValueChanged?.Invoke(this, new PortValueChangedEventArgs(port));
             return true;
         }
         catch (RpcException ex)
@@ -330,24 +367,27 @@ public class FlowService : IFlowService
         }
     }
 
-    private async ValueTask<Port> LazyLoadAsync(Port portModel, Guid? iterationId)
+    private async ValueTask<Port> LazyLoadImagePortAsync(string agentUniqueName, Port portModel, Guid? iterationId, bool asThumbnail)
     {
-        if (portModel.Brand == SDK.Common.Ports.PortBrand.Image && portModel.Direction == SDK.Common.Ports.PortDirection.Input)
+        try
         {
             // Need to transfer the image
             AsyncServerStreamingCall<ImageChunkDto> imageResponse = _editorClient.GetImageStream(new GetImageStreamRequest
             {
-                AgentUniqueName = _stateService.AgentState.UniqueName,
+                AgentUniqueName = agentUniqueName,
                 PortId = portModel.Id.ToString(),
                 IterationId = iterationId == null ? Guid.Empty.ToString() : iterationId.ToString(),
-                AsThumbnail = true
+                AsThumbnail = asThumbnail
 
             });
 
             return portModel with { Value = await CreateImageFromChunksAsync(imageResponse, true) };
         }
-
-        return portModel;
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting image port!");
+            return portModel;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

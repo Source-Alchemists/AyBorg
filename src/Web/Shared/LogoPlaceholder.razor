@@ -1,0 +1,19 @@
+<MudImage Src="icons/logo.svg" Class="mud-full-width mud-full-height" Style="@_style" />
+
+@code {
+    private string _style = "filter: grayscale(1); opacity: 0.5";
+    [Parameter] public bool Watermark { get; init; } = false;
+
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        if (Watermark)
+        {
+            _style = "filter: grayscale(1); opacity: 0.5";
+        }
+        else
+        {
+            _style = string.Empty;
+        }
+    }
+}

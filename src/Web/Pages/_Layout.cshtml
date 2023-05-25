@@ -25,6 +25,7 @@
     <link href="css/colors.css" rel="stylesheet" />
     <link href="css/backbone.css" rel="stylesheet" />
     <link href="css/styles.css" rel="stylesheet" />
+    <link href="AyBorg.Web.styles.css" rel="stylesheet" />
 
     <script>
         function switchTheme(dark) {
@@ -43,6 +44,11 @@
             a.target = "_self";
             a.click();
             URL.revokeObjectURL(exportUrl);
+        }
+    </script>
+    <script>
+        function getElementBoundingClientRect(element) {
+            return element.getBoundingClientRect();
         }
     </script>
 

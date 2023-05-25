@@ -50,7 +50,7 @@ public class FlowNode : NodeModel
 
         foreach (FlowPort targetFlowPort in Ports.Cast<FlowPort>())
         {
-            Port sourcePort = newStep.Ports!.FirstOrDefault(p => p.Id.Equals(targetFlowPort.Port.Id))!;
+            Port sourcePort = newStep.Ports!.FirstOrDefault(p => p != null && p.Id.Equals(targetFlowPort.Port.Id))!;
             if (sourcePort == null)
             {
                 continue;

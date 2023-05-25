@@ -1,38 +1,68 @@
 @inherits BaseInputField
 
-<div Class="flow-node-field mud-full-width px-1 mb-4">
-    <span>@Port.Name</span>
-    <div class="mud-width-full" Style="height: 250px">
-        @if (!string.IsNullOrEmpty(_imageUrl) && _imagePosition.Width > 0 && _imagePosition.Height > 0)
+<div class="mud-full-width mud-full-height relative">
+    @if (AlternativeMode)
+    {
+        <MudToolBar>
+            <MudSpacer />
+            <MudButtonGroup Variant="Variant.Filled" Color="Color.Default" DisableElevation>
+                <MudTooltip Text="Zoom in">
+                    <MudIconButton Icon="@Icons.Filled.ZoomIn" OnClick="@OnZoomIn" />
+                </MudTooltip>
+                <MudTooltip Text="Fit to screen">
+                    <MudIconButton Icon="@Icons.Material.Filled.FitScreen" OnClick="@OnFitToScreen" />
+                </MudTooltip>
+                <MudTooltip Text="Zoom out">
+                    <MudIconButton Icon="@Icons.Filled.ZoomOut" OnClick="@OnZoomOut" />
+                </MudTooltip>
+            </MudButtonGroup>
+            <MudSpacer />
+        </MudToolBar>
+    }
+    else
+    {
+        <span>@Port.Name</span>
+    }
+
+    <div @ref="@_imageContainerRef" class="@_imageContainerClasses" style="@_imageContainerStyle">
+        @if (!string.IsNullOrEmpty(_imageUrl) && _imageInfo.Width > 0 && _imageInfo.Height > 0)
         {
-            <div class="mud-height-full mud-width-full d-flex justify-center">
-                <MudTooltip Text="@ImageTooltip">
-                    <svg width="@SVG_WIDTH" height="@SVG_HEIGHT">
+            <MudTooltip Text="@ImageTooltip"
+                RootClass="mud-full-width mud-full-height overflow-auto">
+                <div style="text-align: center">
+                    <svg preserveAspectRatio="none" width="@_svgWidth" height="@_svgHeight">
                         <defs>
                             <mask id="@_maskId">
-                                @if(_labelRectangles.Any())
+                                @if (_labelRectangles.Any())
                                 {
-                                    <rect x="@_imagePosition.X" y="@_imagePosition.Y" width="@_imagePosition.Width" height="@_imagePosition.Height" fill="white" />
+                                    <rect x="@_imageInfo.X" y="@_imageInfo.Y" width="@_imageInfo.Width"
+                                        height="@_imageInfo.Height" fill="white" />
                                 }
                                 @foreach (var rectangle in _labelRectangles)
                                 {
-                                    <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height" fill="black" />
+                                    <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height"
+                                        fill="black" />
                                 }
                             </mask>
                         </defs>
-                        <image href="@_imageUrl" x="@_imagePosition.X" y="@_imagePosition.Y" width="@_imagePosition.Width" height="@_imagePosition.Height" />
-                        <rect x="@_imagePosition.X" y="@_imagePosition.Y" width="@_imagePosition.Width" height="@_imagePosition.Height" fill="#00000091" mask="url(#@_maskId)" />
-                        @foreach (var rectangle in _labelRectangles)
-                        {
-                            <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height" style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:2" />
-                        }
+                        <g transform="scale(@_svgScaleFactor)">
+                            <image href="@_imageUrl" x="@_imageInfo.X" y="@_imageInfo.Y" width="@_imageInfo.Width"
+                                height="@_imageInfo.Height" />
+                            <rect x="@_imageInfo.X" y="@_imageInfo.Y" width="@_imageInfo.Width"
+                                height="@_imageInfo.Height" fill="#00000091" mask="url(#@_maskId)" />
+                            @foreach (var rectangle in _labelRectangles)
+                            {
+                                <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height"
+                                    style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:2" />
+                            }
+                        </g>
                     </svg>
-                </MudTooltip>
-            </div>
+                </div>
+            </MudTooltip>
         }
         else
         {
-            <MudImage Src="icons/logo.svg" Style="width: 100%; height: 100%; filter: grayscale(1); opacity: 0.5" />
+            <LogoPlaceholder Watermark/>
         }
     </div>
 </div>

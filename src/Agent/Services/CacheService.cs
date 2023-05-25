@@ -84,13 +84,8 @@ internal sealed class CacheService : ICacheService
         var cachedPorts = new HashSet<Port>();
         foreach (IPort port in step.Ports)
         {
-            // Only input ports that are connected to another port are cached.
-            // All other ports are not changing there displayed value at real time.
-            if (port.Direction == PortDirection.Input && port.IsConnected)
-            {
-                Port cachedPort = CreatePortEntry(iterationId, port);
-                cachedPorts.Add(cachedPort);
-            }
+            Port cachedPort = CreatePortEntry(iterationId, port);
+            cachedPorts.Add(cachedPort);
         }
 
         cachedStep.Ports = cachedPorts;
