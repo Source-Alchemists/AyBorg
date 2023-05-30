@@ -39,11 +39,11 @@ public class ImageAiVialDetectTests
 
         // Assert
         Assert.True(result);
-        Assert.Single(regionsPort.Value);
-        Assert.Single(labelsPort.Value);
-        Assert.Single(scoresPort.Value);
-
-        Assert.All(labelsPort.Value, v => v.Equals("Vial"));
+        Assert.Equal(2, regionsPort.Value.Count);
+        Assert.Equal(2, labelsPort.Value.Count);
+        Assert.Equal(2, scoresPort.Value.Count);
+        Assert.Single(labelsPort.Value.Where(p => p.Equals("Cap")));
+        Assert.Single(labelsPort.Value.Where(p => p.Equals("Vial")));
     }
 
     [Fact]
