@@ -1,0 +1,83 @@
+---
+title: Home
+layout: default
+description: Use the Argon Jekyll theme to build a landing page, blog or complete website.
+featured_image: /assets/img/social.jpg
+---
+
+<!--Replace this page with your landing page content -->
+{% if site.data.settings.home_settings.theme == "landing" %}
+  {% include home-sample.html %}
+  <div class="features-7 fullWidth contentWrapper">
+    <div class="container mb-2">
+    <div class="row">
+        <div class="col-md-8 text-center mx-auto">
+            <h3 class="display-2">Blog</h3>
+            <p class="lead pb-5">The latest posts from our blog</p>
+        </div>
+    </div>
+    
+    </div>
+  </div>
+  {% include blogsHome.html %}
+{% endif %}
+
+{% if site.data.settings.home_settings.theme == "blog" %}
+  <!-- Or turn your homepage into just a blog -->
+  {% if site.data.settings.blog_settings.theme == "narrow" %}
+  <div class="page-header page-header-small bg-secondary fullWidth ">
+      <div class="container contentWrapper">
+        <div class="row">
+          <div class="col-lg-10 mx-auto text-center pt-4">
+            <h2 class="display-2">Blog</h2>
+            <h2 class="lead pl-5 pr-5 pb-3 text-center">The latest posts from our blog</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <section class="blog main-raised">
+          {% include blogsHome.html %}  
+      </section>
+          
+  {% endif %}
+
+  {% if site.data.settings.blog_settings.theme == "basic" %}
+  <div class="page-header page-header-small bg-secondary fullWidth ">
+      <div class="container contentWrapper">
+        <div class="row">
+          <div class="col-lg-10 mx-auto text-center pt-4">
+            <h2 class="display-2">Blog</h2>
+            <h2 class="lead pl-5 pr-5 pb-3 text-center">The latest posts from our blog</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <section class="blog mt-5">
+          {% include blogsHome.html %}  
+      </section>
+          
+  {% endif %}
+
+  {% if site.data.settings.blog_settings.theme == "grid" %}
+  <div class="page-header page-header-small bg-secondary fullWidth ">
+      <div class="container contentWrapper">
+        <div class="row">
+          <div class="col-lg-10 mx-auto text-center pt-4">
+            <h2 class="display-2">Blog</h2>
+            <h2 class="lead pl-5 pr-5 pb-3 text-center">The latest posts from our blog</h2>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      <section class="blog">
+          {% include blogsHome.html %}  
+      </section>
+          
+  {% endif %}
+
+{% endif %}
+
+

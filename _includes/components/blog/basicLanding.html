@@ -1,0 +1,63 @@
+<section class="blogs-3">
+    <div class="container">
+        {% assign psize = site.posts | size %}
+        {% if psize == 0 %}
+        <p>No posts...yet.</p>
+        {% endif %}
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                {% for post in site.posts limit:3 %}
+                <div class="card card-blog card-plain blog-horizontal mb-5">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4">
+                            <div class="card-image shadow">
+                                <a href="{{ post.url | relative_url }}">
+                                    <img class="img rounded" src="{{ post.featured_image | relative_url }}">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-8 col-md-8">
+                            <div class="">
+                                <h3 class="card-title">
+                                    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                                </h3>
+                                <p class="card-description">
+                                    {{ post.description }} <a href="{{ post.url | relative_url }}"> Read More </a>
+                                </p>
+                                {% for author in site.data.settings.authors %}
+                                    {% if post.author == author[1].name %}
+                                        <div class="author">
+                                            <img src=" {{author[1].picture | relative_url}}" alt="..." class="avatar img-raised">
+                                            <div class="text">
+                                            <span class="name">{{author[1].name}}</span>
+                                            <div class="meta">{{ post.date | date_to_long_string }}</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}  
+                {% if psize > 6 %}
+                <div class="container mb-2 mt-2">
+                    <div class="row">
+                        <section class="pagination mr-0 ml-auto mt-2 mb-3">
+                            <div class="col-lg-12">
+                                <div class="float-right">
+                                    <a href="{{ '/blog/page2/' | relative_url }}"
+                                        class="button button--light pagination__next"><span>Older Posts</span> <i
+                                            class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            {% endif %}
+
+            </div>
+        </div>
+    </div>
+</section>

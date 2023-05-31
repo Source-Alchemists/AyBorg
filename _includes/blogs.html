@@ -1,0 +1,192 @@
+{% if site.data.settings.blog_settings.theme == "grid" %}
+<section class="blogs-4 fullWidth">
+    <div class="container-fluid">
+        {% assign psize = site.posts | size %}
+        {% if psize == 0 %}
+        <p>No posts...yet.</p>
+        {% endif %}
+        <div class="row">
+            {% for post in paginator.posts %}
+            <div class="col-lg-4">
+                <div class="card card-blog card-background" data-animation="zooming">
+                    <div class="full-background" style="background-image: url({{ post.featured_image | relative_url }})"></div>
+                    <a href="{{ post.url | relative_url }}">
+                        <div class="card-body">
+                            <div class="content-bottom">
+                                <h6 class="card-category text-white opacity-8">{{ post.date | date_to_long_string }}
+                                </h6>
+                                <h5 class="card-title">{{ post.title }}</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+
+        </div>
+        <div class="row">
+            <div class="container">
+                {% if paginator.total_pages > 1 %}
+                <section class="pagination mt-5 mb-3">
+                    <div class="col-lg-12">
+
+
+                        {% if paginator.previous_page %}
+                        <div class="float-left">
+                            <a href="{{ paginator.previous_page_path | relative_url }}"
+                                class="button button--light pagination__prev"><i class="fa fa-angle-left"
+                                    aria-hidden="true"></i> <span>Newer Posts</span></a>
+                        </div>
+                        {% endif %}
+                        {% if paginator.next_page %}
+                        <div class="float-right">
+                            <a href="{{ paginator.next_page_path | relative_url }}"
+                                class="button button--light pagination__next"><span>Older Posts</span> <i
+                                    class="fa fa-angle-right" aria-hidden="true"></i></a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    </div>
+</section>
+{% endif %}
+
+{% if site.data.settings.blog_settings.theme == "narrow" %}
+<section class="blogs-1">
+    <div class="container">
+        {% assign psize = site.posts | size %}
+        {% if psize == 0 %}
+        <p>No posts...yet.</p>
+        {% endif %}
+        <div class="row align-items-center">
+            {% for post in paginator.posts %}
+            <div class="{% if forloop.index == 1 or forloop.index == 6 %}col-lg-6{% else %}col-lg-3{% endif %}">
+                <div class="card card-blog card-background" data-animation="zooming">
+                    <div class="full-background" style="background-image: url({{ post.featured_image | relative_url }})"></div>
+                    <a href="{{ post.url | relative_url }}">
+                        <div class="card-body">
+                            <div class="content-bottom">
+                                <h6 class="card-category text-white opacity-8">{{ post.date | date_to_long_string }}
+                                </h6>
+                                <h5 class="card-title">{{ post.title }}</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="row">
+            <div class="container">
+                {% if paginator.total_pages > 1 %}
+                <section class="pagination mt-2 mb-3">
+                    <div class="col-lg-12">
+
+
+                        {% if paginator.previous_page %}
+                        <div class="float-left">
+                            <a href="{{ paginator.previous_page_path | relative_url }}"
+                                class="button button--light pagination__prev"><i class="fa fa-angle-left"
+                                    aria-hidden="true"></i> <span>Newer Posts</span></a>
+                        </div>
+                        {% endif %}
+                        {% if paginator.next_page %}
+                        <div class="float-right">
+                            <a href="{{ paginator.next_page_path | relative_url }}"
+                                class="button button--light pagination__next"><span>Older Posts</span> <i
+                                    class="fa fa-angle-right" aria-hidden="true"></i></a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
+{% if site.data.settings.blog_settings.theme == "basic" %}
+<section class="blogs-3">
+    <div class="container">
+        {% assign psize = site.posts | size %}
+        {% if psize == 0 %}
+        <p>No posts...yet.</p>
+        {% endif %}
+        <div class="row">
+            <div class="col-lg-10 mx-auto">
+                {% for post in paginator.posts limit:8 %}
+                <div class="card card-blog card-plain blog-horizontal mb-5">
+                    <div class="row">
+                        <div class="col-lg-4 col-md-4">
+                            <div class="card-image shadow">
+                                <a href="{{ post.url | relative_url }}">
+                                    <img class="img rounded" src="{{ post.featured_image | relative_url }}">
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-lg-8 col-md-8">
+                            <div class="">
+                                <h3 class="card-title">
+                                    <a href="{{ post.url | relative_url }}">{{ post.title }}</a>
+                                </h3>
+                                <p class="card-description">
+                                    {{ post.description }} <a href="{{ post.url | relative_url }}"> Read More </a>
+                                </p>
+                                {% for author in site.data.settings.authors %}
+                                    {% if post.author == author[1].name %}
+                                        <div class="author">
+                                            <img src=" {{author[1].picture}}" alt="..." class="avatar img-raised">
+                                            <div class="text">
+                                            <span class="name"></span>
+                                                
+                                            {{author[1].name}}
+                                        
+                                                </span>
+                                            <div class="meta">{{ post.date | date_to_long_string }}</div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+    
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+
+            </div>
+        </div>
+        <div class="row">
+            <div class="container">
+                {% if paginator.total_pages > 1 %}
+                <section class="pagination mt-2 mb-3">
+                    <div class="col-lg-10 mx-auto">
+
+
+                        {% if paginator.previous_page %}
+                        <div class="float-left">
+                            <a href="{{ paginator.previous_page_path | relative_url }}"
+                                class="button button--light pagination__prev"><i class="fa fa-angle-left"
+                                    aria-hidden="true"></i> <span>Newer Posts</span></a>
+                        </div>
+                        {% endif %}
+                        {% if paginator.next_page %}
+                        <div class="float-right">
+                            <a href="{{ paginator.next_page_path | relative_url }}"
+                                class="button button--light pagination__next"><span>Older Posts</span> <i
+                                    class="fa fa-angle-right" aria-hidden="true"></i></a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </section>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}

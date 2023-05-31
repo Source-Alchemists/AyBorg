@@ -1,0 +1,41 @@
+<section class="blogs-1">
+    <div class="container">
+        {% assign psize = site.posts | size %}
+        {% if psize == 0 %}
+        <p>No posts...yet.</p>
+        {% endif %}
+        <div class="row align-items-center">
+            {% for post in site.posts limit:6 %}
+            <div class="{% if forloop.index == 1 or forloop.index == 6 %}col-lg-6{% else %}col-lg-3{% endif %}">
+                <div class="card card-blog card-background" data-animation="zooming">
+                    <div class="full-background" style="background-image: url({{ post.featured_image | relative_url }})"></div>
+                    <a href="{{ post.url | relative_url }}">
+                        <div class="card-body">
+                            <div class="content-bottom">
+                                <h6 class="card-category text-white opacity-8">{{ post.date | date_to_long_string }}
+                                </h6>
+                                <h5 class="card-title">{{ post.title }}</h5>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+            {% if psize > 6 %}
+                <div class="container mb-2 mt-2">
+                    <div class="row">
+                        <section class="pagination mr-0 ml-auto mt-2 mb-3">
+                            <div class="col-lg-12">
+                                <div class="float-right">
+                                    <a href="{{ '/blog/page2/' | relative_url }}"
+                                        class="button button--light pagination__next"><span>Older Posts</span> <i
+                                            class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                </div>
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
