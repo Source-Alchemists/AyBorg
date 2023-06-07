@@ -1,9 +1,9 @@
 basic_settings:
-  site_title: Argon Jekyll Theme
-  favicon_image: /assets/img/favicon.png
+  site_title: AyBorg
+  favicon_image: /assets/img/favicon.ico
 
 header_settings:
-  logo_image: /assets/img/brand/white.png
+  logo_image: /assets/img/brand/logo.svg
   mobile_logo_image: /assets/img/brand/blue.png
   # Choose a color for your header [blue, dark, light].
   theme: dark
@@ -32,38 +32,16 @@ blog_settings:
 menu_settings:
   menu_items:
     - title: 'Home'
-      submenu_items:
-      - title: Landing Page
-        url: /
-        icon: ni-spaceship text-success    
-      - title: Blog
-        url: /blog
-        icon: ni-books text-primary
+      url: '/'
     - title: 'Features'
-      url: '/features'     
-    - title: Pricing
-      url: /pricing        
-    - title: 'Blog'
-      submenu_items:
-      - title: Blog
-        url: /blog
-        icon: ni-books text-primary
-      - title: Narrow Grid Example
-        url: /blog-narrow-example
-        icon: ni-align-center text-success
-      - title: Wide Grid Example
-        url: /blog-grid-example
-        icon: ni-image text-info
-      - title: List Example
-        url: /blog-list-example
-        icon: ni-bullet-list-67 text-default    
+      url: '/features'         
     - title: 'About'
       url: '/about'
-    - title: 'Contact'
-      url: '/contact'
+    - title: 'GitHub'
+      url: 'https://github.com/Source-Alchemists/AyBorg'
 
 footer_settings:
-  footer_tagline: Argon & Jekyll, together at last.
+  footer_tagline: AyBorg, Automation made easY.
 
 contact_settings:
   form_action: 'https://formspree.io/hello@jekyllthemes.io'
@@ -72,31 +50,25 @@ contact_settings:
   send_button_text: 'Send Message'
 
 social_settings:
-  facebook_url: 'https://www.facebook.com/jekyllthemes/'
-  twitter_url: 'https://twitter.com/jekyllthemesio'
-  instagram_url: 'https://twitter.com/jekyllthemesio'
+  facebook_url: ''
+  twitter_url: 'https://twitter.com/ayborg_io'
+  instagram_url: ''
   youtube_url: ''
   vimeo_url: ''
   pinterest_url: ''
   tumblr_url: ''
   dribbble_url: ''
   behance_url: ''
-  github_url: 'https://twitter.com/jekyllthemesio'
+  github_url: 'https://github.com/Source-Alchemists/AyBorg'
   reddit_url: ''
-  linkedin_url: ''
+  # linkedin_url: 'https://www.linkedin.com/in/levent-tasdemir'
 
 authors:
-  tom:
-    name: Tom
-    picture: /assets/img/faces/team-1.jpg
-  jane:
-    name: Jane
-    picture: /assets/img/faces/team-4.jpg
-  michael:
-    name: Michael
-    picture: /assets/img/faces/michael.jpg
+  levent:
+    name: Levent
+    picture: /assets/img/faces/levent.jpg
 
 advanced_settings:
   analytics_code: 
-  header_js: 
+  # header_js: <script src="/assets/js/cookie.notice.min.js"></script>
   footer_js: 

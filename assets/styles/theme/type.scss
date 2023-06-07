@@ -11,6 +11,7 @@ p {
   	font-weight: $lead-font-weight;
 	line-height: $paragraph-line-height;
 	margin-top: 1.5rem;
+	color: $lead-color;
 
 	+ .btn-wrapper {
 		margin-top: 3rem;
@@ -66,7 +67,7 @@ p {
 .display-4 {
 	span {
 		display: block;
-		font-weight: $font-weight-light;
+		font-weight: $font-weight-extra-bold;
 	}
 }
 

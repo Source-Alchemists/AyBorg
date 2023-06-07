@@ -30,6 +30,17 @@ ol ul{margin-bottom:1rem !important;}
 .page-header.header-filter:before {background-color: rgba(0,0,0,0.25) !important;} 
 .footnotes{border-top: 0.0625rem solid rgba(0,0,0,0.1); padding-top:20px;}
 
+.text-span {
+    background: linear-gradient(135deg, #594ae2 10%, #f969cd 40%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.txt-rotate-container {
+    min-height: 70px;
+}
+
 @media (max-width: 991.98px) {
     .navbar-collapse .collapse-brand img {
         height: auto !important;
