@@ -3,8 +3,8 @@ basic_settings:
   favicon_image: /assets/img/favicon.ico
 
 header_settings:
-  logo_image: /assets/img/brand/logo.svg
-  mobile_logo_image: /assets/img/brand/blue.png
+  logo_image: /assets/img/brand/logo-white.svg
+  mobile_logo_image: /assets/img/brand/logo-white.png
   # Choose a color for your header [blue, dark, light].
   theme: dark
   # If the page has a featured image, it turns transparent if allow_transparent is set to "yes".
