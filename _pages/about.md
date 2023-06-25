@@ -1,8 +1,6 @@
 ---
 title: About
-subtitle: 
 description: About page for AyBorg
-featured_image: 
 ---
 
 AyBorg is an open source, flow-based platform that is revolutionizing industrial automation. Founded in 2022, AyBorg is driven by a passionate community of developers, engineers, and industry experts committed to transforming manufacturing processes with a flexible and extensible approach.

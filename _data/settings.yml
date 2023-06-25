@@ -35,6 +35,8 @@ menu_settings:
       url: '/'
     - title: 'Features'
       url: '/features'         
+    - title: 'Documentation'
+      url: '/docs'
     - title: 'About'
       url: '/about'
     - title: 'GitHub'
@@ -44,7 +46,7 @@ footer_settings:
   footer_tagline: AyBorg, Automation made easY.
 
 contact_settings:
-  form_action: 'https://formspree.io/hello@jekyllthemes.io'
+  form_action: ''
   confirmation_url: '/thanks'
   email_subject: 'Contact form submission'
   send_button_text: 'Send Message'
@@ -61,12 +63,9 @@ social_settings:
   behance_url: ''
   github_url: 'https://github.com/Source-Alchemists/AyBorg'
   reddit_url: ''
-  # linkedin_url: 'https://www.linkedin.com/in/levent-tasdemir'
+  linkedin_url: ''
 
 authors:
-  levent:
-    name: Levent
-    picture: /assets/img/faces/levent.jpg
 
 advanced_settings:
   analytics_code: 
