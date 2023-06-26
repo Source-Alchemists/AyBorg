@@ -1,7 +1,7 @@
 site: AyBorg
 
 url: https://ayborg.io
-baseurl: https://source-alchemists.github.io/AyBorg
+baseurl: /AyBorg
 
 collections:
   pages:
