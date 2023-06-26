@@ -1,7 +1,7 @@
 site: AyBorg
 
 url: https://ayborg.io
-baseurl: /AyBorg
+baseurl: 
 
 collections:
   pages:
