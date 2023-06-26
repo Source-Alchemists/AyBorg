@@ -1,0 +1,7 @@
+<div class="docs sidebar">
+    <ul>
+        {% for item in site.data.sidebars.docs.[page.sidebar].docs %}
+        <li><a href="{{site.baseurl}}{{item.url}}">{{ item.title }}</a></li>
+        {% endfor %}
+    </ul>
+</div>

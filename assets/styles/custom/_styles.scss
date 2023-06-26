@@ -1,3 +1,17 @@
 .highlight {
     color: $black;
 }
+
+.docs {
+    &.grid {
+        display: grid;
+        grid-template-columns: 3fr 9fr;
+    }
+    &.sidebar {
+        grid-column: 1;
+        height: 100%;
+    }
+    &.content {
+        grid-column: 2;
+    }
+}

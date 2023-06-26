@@ -20,6 +20,12 @@ defaults:
       layout: "default"
   -
     scope:
+      path: "*/docs"
+      type: "pages"
+    values:
+      layout: "docs"
+  -
+    scope:
       path: ""
       type: "pages"
     values:

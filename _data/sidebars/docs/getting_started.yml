@@ -1,6 +1,6 @@
 docs:
-- title: Getting started
-  url:
+- title: Running locally
+  url: /docs/getting-started/local
 
 - title: 123
-  url:
+  url: abc
