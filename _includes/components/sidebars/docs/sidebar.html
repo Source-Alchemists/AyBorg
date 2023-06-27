@@ -1,4 +1,4 @@
-<div class="docs sidebar mt-6 mb-3">
+<div class="docs sidebar mt-6">
     <ul>
         {% for item in site.data.sidebars.docs.[page.sidebar].docs %}
         <li class="{% if {{site.baseurl}}{{item.url}} == page.url %}active{% endif %}"><a href="{{site.baseurl}}{{item.url}}">{{ item.title }}</a></li>

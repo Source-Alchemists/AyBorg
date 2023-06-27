@@ -41,10 +41,7 @@ cd src/Gateway
 dotnet run -c release
 ```
 
-## Default credentials
-
-{% include docs/fragments/default_credentials.md %}
-
 ## Next steps
 
 - [First start]({{site.baseurl}}/docs/getting-started/first-start)
+- [Change your password]({{site.baseurl}}/docs/getting-started/change-password)

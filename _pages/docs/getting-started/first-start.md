@@ -1,6 +1,6 @@
 ---
 title: First start
-description: Documentation for AyBorg.
+description: Starting AyBorg for the first time.
 sidebar: getting_started
 permalink: "/docs/getting-started/first-start.html"
 ---
@@ -32,4 +32,8 @@ At the top navigation bar you will find:
 - A toggle button to switch between light and dark themes
 - Your username and user menu
 
-| ![Navigation Bar]({{site.baseurl}}/assets/img/docs/main-navigation-bar.png) |  On the left side is the navigation bar.<br/> ℹ️ Depending on what services are started and what permissions you have, the content may vary. |
+| ![Navigation Bar]({{site.baseurl}}/assets/img/docs/main-navigation-bar.png) |  On the left side is the main navigation bar.<br/> ℹ️ Depending on what services are started and what permissions you have, the content may vary. |
+
+## Next steps
+
+- [Change your password]({{site.baseurl}}/docs/getting-started/change-password)
