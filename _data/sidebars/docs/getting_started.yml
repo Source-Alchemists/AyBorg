@@ -2,5 +2,5 @@ docs:
 - title: Running locally
   url: /docs/getting-started/local
 
-- title: 123
-  url: abc
+- title: First start
+  url: /docs/getting-started/first-start

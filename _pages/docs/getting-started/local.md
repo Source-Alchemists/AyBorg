@@ -1,6 +1,6 @@
 ---
 title: Running locally
-description: Documentation for AyBorg.
+description: How to run AyBorg locally.
 sidebar: getting_started
 permalink: "/docs/getting-started/local.html"
 ---
@@ -43,4 +43,8 @@ dotnet run -c release
 
 ## Default credentials
 
- {% include docs/fragments/default_credentials.md %}
+{% include docs/fragments/default_credentials.md %}
+
+## Next steps
+
+- [First start]({{site.baseurl}}/docs/getting-started/first-start)
