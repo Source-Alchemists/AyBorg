@@ -32,9 +32,15 @@ Because AyBorg is orchastrated into multipe services, you need to start each ser
 
 To start a service, navigate to its source directory and run `dotnet run -c release`.
 
+The default appsettings give you a good starting point and will also work locally, but for real scenarios, you will need to change the settings.
+
 **Example (AyBorg.Gateway):**
 
 ``` bash
 cd src/Gateway
 dotnet run -c release
 ```
+
+## Default credentials
+
+ {% include docs/fragments/default_credentials.md %}
