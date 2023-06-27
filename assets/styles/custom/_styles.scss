@@ -9,7 +9,12 @@
     }
     &.sidebar {
         grid-column: 1;
-        height: 100%;
+        height: 95%;
+
+        li.active a {
+            color: lightgray;
+            cursor: default;
+        }
     }
     &.content {
         grid-column: 2;

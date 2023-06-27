@@ -106,38 +106,15 @@ window.onload = function() {
   {% include header.html %}
 
   <div class="wrapper page">
-    {% if page.url != "/" and page.collection != "posts" and page.type != "blogListing" and page.type != "contact" %}
-    <!-- Is not a blog post or blog archive or contact page -->
-    {% if page.featured_image %}
-    <!-- Is a page with a banner -->
-    <div class="page-header page-header-small header-filter mb-4">
-      <div class="page-header-image card-background"
-        style="background-image: url({{ page.featured_image | relative_url }});"></div>
-      <div class="container contentWrapper">
-        <div class="row">
-          <div class="col-lg-10 mx-auto text-center pt-4">
-            <h2 class="display-2 text-white">{{ page.title }}</h2>
-            <h2 class="lead text-white pl-5 pr-5 pb-3 text-center">{{page.subtitle}}</h2>
-          </div>
-        </div>
-      </div>
-    </div>
-    {% elsif page.title %}
-    <!-- Is a page without a banner -->
-    <div class="container contentWrapper pb-2">
-      <div class="text-left mt-5 mb-3">
-        <h3 class="display-2">{{page.title}}</h3>
-        {% if page.subtitle %}
-        <p class="lead">{{page.subtitle}}</p>
-        {% endif %}
-      </div>
-    </div>
-    {% endif %}
-    {% endif %}
-
-    <div id="main" class="container docs grid">
+    <div id="main" class="container contentWrapper docs grid">
       {% include components/sidebars/docs/sidebar.html %}
       <div class="docs content">
+        <div class="text-left mt-5 mb-3">
+          <h3 class="display-2">{{page.title}}</h3>
+          {% if page.subtitle %}
+          <p class="lead">{{page.subtitle}}</p>
+          {% endif %}
+        </div>
         {{content}}
       </div>
     </div>
