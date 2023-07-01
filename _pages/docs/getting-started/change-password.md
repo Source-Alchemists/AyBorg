@@ -12,3 +12,7 @@ permalink: "/docs/getting-started/change-password.html"
 4. Confirm your new password
 5. Click on *Update password*<br/>
 ![Change password]({{site.baseurl}}/assets/img/docs/change-password.png)
+
+## Next steps
+
+- [Create a new project]({{site.baseurl}}/docs/user-guide/agent-create-project)

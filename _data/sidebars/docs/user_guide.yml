@@ -1,0 +1,6 @@
+docs:
+- title: Create a new project
+  url: /docs/user-guide/agent-create-project
+
+- title: Change active project 
+  url: /docs/user-guide/agent-activate-project
