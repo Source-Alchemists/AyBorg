@@ -17,3 +17,4 @@ permalink: "/docs/user-guide/agent-create-project.html"
 ## Next steps
 
 - [Change active project]({{site.baseurl}}/docs/user-guide/agent-activate-project)
+- [Create a new workflow]({{site.baseurl}}/docs/user-guide/agent-create-workflow)

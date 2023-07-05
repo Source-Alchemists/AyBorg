@@ -4,3 +4,6 @@ docs:
 
 - title: Change active project 
   url: /docs/user-guide/agent-activate-project
+
+- title: Create a new workflow
+  url: /docs/user-guide/agent-create-workflow
