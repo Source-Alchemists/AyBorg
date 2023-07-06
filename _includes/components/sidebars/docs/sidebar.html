@@ -1,7 +1,8 @@
 <div class="docs sidebar mt-6">
     <ul>
         {% for item in site.data.sidebars.docs.[page.sidebar].docs %}
-        <li class="{% if {{site.baseurl}}{{item.url}} == page.url %}active{% endif %}"><a href="{{site.baseurl}}{{item.url}}">{{ item.title }}</a></li>
+        {% assign current =  item.url | append: '.html' %}
+        <li class="{% if {{current}} == page.url %}active{% endif %}"><a href="{{site.baseurl}}{{item.url}}">{{ item.title }}</a></li>
         {% endfor %}
     </ul>
 </div>

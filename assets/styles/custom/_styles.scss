@@ -11,9 +11,26 @@
         grid-column: 1;
         height: 95%;
 
-        li.active a {
-            color: lightgray;
-            cursor: default;
+        ul {
+            list-style-type: none;
+            border-left: 8px solid #eee;
+            padding: 0px 5px;
+            line-height: 30px;
+            
+            a {
+                color: #525f7f;
+            }
+
+            li {
+                display: list-item;
+            }
+    
+            li.active {
+                a {
+                    font-weight: bold;
+                    cursor: default;
+                }
+            }
         }
     }
     &.content {
