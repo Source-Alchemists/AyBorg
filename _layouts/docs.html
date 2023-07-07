@@ -106,20 +106,23 @@ window.onload = function() {
   {% include header.html %}
 
   <div class="wrapper page">
-    <div id="main" class="container contentWrapper docs grid">
-      {% include components/sidebars/docs/sidebar.html %}
-      <div class="docs content">
-        <div class="text-left mt-5 mb-3">
-          <h3 class="display-2">{{page.title}}</h3>
-          {% if page.subtitle %}
-          <p class="lead">{{page.subtitle}}</p>
-          {% endif %}
+    <div id="main" class="container contentWrapper docs">
+      <div class="row row-grid">
+        <div class="col-lg-3">
+          {% include components/sidebars/docs/sidebar.html %}
         </div>
-        {{content}}
+        <div class="col-lg-9">
+          <div class="text-left mt-5 mb-3">
+            <h3 class="display-2">{{page.title}}</h3>
+            {% if page.subtitle %}
+            <p class="lead">{{page.subtitle}}</p>
+            {% endif %}
+          </div>
+          {{content}}
+        </div>
       </div>
     </div>
   </div>
-
 
   {% include footer.html %}
 

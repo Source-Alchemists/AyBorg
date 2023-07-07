@@ -3,14 +3,7 @@
 }
 
 .docs {
-    &.grid {
-        display: grid;
-        grid-template-columns: 3fr 9fr;
-    }
     &.sidebar {
-        grid-column: 1;
-        height: 95%;
-
         ul {
             list-style-type: none;
             border-left: 8px solid #eee;
@@ -32,8 +25,5 @@
                 }
             }
         }
-    }
-    &.content {
-        grid-column: 2;
     }
 }
