@@ -37,3 +37,4 @@ At the top navigation bar you will find:
 ## Next steps
 
 - [Change your password]({{site.baseurl}}/docs/getting-started/change-password)
+- [Create a new project]({{site.baseurl}}/docs/user-guide/agent-create-project)

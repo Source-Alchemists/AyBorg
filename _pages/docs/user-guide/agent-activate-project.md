@@ -9,3 +9,7 @@ permalink: "/docs/user-guide/agent-activate-project.html"
 ℹ️ Each agent has its own independent view!
 2. Click on **ACTIVATE**<br/>
 ![Change active project]({{site.baseurl}}/assets/img/docs/agent-change-active-project.png)
+
+## Next steps
+
+- [Create a new workflow]({{site.baseurl}}/docs/user-guide/agent-create-workflow)
