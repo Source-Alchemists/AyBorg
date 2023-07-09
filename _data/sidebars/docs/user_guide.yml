@@ -7,3 +7,6 @@ docs:
 
 - title: Create a new workflow
   url: /docs/user-guide/agent-create-workflow
+
+- title: Step detail view explained
+  url: /docs/user-guide/agent-step-detail-view

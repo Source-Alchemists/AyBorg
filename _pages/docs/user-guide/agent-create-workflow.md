@@ -43,7 +43,7 @@ The editor is divided into three components:
 5. Repeat step 4 for each port you want to connect
 6. Adjust the property values as needed
     - Only input ports that are not connected/linked can be changed manually
-    - You can also get a more detailed view of the selected step by clicking the **Full Screen** button<br/>
+    - You can also get a more [detailed view](/docs/user-guide/agent-step-detail-view) of the selected step by clicking the **Full Screen** button<br/>
     ![Agent step toolbar]({{site.baseurl}}/assets/img/docs/agent-step-toolbar.png)
 7. Click the **Continuous** button on the **Runtime Toolbar** (3)<br/>
 ![Agent runtime toolbar]({{site.baseurl}}/assets/img/docs/agent-runtime-toolbar.png)
