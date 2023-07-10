@@ -11,7 +11,7 @@ public sealed class MqttReceive : BaseMqttReceiveStep
 {
     private readonly StringPort _messagePort = new("Message", PortDirection.Output, string.Empty);
 
-    public override string DefaultName => "MQTT.Receive";
+    public override string Name => "MQTT.Receive";
 
     public MqttReceive(ILogger<MqttReceive> logger, IMqttClientProvider mqttClientProvider)
         : base(logger, mqttClientProvider)

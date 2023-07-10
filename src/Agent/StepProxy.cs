@@ -21,7 +21,7 @@ public sealed class StepProxy : IStepProxy
     {
         StepBody = stepBody;
         Ports = stepBody.Ports;
-        Name = stepBody.DefaultName;
+        Name = stepBody.Name;
         Categories = stepBody.Categories;
         X = x;
         Y = y;

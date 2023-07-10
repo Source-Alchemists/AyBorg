@@ -11,7 +11,7 @@ public sealed class StringCollectionIndexOf : IStepBody
     private readonly StringPort _inputSearchValue = new("Value", PortDirection.Input, string.Empty);
     private readonly NumericPort _outputIndex = new("Index", PortDirection.Output, 0);
 
-    public string DefaultName => "String.Collection.IndexOf";
+    public string Name => "String.Collection.IndexOf";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Collection };
 

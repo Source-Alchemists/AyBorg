@@ -13,7 +13,7 @@ public sealed class ImageBinarize : IStepBody, IDisposable
     private readonly EnumPort _thresholdTypePort = new("Mode", PortDirection.Input, BinaryThresholdMode.Lumincance);
     private bool _disposedValue;
 
-    public string DefaultName => "Image.Binarize";
+    public string Name => "Image.Binarize";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 

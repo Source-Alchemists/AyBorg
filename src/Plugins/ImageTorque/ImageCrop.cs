@@ -13,7 +13,7 @@ public sealed class ImageCrop : IStepBody, IDisposable
     private readonly ImagePort _outputImagePort = new("Cropped image", PortDirection.Output, null!);
     private bool _disposedValue;
 
-    public string DefaultName => "Image.Crop";
+    public string Name => "Image.Crop";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 

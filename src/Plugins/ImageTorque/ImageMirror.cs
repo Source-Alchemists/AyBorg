@@ -12,7 +12,7 @@ public sealed class ImageMirror : IStepBody, IDisposable
     private readonly ImagePort _outputImage = new("Mirrored image", PortDirection.Output, null!);
     private bool _disposedValue;
 
-    public string DefaultName => "Image.Mirror";
+    public string Name => "Image.Mirror";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 

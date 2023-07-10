@@ -9,7 +9,7 @@ public sealed class StringCollectionElementAt : CollectionElementAt, IStepBody
     private readonly StringCollectionPort _inputCollection = new("Collection", PortDirection.Input);
     private readonly StringPort _outputValue = new("Result", PortDirection.Output, string.Empty);
 
-    public string DefaultName => "String.Collection.ElementAt";
+    public string Name => "String.Collection.ElementAt";
 
     public StringCollectionElementAt(ILogger<StringCollectionElementAt> logger) : base(logger)
     {

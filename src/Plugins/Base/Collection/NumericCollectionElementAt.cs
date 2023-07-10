@@ -9,7 +9,7 @@ public sealed class NumericCollectionElementAt : CollectionElementAt, IStepBody
     private readonly NumericCollectionPort _inputCollection = new("Collection", PortDirection.Input);
     private readonly NumericPort _outputValue = new("Result", PortDirection.Output, 0);
 
-    public string DefaultName => "Numeric.Collection.ElementAt";
+    public string Name => "Numeric.Collection.ElementAt";
 
     public NumericCollectionElementAt(ILogger<NumericCollectionElementAt> logger) : base(logger)
     {

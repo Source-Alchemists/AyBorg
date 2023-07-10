@@ -14,7 +14,7 @@ public sealed class MqttImageSend : BaseMqttSendStep
     private readonly EnumPort _encodingPort = new("Encoding", PortDirection.Input, EncoderType.Jpeg);
     private readonly NumericPort _qualityPort = new("Quality", PortDirection.Input, 80, 1, 100);
 
-    public override string DefaultName => "MQTT.Image.Send";
+    public override string Name => "MQTT.Image.Send";
 
     public MqttImageSend(ILogger<MqttImageSend> logger, IMqttClientProvider mqttClientProvider, ICommunicationStateProvider communicationState)
         : base(logger, mqttClientProvider, communicationState)

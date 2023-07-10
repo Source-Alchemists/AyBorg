@@ -12,7 +12,7 @@ public abstract class BaseMqttStep : IStepBody
     protected readonly StringPort _topicPort = new("Topic", PortDirection.Input, $"AyBorg/results/{Guid.NewGuid()}");
     protected IList<IPort> _ports = new List<IPort>();
 
-    public abstract string DefaultName { get; }
+    public abstract string Name { get; }
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Communication };
 

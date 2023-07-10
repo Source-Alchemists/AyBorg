@@ -18,7 +18,7 @@ public sealed class ImageLoad : IStepBody, IDisposable
     private Task<KeyValuePair<string, Image>>? _preloadTask;
     private string _lastFolderPath = string.Empty;
 
-    public string DefaultName => "Image.Load";
+    public string Name => "Image.Load";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.Simulation };
 

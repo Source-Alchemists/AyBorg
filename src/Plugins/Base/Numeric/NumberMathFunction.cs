@@ -10,7 +10,7 @@ public sealed class NumberMathFunction : IStepBody
     private readonly NumericPort _valueBPort = new("Value B", PortDirection.Input, 0);
     private readonly NumericPort _resultPort = new("Result", PortDirection.Output, 0);
 
-    public string DefaultName => "Number.Math.Function";
+    public string Name => "Number.Math.Function";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Math };
 

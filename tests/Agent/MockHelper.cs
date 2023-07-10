@@ -42,7 +42,7 @@ public static class MockHelper
     public static Mock<IStepBody> CreateStepBodyMock(string name, int inputCount, int outputCount, bool successful = true)
     {
         var stepBodyMock = new Mock<IStepBody>();
-        stepBodyMock.SetupGet(s => s.DefaultName).Returns(name);
+        stepBodyMock.SetupGet(s => s.Name).Returns(name);
         stepBodyMock.Setup(s => s.TryRunAsync(It.IsAny<CancellationToken>())).ReturnsAsync(successful);
 
         var ports = new List<IPort>();

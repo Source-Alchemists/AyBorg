@@ -10,7 +10,7 @@ public sealed class ImageAiCodeDetect : ImageAiDetectBase, IDisposable
     private readonly YoloDetector<YoloV5CodeDetectorModel> _detector;
     private bool _disposedValue;
 
-    public override string DefaultName => "Image.AI.Code.Detect";
+    public override string Name => "Image.AI.Code.Detect";
 
     public ImageAiCodeDetect(ILogger<ImageAiCodeDetect> logger) : base(logger)
     {

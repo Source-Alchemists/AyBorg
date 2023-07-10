@@ -10,7 +10,7 @@ public sealed class ImageAiVialDetect : ImageAiDetectBase, IDisposable
     private readonly YoloDetector<YoloV5VialDetectorModel> _detector;
     private bool _disposedValue;
 
-    public override string DefaultName => "Image.AI.Vial.Detect";
+    public override string Name => "Image.AI.Vial.Detect";
 
     public ImageAiVialDetect(ILogger<ImageAiVialDetect> logger) : base(logger)
     {

@@ -8,7 +8,7 @@ public sealed class TimeDelay : IStepBody
     private readonly NumericPort _milliseconds = new("Milliseconds", PortDirection.Input, 1000, 0);
 
     /// <inheritdoc />
-    public string DefaultName => "Time.Delay";
+    public string Name => "Time.Delay";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Time };
 
