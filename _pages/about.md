@@ -3,7 +3,7 @@ title: About
 description: About page for AyBorg
 ---
 
-AyBorg is an open source, flow-based platform that is revolutionizing industrial automation. Founded by Levent Tasdemir in 2022, AyBorg is driven by a passionate community of developers, engineers, and industry experts committed to transforming manufacturing processes with a flexible and extensible approach.
+AyBorg is an open source, flow-based platform that is revolutionizing industrial automation. Founded by [Levent Tasdemir](https://www.linkedin.com/in/levent-tasdemir) in 2022, AyBorg is driven by a passionate community of developers, engineers, and industry experts committed to transforming manufacturing processes with a flexible and extensible approach.
 
 ## Our Vision
 
