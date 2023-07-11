@@ -17,7 +17,7 @@ AyBorg is committed to promoting innovation, reliability and openness in industr
 
 We invite you to join the AyBorg community and contribute to the evolution of industrial automation:
 
-**Develop plug-ins:** Explore the AyBorg plug-in development resources and contribute your own plug-ins tailored to specific industrial needs. Extend the capabilities of AyBorg and share your expertise with the community.
+**Develop plug-ins:** Explore the AyBorg [plug-in development resources](docs/) and contribute your own plug-ins tailored to specific industrial needs. Extend the capabilities of AyBorg and share your expertise with the community.
 
 **Spread the Word:** Help us spread the word about AyBorg within the industrial automation ecosystem. Share your experiences, success stories and use cases with AyBorg. Spread the word at conferences, workshops and industry events.
 
