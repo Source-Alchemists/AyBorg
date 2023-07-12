@@ -126,7 +126,7 @@ internal sealed class PluginsService : IPluginsService
                 if (ActivatorUtilities.CreateInstance(_serviceProvider, sp) is IStepBody si)
                 {
                     _stepPlugins = _stepPlugins.Add(new StepProxy(_loggerFactory.CreateLogger<StepProxy>(), si));
-                    _logger.LogTrace("Added step plugin '{si.GetType.Name}'.", si.GetType().Name);
+                    _logger.LogTrace((int)EventLogType.Plugin, "Added step plugin '{si.GetType.Name}'.", si.GetType().Name);
                 }
             }
             return true;
@@ -139,7 +139,7 @@ internal sealed class PluginsService : IPluginsService
                 if (ActivatorUtilities.CreateInstance(_serviceProvider, dm) is IDeviceManager di)
                 {
                     _deviceManagerPlugins = _deviceManagerPlugins.Add(new DeviceManagerProxy(_loggerFactory, _loggerFactory.CreateLogger<DeviceManagerProxy>(), di));
-                    _logger.LogTrace("Added device manager plugin '{di.GetType.Name}'.", di.GetType().Name);
+                    _logger.LogTrace((int)EventLogType.Plugin, "Added device manager plugin '{di.GetType.Name}'.", di.GetType().Name);
                 }
             }
             return true;

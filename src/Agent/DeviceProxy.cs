@@ -7,6 +7,8 @@ public sealed class DeviceProxy : IDeviceProxy {
 
     private readonly IDevice _device;
 
+    public string Name => _device.Name;
+
     public DeviceProxy(ILogger<IDeviceProxy> logger, IDevice device)
     {
         _device = device;
