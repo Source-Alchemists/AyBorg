@@ -8,7 +8,8 @@ namespace AyBorg.Agent.Runtime.Tests;
 
 public class EngineTests
 {
-    private readonly NullLogger<Engine> _logger = new();
+    private static readonly NullLogger<Engine> s_logger = new();
+    private static readonly NullLogger<StepProxy> s_stepProxyLogger = new();
     private readonly NullLoggerFactory _loggerFactory = new();
 
     /// <summary>
@@ -20,10 +21,10 @@ public class EngineTests
         // Arrange
         var project = new Project();
 
-        var startStep = new StepProxy(MockHelper.CreateStepBodyMock("Start", 0, 1).Object);
-        var step1 = new StepProxy(MockHelper.CreateStepBodyMock("Step 1", 1, 1).Object);
-        var step2 = new StepProxy(MockHelper.CreateStepBodyMock("Step 2", 1, 1).Object);
-        var endStep = new StepProxy(MockHelper.CreateStepBodyMock("End", 1, 0).Object);
+        var startStep = new StepProxy(s_stepProxyLogger, MockHelper.CreateStepBodyMock("Start", 0, 1).Object);
+        var step1 = new StepProxy(s_stepProxyLogger, MockHelper.CreateStepBodyMock("Step 1", 1, 1).Object);
+        var step2 = new StepProxy(s_stepProxyLogger, MockHelper.CreateStepBodyMock("Step 2", 1, 1).Object);
+        var endStep = new StepProxy(s_stepProxyLogger, MockHelper.CreateStepBodyMock("End", 1, 0).Object);
 
         var linkStartStep1 = new PortLink(startStep.Ports.First(p => p.Direction == PortDirection.Output), step1.Ports.First(p => p.Direction == PortDirection.Input));
         var linkStep1Step2 = new PortLink(step1.Ports.First(p => p.Direction == PortDirection.Output), step2.Ports.First(p => p.Direction == PortDirection.Input));
@@ -42,7 +43,7 @@ public class EngineTests
         project.Links = links;
         project.Steps = steps;
 
-        using var engine = new Engine(_logger, _loggerFactory, project, EngineExecutionType.SingleRun);
+        using var engine = new Engine(s_logger, _loggerFactory, project, EngineExecutionType.SingleRun);
         bool done = false;
         Guid lastIterationId = Guid.Empty;
         bool successful = false;
@@ -71,11 +72,11 @@ public class EngineTests
         // Arrange
         var project = new Project();
 
-        var startStep = new StepProxy(MockHelper.CreateStepBodyMock("Start", 0, 1).Object);
-        var step1 = new StepProxy(MockHelper.CreateStepBodyMock("Step 1", 1, 1).Object);
-        var step2a = new StepProxy(MockHelper.CreateStepBodyMock("Step 2a", 1, 1).Object);
-        var step2b = new StepProxy(MockHelper.CreateStepBodyMock("Step 2b", 1, 1).Object);
-        var endStep = new StepProxy(MockHelper.CreateStepBodyMock("End", 1, 0).Object);
+        var startStep = new StepProxy(s_stepProxyLogger, MockHelper.CreateStepBodyMock("Start", 0, 1).Object);
+        var step1 = new StepProxy(s_stepProxyLogger, MockHelper.CreateStepBodyMock("Step 1", 1, 1).Object);
+        var step2a = new StepProxy(s_stepProxyLogger, MockHelper.CreateStepBodyMock("Step 2a", 1, 1).Object);
+        var step2b = new StepProxy(s_stepProxyLogger, MockHelper.CreateStepBodyMock("Step 2b", 1, 1).Object);
+        var endStep = new StepProxy(s_stepProxyLogger, MockHelper.CreateStepBodyMock("End", 1, 0).Object);
 
         var linkStartStep1 = new PortLink(startStep.Ports.First(p => p.Direction == PortDirection.Output), step1.Ports.First(p => p.Direction == PortDirection.Input));
         var linkStep1Step2a = new PortLink(step1.Ports.First(p => p.Direction == PortDirection.Output), step2a.Ports.First(p => p.Direction == PortDirection.Input));
@@ -100,7 +101,7 @@ public class EngineTests
         project.Links = links;
         project.Steps = steps;
 
-        using var engine = new Engine(_logger, _loggerFactory, project, EngineExecutionType.SingleRun);
+        using var engine = new Engine(s_logger, _loggerFactory, project, EngineExecutionType.SingleRun);
         bool done = false;
         Guid lastIterationId = Guid.Empty;
         bool successful = false;
@@ -126,7 +127,7 @@ public class EngineTests
         // Arrange
         var project = new Project();
 
-        using var engine = new Engine(_logger, _loggerFactory, project, EngineExecutionType.ContinuousRun);
+        using var engine = new Engine(s_logger, _loggerFactory, project, EngineExecutionType.ContinuousRun);
         bool done = false;
         Guid lastIterationId = Guid.Empty;
         bool successful = false;
@@ -152,7 +153,7 @@ public class EngineTests
         // Arrange
         var project = new Project();
 
-        using var engine = new Engine(_logger, _loggerFactory, project, EngineExecutionType.ContinuousRun);
+        using var engine = new Engine(s_logger, _loggerFactory, project, EngineExecutionType.ContinuousRun);
         bool done = false;
         Guid lastIterationId = Guid.Empty;
         bool successful = false;

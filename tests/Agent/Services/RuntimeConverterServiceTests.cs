@@ -19,7 +19,7 @@ public class RuntimeConverterServiceTests
 
     public RuntimeConverterServiceTests()
     {
-        _service = new RuntimeConverterService(s_logger, _mockServiceProvider.Object, _mockPluginService.Object);
+        _service = new RuntimeConverterService(new NullLoggerFactory(), s_logger, _mockServiceProvider.Object, _mockPluginService.Object);
     }
 
     [Theory]
@@ -171,7 +171,7 @@ public class RuntimeConverterServiceTests
         projectRecord.Steps.Add(stepRecord);
         projectRecord.Links.Add(new LinkRecord());
 
-        _mockPluginService.Setup(x => x.Find(stepRecord)).Returns(new StepProxy(new DummyStep()));
+        _mockPluginService.Setup(x => x.Find(stepRecord)).Returns(new StepProxy(new NullLogger<StepProxy>(), new DummyStep()));
 
         // Act
         Project project = await _service.ConvertAsync(projectRecord);

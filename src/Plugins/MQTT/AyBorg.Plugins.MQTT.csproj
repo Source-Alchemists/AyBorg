@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\SDK\src\Common\AyBorg.SDK.Common.csproj" />
     <ProjectReference Include="..\..\SDK\src\Communication\MQTT\AyBorg.SDK.Communication.MQTT.csproj" />
+    <ProjectReference Include="..\..\SDK\src\Communication\Base\AyBorg.SDK.Communication.csproj" />
   </ItemGroup>
 
 </Project>

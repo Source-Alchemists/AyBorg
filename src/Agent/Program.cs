@@ -8,7 +8,6 @@ using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Communication.gRPC.Registry;
-using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
@@ -42,7 +41,6 @@ builder.Services.AddHostedService<RegistryBackgroundService>();
 builder.Services.AddSingleton<IPluginsService, PluginsService>();
 builder.Services.AddSingleton<IEngineHost, EngineHost>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
-builder.Services.AddSingleton<IMqttClientProvider, MqttClientProvider>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
 
 builder.Services.AddTransient<IJwtConsumer, JwtConsumer>();
@@ -84,6 +82,5 @@ app.Services.GetService<IDbContextFactory<ProjectContext>>()!.CreateDbContext().
 
 app.Services.GetService<IPluginsService>()?.Load();
 await app.Services.GetService<IProjectManagementService>()?.TryLoadActiveAsync().AsTask()!;
-await app.Services.GetService<IMqttClientProvider>()?.ConnectAsync().AsTask()!;
 
 app.Run();

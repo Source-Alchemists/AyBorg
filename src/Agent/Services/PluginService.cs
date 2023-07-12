@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using System.Collections.Immutable;
+using System.Reflection;
 using AyBorg.Data.Agent;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Projects;
@@ -7,10 +8,12 @@ using McMaster.NETCore.Plugins;
 namespace AyBorg.Agent.Services;
 internal sealed class PluginsService : IPluginsService
 {
+    private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<PluginsService> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
-    private readonly IList<IStepProxy> _stepPlugins = new List<IStepProxy>();
+    private ImmutableList<IStepProxy> _stepPlugins = ImmutableList.Create<IStepProxy>();
+    private ImmutableList<IDeviceManagerProxy> _deviceManagerPlugins = ImmutableList.Create<IDeviceManagerProxy>();
 
     /// <summary>
     /// Gets the steps.
@@ -23,11 +26,13 @@ internal sealed class PluginsService : IPluginsService
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginsService"/> class.
     /// </summary>
+    /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="configuration">The configuration.</param>
-    public PluginsService(ILogger<PluginsService> logger, IServiceProvider serviceProvider, IConfiguration configuration)
+    public PluginsService(ILoggerFactory loggerFactory, ILogger<PluginsService> logger, IServiceProvider serviceProvider, IConfiguration configuration)
     {
+        _loggerFactory = loggerFactory;
         _logger = logger;
         _serviceProvider = serviceProvider;
         _configuration = configuration;
@@ -38,7 +43,7 @@ internal sealed class PluginsService : IPluginsService
     /// </summary>
     public void Load()
     {
-        _stepPlugins.Clear();
+        _stepPlugins = _stepPlugins.Clear();
         try
         {
             string? configFolder = _configuration.GetValue<string>("AyBorg:Plugins:Folder");
@@ -104,22 +109,37 @@ internal sealed class PluginsService : IPluginsService
             throw new InvalidOperationException($"Step body '{stepBody.GetType().FullName}' is not a valid step body.");
         }
 
-        return new StepProxy(newInstance);
+        return new StepProxy(_loggerFactory.CreateLogger<StepProxy>(), newInstance);
     }
 
     private bool TryLoadPlugins(Assembly assembly)
     {
         Type stepBodyType = typeof(IStepBody);
+        Type deviceManagerType = typeof(IDeviceManager);
 
         IEnumerable<Type> stepPlugins = assembly.GetTypes().Where(p => stepBodyType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
+        IEnumerable<Type> deviceManagerPlugins = assembly.GetTypes().Where(p => deviceManagerType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
         if (stepPlugins.Any())
         {
             foreach (Type sp in stepPlugins)
             {
                 if (ActivatorUtilities.CreateInstance(_serviceProvider, sp) is IStepBody si)
                 {
-                    _stepPlugins.Add(new StepProxy(si));
+                    _stepPlugins = _stepPlugins.Add(new StepProxy(_loggerFactory.CreateLogger<StepProxy>(), si));
                     _logger.LogTrace("Added step plugin '{si.GetType.Name}'.", si.GetType().Name);
+                }
+            }
+            return true;
+        }
+
+        if (deviceManagerPlugins.Any())
+        {
+            foreach (Type dm in deviceManagerPlugins)
+            {
+                if (ActivatorUtilities.CreateInstance(_serviceProvider, dm) is IDeviceManager di)
+                {
+                    _deviceManagerPlugins = _deviceManagerPlugins.Add(new DeviceManagerProxy(_loggerFactory, _loggerFactory.CreateLogger<DeviceManagerProxy>(), di));
+                    _logger.LogTrace("Added device manager plugin '{di.GetType.Name}'.", di.GetType().Name);
                 }
             }
             return true;

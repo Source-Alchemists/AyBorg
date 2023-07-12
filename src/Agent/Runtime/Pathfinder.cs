@@ -104,7 +104,7 @@ internal sealed class Pathfinder : IPathfinder
 
             // Ininitialize the step.
             // Internal it will call onInitilaizeAsync for each stepBody.
-            await pathItem.Step.InitializeAsync();
+            await pathItem.Step.TryInitializeAsync();
         }
         return await ValueTask.FromResult(allPathItems);
     }

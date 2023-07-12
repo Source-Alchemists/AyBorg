@@ -24,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Plugins\MQTT\AyBorg.Plugins.MQTT.csproj" />
+    <ProjectReference Include="..\..\..\src\SDK\src\Communication\Base\AyBorg.SDK.Communication.csproj" />
   </ItemGroup>
 
 </Project>

@@ -10,6 +10,7 @@ namespace AyBorg.Agent.Services;
 
 internal sealed class RuntimeConverterService : IRuntimeConverterService
 {
+    private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<RuntimeConverterService> _logger;
     private readonly IServiceProvider _serviceProvider;
     private readonly IPluginsService _pluginsService;
@@ -17,11 +18,13 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
     /// <summary>
     /// Initializes a new instance of the <see cref="RuntimeConverterService"/> class.
     /// </summary>
+    /// <param name="loggerFactory">The logger factory.</param>
     /// <param name="logger">The logger.</param>
     /// <param name="serviceProvider">The service provider.</param>
     /// <param name="pluginsService">The plugins service.</param>
-    public RuntimeConverterService(ILogger<RuntimeConverterService> logger, IServiceProvider serviceProvider, IPluginsService pluginsService)
+    public RuntimeConverterService(ILoggerFactory loggerFactory, ILogger<RuntimeConverterService> logger, IServiceProvider serviceProvider, IPluginsService pluginsService)
     {
+        _loggerFactory = loggerFactory;
         _logger = logger;
         _serviceProvider = serviceProvider;
         _pluginsService = pluginsService;
@@ -93,7 +96,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
         if (ActivatorUtilities.CreateInstance(_serviceProvider, proxyInstance.StepBody.GetType()) is IStepBody stepBody)
         {
-            var stepProxy = new StepProxy(stepBody, stepRecord.X, stepRecord.Y)
+            var stepProxy = new StepProxy(_loggerFactory.CreateLogger<StepProxy>(), stepBody, stepRecord.X, stepRecord.Y)
             {
                 Id = stepRecord.Id,
                 Name = stepRecord.Name
