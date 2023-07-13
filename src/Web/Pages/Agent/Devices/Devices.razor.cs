@@ -1,5 +1,7 @@
+using System.Collections.Immutable;
 using AyBorg.Web.Services;
 using AyBorg.Web.Shared.Models;
+using AyBorg.Web.Shared.Models.Agent;
 using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Devices;
@@ -9,6 +11,7 @@ public partial class Devices : ComponentBase {
     private string _serviceName = string.Empty;
     private bool _hasServiceError = false;
     private bool _isLoading = true;
+    private ImmutableList<DeviceMeta> _devices = ImmutableList.Create<DeviceMeta>();
     [Parameter] public string ServiceId { get; init; } = string.Empty;
     [Inject] IRegistryService? RegistryService { get; init; }
 

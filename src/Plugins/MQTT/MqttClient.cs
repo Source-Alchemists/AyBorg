@@ -22,6 +22,8 @@ namespace AyBorg.Plugins.MQTT
         private bool _isConnected;
         private bool _isDisposed;
 
+        public string Id { get; }
+
         public string Name { get; }
 
         public IReadOnlyCollection<string> Categories { get; } = new List<string> { "Communication", "MQTT" };
@@ -32,6 +34,7 @@ namespace AyBorg.Plugins.MQTT
         {
             _logger = logger;
             _clientProviderFactory = clientProviderFactory;
+            Id = id;
             Name = id;
 
             Ports = new List<IPort> {

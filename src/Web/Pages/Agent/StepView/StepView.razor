@@ -23,7 +23,7 @@ else{
             }
         </MudItem>
         <MudItem xs="4" Class="overflow-y-auto" Style="height: 60px">
-            @foreach (var category in _step.Categories)
+            @foreach (var category in _step.Categories.Order())
             {
                 <MudChip Size="Size.Small" Text="@category" Style="float: right" Disabled/>
             }

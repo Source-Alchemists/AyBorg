@@ -30,6 +30,35 @@ else
                     <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox" Color="Color.Primary" OnClick="@OnAddDeviceClicked">Add Device</MudButton>
                 </CardHeaderActions>
             </MudCardHeader>
+            <MudCardContent>
+                <MudTable Items="@_devices" Hover="true" Elevation="0">
+                    <HeaderContent>
+                        <MudTh Style="width: 30px">Active</MudTh>
+                        <MudTh Style="width: 30px">Connected</MudTh>
+                        <MudTh>Id</MudTh>
+                        <MudTh>Name</MudTh>
+                        <MudTh>Categories</MudTh>
+                        <MudTh Style="width: 30px">Actions</MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Active">@context.IsActive</MudTd>
+                        <MudTd DataLabel="Connected">@context.IsConnected</MudTd>
+                        <MudTd DataLabel="Id">@context.Id</MudTd>
+                        <MudTd DataLabel="Name">@context.Name</MudTd>
+                        <MudTd DataLabel="Categories">
+                            @foreach (var category in @context.Categories.Order())
+                            {
+                                <MudChip Size="Size.Small" Text="@category" Style="float: right" Disabled/>
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="Actions">
+                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
+
+                            </MudMenu>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudCardContent>
         </MudCard>
     </MudItem>
 </MudGrid>
