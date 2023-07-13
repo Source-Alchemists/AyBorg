@@ -37,18 +37,28 @@ else
                         <MudTh Style="width: 30px">Connected</MudTh>
                         <MudTh>Id</MudTh>
                         <MudTh>Name</MudTh>
-                        <MudTh>Categories</MudTh>
+                        <MudTh Style="width: 30%">Categories</MudTh>
                         <MudTh Style="width: 30px">Actions</MudTh>
                     </HeaderContent>
                     <RowTemplate>
-                        <MudTd DataLabel="Active">@context.IsActive</MudTd>
-                        <MudTd DataLabel="Connected">@context.IsConnected</MudTd>
+                        <MudTd DataLabel="Active">
+                            @if (@context.IsActive)
+                            {
+                                <MudIcon Icon="@Icons.Filled.Check" />
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="Connected">
+                            @if (@context.IsConnected)
+                            {
+                                <MudIcon Icon="@Icons.Filled.Check" />
+                            }
+                        </MudTd>
                         <MudTd DataLabel="Id">@context.Id</MudTd>
                         <MudTd DataLabel="Name">@context.Name</MudTd>
                         <MudTd DataLabel="Categories">
                             @foreach (var category in @context.Categories.Order())
                             {
-                                <MudChip Size="Size.Small" Text="@category" Style="float: right" Disabled/>
+                                <MudChip Size="Size.Small" Text="@category" Disabled/>
                             }
                         </MudTd>
                         <MudTd DataLabel="Actions">

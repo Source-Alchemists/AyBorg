@@ -12,6 +12,8 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
     private ImmutableList<IDeviceProxy> _devices = ImmutableList.Create<IDeviceProxy>();
     private bool _isDisposed = false;
 
+    public string Name => _deviceManager.Name;
+
     public bool CanAdd => _deviceManager.CanCreate;
 
     public IReadOnlyCollection<IDeviceProxy> Devices => _devices;

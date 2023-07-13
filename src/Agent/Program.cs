@@ -42,6 +42,7 @@ builder.Services.AddSingleton<IPluginsService, PluginsService>();
 builder.Services.AddSingleton<IEngineHost, EngineHost>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
+builder.Services.AddSingleton<IDeviceManagerService, DeviceManagerService>();
 
 builder.Services.AddTransient<IJwtConsumer, JwtConsumer>();
 // Repositories
@@ -75,6 +76,7 @@ app.MapGrpcService<ProjectSettingsServiceV1>();
 app.MapGrpcService<EditorServiceV1>();
 app.MapGrpcService<RuntimeServiceV1>();
 app.MapGrpcService<StorageServiceV1>();
+app.MapGrpcService<DeviceManagerServiceV1>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists

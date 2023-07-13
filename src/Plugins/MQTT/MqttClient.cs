@@ -35,7 +35,7 @@ namespace AyBorg.Plugins.MQTT
             _logger = logger;
             _clientProviderFactory = clientProviderFactory;
             Id = id;
-            Name = id;
+            Name = $"MQTT-{id}";
 
             Ports = new List<IPort> {
             _host,

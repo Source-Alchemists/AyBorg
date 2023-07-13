@@ -26,6 +26,7 @@ internal static class GrpcClientExtension
         CreateClientFactory<Runtime.RuntimeClient>(builder, gatewayUrl);
         CreateClientFactory<Storage.StorageClient>(builder, gatewayUrl);
         CreateClientFactory<Audit.AuditClient>(builder, gatewayUrl);
+        CreateClientFactory<DeviceManager.DeviceManagerClient>(builder, gatewayUrl);
         return builder;
     }
 

@@ -73,7 +73,7 @@ public partial class Projects : ComponentBase
         {
             { "ContentText", $"Are you sure you want to delete project '{project.Name}'?" }
         };
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete project", parameters, options);
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete Project", parameters, options);
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
@@ -86,12 +86,15 @@ public partial class Projects : ComponentBase
 
     private async void OnSaveAsReviewClicked(ProjectMeta projectMeta)
     {
-        var options = new DialogOptions();
         var parameters = new DialogParameters
         {
             { "Project", projectMeta }
         };
-        IDialogReference dialog = DialogService.Show<CreateReviewProjectDialog>($"Create review for {projectMeta.Name}", parameters, options);
+        IDialogReference dialog = DialogService.Show<CreateReviewProjectDialog>($"Create Review for {projectMeta.Name}", parameters, new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        });
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
@@ -136,11 +139,14 @@ public partial class Projects : ComponentBase
 
     private async void OnSaveAsReadyClicked(ProjectMeta projectMeta)
     {
-        DialogParameters parameters = new()
+        IDialogReference dialog = DialogService.Show<ConfirmProjectApproveDialog>($"Approve Project {projectMeta.Name}", new DialogParameters
         {
             { "Project", projectMeta }
-        };
-        IDialogReference dialog = DialogService.Show<ConfirmProjectApproveDialog>($"Approve project {projectMeta.Name}", parameters, new DialogOptions());
+        }, new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        });
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {
@@ -160,9 +166,11 @@ public partial class Projects : ComponentBase
 
     private async Task OnNewProjectClicked()
     {
-        var options = new DialogOptions();
-        var parameters = new DialogParameters();
-        IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
+        IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New Project", new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        });
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {

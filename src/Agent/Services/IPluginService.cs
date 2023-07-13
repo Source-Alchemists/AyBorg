@@ -9,10 +9,12 @@ public interface IPluginsService
     /// <summary>
     /// Gets the steps.
     /// </summary>
-    /// <value>
-    /// The steps.
-    /// </value>
-    IEnumerable<IStepProxy> Steps { get; }
+    IReadOnlyCollection<IStepProxy> Steps { get; }
+
+    /// <summary>
+    /// Gets the device providers.
+    /// </summary>
+    IReadOnlyCollection<IDeviceProviderProxy> DeviceProviders { get; }
 
     /// <summary>
     /// Loads this instance.

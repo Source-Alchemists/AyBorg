@@ -13,7 +13,7 @@ internal sealed class PluginsService : IPluginsService
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
     private ImmutableList<IStepProxy> _stepPlugins = ImmutableList.Create<IStepProxy>();
-    private ImmutableList<IDeviceProviderProxy> _deviceManagerPlugins = ImmutableList.Create<IDeviceProviderProxy>();
+    private ImmutableList<IDeviceProviderProxy> _deviceProviderPlugins = ImmutableList.Create<IDeviceProviderProxy>();
 
     /// <summary>
     /// Gets the steps.
@@ -21,7 +21,12 @@ internal sealed class PluginsService : IPluginsService
     /// <value>
     /// The steps.
     /// </value>
-    public IEnumerable<IStepProxy> Steps => _stepPlugins;
+    public IReadOnlyCollection<IStepProxy> Steps => _stepPlugins;
+
+    /// <summary>
+    /// Gets the device providers.
+    /// </summary>
+    public IReadOnlyCollection<IDeviceProviderProxy> DeviceProviders => _deviceProviderPlugins;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PluginsService"/> class.
@@ -44,6 +49,8 @@ internal sealed class PluginsService : IPluginsService
     public void Load()
     {
         _stepPlugins = _stepPlugins.Clear();
+        _deviceProviderPlugins = _deviceProviderPlugins.Clear();
+
         try
         {
             string? configFolder = _configuration.GetValue<string>("AyBorg:Plugins:Folder");
@@ -138,7 +145,7 @@ internal sealed class PluginsService : IPluginsService
             {
                 if (ActivatorUtilities.CreateInstance(_serviceProvider, dm) is IDeviceProvider di)
                 {
-                    _deviceManagerPlugins = _deviceManagerPlugins.Add(new DeviceProviderProxy(_loggerFactory, _loggerFactory.CreateLogger<DeviceProviderProxy>(), di));
+                    _deviceProviderPlugins = _deviceProviderPlugins.Add(new DeviceProviderProxy(_loggerFactory, _loggerFactory.CreateLogger<DeviceProviderProxy>(), di));
                     _logger.LogTrace((int)EventLogType.Plugin, "Added device manager plugin '{di.GetType.Name}'.", di.GetType().Name);
                 }
             }

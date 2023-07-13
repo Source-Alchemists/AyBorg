@@ -90,6 +90,7 @@ builder.Services.AddScoped<IRuntimeService, RuntimeService>();
 builder.Services.AddScoped<IAgentOverviewService, AgentsOverviewService>();
 builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddScoped<IEventLogService, EventLogService>();
+builder.Services.AddScoped<IDeviceManagerService, DeviceManagerService>();
 
 builder.Services.AddTransient<ITokenProvider, TokenProvider>();
 builder.Services.AddTransient<IStorageService, StorageService>();

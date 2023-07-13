@@ -19,6 +19,7 @@ internal static class GrpcClientExtension
         CreateClientFactory<Notify.NotifyClient>(builder, gatewayUrl);
         CreateClientFactory<EventLog.EventLogClient>(builder, gatewayUrl);
         CreateClientFactory<Audit.AuditClient>(builder, gatewayUrl);
+        CreateClientFactory<DeviceManager.DeviceManagerClient>(builder, gatewayUrl);
         return builder;
     }
 
