@@ -1,0 +1,35 @@
+@page "/agents/devices/{serviceId}"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
+
+@if (string.IsNullOrEmpty(_serviceName))
+{
+    <PageTitle>AyBorg - Devices</PageTitle>
+}
+else
+{
+    <PageTitle>AyBorg - Devices (@_serviceName)</PageTitle>
+}
+
+<AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudGrid class="pt-1">
+    <MudItem xs="12">
+        <MudCard Class="rounded-lg">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudIcon Icon="@Icons.Material.Filled.DeviceHub" Size="Size.Large" Color="Color.Default" />
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Devices</MudText>
+                </CardHeaderContent>
+                 <CardHeaderActions>
+                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox" Color="Color.Primary" OnClick="@OnAddDeviceClicked">Add Device</MudButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+        </MudCard>
+    </MudItem>
+</MudGrid>

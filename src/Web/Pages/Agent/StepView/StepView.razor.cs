@@ -3,6 +3,7 @@ using AyBorg.SDK.Common.Ports;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
 using Toolbelt.Blazor.HotKeys2;
 
@@ -14,12 +15,14 @@ public partial class StepView : ComponentBase, IDisposable
 {
     private bool _disposedValue;
     private HotKeysContext _hotKeysContext = null!;
+    private string _serviceUniqueName;
 
-    [Parameter] public string UniqueName { get; init; }
+    [Parameter] public string ServiceId { get; init; } = string.Empty;
     [Parameter] public string StepId { get; init; }
     [Inject] public HotKeys HotKeys { get; init; }
     [Inject] public IFlowService FlowService { get; init; }
     [Inject] public INotifyService NotifyService { get; init; }
+    [Inject] IRegistryService RegistryService { get; init; }
 
     private bool _isLoading = true;
     private Step _step = new();
@@ -38,8 +41,17 @@ public partial class StepView : ComponentBase, IDisposable
         await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+            IEnumerable<ServiceInfoEntry> services = await RegistryService!.ReceiveServicesAsync();
+            ServiceInfoEntry service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
+            if (service == null)
+            {
+                return;
+            }
+
+            _serviceUniqueName = service.UniqueName;
+
             var stepGuid = Guid.Parse(StepId);
-            _step = await FlowService.GetStepAsync(UniqueName, new Step { Id = stepGuid }, null, true, false, false);
+            _step = await FlowService.GetStepAsync(_serviceUniqueName, new Step { Id = stepGuid }, null, true, false, false);
             _node = new FlowNode(_step);
             var flowPorts = new List<FlowPort>();
 
@@ -53,7 +65,7 @@ public partial class StepView : ComponentBase, IDisposable
             await UpdateNode(null);
 
             if (_iterationFinishedSubscription != null) _iterationFinishedSubscription.Callback -= IterationFinishedNotificationReceived;
-            _iterationFinishedSubscription = NotifyService.Subscribe(UniqueName, SDK.Communication.gRPC.NotifyType.AgentIterationFinished);
+            _iterationFinishedSubscription = NotifyService.Subscribe(_serviceUniqueName, SDK.Communication.gRPC.NotifyType.AgentIterationFinished);
             _iterationFinishedSubscription.Callback += IterationFinishedNotificationReceived;
             _isLoading = false;
             await InvokeAsync(StateHasChanged);
@@ -62,7 +74,7 @@ public partial class StepView : ComponentBase, IDisposable
 
     private async ValueTask UpdateNode(Guid? iterationId)
     {
-        Step fullStep = await FlowService.GetStepAsync(UniqueName, _step, iterationId, true, false, false);
+        Step fullStep = await FlowService.GetStepAsync(_serviceUniqueName, _step, iterationId, true, false, false);
 
         foreach (Port port in fullStep.Ports)
         {

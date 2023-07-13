@@ -4,11 +4,11 @@ using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent;
 
-public sealed class DeviceManagerProxy : IDeviceManagerProxy
+public sealed class DeviceProviderProxy : IDeviceProviderProxy
 {
     private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<DeviceManagerProxy> _logger;
-    private readonly IDeviceManager _deviceManager;
+    private readonly ILogger<DeviceProviderProxy> _logger;
+    private readonly IDeviceProvider _deviceManager;
     private ImmutableList<IDeviceProxy> _devices = ImmutableList.Create<IDeviceProxy>();
     private bool _isDisposed = false;
 
@@ -16,7 +16,7 @@ public sealed class DeviceManagerProxy : IDeviceManagerProxy
 
     public IReadOnlyCollection<IDeviceProxy> Devices => _devices;
 
-    public DeviceManagerProxy(ILoggerFactory loggerFactory, ILogger<DeviceManagerProxy> logger, IDeviceManager deviceManager)
+    public DeviceProviderProxy(ILoggerFactory loggerFactory, ILogger<DeviceProviderProxy> logger, IDeviceProvider deviceManager)
     {
         _loggerFactory = loggerFactory;
         _logger = logger;

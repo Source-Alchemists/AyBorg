@@ -13,7 +13,7 @@ internal sealed class PluginsService : IPluginsService
     private readonly IServiceProvider _serviceProvider;
     private readonly IConfiguration _configuration;
     private ImmutableList<IStepProxy> _stepPlugins = ImmutableList.Create<IStepProxy>();
-    private ImmutableList<IDeviceManagerProxy> _deviceManagerPlugins = ImmutableList.Create<IDeviceManagerProxy>();
+    private ImmutableList<IDeviceProviderProxy> _deviceManagerPlugins = ImmutableList.Create<IDeviceProviderProxy>();
 
     /// <summary>
     /// Gets the steps.
@@ -115,7 +115,7 @@ internal sealed class PluginsService : IPluginsService
     private bool TryLoadPlugins(Assembly assembly)
     {
         Type stepBodyType = typeof(IStepBody);
-        Type deviceManagerType = typeof(IDeviceManager);
+        Type deviceManagerType = typeof(IDeviceProvider);
 
         IEnumerable<Type> stepPlugins = assembly.GetTypes().Where(p => stepBodyType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
         IEnumerable<Type> deviceManagerPlugins = assembly.GetTypes().Where(p => deviceManagerType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
@@ -136,9 +136,9 @@ internal sealed class PluginsService : IPluginsService
         {
             foreach (Type dm in deviceManagerPlugins)
             {
-                if (ActivatorUtilities.CreateInstance(_serviceProvider, dm) is IDeviceManager di)
+                if (ActivatorUtilities.CreateInstance(_serviceProvider, dm) is IDeviceProvider di)
                 {
-                    _deviceManagerPlugins = _deviceManagerPlugins.Add(new DeviceManagerProxy(_loggerFactory, _loggerFactory.CreateLogger<DeviceManagerProxy>(), di));
+                    _deviceManagerPlugins = _deviceManagerPlugins.Add(new DeviceProviderProxy(_loggerFactory, _loggerFactory.CreateLogger<DeviceProviderProxy>(), di));
                     _logger.LogTrace((int)EventLogType.Plugin, "Added device manager plugin '{di.GetType.Name}'.", di.GetType().Name);
                 }
             }

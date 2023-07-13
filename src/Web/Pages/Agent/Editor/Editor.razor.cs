@@ -24,8 +24,7 @@ public partial class Editor : ComponentBase
     /// <summary>
     /// Gets or sets the service identifier.
     /// </summary>
-    [Parameter]
-    public string ServiceId { get; init; } = string.Empty;
+    [Parameter] public string ServiceId { get; init; } = string.Empty;
 
     [Inject] IRegistryService? RegistryService { get; init; }
     [Inject] IProjectManagementService? ProjectManagementService { get; init; }
@@ -41,7 +40,6 @@ public partial class Editor : ComponentBase
             _areSubComponentsHidden = true;
             await InvokeAsync(StateHasChanged);
             IEnumerable<ServiceInfoEntry> services = await RegistryService!.ReceiveServicesAsync();
-
             ServiceInfoEntry? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
             if (service == null)
             {

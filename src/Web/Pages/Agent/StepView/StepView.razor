@@ -1,4 +1,4 @@
-@page "/agents/editor/{uniqueName}/step/{stepId}"
+@page "/agents/editor/{serviceId}/step/{stepId}"
 @using AyBorg.Web.Pages.Agent.Shared
 @using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
@@ -17,7 +17,10 @@ else{
             <MudText Typo="Typo.h6" Class="pl-3">@_step.Name</MudText>
         </MudItem>
         <MudItem xs="4">
-            <RuntimeToolbar ServiceUniqueName="@UniqueName" />
+            @if (!string.IsNullOrEmpty(_serviceUniqueName))
+            {
+                <RuntimeToolbar ServiceUniqueName="@_serviceUniqueName" />
+            }
         </MudItem>
         <MudItem xs="4" Class="overflow-y-auto" Style="height: 60px">
             @foreach (var category in _step.Categories)

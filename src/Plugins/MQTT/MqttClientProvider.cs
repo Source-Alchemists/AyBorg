@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.MQTT;
 
-public sealed class MqttClientManager : IDeviceManager
+public sealed class MqttClientProvider : IDeviceProvider
 {
     private readonly ILoggerFactory _loggerFactory;
-    private readonly ILogger<MqttClientManager> _logger;
+    private readonly ILogger<MqttClientProvider> _logger;
     private readonly IMqttClientProviderFactory _clientProviderFactory;
 
     public string Name => "MQTT Clients";
@@ -16,14 +16,14 @@ public sealed class MqttClientManager : IDeviceManager
 
     public bool CanCreate => true;
 
-    public MqttClientManager(ILogger<MqttClientManager> logger, ILoggerFactory loggerFactory)
+    public MqttClientProvider(ILogger<MqttClientProvider> logger, ILoggerFactory loggerFactory)
     {
         _logger = logger;
         _loggerFactory = loggerFactory;
         _clientProviderFactory = new MqttClientProviderFactory();
     }
 
-    public MqttClientManager(ILogger<MqttClientManager> logger, ILoggerFactory loggerFactory, IMqttClientProviderFactory clientProviderFactory)
+    public MqttClientProvider(ILogger<MqttClientProvider> logger, ILoggerFactory loggerFactory, IMqttClientProviderFactory clientProviderFactory)
     {
         _logger = logger;
         _loggerFactory = loggerFactory;

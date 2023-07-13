@@ -77,7 +77,7 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
 
     private void OnStepFullScreenClicked()
     {
-        NavigationManager.NavigateTo($"/agents/editor/{StateService.AgentState.UniqueName}/step/{Node.Step.Id}");
+        NavigationManager.NavigateTo($"/agents/editor/{StateService.AgentState.ServiceId}/step/{Node.Step.Id}");
     }
 
     protected virtual void Dispose(bool disposing)

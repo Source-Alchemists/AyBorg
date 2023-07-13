@@ -12,6 +12,7 @@ public partial class Projects : ComponentBase
 {
     private string _serviceName = string.Empty;
     private bool _hasServiceError = false;
+    private bool _isLoading = true;
     private IEnumerable<ProjectMeta> _readyProjects = new List<ProjectMeta>();
     private IEnumerable<ProjectMeta> _reviewProjects = new List<ProjectMeta>();
     private IEnumerable<ProjectMeta> _draftProjects = new List<ProjectMeta>();
@@ -43,6 +44,7 @@ public partial class Projects : ComponentBase
             await StateService.SetAgentStateAsync(new UiAgentState(service));
 
             await ReceiveProjectsAsync();
+            _isLoading = false;
             await InvokeAsync(StateHasChanged);
         }
     }
