@@ -22,10 +22,10 @@ public class DeviceManagerService : IDeviceManagerService
         });
 
         var result = new List<DeviceProviderMeta>();
-        foreach (DeviceProvider? dtoProvider in response.DeviceProviders)
+        foreach (DeviceProviderDto? dtoProvider in response.DeviceProviders)
         {
             var devices = new List<DeviceMeta>();
-            foreach (Device? dtoDevice in dtoProvider.Devices)
+            foreach (DeviceDto? dtoDevice in dtoProvider.Devices)
             {
                 DeviceMeta device = ToObject(dtoDevice);
                 devices.Add(device);
@@ -42,22 +42,51 @@ public class DeviceManagerService : IDeviceManagerService
         return result;
     }
 
-    public async ValueTask<DeviceMeta> AddDeviceAsync(string agentUniqueName, string deviceProvideName, string deviceId)
+    public async ValueTask<DeviceMeta> AddDeviceAsync(AddDeviceOptions options)
     {
-        Device response = await _deviceManagerClient.AddAsync(new AddDeviceRequest
+        DeviceDto response = await _deviceManagerClient.AddAsync(new AddDeviceRequest
         {
-            AgentUniqueName = agentUniqueName,
-            DeviceProviderName = deviceProvideName,
-            DeviceId = deviceId
+            AgentUniqueName = options.AgentUniqueName,
+            DeviceProviderName = options.DeviceProviderName,
+            DeviceId = options.DeviceId
         });
 
         return ToObject(response);
     }
 
-    private static DeviceMeta ToObject(Device dtoDevice) => new()
+    public async ValueTask<DeviceMeta> RemoveDeviceAsync(RemoveDeviceOptions options)
+    {
+        DeviceDto response = await _deviceManagerClient.RemoveAsync(new RemoveDeviceRequest
+        {
+            AgentUniqueName = options.AgentUniqueName,
+            DeviceId = options.DeviceId
+        });
+
+        return ToObject(response);
+    }
+
+    public async ValueTask<DeviceMeta> ChangeDeviceStateAsync(ChangeDeviceStateOptions options)
+    {
+        DeviceDto response = await _deviceManagerClient.ChangeStateAsync(new DeviceStateRequest
+        {
+            AgentUniqueName = options.AgentUniqueName,
+            DeviceId = options.DeviceId,
+            Activate = options.Activate
+        });
+
+        return ToObject(response);
+    }
+
+    private static DeviceMeta ToObject(DeviceDto dtoDevice) => new()
     {
         Id = dtoDevice.Id,
         Name = dtoDevice.Name,
+        IsActive = dtoDevice.IsActive,
+        IsConnected = dtoDevice.IsConnected,
         Categories = dtoDevice.Categories
     };
+
+    public sealed record AddDeviceOptions (string AgentUniqueName, string DeviceProviderName, string DeviceId);
+    public sealed record RemoveDeviceOptions (string AgentUniqueName, string DeviceId);
+    public sealed record ChangeDeviceStateOptions (string AgentUniqueName, string DeviceId, bool Activate);
 }

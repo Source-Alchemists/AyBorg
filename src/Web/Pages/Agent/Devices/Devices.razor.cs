@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
+using AyBorg.SDK.Projects;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
+using AyBorg.Web.Shared.Modals;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Shared.Models.Agent;
 using Microsoft.AspNetCore.Components;
@@ -20,6 +22,7 @@ public partial class Devices : ComponentBase
     [Inject] IRegistryService RegistryService { get; init; } = null!;
     [Inject] IDialogService DialogService { get; init; } = null!;
     [Inject] IDeviceManagerService DeviceManagerService { get; init; } = null!;
+    [Inject] ISnackbar Snackbar { get; init; } = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -70,9 +73,60 @@ public partial class Devices : ComponentBase
             FullWidth = true
         });
         DialogResult result = await dialogReference.Result;
-        if(!result.Cancelled)
+        if (!result.Cancelled)
         {
             await UpdateProviderCollection();
         }
+    }
+
+    private async Task OnRemoveDeviceClicked(DeviceMeta deviceMeta)
+    {
+        IDialogReference dialogReference = DialogService.Show<ConfirmDialog>("Remove Device", new DialogParameters {
+            { "ContentText", $"Are you sure you want to remove device '{deviceMeta.Name}'?"  }
+        });
+        DialogResult result = await dialogReference.Result;
+        if (!result.Cancelled)
+        {
+            _isLoading = true;
+            await InvokeAsync(StateHasChanged);
+            try
+            {
+                DeviceMeta removedDevice = await DeviceManagerService.RemoveDeviceAsync(new DeviceManagerService.RemoveDeviceOptions(_serviceUniqueName, deviceMeta.Id));
+                _devices = _devices.Remove(deviceMeta);
+            }
+            catch (Exception)
+            {
+                Snackbar.Add("Could not remove device", Severity.Warning);
+            }
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task OnActivateDeviceClicked(DeviceMeta deviceMeta)
+    {
+        await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateOptions(_serviceUniqueName, deviceMeta.Id, true));
+    }
+
+    private async Task OnDeactivateDeviceClicked(DeviceMeta deviceMeta)
+    {
+        await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateOptions(_serviceUniqueName, deviceMeta.Id, false));
+    }
+
+    private async ValueTask ChangeDeviceState(DeviceManagerService.ChangeDeviceStateOptions options)
+    {
+        _isLoading = true;
+        await InvokeAsync(StateHasChanged);
+        DeviceMeta updatedDevice = await DeviceManagerService.ChangeDeviceStateAsync(options);
+        DeviceMeta oldDevice = _devices.First(d => d.Id.Equals(updatedDevice.Id, StringComparison.InvariantCultureIgnoreCase));
+        _devices = _devices.Replace(oldDevice, updatedDevice);
+        _isLoading = false;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private bool CanAdd(DeviceMeta deviceMeta)
+    {
+        DeviceProviderMeta provider = _deviceProviders.First(p => p.Devices.Any(d => d.Id.Equals(deviceMeta.Id, StringComparison.InvariantCultureIgnoreCase)));
+        return provider.CanAdd;
     }
 }

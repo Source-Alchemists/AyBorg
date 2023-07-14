@@ -1,6 +1,7 @@
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication;
 using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.System.Runtime;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
@@ -12,17 +13,19 @@ namespace AyBorg.Plugins.MQTT.Tests
         private static readonly NullLogger<ICommunicationDevice> s_logger = new();
         private readonly Mock<IMqttClientProviderFactory> _clientProviderFactoryMock = new();
         private readonly Mock<IMqttClientProvider> _clientProviderMock = new();
+        private readonly Mock<ICommunicationStateProvider> _communicationStateProviderMock = new();
 
         public MqttClientTests() {
             _clientProviderFactoryMock.Setup(f => f.Create(It.IsAny<ILogger>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<int>()))
                 .Returns(_clientProviderMock.Object);
+            _communicationStateProviderMock.Setup(m => m.IsResultCommunicationEnabled).Returns(true);
         }
 
         [Fact]
         public async Task TryConnectAsync_ShouldConnectToMqttBroker()
         {
             // Arrange
-            using var mqttClient = new MqttClient(s_logger, _clientProviderFactoryMock.Object, "mqtt-client");
+            using var mqttClient = new MqttClient(s_logger, _clientProviderFactoryMock.Object, _communicationStateProviderMock.Object, "mqtt-client");
 
             // Act
             bool result = await mqttClient.TryConnectAsync();
@@ -37,7 +40,7 @@ namespace AyBorg.Plugins.MQTT.Tests
         public async Task TrySendAsync_ShouldPublishMqttMessage()
         {
             // Arrange
-            using var mqttClient = new MqttClient(s_logger, _clientProviderFactoryMock.Object, "mqtt-client");
+            using var mqttClient = new MqttClient(s_logger, _clientProviderFactoryMock.Object, _communicationStateProviderMock.Object, "mqtt-client");
             string messageId = "test-message";
             var portMock = new Mock<IPort>();
 
@@ -56,7 +59,7 @@ namespace AyBorg.Plugins.MQTT.Tests
             // Arrange
             var rawSub = new MqttSubscription();
             _clientProviderMock.Setup(m => m.SubscribeAsync(It.IsAny<string>())).ReturnsAsync(rawSub);
-            using var mqttClient = new MqttClient(s_logger, _clientProviderFactoryMock.Object, "mqtt-client");
+            using var mqttClient = new MqttClient(s_logger, _clientProviderFactoryMock.Object, _communicationStateProviderMock.Object, "mqtt-client");
             string messageId = "test-message";
 
             // Act
@@ -74,7 +77,7 @@ namespace AyBorg.Plugins.MQTT.Tests
             // Arrange
             var rawSub = new MqttSubscription();
             _clientProviderMock.Setup(m => m.SubscribeAsync(It.IsAny<string>())).ReturnsAsync(rawSub);
-            using var mqttClient = new MqttClient(s_logger, _clientProviderFactoryMock.Object, "mqtt-client");
+            using var mqttClient = new MqttClient(s_logger, _clientProviderFactoryMock.Object, _communicationStateProviderMock.Object, "mqtt-client");
             string messageId = "test-message";
             var subscriptionMock = new Mock<IMessageSubscription>();
             subscriptionMock.Setup(m => m.Id).Returns(messageId);

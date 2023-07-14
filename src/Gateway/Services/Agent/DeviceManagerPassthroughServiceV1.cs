@@ -19,17 +19,24 @@ public sealed class DeviceManagerPassthroughServiceV1 : DeviceManager.DeviceMana
         return await client.GetAvailableProvidersAsync(request);
     }
 
-    public override async Task<Device> Add(AddDeviceRequest request, ServerCallContext context)
+    public override async Task<DeviceDto> Add(AddDeviceRequest request, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         DeviceManager.DeviceManagerClient client = _grpcChannelService.CreateClient<DeviceManager.DeviceManagerClient>(request.AgentUniqueName);
         return await client.AddAsync(request, headers);
     }
 
-    public override async Task<Device> Remove(RemoveDeviceRequest request, ServerCallContext context)
+    public override async Task<DeviceDto> Remove(RemoveDeviceRequest request, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         DeviceManager.DeviceManagerClient client = _grpcChannelService.CreateClient<DeviceManager.DeviceManagerClient>(request.AgentUniqueName);
         return await client.RemoveAsync(request, headers);
+    }
+
+    public override async Task<DeviceDto> ChangeState(DeviceStateRequest request, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
+        DeviceManager.DeviceManagerClient client = _grpcChannelService.CreateClient<DeviceManager.DeviceManagerClient>(request.AgentUniqueName);
+        return await client.ChangeStateAsync(request, headers);
     }
 }

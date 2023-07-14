@@ -2,6 +2,7 @@ using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication;
 using AyBorg.SDK.Communication.MQTT;
+using AyBorg.SDK.System.Runtime;
 using ImageTorque.Processing;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
@@ -17,25 +18,28 @@ namespace AyBorg.Plugins.MQTT
         private readonly BooleanPort _retain = new("Retain", PortDirection.Input, false);
         private readonly EnumPort _encoder = new("Encoder", PortDirection.Input, EncoderType.Jpeg);
         private readonly IMqttClientProviderFactory _clientProviderFactory;
+        private readonly ICommunicationStateProvider _communicationStateProvider;
         private readonly Dictionary<MessageSubscription, MqttSubscription> _subscriptions = new();
         private IMqttClientProvider _mqttClientProvider = null!;
-        private bool _isConnected;
         private bool _isDisposed;
 
         public string Id { get; }
 
         public string Name { get; }
 
+        public bool IsConnected { get; private set; }
+
         public IReadOnlyCollection<string> Categories { get; } = new List<string> { "Communication", "MQTT" };
 
         public IEnumerable<IPort> Ports { get; }
 
-        public MqttClient(ILogger<ICommunicationDevice> logger, IMqttClientProviderFactory clientProviderFactory, string id)
+        public MqttClient(ILogger<ICommunicationDevice> logger, IMqttClientProviderFactory clientProviderFactory, ICommunicationStateProvider communicationStateProvider, string id)
         {
             _logger = logger;
             _clientProviderFactory = clientProviderFactory;
+            _communicationStateProvider = communicationStateProvider;
             Id = id;
-            Name = $"MQTT-{id}";
+            Name = $"MQTT-Client ({id})";
 
             Ports = new List<IPort> {
             _host,
@@ -53,23 +57,43 @@ namespace AyBorg.Plugins.MQTT
                 _mqttClientProvider?.Dispose();
                 _mqttClientProvider = _clientProviderFactory.Create(_logger, Name, _host.Value, Convert.ToInt32(_port.Value));
                 await _mqttClientProvider.ConnectAsync();
-                _isConnected = true;
+                IsConnected = true;
+                return true;
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(new EventId((int)EventLogType.Plugin), ex, "Failed connecting to MQTT broker");
                 return false;
             }
+        }
 
-            return true;
+        public ValueTask<bool> TryDisconnectAsync()
+        {
+            try
+            {
+                _mqttClientProvider?.Dispose();
+                IsConnected = false;
+                return ValueTask.FromResult(true);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(new EventId((int)EventLogType.Plugin), ex, "Failed disconnecting from MQTT broker");
+                return ValueTask.FromResult(false);
+            }
         }
 
         public async ValueTask<bool> TrySendAsync(string messageId, IPort port)
         {
-            if (!_isConnected)
+            if (!IsConnected)
             {
                 _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Not connected to MQTT broker");
                 return false;
+            }
+
+            if (!_communicationStateProvider.IsResultCommunicationEnabled)
+            {
+                _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Communication is disabled");
+                return true;
             }
 
             try
@@ -92,7 +116,7 @@ namespace AyBorg.Plugins.MQTT
 
         public async ValueTask<IMessageSubscription> SubscribeAsync(string messageId)
         {
-            if (!_isConnected)
+            if (!IsConnected)
             {
                 _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Not connected to MQTT broker");
                 throw new InvalidOperationException("Not connected to MQTT broker");
@@ -123,7 +147,7 @@ namespace AyBorg.Plugins.MQTT
 
         public async ValueTask UnsubscribeAsync(IMessageSubscription subscription)
         {
-            if (!_isConnected)
+            if (!IsConnected)
             {
                 _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Not connected to MQTT broker");
                 throw new InvalidOperationException("Not connected to MQTT broker");

@@ -42,7 +42,7 @@ builder.Services.AddSingleton<IPluginsService, PluginsService>();
 builder.Services.AddSingleton<IEngineHost, EngineHost>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
-builder.Services.AddSingleton<IDeviceManagerService, DeviceManagerService>();
+builder.Services.AddSingleton<IDeviceManager, DeviceManager>();
 
 builder.Services.AddTransient<IJwtConsumer, JwtConsumer>();
 // Repositories
@@ -57,6 +57,7 @@ builder.Services.AddTransient<IRuntimeToStorageMapper, RuntimeToStorageMapper>()
 builder.Services.AddTransient<IRuntimeConverterService, RuntimeConverterService>();
 // Runtime / Project
 builder.Services.AddTransient<IFlowService, FlowService>();
+builder.Services.AddSingleton<IDeviceProxyManagerService, DeviceProxyManagerService>();
 builder.Services.AddTransient<IEngineFactory, EngineFactory>();
 builder.Services.AddTransient<IStorageService, StorageService>();
 builder.Services.AddTransient<INotifyService, NotifyService>();

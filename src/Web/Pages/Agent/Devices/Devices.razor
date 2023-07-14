@@ -26,8 +26,9 @@ else
                 <CardHeaderContent>
                     <MudText Typo="Typo.h6">Devices</MudText>
                 </CardHeaderContent>
-                 <CardHeaderActions>
-                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox" Color="Color.Primary" OnClick="@OnAddDeviceClicked">Add Device</MudButton>
+                <CardHeaderActions>
+                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox"
+                        Color="Color.Primary" OnClick="@OnAddDeviceClicked">Add Device</MudButton>
                 </CardHeaderActions>
             </MudCardHeader>
             <MudCardContent>
@@ -38,7 +39,7 @@ else
                         <MudTh>Id</MudTh>
                         <MudTh>Name</MudTh>
                         <MudTh Style="width: 30%">Categories</MudTh>
-                        <MudTh Style="width: 30px">Actions</MudTh>
+                        <MudTh Style="width: 30px"></MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Active">
@@ -50,7 +51,15 @@ else
                         <MudTd DataLabel="Connected">
                             @if (@context.IsConnected)
                             {
-                                <MudIcon Icon="@Icons.Filled.Check" />
+                                <MudTooltip Text="Connected">
+                                    <MudIcon Icon="@Icons.Material.Filled.Power" Color="Color.Success" />
+                                </MudTooltip>
+                            }
+                            else
+                            {
+                                <MudTooltip Text="Disconnected">
+                                    <MudIcon Icon="@Icons.Material.Filled.PowerOff" Color="Color.Warning" />
+                                </MudTooltip>
                             }
                         </MudTd>
                         <MudTd DataLabel="Id">@context.Id</MudTd>
@@ -58,12 +67,31 @@ else
                         <MudTd DataLabel="Categories">
                             @foreach (var category in @context.Categories.Order())
                             {
-                                <MudChip Size="Size.Small" Text="@category" Disabled/>
+                                <MudChip Size="Size.Small" Text="@category" Disabled />
                             }
                         </MudTd>
                         <MudTd DataLabel="Actions">
                             <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
+                                @if (@context.IsConnected)
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.PowerOff" IconColor="Color.Warning" OnClick="() => OnDeactivateDeviceClicked(context)">
+                                        Deactivate
+                                    </MudMenuItem>
+                                }
+                                else
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.Power" IconColor="Color.Success" OnClick="() => OnActivateDeviceClicked(context)">
+                                        Activate
+                                    </MudMenuItem>
+                                }
 
+                                <MudMenuItem Icon="@Icons.Material.Filled.Settings">
+                                    Settings
+                                </MudMenuItem>
+                                <MudDivider />
+                                <MudMenuItem Icon="@Icons.Material.Filled.Remove" IconColor="Color.Error" OnClick="() => OnRemoveDeviceClicked(context)" Disabled=@(!CanAdd(context))>
+                                    Remove
+                                </MudMenuItem>
                             </MudMenu>
                         </MudTd>
                     </RowTemplate>

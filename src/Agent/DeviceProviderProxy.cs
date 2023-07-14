@@ -8,13 +8,13 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
 {
     private readonly ILoggerFactory _loggerFactory;
     private readonly ILogger<DeviceProviderProxy> _logger;
-    private readonly IDeviceProvider _deviceManager;
+    private readonly IDeviceProvider _deviceProvider;
     private ImmutableList<IDeviceProxy> _devices = ImmutableList.Create<IDeviceProxy>();
     private bool _isDisposed = false;
 
-    public string Name => _deviceManager.Name;
+    public string Name => _deviceProvider.Name;
 
-    public bool CanAdd => _deviceManager.CanCreate;
+    public bool CanAdd => _deviceProvider.CanCreate;
 
     public IReadOnlyCollection<IDeviceProxy> Devices => _devices;
 
@@ -22,14 +22,14 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
     {
         _loggerFactory = loggerFactory;
         _logger = logger;
-        _deviceManager = deviceManager;
+        _deviceProvider = deviceManager;
     }
 
     public async ValueTask<bool> TryInitializeAsync()
     {
         try
         {
-            if (_deviceManager is IInitializable initializable)
+            if (_deviceProvider is IInitializable initializable)
             {
                 await initializable.OnInitializeAsync();
             }
@@ -38,34 +38,34 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
         }
         catch (Exception ex)
         {
-            _logger.LogWarning((int)EventLogType.Plugin, ex, "Failed to initialize device manager '{name}'", _deviceManager.Name);
+            _logger.LogWarning((int)EventLogType.Plugin, ex, "Failed to initialize device manager '{name}'", _deviceProvider.Name);
             return false;
         }
     }
 
-    public async ValueTask<IDeviceProxy> AddAsync(string id)
+    public async ValueTask<IDeviceProxy> AddAsync(AddDeviceOptions options)
     {
-        if (!_deviceManager.CanCreate)
+        if (!_deviceProvider.CanCreate)
         {
             throw new InvalidOperationException("Device manager does not support adding devices");
         }
 
-        if (Devices.Any(d => d.Name.Equals(id, StringComparison.InvariantCultureIgnoreCase)))
+        if (Devices.Any(d => d.Name.Equals(options.DeviceId, StringComparison.InvariantCultureIgnoreCase)))
         {
-            throw new InvalidOperationException($"Device with name '{id}' already exists");
+            throw new InvalidOperationException($"Device with name '{options.DeviceId}' already exists");
         }
 
-        IDevice device = await _deviceManager.CreateAsync(id);
+        IDevice device = await _deviceProvider.CreateAsync(options.DeviceId);
         var deviceProxy = new DeviceProxy(_loggerFactory.CreateLogger<IDeviceProxy>(), device);
         _devices = _devices.Add(deviceProxy);
-        _logger.LogInformation((int)EventLogType.Plugin, "Added device '{id}'", id);
+        _logger.LogInformation((int)EventLogType.Plugin, "Added device '{id}'", options.DeviceId);
         return deviceProxy;
     }
 
     public ValueTask<IDeviceProxy> RemoveAsync(string id)
     {
 
-        IDeviceProxy? deviceProxy = Devices.FirstOrDefault(d => d.Name.Equals(id, StringComparison.InvariantCultureIgnoreCase)) ?? throw new KeyNotFoundException($"Device with name '{id}' does not exist");
+        IDeviceProxy? deviceProxy = Devices.FirstOrDefault(d => d.Id.Equals(id, StringComparison.InvariantCultureIgnoreCase)) ?? throw new KeyNotFoundException($"Device with id '{id}' does not exist");
 
         if (deviceProxy is IDisposable disposable)
         {
@@ -89,7 +89,7 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
                 }
             }
 
-            if (_deviceManager is IDisposable disposable)
+            if (_deviceProvider is IDisposable disposable)
             {
                 disposable.Dispose();
             }
