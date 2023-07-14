@@ -18,6 +18,11 @@ public partial class AddDeviceDialog : ComponentBase
     private string _providerError = string.Empty;
     private string _deviceError = string.Empty;
 
+    protected override void OnParametersSet() {
+         base.OnParametersSet();
+         _selectedProvider = DeviceProviders.FirstOrDefault()!;
+    }
+
     private void OnCloseClicked()
     {
         MudDialog.Cancel();

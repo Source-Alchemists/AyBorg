@@ -24,7 +24,9 @@ else
                     <MudIcon Icon="@Icons.Material.Filled.DeviceHub" Size="Size.Large" Color="Color.Default" />
                 </CardHeaderAvatar>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Devices</MudText>
+                    <MudBadge Content="@(_devices.Count)" Overlap="true" Color="Color.Primary">
+                        <MudText Typo="Typo.h6">Devices</MudText>
+                    </MudBadge>
                 </CardHeaderContent>
                 <CardHeaderActions>
                     <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox"

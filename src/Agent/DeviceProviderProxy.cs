@@ -62,10 +62,19 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
         return deviceProxy;
     }
 
-    public ValueTask<IDeviceProxy> RemoveAsync(string id)
+    public async ValueTask<IDeviceProxy> RemoveAsync(string id)
     {
 
         IDeviceProxy? deviceProxy = Devices.FirstOrDefault(d => d.Id.Equals(id, StringComparison.InvariantCultureIgnoreCase)) ?? throw new KeyNotFoundException($"Device with id '{id}' does not exist");
+
+        if (deviceProxy.IsConnected)
+        {
+            if (!await deviceProxy.TryDisconnectAsync())
+            {
+                _logger.LogWarning((int)EventLogType.Plugin, "Failed to disconnect device '{id}'", id);
+                return deviceProxy;
+            }
+        }
 
         if (deviceProxy is IDisposable disposable)
         {
@@ -74,7 +83,7 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
 
         _devices = _devices.Remove(deviceProxy);
         _logger.LogInformation((int)EventLogType.Plugin, "Removed device '{id}'", id);
-        return ValueTask.FromResult(deviceProxy);
+        return deviceProxy;
     }
 
     public void Dispose(bool disposing)

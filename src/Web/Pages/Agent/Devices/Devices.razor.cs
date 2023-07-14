@@ -93,6 +93,7 @@ public partial class Devices : ComponentBase
             {
                 DeviceMeta removedDevice = await DeviceManagerService.RemoveDeviceAsync(new DeviceManagerService.RemoveDeviceOptions(_serviceUniqueName, deviceMeta.Id));
                 _devices = _devices.Remove(deviceMeta);
+                _deviceProviders = await DeviceManagerService.GetDeviceProvidersAsync(_serviceUniqueName);
             }
             catch (Exception)
             {
@@ -105,12 +106,26 @@ public partial class Devices : ComponentBase
 
     private async Task OnActivateDeviceClicked(DeviceMeta deviceMeta)
     {
-        await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateOptions(_serviceUniqueName, deviceMeta.Id, true));
+        IDialogReference dialogReference = DialogService.Show<ConfirmDialog>("Activate Device", new DialogParameters {
+            { "ContentText", $"Are you sure you want to activate device '{deviceMeta.Name}'?"  }
+        });
+        DialogResult result = await dialogReference.Result;
+        if (!result.Cancelled)
+        {
+            await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateOptions(_serviceUniqueName, deviceMeta.Id, true));
+        }
     }
 
     private async Task OnDeactivateDeviceClicked(DeviceMeta deviceMeta)
     {
-        await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateOptions(_serviceUniqueName, deviceMeta.Id, false));
+        IDialogReference dialogReference = DialogService.Show<ConfirmDialog>("Deactivate Device", new DialogParameters {
+            { "ContentText", $"Are you sure you want to deactivate device '{deviceMeta.Name}'?"  }
+        });
+        DialogResult result = await dialogReference.Result;
+        if (!result.Cancelled)
+        {
+            await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateOptions(_serviceUniqueName, deviceMeta.Id, false));
+        }
     }
 
     private async ValueTask ChangeDeviceState(DeviceManagerService.ChangeDeviceStateOptions options)
