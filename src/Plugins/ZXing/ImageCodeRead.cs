@@ -40,7 +40,7 @@ namespace AyBorg.Plugins.ZXing
             };
         }
 
-        public IEnumerable<IPort> Ports { get; }
+        public IReadOnlyCollection<IPort> Ports { get; }
 
         public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
         {

@@ -18,7 +18,7 @@ public sealed class ImageArithemtic : IStepBody, IDisposable
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.Math };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public ImageArithemtic(ILogger<ImageArithemtic> logger)
     {

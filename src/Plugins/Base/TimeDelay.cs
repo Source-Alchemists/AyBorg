@@ -21,7 +21,7 @@ public sealed class TimeDelay : IStepBody
     }
 
     /// <inheritdoc />
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     /// <inheritdoc />
     public async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)

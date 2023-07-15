@@ -22,7 +22,7 @@ public sealed class ImageLoad : IStepBody, IDisposable
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.Simulation };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public ImageLoad(ILogger<ImageLoad> logger, IEnvironment environment)
     {

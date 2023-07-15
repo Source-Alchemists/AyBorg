@@ -11,7 +11,7 @@ public abstract class CollectionElementAt
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Collection };
 
-    public IEnumerable<IPort> Ports { get; protected init; } = null!;
+    public IReadOnlyCollection<IPort> Ports { get; protected init; } = null!;
 
     protected CollectionElementAt(ILogger<CollectionElementAt> logger)
     {

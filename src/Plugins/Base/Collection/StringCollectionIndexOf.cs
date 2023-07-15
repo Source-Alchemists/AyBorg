@@ -15,7 +15,7 @@ public sealed class StringCollectionIndexOf : IStepBody
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Collection };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public StringCollectionIndexOf(ILogger<StringCollectionIndexOf> logger)
     {

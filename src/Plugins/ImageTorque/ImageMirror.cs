@@ -16,7 +16,7 @@ public sealed class ImageMirror : IStepBody, IDisposable
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public ImageMirror()
     {

@@ -14,7 +14,7 @@ public sealed class NumberMathFunction : IStepBody
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Math };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public NumberMathFunction()
     {

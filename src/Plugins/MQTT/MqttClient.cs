@@ -31,7 +31,7 @@ namespace AyBorg.Plugins.MQTT
 
         public IReadOnlyCollection<string> Categories { get; } = new List<string> { "Communication", "MQTT" };
 
-        public IEnumerable<IPort> Ports { get; }
+        public IReadOnlyCollection<IPort> Ports { get; }
 
         public MqttClient(ILogger<ICommunicationDevice> logger, IMqttClientProviderFactory clientProviderFactory, ICommunicationStateProvider communicationStateProvider, string id)
         {
@@ -42,12 +42,43 @@ namespace AyBorg.Plugins.MQTT
             Name = $"MQTT-Client ({id})";
 
             Ports = new List<IPort> {
-            _host,
-            _port,
-            _qualityOfService,
-            _retain,
-            _encoder
-        };
+                _host,
+                _port,
+                _qualityOfService,
+                _retain,
+                _encoder
+            };
+        }
+
+        public async ValueTask<bool> TryUpdate(IReadOnlyCollection<IPort> ports)
+        {
+            bool prevConnected = IsConnected;
+            if(IsConnected && !await TryDisconnectAsync())
+            {
+                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed disconnecting from MQTT broker");
+                return false;
+            }
+
+            foreach(IPort port in ports)
+            {
+                IPort? targetPort = Ports.FirstOrDefault(p => p.Id.Equals(port.Id) && p.Brand.Equals(port.Brand));
+                if(targetPort == null)
+                {
+                    _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Port {PortId} not found", port.Id);
+                    continue;
+                }
+
+                targetPort.UpdateValue(port);
+            }
+
+            if(prevConnected && !await TryConnectAsync())
+            {
+                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed connecting to MQTT broker");
+                return false;
+            }
+
+            _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Updated MQTT client");
+            return true;
         }
 
         public async ValueTask<bool> TryConnectAsync()

@@ -1,0 +1,19 @@
+<MudDialog>
+    <DialogContent>
+        <div class="page-loading-bar">
+            <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default">Close</MudButton>
+        @if(Device.IsConnected)
+        {
+            <MudButton Color="Color.Warning" StartIcon="@Icons.Material.Filled.PowerOff">Disconnect</MudButton>
+        }
+        else
+        {
+            <MudButton Color="Color.Success" StartIcon="@Icons.Material.Filled.Power">Connect</MudButton>
+        }
+        <MudButton Color="Color.Primary" Variant="Variant.Filled">Apply</MudButton>
+    </DialogActions>
+</MudDialog>

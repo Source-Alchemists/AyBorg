@@ -1,5 +1,4 @@
 using System.Collections.Immutable;
-using AyBorg.SDK.Projects;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Shared.Modals;
@@ -126,6 +125,24 @@ public partial class Devices : ComponentBase
         {
             await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateOptions(_serviceUniqueName, deviceMeta.Id, false));
         }
+    }
+
+    private async Task OnDeviceSettingsClicked(DeviceMeta deviceMeta)
+    {
+        IDialogReference dialogReference = DialogService.Show<DeviceSettingsDialog>($"{deviceMeta.Name} Settings", new DialogParameters {
+            { "Device", deviceMeta }
+        },
+        new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        });
+        await dialogReference.Result;
+        _isLoading = true;
+        await InvokeAsync(StateHasChanged);
+        await UpdateProviderCollection();
+        _isLoading = false;
+        await InvokeAsync(StateHasChanged);
     }
 
     private async ValueTask ChangeDeviceState(DeviceManagerService.ChangeDeviceStateOptions options)

@@ -13,7 +13,7 @@ public sealed class ImageObjectsDisplay : IStepBody
 
     public IReadOnlyCollection<string> Categories => new List<string> { DefaultStepCategories.Display, DefaultStepCategories.Ai };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public ImageObjectsDisplay()
     {
