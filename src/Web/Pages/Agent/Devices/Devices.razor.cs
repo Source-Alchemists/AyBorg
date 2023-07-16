@@ -90,7 +90,7 @@ public partial class Devices : ComponentBase
             await InvokeAsync(StateHasChanged);
             try
             {
-                DeviceMeta removedDevice = await DeviceManagerService.RemoveDeviceAsync(new DeviceManagerService.RemoveDeviceOptions(_serviceUniqueName, deviceMeta.Id));
+                DeviceMeta removedDevice = await DeviceManagerService.RemoveDeviceAsync(new DeviceManagerService.CommonDeviceRequestOptions(_serviceUniqueName, deviceMeta.Id));
                 _devices = _devices.Remove(deviceMeta);
                 _deviceProviders = await DeviceManagerService.GetDeviceProvidersAsync(_serviceUniqueName);
             }
@@ -111,7 +111,7 @@ public partial class Devices : ComponentBase
         DialogResult result = await dialogReference.Result;
         if (!result.Cancelled)
         {
-            await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateOptions(_serviceUniqueName, deviceMeta.Id, true));
+            await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateRequestOptions(_serviceUniqueName, deviceMeta.Id, true));
         }
     }
 
@@ -123,7 +123,7 @@ public partial class Devices : ComponentBase
         DialogResult result = await dialogReference.Result;
         if (!result.Cancelled)
         {
-            await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateOptions(_serviceUniqueName, deviceMeta.Id, false));
+            await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateRequestOptions(_serviceUniqueName, deviceMeta.Id, false));
         }
     }
 
@@ -145,7 +145,7 @@ public partial class Devices : ComponentBase
         await InvokeAsync(StateHasChanged);
     }
 
-    private async ValueTask ChangeDeviceState(DeviceManagerService.ChangeDeviceStateOptions options)
+    private async ValueTask ChangeDeviceState(DeviceManagerService.ChangeDeviceStateRequestOptions options)
     {
         _isLoading = true;
         await InvokeAsync(StateHasChanged);

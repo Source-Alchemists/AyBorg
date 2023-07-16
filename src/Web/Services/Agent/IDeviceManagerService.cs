@@ -7,7 +7,8 @@ public interface IDeviceManagerService
 {
     ValueTask<IReadOnlyCollection<DeviceProviderMeta>> GetDeviceProvidersAsync(string agentUniqueName);
 
-    ValueTask<DeviceMeta> AddDeviceAsync(AddDeviceOptions options);
-    ValueTask<DeviceMeta> RemoveDeviceAsync(RemoveDeviceOptions options);
-    ValueTask<DeviceMeta> ChangeDeviceStateAsync(ChangeDeviceStateOptions options);
+    ValueTask<DeviceMeta> AddDeviceAsync(AddDeviceRequestOptions options);
+    ValueTask<DeviceMeta> RemoveDeviceAsync(CommonDeviceRequestOptions options);
+    ValueTask<DeviceMeta> ChangeDeviceStateAsync(ChangeDeviceStateRequestOptions options);
+    ValueTask<DeviceMeta> GetDevice(CommonDeviceRequestOptions options);
 }

@@ -1,11 +1,16 @@
+@using AyBorg.Web.Pages.Agent.Shared
 <MudDialog>
     <DialogContent>
         <div class="page-loading-bar">
             <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
         </div>
+        @* @foreach (var port in _ports)
+        {
+            <PortResolver Port="port" />
+        } *@
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default">Close</MudButton>
+        <MudButton Color="Color.Default" OnClick="OnCloseClicked">Close</MudButton>
         @if(Device.IsConnected)
         {
             <MudButton Color="Color.Warning" StartIcon="@Icons.Material.Filled.PowerOff">Disconnect</MudButton>

@@ -54,7 +54,7 @@ public partial class AddDeviceDialog : ComponentBase
 
         try
         {
-            await DeviceManagerService.AddDeviceAsync(new DeviceManagerService.AddDeviceOptions(ServiceUniqueName,
+            await DeviceManagerService.AddDeviceAsync(new DeviceManagerService.AddDeviceRequestOptions(ServiceUniqueName,
                                                                                                 _selectedProvider!.Name,
                                                                                                 _deviceId));
         }

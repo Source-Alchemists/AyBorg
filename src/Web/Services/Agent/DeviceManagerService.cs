@@ -1,4 +1,6 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Common.Models;
+using AyBorg.SDK.Communication.gRPC;
 using AyBorg.Web.Shared.Models.Agent;
 
 namespace AyBorg.Web.Services.Agent;
@@ -7,11 +9,13 @@ public class DeviceManagerService : IDeviceManagerService
 {
     private readonly ILogger<DeviceManagerService> _logger;
     private readonly DeviceManager.DeviceManagerClient _deviceManagerClient;
+    private readonly IRpcMapper _rpcMapper;
 
-    public DeviceManagerService(ILogger<DeviceManagerService> logger, DeviceManager.DeviceManagerClient deviceManagerClient)
+    public DeviceManagerService(ILogger<DeviceManagerService> logger, DeviceManager.DeviceManagerClient deviceManagerClient, IRpcMapper rpcMapper)
     {
         _logger = logger;
         _deviceManagerClient = deviceManagerClient;
+        _rpcMapper = rpcMapper;
     }
 
     public async ValueTask<IReadOnlyCollection<DeviceProviderMeta>> GetDeviceProvidersAsync(string agentUniqueName)
@@ -42,7 +46,7 @@ public class DeviceManagerService : IDeviceManagerService
         return result;
     }
 
-    public async ValueTask<DeviceMeta> AddDeviceAsync(AddDeviceOptions options)
+    public async ValueTask<DeviceMeta> AddDeviceAsync(AddDeviceRequestOptions options)
     {
         DeviceDto response = await _deviceManagerClient.AddAsync(new AddDeviceRequest
         {
@@ -54,7 +58,7 @@ public class DeviceManagerService : IDeviceManagerService
         return ToObject(response);
     }
 
-    public async ValueTask<DeviceMeta> RemoveDeviceAsync(RemoveDeviceOptions options)
+    public async ValueTask<DeviceMeta> RemoveDeviceAsync(CommonDeviceRequestOptions options)
     {
         DeviceDto response = await _deviceManagerClient.RemoveAsync(new RemoveDeviceRequest
         {
@@ -65,7 +69,7 @@ public class DeviceManagerService : IDeviceManagerService
         return ToObject(response);
     }
 
-    public async ValueTask<DeviceMeta> ChangeDeviceStateAsync(ChangeDeviceStateOptions options)
+    public async ValueTask<DeviceMeta> ChangeDeviceStateAsync(ChangeDeviceStateRequestOptions options)
     {
         DeviceDto response = await _deviceManagerClient.ChangeStateAsync(new DeviceStateRequest
         {
@@ -77,16 +81,37 @@ public class DeviceManagerService : IDeviceManagerService
         return ToObject(response);
     }
 
-    private static DeviceMeta ToObject(DeviceDto dtoDevice) => new()
+    public async ValueTask<DeviceMeta> GetDevice(CommonDeviceRequestOptions options)
     {
-        Id = dtoDevice.Id,
-        Name = dtoDevice.Name,
-        IsActive = dtoDevice.IsActive,
-        IsConnected = dtoDevice.IsConnected,
-        Categories = dtoDevice.Categories
-    };
+        DeviceDto response = await _deviceManagerClient.GetDeviceAsync(new GetDeviceRequest
+        {
+            AgentUniqueName = options.AgentUniqueName,
+            DeviceId = options.DeviceId
+        });
 
-    public sealed record AddDeviceOptions (string AgentUniqueName, string DeviceProviderName, string DeviceId);
-    public sealed record RemoveDeviceOptions (string AgentUniqueName, string DeviceId);
-    public sealed record ChangeDeviceStateOptions (string AgentUniqueName, string DeviceId, bool Activate);
+        return ToObject(response);
+    }
+
+    private DeviceMeta ToObject(DeviceDto dtoDevice)
+    {
+        var ports = new List<Port>();
+        foreach (PortDto? portDto in dtoDevice.Ports)
+        {
+            ports.Add(_rpcMapper.FromRpc(portDto));
+        }
+
+        return new DeviceMeta()
+        {
+            Id = dtoDevice.Id,
+            Name = dtoDevice.Name,
+            IsActive = dtoDevice.IsActive,
+            IsConnected = dtoDevice.IsConnected,
+            Categories = dtoDevice.Categories,
+            Ports = ports
+        };
+    }
+
+    public sealed record CommonDeviceRequestOptions(string AgentUniqueName, string DeviceId);
+    public sealed record AddDeviceRequestOptions(string AgentUniqueName, string DeviceProviderName, string DeviceId);
+    public sealed record ChangeDeviceStateRequestOptions(string AgentUniqueName, string DeviceId, bool Activate);
 }

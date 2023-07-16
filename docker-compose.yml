@@ -82,7 +82,6 @@ services:
       - AyBorg:Service:Url=http://agent-internal-1:6020
       - AyBorg:Service:DisplayName=Agent.Internal-1
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-1
-      - MQTT:Host=mqttbroker-1
       - Storage:Folder=/ayborg/img
 
   agent-2:
@@ -103,7 +102,6 @@ services:
       - AyBorg:Service:Url=http://agent-internal-2:6020
       - AyBorg:Service:DisplayName=Agent.Internal-2
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-2
-      - MQTT:Host=mqttbroker-1
       - Storage:Folder=/ayborg/img
 
   agent-3:
@@ -124,7 +122,6 @@ services:
       - AyBorg:Service:Url=http://agent-internal-3:6020
       - AyBorg:Service:DisplayName=Agent.Internal-3
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-3
-      - MQTT:Host=mqttbroker-1
       - Storage:Folder=/ayborg/img
 
   agent-4:
@@ -145,7 +142,6 @@ services:
       - AyBorg:Service:Url=http://agent-internal-4:6020
       - AyBorg:Service:DisplayName=Agent.Internal-4
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-4
-      - MQTT:Host=mqttbroker-1
       - Storage:Folder=/ayborg/img
 
   agent-5:
@@ -166,5 +162,4 @@ services:
       - AyBorg:Service:Url=http://agent-internal-5:6020
       - AyBorg:Service:DisplayName=Agent.Internal-5
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-5
-      - MQTT:Host=mqttbroker-1
       - Storage:Folder=/ayborg/img

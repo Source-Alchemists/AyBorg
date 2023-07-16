@@ -171,8 +171,8 @@ public partial class ImageInputField : BaseInputField
 
     private record struct ImagePosition(float X, float Y, float Width, float Height, float OrgWidth, float OrgHeight)
     {
-        public float FactorX => Width / OrgWidth;
-        public float FactorY => Height / OrgHeight;
+        public readonly float FactorX => Width / OrgWidth;
+        public readonly float FactorY => Height / OrgHeight;
     }
 
     private sealed record LabelRectangle(float X, float Y, float Width, float Height)
