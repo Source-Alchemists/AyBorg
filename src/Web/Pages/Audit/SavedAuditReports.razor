@@ -9,7 +9,7 @@
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
 </div>
 <div hidden="@_isFilterHidden">
-    <MudToolBar Class="mud-full-width">
+    <MudToolBar Class="mud-full-width px-0">
         <MudDateRangePicker Label="Date Range" Editable="true" @bind-DateRange="_dateRange" Class="mr-5" />
         <MudTooltip Text="Filter">
             <MudIconButton Icon="@Icons.Material.Filled.FilterList" Color="Color.Primary" OnClick="FilterClicked" />

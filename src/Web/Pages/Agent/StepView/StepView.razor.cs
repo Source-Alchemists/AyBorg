@@ -24,6 +24,7 @@ public partial class StepView : ComponentBase, IDisposable
     [Inject] public IFlowService FlowService { get; init; }
     [Inject] public INotifyService NotifyService { get; init; }
     [Inject] IRegistryService RegistryService { get; init; }
+    [Inject] NavigationManager NavigationManager { get; init; }
 
     private bool _isLoading = true;
     private Step _step = new();
@@ -109,6 +110,11 @@ public partial class StepView : ComponentBase, IDisposable
     {
         Guid iterationId = (Guid)obj;
         await UpdateNode(iterationId);
+    }
+
+    private void OnBackClicked()
+    {
+         NavigationManager.NavigateTo($"/agents/editor/{ServiceId}");
     }
 
     protected virtual void Dispose(bool disposing)

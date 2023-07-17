@@ -17,7 +17,7 @@
 }
 
 <div hidden="@(_isFilterHidden || !_areChangesetsAvailable)">
-    <MudToolBar Class="mud-full-width">
+    <MudToolBar Class="mud-full-width px-0">
         <MudDateRangePicker Label="Date Range" Editable="true" @bind-DateRange="_dateRange" Class="mr-5" />
         <MudSelect T="ServiceOption" Label="Services" MultiSelection="true" SelectAll="true"
             ToStringFunc="@_serviceSelectionConveter" @bind-SelectedValues="_selectedOptions" Class="mr-5">
@@ -59,7 +59,7 @@
 
 @if (_isFilterHidden)
 {
-    <MudToolBar Class="mud-full-width">
+<MudToolBar Class="mud-full-width px-0">
     <MudTooltip Text="Back">
         <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small"
             OnClick="PreviewBackClicked" />

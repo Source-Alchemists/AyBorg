@@ -14,7 +14,13 @@ else{
 <MudToolBar Class="px-0">
     <MudGrid>
         <MudItem xs="4">
-            <MudText Typo="Typo.h6" Class="pl-3">@_step.Name</MudText>
+            <MudStack Row>
+                <MudTooltip Text="Back">
+                    <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small"
+                        OnClick="OnBackClicked" />
+                </MudTooltip>
+                <MudText Typo="Typo.h6" Class="pl-3">@_step.Name</MudText>
+            </MudStack>
         </MudItem>
         <MudItem xs="4">
             @if (!string.IsNullOrEmpty(_serviceUniqueName))
