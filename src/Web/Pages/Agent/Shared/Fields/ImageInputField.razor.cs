@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using AyBorg.SDK.Common.Models;
-using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Shared.Utils;
 using Microsoft.AspNetCore.Components;
@@ -10,7 +9,7 @@ namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class ImageInputField : BaseInputField
 {
-    [Parameter, EditorRequired] public IReadOnlyCollection<FlowPort> ShapePorts { get; init; } = null!;
+    [Parameter, EditorRequired] public IReadOnlyCollection<Port> ShapePorts { get; init; } = null!;
     [Parameter] public bool AlternativeMode { get; init; } = false;
     [Inject] public IJSRuntime JSRuntime { get; init; } = null!;
 
@@ -77,7 +76,7 @@ public partial class ImageInputField : BaseInputField
         _labelRectangles.Clear();
         float scaleFactorX = _imageInfo.FactorX;
         float scaleFactorY = _imageInfo.FactorY;
-        foreach(Port shapePort in ShapePorts.Select(p => p.Port))
+        foreach(Port shapePort in ShapePorts)
         {
             if(shapePort.Value is Rectangle rectangle)
             {

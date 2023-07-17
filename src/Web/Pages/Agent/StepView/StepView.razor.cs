@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
@@ -26,8 +27,7 @@ public partial class StepView : ComponentBase, IDisposable
 
     private bool _isLoading = true;
     private Step _step = new();
-    private FlowNode _node;
-    private IReadOnlyCollection<FlowPort> _ports = Array.Empty<FlowPort>();
+    private ImmutableList<Port> _ports = ImmutableList.Create<Port>();
     private NotifyService.Subscription _iterationFinishedSubscription;
 
     protected override void OnInitialized()
@@ -52,15 +52,10 @@ public partial class StepView : ComponentBase, IDisposable
 
             var stepGuid = Guid.Parse(StepId);
             _step = await FlowService.GetStepAsync(_serviceUniqueName, new Step { Id = stepGuid }, null, true, false, false);
-            _node = new FlowNode(_step);
             var flowPorts = new List<FlowPort>();
 
-            foreach (Port port in _step.Ports)
-            {
-                var newPort = new FlowPort(_node, port);
-                flowPorts.Add(newPort);
-            }
-            _ports = flowPorts;
+            _ports = _ports.Clear();
+            _ports = _ports.AddRange(_step.Ports);
 
             await UpdateNode(null);
 
@@ -80,20 +75,34 @@ public partial class StepView : ComponentBase, IDisposable
         {
             if (port.Direction == PortDirection.Input)
             {
-                FlowPort inputPort = _ports.FirstOrDefault(p => p.Port.Id.Equals(port.Id));
-                if (inputPort == null) continue;
-                inputPort.Update(port);
+                Port inputPort = _ports.FirstOrDefault(p => p.Id.Equals(port.Id));
+                if (inputPort == null || !_ports.Contains(inputPort)) continue;
+                _ports = _ports.Replace(inputPort, port);
             }
             else if (port.Direction == PortDirection.Output)
             {
-                FlowPort outputPort = _ports.FirstOrDefault(p => p.Port.Id.Equals(port.Id));
-                if (outputPort == null) continue;
-                outputPort.Locked = true;
-                outputPort.Update(port);
+                Port outputPort = _ports.FirstOrDefault(p => p.Id.Equals(port.Id));
+                if (outputPort == null || !_ports.Contains(outputPort)) continue;
+                _ports = _ports.Replace(outputPort, port);
             }
         }
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    private static bool IsDisabled(Port port)
+    {
+        if(port.Direction == PortDirection.Output)
+        {
+            return true;
+        }
+
+        if(port.IsConnected)
+        {
+            return true;
+        }
+
+        return false;
     }
 
     private async void IterationFinishedNotificationReceived(object obj)
