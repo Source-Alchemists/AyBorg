@@ -1,3 +1,4 @@
+using AyBorg.Data.Agent;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Projects;
 
@@ -7,13 +8,25 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
 {
     private readonly ILogger<DeviceProxyManagerService> _logger;
     private readonly IPluginsService _pluginsService;
+    private readonly IDeviceToStorageMapper _storageMapper;
+    private readonly IDeviceRepository _deviceRepository;
 
     public IReadOnlyCollection<IDeviceProviderProxy> DeviceProviders => _pluginsService.DeviceProviders;
 
-    public DeviceProxyManagerService(ILogger<DeviceProxyManagerService> logger, IPluginsService pluginsService)
+    public DeviceProxyManagerService(ILogger<DeviceProxyManagerService> logger,
+                                        IPluginsService pluginsService,
+                                        IDeviceToStorageMapper storageMapper,
+                                        IDeviceRepository deviceRepository)
     {
         _logger = logger;
         _pluginsService = pluginsService;
+        _storageMapper = storageMapper;
+        _deviceRepository = deviceRepository;
+    }
+
+    public async void Load()
+    {
+        IEnumerable<DeviceRecord> deviceRecords = await _deviceRepository.GetAllAsync();
     }
 
     public async ValueTask<IDeviceProxy> AddAsync(AddDeviceOptions options)
@@ -26,13 +39,32 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
         IDeviceProviderProxy? provider = DeviceProviders.FirstOrDefault(p => p.Name.Equals(options.ProviderName))
                                             ?? throw new KeyNotFoundException($"Device provider '{options.ProviderName}' not found");
 
-        return await provider.AddAsync(options);
+        IDeviceProxy newDevice = await provider.AddAsync(options);
+
+        DeviceRecord deviceRecord = _storageMapper.Map(newDevice);
+        try
+        {
+            await _deviceRepository.AddAsync(deviceRecord);
+        }
+        catch (Exception)
+        {
+            // Rollback
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed to add device '{deviceId}' to storage, removing from provider", newDevice.Id);
+            await provider.RemoveAsync(newDevice.Id);
+            throw;
+        }
+        return newDevice;
     }
 
     public async ValueTask<IDeviceProxy> RemoveAsync(string deviceId)
     {
         IDeviceProviderProxy provider = DeviceProviders.First(p => p.Devices.Any(d => d.Id.Equals(deviceId)));
-        return await provider.RemoveAsync(deviceId);
+        IDeviceProxy removedDevice = await provider.RemoveAsync(deviceId);
+
+        DeviceRecord deviceRecord = _storageMapper.Map(removedDevice);
+        await _deviceRepository.RemoveAsync(deviceRecord);
+
+        return removedDevice;
     }
 
     public async ValueTask<IDeviceProxy> ChangeStateAsync(ChangeDeviceStateOptions options)
@@ -61,6 +93,9 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
             _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Device '{deviceId}' failed to disconnect", options.DeviceId);
             return device;
         }
+
+        DeviceRecord deviceRecord = _storageMapper.Map(device);
+        await _deviceRepository.UpdateAsync(deviceRecord);
 
         return device;
     }

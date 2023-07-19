@@ -96,7 +96,7 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
 
                     b.HasKey("DbId");
 
-                    b.ToTable("PluginMetaInfoRecord");
+                    b.ToTable("AyBorgDevicePluginMetaInfo");
                 });
 
             modelBuilder.Entity("AyBorg.Data.Agent.DevicePortRecord", b =>

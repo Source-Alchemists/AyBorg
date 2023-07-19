@@ -41,4 +41,9 @@ public class ProjectContext : DbContext
     /// Gets or sets the links.
     /// </summary>
     public DbSet<LinkRecord>? AyBorgLinks { get; init; }
+
+    /// <summary>
+    /// Gets or sets the step plugin meta info.
+    /// </summary>
+    public DbSet<PluginMetaInfoRecord>? AyBorgStepPluginMetaInfo { get; init; }
 }

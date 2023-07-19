@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
+namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations
 {
     /// <inheritdoc />
     public partial class Init : Migration
@@ -15,8 +15,8 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
                 name: "AyBorgProjectSettings",
                 columns: table => new
                 {
-                    DbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    IsForceResultCommunicationEnabled = table.Column<bool>(type: "boolean", nullable: false)
+                    DbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    IsForceResultCommunicationEnabled = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -24,26 +24,26 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "PluginMetaInfoRecord",
+                name: "AyBorgStepPluginMetaInfo",
                 columns: table => new
                 {
-                    DbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    AssemblyName = table.Column<string>(type: "text", nullable: false),
-                    AssemblyVersion = table.Column<string>(type: "text", nullable: false),
-                    TypeName = table.Column<string>(type: "text", nullable: false)
+                    DbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AssemblyName = table.Column<string>(type: "TEXT", nullable: false),
+                    AssemblyVersion = table.Column<string>(type: "TEXT", nullable: false),
+                    TypeName = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PluginMetaInfoRecord", x => x.DbId);
+                    table.PrimaryKey("PK_AyBorgStepPluginMetaInfo", x => x.DbId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "AyBorgProjects",
                 columns: table => new
                 {
-                    DbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    SettingsDbId = table.Column<Guid>(type: "uuid", nullable: false)
+                    DbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SettingsDbId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -60,11 +60,11 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
                 name: "AyBorgLinks",
                 columns: table => new
                 {
-                    DbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SourceId = table.Column<Guid>(type: "uuid", nullable: false),
-                    TargetId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProjectRecordId = table.Column<Guid>(type: "uuid", nullable: false)
+                    DbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    SourceId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    TargetId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ProjectRecordId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -81,19 +81,19 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
                 name: "AyBorgProjectMetas",
                 columns: table => new
                 {
-                    DbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    State = table.Column<int>(type: "integer", nullable: false),
-                    ServiceUniqueName = table.Column<string>(type: "text", nullable: false),
-                    VersionName = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    Comment = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    VersionIteration = table.Column<long>(type: "bigint", nullable: false),
-                    ProjectRecordId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ApprovedBy = table.Column<string>(type: "text", nullable: false)
+                    DbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    CreatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedDate = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    State = table.Column<int>(type: "INTEGER", nullable: false),
+                    ServiceUniqueName = table.Column<string>(type: "TEXT", nullable: false),
+                    VersionName = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Comment = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    VersionIteration = table.Column<long>(type: "INTEGER", nullable: false),
+                    ProjectRecordId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    ApprovedBy = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -110,13 +110,13 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
                 name: "AyBorgSteps",
                 columns: table => new
                 {
-                    DbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: false),
-                    MetaInfoDbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    X = table.Column<int>(type: "integer", nullable: false),
-                    Y = table.Column<int>(type: "integer", nullable: false),
-                    ProjectRecordId = table.Column<Guid>(type: "uuid", nullable: false)
+                    DbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: false),
+                    MetaInfoDbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    X = table.Column<int>(type: "INTEGER", nullable: false),
+                    Y = table.Column<int>(type: "INTEGER", nullable: false),
+                    ProjectRecordId = table.Column<Guid>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -128,9 +128,9 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
                         principalColumn: "DbId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AyBorgSteps_PluginMetaInfoRecord_MetaInfoDbId",
+                        name: "FK_AyBorgSteps_AyBorgStepPluginMetaInfo_MetaInfoDbId",
                         column: x => x.MetaInfoDbId,
-                        principalTable: "PluginMetaInfoRecord",
+                        principalTable: "AyBorgStepPluginMetaInfo",
                         principalColumn: "DbId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -139,13 +139,13 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
                 name: "AyBorgPorts",
                 columns: table => new
                 {
-                    DbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    StepRecordId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Direction = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Value = table.Column<string>(type: "text", nullable: true),
-                    Brand = table.Column<int>(type: "integer", nullable: false)
+                    DbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    StepRecordId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Direction = table.Column<int>(type: "INTEGER", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Value = table.Column<string>(type: "TEXT", nullable: true),
+                    Brand = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -209,7 +209,7 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
                 name: "AyBorgProjects");
 
             migrationBuilder.DropTable(
-                name: "PluginMetaInfoRecord");
+                name: "AyBorgStepPluginMetaInfo");
 
             migrationBuilder.DropTable(
                 name: "AyBorgProjectSettings");

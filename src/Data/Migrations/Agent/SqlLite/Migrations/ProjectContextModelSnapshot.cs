@@ -65,7 +65,7 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations
 
                     b.HasKey("DbId");
 
-                    b.ToTable("PluginMetaInfoRecord");
+                    b.ToTable("AyBorgStepPluginMetaInfo");
                 });
 
             modelBuilder.Entity("AyBorg.Data.Agent.ProjectMetaRecord", b =>

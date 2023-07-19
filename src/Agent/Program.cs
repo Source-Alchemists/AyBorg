@@ -58,6 +58,7 @@ builder.Services.AddSingleton<IDeviceManager, DeviceManager>();
 builder.Services.AddTransient<IJwtConsumer, JwtConsumer>();
 // Repositories
 builder.Services.AddTransient<IProjectRepository, ProjectRepository>();
+builder.Services.AddTransient<IDeviceRepository, DeviceRepository>();
 // Environment / Configuration
 builder.Services.AddTransient<IEnvironment, AyBorg.SDK.Common.Environment>();
 builder.Services.AddTransient<IServiceConfiguration, ServiceConfiguration>();
@@ -65,6 +66,7 @@ builder.Services.AddTransient<IServiceConfiguration, ServiceConfiguration>();
 builder.Services.AddTransient<IRuntimeMapper, RuntimeMapper>();
 builder.Services.AddTransient<IRpcMapper, RpcMapper>();
 builder.Services.AddTransient<IFlowToStorageMapper, FlowToStorageMapper>();
+builder.Services.AddTransient<IDeviceToStorageMapper, DeviceToStorageMapper>();
 builder.Services.AddTransient<IRuntimeConverterService, RuntimeConverterService>();
 // Runtime / Project
 builder.Services.AddTransient<IFlowService, FlowService>();
@@ -93,8 +95,10 @@ app.MapGet("/", () => "Communication with gRPC endpoints must be made through a 
 
 // Create database if not exists
 app.Services.GetService<IDbContextFactory<ProjectContext>>()!.CreateDbContext().Database.Migrate();
+app.Services.GetService<IDbContextFactory<DeviceContext>>()!.CreateDbContext().Database.Migrate();
 
-app.Services.GetService<IPluginsService>()?.Load();
-await app.Services.GetService<IProjectManagementService>()?.TryLoadActiveAsync().AsTask()!;
+app.Services.GetService<IPluginsService>()!.Load();
+app.Services.GetService<IDeviceProxyManagerService>()!.Load();
+await app.Services.GetService<IProjectManagementService>()!.TryLoadActiveAsync().AsTask()!;
 
 app.Run();

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations
 {
     [DbContext(typeof(ProjectContext))]
-    [Migration("20230719072027_Init")]
+    [Migration("20230719082018_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -68,7 +68,7 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations
 
                     b.HasKey("DbId");
 
-                    b.ToTable("PluginMetaInfoRecord");
+                    b.ToTable("AyBorgStepPluginMetaInfo");
                 });
 
             modelBuilder.Entity("AyBorg.Data.Agent.ProjectMetaRecord", b =>

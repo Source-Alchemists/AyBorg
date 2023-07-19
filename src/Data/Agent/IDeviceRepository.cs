@@ -1,6 +1,6 @@
 namespace AyBorg.Data.Agent;
 
-public interface IDevicesRepository
+public interface IDeviceRepository
 {
     ValueTask<IEnumerable<DeviceRecord>> GetAllAsync();
     ValueTask<DeviceRecord> AddAsync(DeviceRecord device);

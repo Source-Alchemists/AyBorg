@@ -70,7 +70,7 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
 
                     b.HasKey("DbId");
 
-                    b.ToTable("PluginMetaInfoRecord");
+                    b.ToTable("AyBorgStepPluginMetaInfo");
                 });
 
             modelBuilder.Entity("AyBorg.Data.Agent.ProjectMetaRecord", b =>

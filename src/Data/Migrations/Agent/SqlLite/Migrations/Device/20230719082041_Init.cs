@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations.Device
+namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
 {
     /// <inheritdoc />
     public partial class Init : Migration
@@ -12,37 +12,37 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations.Device
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "PluginMetaInfoRecord",
+                name: "AyBorgDevicePluginMetaInfo",
                 columns: table => new
                 {
-                    DbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    AssemblyName = table.Column<string>(type: "text", nullable: false),
-                    AssemblyVersion = table.Column<string>(type: "text", nullable: false),
-                    TypeName = table.Column<string>(type: "text", nullable: false)
+                    DbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    AssemblyName = table.Column<string>(type: "TEXT", nullable: false),
+                    AssemblyVersion = table.Column<string>(type: "TEXT", nullable: false),
+                    TypeName = table.Column<string>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_PluginMetaInfoRecord", x => x.DbId);
+                    table.PrimaryKey("PK_AyBorgDevicePluginMetaInfo", x => x.DbId);
                 });
 
             migrationBuilder.CreateTable(
                 name: "AyBorgDevices",
                 columns: table => new
                 {
-                    DbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Id = table.Column<string>(type: "text", nullable: true),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    IsActive = table.Column<bool>(type: "boolean", nullable: false),
-                    MetaInfoDbId = table.Column<Guid>(type: "uuid", nullable: true)
+                    DbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<string>(type: "TEXT", nullable: true),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
+                    MetaInfoDbId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AyBorgDevices", x => x.DbId);
                     table.ForeignKey(
-                        name: "FK_AyBorgDevices_PluginMetaInfoRecord_MetaInfoDbId",
+                        name: "FK_AyBorgDevices_AyBorgDevicePluginMetaInfo_MetaInfoDbId",
                         column: x => x.MetaInfoDbId,
-                        principalTable: "PluginMetaInfoRecord",
+                        principalTable: "AyBorgDevicePluginMetaInfo",
                         principalColumn: "DbId");
                 });
 
@@ -50,13 +50,13 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations.Device
                 name: "AyBorgDevicePorts",
                 columns: table => new
                 {
-                    DbId = table.Column<Guid>(type: "uuid", nullable: false),
-                    DeviceRecordId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Direction = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "text", nullable: true),
-                    Value = table.Column<string>(type: "text", nullable: true),
-                    Brand = table.Column<int>(type: "integer", nullable: false)
+                    DbId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    DeviceRecordId = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    Direction = table.Column<int>(type: "INTEGER", nullable: false),
+                    Name = table.Column<string>(type: "TEXT", nullable: true),
+                    Value = table.Column<string>(type: "TEXT", nullable: true),
+                    Brand = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -90,7 +90,7 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations.Device
                 name: "AyBorgDevices");
 
             migrationBuilder.DropTable(
-                name: "PluginMetaInfoRecord");
+                name: "AyBorgDevicePluginMetaInfo");
         }
     }
 }

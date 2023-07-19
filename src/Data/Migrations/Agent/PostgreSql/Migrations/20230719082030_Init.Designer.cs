@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
 {
     [DbContext(typeof(ProjectContext))]
-    [Migration("20230719072338_Init")]
+    [Migration("20230719082030_Init")]
     partial class Init
     {
         /// <inheritdoc />
@@ -73,7 +73,7 @@ namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations
 
                     b.HasKey("DbId");
 
-                    b.ToTable("PluginMetaInfoRecord");
+                    b.ToTable("AyBorgStepPluginMetaInfo");
                 });
 
             modelBuilder.Entity("AyBorg.Data.Agent.ProjectMetaRecord", b =>
