@@ -168,7 +168,7 @@ public partial class Projects : ComponentBase
     {
         IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New Project", new DialogOptions
         {
-            MaxWidth = MaxWidth.Medium,
+            MaxWidth = MaxWidth.Small,
             FullWidth = true
         });
         DialogResult result = await dialog.Result;

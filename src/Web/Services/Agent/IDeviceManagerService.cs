@@ -10,5 +10,6 @@ public interface IDeviceManagerService
     ValueTask<DeviceMeta> AddDeviceAsync(AddDeviceRequestOptions options);
     ValueTask<DeviceMeta> RemoveDeviceAsync(CommonDeviceRequestOptions options);
     ValueTask<DeviceMeta> ChangeDeviceStateAsync(ChangeDeviceStateRequestOptions options);
-    ValueTask<DeviceMeta> GetDevice(CommonDeviceRequestOptions options);
+    ValueTask<DeviceMeta> GetDeviceAsync(CommonDeviceRequestOptions options);
+    ValueTask<DeviceMeta> UpdateDeviceAsync(UpdateDeviceRequestOptions options);
 }

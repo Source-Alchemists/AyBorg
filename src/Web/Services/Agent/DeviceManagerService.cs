@@ -81,7 +81,7 @@ public class DeviceManagerService : IDeviceManagerService
         return ToObject(response);
     }
 
-    public async ValueTask<DeviceMeta> GetDevice(CommonDeviceRequestOptions options)
+    public async ValueTask<DeviceMeta> GetDeviceAsync(CommonDeviceRequestOptions options)
     {
         DeviceDto response = await _deviceManagerClient.GetDeviceAsync(new GetDeviceRequest
         {
@@ -90,6 +90,21 @@ public class DeviceManagerService : IDeviceManagerService
         });
 
         return ToObject(response);
+    }
+
+    public async ValueTask<DeviceMeta> UpdateDeviceAsync(UpdateDeviceRequestOptions options)
+    {
+        var request = new UpdateDeviceRequest{
+            AgentUniqueName = options.AgentUniqueName,
+            DeviceId = options.DeviceId
+        };
+
+        foreach(Port port in options.Ports)
+        {
+            request.Ports.Add(_rpcMapper.ToRpc(port));
+        }
+
+        return ToObject(await _deviceManagerClient.UpdateDeviceAsync(request));
     }
 
     private DeviceMeta ToObject(DeviceDto dtoDevice)
@@ -114,4 +129,5 @@ public class DeviceManagerService : IDeviceManagerService
     public sealed record CommonDeviceRequestOptions(string AgentUniqueName, string DeviceId);
     public sealed record AddDeviceRequestOptions(string AgentUniqueName, string DeviceProviderName, string DeviceId);
     public sealed record ChangeDeviceStateRequestOptions(string AgentUniqueName, string DeviceId, bool Activate);
+    public sealed record UpdateDeviceRequestOptions(string AgentUniqueName, string DeviceId, IReadOnlyCollection<Port> Ports);
 }

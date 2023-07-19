@@ -97,9 +97,10 @@ public partial class Editor : ComponentBase
 
     private async Task OnCreateProjectClicked()
     {
-        var options = new DialogOptions();
-        var parameters = new DialogParameters();
-        IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
+        IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New project", new DialogOptions {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        });
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {

@@ -134,7 +134,7 @@ public partial class Devices : ComponentBase
         },
         new DialogOptions
         {
-            MaxWidth = MaxWidth.Medium,
+            MaxWidth = MaxWidth.Small,
             FullWidth = true
         });
         await dialogReference.Result;
@@ -154,6 +154,15 @@ public partial class Devices : ComponentBase
         _devices = _devices.Replace(oldDevice, updatedDevice);
         _isLoading = false;
         await InvokeAsync(StateHasChanged);
+        if (options.Activate && !updatedDevice.IsActive)
+        {
+            Snackbar.Add("Could not activate device", Severity.Warning);
+        }
+        else if (!options.Activate && updatedDevice.IsActive)
+        {
+            Snackbar.Add("Could not deactivate device", Severity.Warning);
+        }
+
     }
 
     private bool CanAdd(DeviceMeta deviceMeta)

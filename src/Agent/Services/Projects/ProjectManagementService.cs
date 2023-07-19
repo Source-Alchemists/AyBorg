@@ -124,12 +124,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     {
         try
         {
-            ProjectMetaRecord? orgMetaRecord = await _projectRepository.FindMetaAsync(projectMetaDbId);
-            if (orgMetaRecord == null)
-            {
-                throw new KeyNotFoundException("No project found to activate.");
-            }
-
+            ProjectMetaRecord? orgMetaRecord = await _projectRepository.FindMetaAsync(projectMetaDbId) ?? throw new KeyNotFoundException("No project found to activate.");
             if (orgMetaRecord.ServiceUniqueName != _serviceUniqueName)
             {
                 throw new ProjectException("Project is not owned by this service.");
@@ -251,12 +246,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
                 throw new ProjectException("No active project.");
             }
 
-            ProjectMetaRecord? previousProjectMetaRecord = (await _projectRepository.GetAllMetasAsync(_serviceUniqueName))!.FirstOrDefault(p => p.IsActive);
-            if (previousProjectMetaRecord == null)
-            {
-                throw new KeyNotFoundException("No project found to save.");
-            }
-
+            ProjectMetaRecord? previousProjectMetaRecord = (await _projectRepository.GetAllMetasAsync(_serviceUniqueName))!.FirstOrDefault(p => p.IsActive) ?? throw new KeyNotFoundException("No project found to save.");
             ProjectRecord projectRecord = _runtimeToStorageMapper.Map(_engineHost.ActiveProject);
             projectRecord.Meta = previousProjectMetaRecord with { DbId = Guid.Empty, IsActive = true };
             projectRecord.Settings.DbId = Guid.Empty;
@@ -300,11 +290,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
         try
         {
             var informations = new Informations(approver!, approver!, comment, newVersionName);
-            ProjectRecord previousProjectRecord = await _projectRepository.FindAsync(projectMetaDbId);
-            if (previousProjectRecord == null)
-            {
-                throw new KeyNotFoundException("No project found to save.");
-            }
+            ProjectRecord previousProjectRecord = await _projectRepository.FindAsync(projectMetaDbId) ?? throw new KeyNotFoundException("No project found to save.");
 
             // Moving from draft to review state
             if (previousProjectRecord.Meta.State == ProjectState.Draft)

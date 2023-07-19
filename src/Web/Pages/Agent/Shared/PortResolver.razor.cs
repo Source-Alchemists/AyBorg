@@ -13,6 +13,8 @@ public partial class PortResolver : ComponentBase
     [Parameter, EditorRequired] public IEnumerable<Port> Ports { get; init; } = Array.Empty<Port>();
     [Parameter] public bool Disabled { get; init; } = false;
     [Parameter] public bool AlternativeMode { get; init; } = false;
+    [Parameter] public ListType Mode { get; init; } = ListType.Flow;
+    [Parameter] public EventCallback<ValueChangedEventArgs> ValueChanged { get; set; }
     [Inject] IFlowService FlowService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
 
@@ -31,15 +33,31 @@ public partial class PortResolver : ComponentBase
         try
         {
             Port newPort = Port with { Value = e.Value };
-            if(await FlowService.TrySetPortValueAsync(newPort))
+
+            if (Mode == ListType.Flow)
+            {
+                if (await FlowService.TrySetPortValueAsync(newPort))
+                {
+                    Port = newPort;
+                }
+            }
+            else
             {
                 Port = newPort;
-                await InvokeAsync(StateHasChanged);
             }
+
+            await ValueChanged.InvokeAsync(new ValueChangedEventArgs(newPort, newPort.Value));
+            await InvokeAsync(StateHasChanged);
         }
         catch (Exception)
         {
             Snackbar.Add("Could not set port value", Severity.Warning);
         }
+    }
+
+    public enum ListType
+    {
+        Flow,
+        Device
     }
 }

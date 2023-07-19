@@ -45,4 +45,11 @@ public sealed class DeviceManagerPassthroughServiceV1 : DeviceManager.DeviceMana
         DeviceManager.DeviceManagerClient client = _grpcChannelService.CreateClient<DeviceManager.DeviceManagerClient>(request.AgentUniqueName);
         return await client.GetDeviceAsync(request);
     }
+
+    public override async Task<DeviceDto> UpdateDevice(UpdateDeviceRequest request, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
+        DeviceManager.DeviceManagerClient client = _grpcChannelService.CreateClient<DeviceManager.DeviceManagerClient>(request.AgentUniqueName);
+        return await client.UpdateDeviceAsync(request, headers);
+    }
 }
