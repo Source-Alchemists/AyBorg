@@ -15,7 +15,7 @@ public sealed class ProjectManagementServiceTests
     private static readonly NullLogger<IServiceConfiguration> s_serviceLogger = new();
     private readonly IServiceConfiguration _serviceConfiguration;
     private readonly Mock<IEngineHost> _mockEngineHost = new();
-    private readonly Mock<IRuntimeToStorageMapper> _mockRuntimeToStorageMapper = new();
+    private readonly Mock<IFlowToStorageMapper> _mockRuntimeToStorageMapper = new();
     private readonly Mock<IRuntimeConverterService> _mockRuntimeConverterService = new();
     private readonly Mock<IProjectRepository> _mockProjectRepository = new();
     private readonly Mock<IAuditProviderService> _mockAuditProviderService = new();
@@ -198,7 +198,7 @@ public sealed class ProjectManagementServiceTests
                 State = oldProjectState
             },
             Steps = new List<StepRecord> { new StepRecord {
-                Ports = new List<PortRecord> { new PortRecord() }
+                Ports = new List<StepPortRecord> { new StepPortRecord() }
             } },
             Links = new List<LinkRecord> { new LinkRecord() }
         });

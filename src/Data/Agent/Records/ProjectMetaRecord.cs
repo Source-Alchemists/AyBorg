@@ -82,5 +82,5 @@ public record ProjectMetaRecord
     /// <summary>
     /// Gets or sets the approvers.
     /// </summary>
-    public string? ApprovedBy { get; set; }
+    public string ApprovedBy { get; set; } = string.Empty;
 }

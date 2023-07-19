@@ -11,7 +11,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
     private readonly ILogger<ProjectManagementService> _logger;
     private readonly IProjectRepository _projectRepository;
     private readonly IEngineHost _engineHost;
-    private readonly IRuntimeToStorageMapper _runtimeToStorageMapper;
+    private readonly IFlowToStorageMapper _flowToStorageMapper;
     private readonly IRuntimeConverterService _runtimeConverterService;
     private readonly IAuditProviderService _auditProviderService;
     private readonly string _serviceUniqueName;
@@ -38,21 +38,21 @@ internal sealed class ProjectManagementService : IProjectManagementService
     /// <param name="serviceConfiguration">The service configuration.</param>
     /// <param name="projectRepository">The project repository.</param>
     /// <param name="runtimeHost">The runtime host.</param>
-    /// <param name="runtimeToStorageMapper">The runtime to storage mapper.</param>
+    /// <param name="flowToStorageMapper">The flow to storage mapper.</param>
     /// <param name="runtimeConverterService">The runtime converter service.</param>
     /// <param name="auditProviderService">The audit provider service.</param>
     public ProjectManagementService(ILogger<ProjectManagementService> logger,
                                     IServiceConfiguration serviceConfiguration,
                                     IProjectRepository projectRepository,
                                     IEngineHost runtimeHost,
-                                    IRuntimeToStorageMapper runtimeToStorageMapper,
+                                    IFlowToStorageMapper flowToStorageMapper,
                                     IRuntimeConverterService runtimeConverterService,
                                     IAuditProviderService auditProviderService)
     {
         _logger = logger;
         _projectRepository = projectRepository;
         _engineHost = runtimeHost;
-        _runtimeToStorageMapper = runtimeToStorageMapper;
+        _flowToStorageMapper = flowToStorageMapper;
         _runtimeConverterService = runtimeConverterService;
         _auditProviderService = auditProviderService;
 
@@ -247,7 +247,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
             }
 
             ProjectMetaRecord? previousProjectMetaRecord = (await _projectRepository.GetAllMetasAsync(_serviceUniqueName))!.FirstOrDefault(p => p.IsActive) ?? throw new KeyNotFoundException("No project found to save.");
-            ProjectRecord projectRecord = _runtimeToStorageMapper.Map(_engineHost.ActiveProject);
+            ProjectRecord projectRecord = _flowToStorageMapper.Map(_engineHost.ActiveProject);
             projectRecord.Meta = previousProjectMetaRecord with { DbId = Guid.Empty, IsActive = true };
             projectRecord.Settings.DbId = Guid.Empty;
 
@@ -478,9 +478,9 @@ internal sealed class ProjectManagementService : IProjectManagementService
                 MetaInfo = s.MetaInfo with { DbId = Guid.Empty },
                 Ports = new()
             };
-            foreach (PortRecord p in s.Ports)
+            foreach (StepPortRecord p in s.Ports)
             {
-                PortRecord np = p with
+                StepPortRecord np = p with
                 {
                     DbId = Guid.Empty,
                     StepRecord = ns,

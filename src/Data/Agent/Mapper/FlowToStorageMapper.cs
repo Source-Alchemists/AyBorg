@@ -7,14 +7,14 @@ using ImageTorque;
 
 namespace AyBorg.Data.Agent;
 
-public sealed class RuntimeToStorageMapper : IRuntimeToStorageMapper
+public sealed class FlowToStorageMapper : IFlowToStorageMapper
 {
     private readonly Mapper _mapper;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="RuntimeToStorageMapper"/> class.
+    /// Initializes a new instance of the <see cref="FlowToStorageMapper"/> class.
     /// </summary>
-    public RuntimeToStorageMapper()
+    public FlowToStorageMapper()
     {
         var config = new MapperConfiguration(config =>
         {
@@ -26,17 +26,17 @@ public sealed class RuntimeToStorageMapper : IRuntimeToStorageMapper
             config.CreateMap<PortLink, LinkRecord>();
 
             // Ports
-            config.CreateMap<NumericPort, PortRecord>().ForMember(d => d.Value, opt => opt.MapFrom(s => Convert.ToString(s.Value, CultureInfo.InvariantCulture)));
-            config.CreateMap<StringPort, PortRecord>();
-            config.CreateMap<FolderPort, PortRecord>();
-            config.CreateMap<BooleanPort, PortRecord>();
-            config.CreateMap<ImagePort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new ImageToRecordConverter()));
-            config.CreateMap<RectanglePort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new RectangleToRecordConverter()));
-            config.CreateMap<EnumPort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new EnumToRecordConverter()));
+            config.CreateMap<NumericPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.MapFrom(s => Convert.ToString(s.Value, CultureInfo.InvariantCulture)));
+            config.CreateMap<StringPort, StepPortRecord>();
+            config.CreateMap<FolderPort, StepPortRecord>();
+            config.CreateMap<BooleanPort, StepPortRecord>();
+            config.CreateMap<ImagePort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new ImageToRecordConverter()));
+            config.CreateMap<RectanglePort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new RectangleToRecordConverter()));
+            config.CreateMap<EnumPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new EnumToRecordConverter()));
             // Port collections
-            config.CreateMap<StringCollectionPort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<string>()));
-            config.CreateMap<NumericCollectionPort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<double>()));
-            config.CreateMap<RectangleCollectionPort, PortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<Rectangle>()));
+            config.CreateMap<StringCollectionPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<string>()));
+            config.CreateMap<NumericCollectionPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<double>()));
+            config.CreateMap<RectangleCollectionPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<Rectangle>()));
         });
 
         _mapper = new Mapper(config);
@@ -47,9 +47,9 @@ public sealed class RuntimeToStorageMapper : IRuntimeToStorageMapper
     /// </summary>
     /// <param name="port">The port.</param>
     /// <returns></returns>
-    public PortRecord Map(IPort port)
+    public StepPortRecord Map(IPort port)
     {
-        return _mapper.Map<PortRecord>(port);
+        return _mapper.Map<StepPortRecord>(port);
     }
 
     /// <summary>

@@ -17,5 +17,5 @@ public sealed record DeviceRecord
 
     public PluginMetaInfoRecord MetaInfo { get; init; }
 
-    public IEnumerable<PortRecord> Ports { get; init; }
+    public IEnumerable<DevicePortRecord> Ports { get; init; }
 }

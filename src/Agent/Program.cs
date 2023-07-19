@@ -29,7 +29,7 @@ builder.Services.AddDbContextFactory<ProjectContext>(options =>
     }
 );
 
-builder.Services.AddDbContextFactory<DevicesContext>(options =>
+builder.Services.AddDbContextFactory<DeviceContext>(options =>
     _ = databaseProvider switch
     {
         "SqlLite" => options.UseSqlite(builder.Configuration.GetConnectionString("SqlLiteConnection"),
@@ -64,7 +64,7 @@ builder.Services.AddTransient<IServiceConfiguration, ServiceConfiguration>();
 // Mapper / Converter
 builder.Services.AddTransient<IRuntimeMapper, RuntimeMapper>();
 builder.Services.AddTransient<IRpcMapper, RpcMapper>();
-builder.Services.AddTransient<IRuntimeToStorageMapper, RuntimeToStorageMapper>();
+builder.Services.AddTransient<IFlowToStorageMapper, FlowToStorageMapper>();
 builder.Services.AddTransient<IRuntimeConverterService, RuntimeConverterService>();
 // Runtime / Project
 builder.Services.AddTransient<IFlowService, FlowService>();

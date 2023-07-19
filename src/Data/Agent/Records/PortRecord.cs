@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 using AyBorg.SDK.Common.Ports;
 
 namespace AyBorg.Data.Agent;
 
 #nullable disable
 
-public record PortRecord
+public abstract record PortRecord
 {
     /// <summary>
     /// Gets or sets the database identifier.
@@ -38,22 +37,4 @@ public record PortRecord
     /// Gets or sets the brand.
     /// </summary>
     public PortBrand Brand { get; init; }
-
-    /// <summary>
-    /// Gets or sets the step record identifier.
-    /// </summary>
-    /// <remarks>Used by entity.</remarks>
-    public Guid StepRecordId { get; init; }
-
-    public Guid DeviceRecordId { get; init; }
-
-    /// <summary>
-    /// Gets or sets the step record.
-    /// </summary>
-    /// <remarks>Used by entity.</remarks>
-    [JsonIgnore]
-    public StepRecord StepRecord { get; init; }
-
-    [JsonIgnore]
-    public DeviceRecord DeviceRecord { get; init; }
 }

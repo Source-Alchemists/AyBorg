@@ -15,30 +15,30 @@ public class ProjectContext : DbContext
     /// <summary>
     /// Gets or sets the project meta records.
     /// </summary>
-    public DbSet<ProjectMetaRecord>? AyBorgProjectMetas { get; set; }
+    public DbSet<ProjectMetaRecord>? AyBorgProjectMetas { get; init; }
 
     /// <summary>
     /// Gets or sets the project setting records.
     /// </summary>
-    public DbSet<ProjectSettingsRecord>? AyBorgProjectSettings { get; set; }
+    public DbSet<ProjectSettingsRecord>? AyBorgProjectSettings { get; init; }
 
     /// <summary>
     /// Gets or sets the projects.
     /// </summary>
-    public DbSet<ProjectRecord>? AyBorgProjects { get; set; }
+    public DbSet<ProjectRecord>? AyBorgProjects { get; init; }
 
     /// <summary>
     /// Gets or sets the steps.
     /// </summary>
-    public DbSet<StepRecord>? AyBorgSteps { get; set; }
+    public DbSet<StepRecord>? AyBorgSteps { get; init; }
 
     /// <summary>
     /// Gets or sets the ports.
     /// </summary>
-    public DbSet<PortRecord>? AyBorgPorts { get; set; }
+    public DbSet<StepPortRecord>? AyBorgPorts { get; init; }
 
     /// <summary>
     /// Gets or sets the links.
     /// </summary>
-    public DbSet<LinkRecord>? AyBorgLinks { get; set; }
+    public DbSet<LinkRecord>? AyBorgLinks { get; init; }
 }

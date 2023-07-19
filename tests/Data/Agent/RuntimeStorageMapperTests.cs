@@ -13,7 +13,7 @@ namespace AyBorg.Data.Agent.Tests;
 
 public class RuntimeStorageMapperTests
 {
-    private readonly RuntimeToStorageMapper _mapper = new();
+    private readonly FlowToStorageMapper _mapper = new();
     [Fact]
     public void MapStepProxyWithInvalidPort()
     {

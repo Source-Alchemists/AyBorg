@@ -3,7 +3,7 @@ using AyBorg.SDK.Projects;
 
 namespace AyBorg.Data.Agent;
 
-public interface IRuntimeToStorageMapper
+public interface IFlowToStorageMapper
 {
     /// <summary>
     /// Maps the specified step proxy.

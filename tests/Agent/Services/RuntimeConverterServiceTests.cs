@@ -132,7 +132,7 @@ public class RuntimeConverterServiceTests
     {
         // Arrange
         ProjectRecord projectRecord = CreateEmptyProjectRecord();
-        var inputPort1 = new PortRecord
+        var inputPort1 = new StepPortRecord
         {
             Id = Guid.NewGuid(),
             Name = "String input",
@@ -140,7 +140,7 @@ public class RuntimeConverterServiceTests
             Brand = PortBrand.String,
             Direction = PortDirection.Input
         };
-        var inputPort2 = new PortRecord
+        var inputPort2 = new StepPortRecord
         {
             Id = Guid.NewGuid(),
             Name = "Numeric input",
@@ -148,7 +148,7 @@ public class RuntimeConverterServiceTests
             Brand = PortBrand.Numeric,
             Direction = PortDirection.Input
         };
-        var outputPort = new PortRecord
+        var outputPort = new StepPortRecord
         {
             Id = Guid.NewGuid(),
             Name = "Output",
@@ -166,7 +166,7 @@ public class RuntimeConverterServiceTests
             },
             X = 123,
             Y = 456,
-            Ports = new List<PortRecord> { inputPort1, inputPort2, outputPort }
+            Ports = new List<StepPortRecord> { inputPort1, inputPort2, outputPort }
         };
         projectRecord.Steps.Add(stepRecord);
         projectRecord.Links.Add(new LinkRecord());
