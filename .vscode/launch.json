@@ -30,7 +30,7 @@
             "name": ".NET Core Launch (Agent)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build-agent",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/src/Agent/bin/Debug/net7.0/AyBorg.Agent.dll",
             "args": [],
