@@ -70,6 +70,28 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
         return await ValueTask.FromResult(true);
     }
 
+    /// <summary>
+    /// Updates the port values.
+    /// </summary>
+    /// <param name="ports">The ports.</param>
+    /// <param name="portRecords">The port records.</param>
+    public async ValueTask UpdateValuesAsync(IEnumerable<IPort> ports, IEnumerable<PortRecord> portRecords)
+    {
+        foreach (IPort port in ports)
+        {
+            PortRecord? portRecord = portRecords.FirstOrDefault(x => x.Name == port.Name && x.Direction == port.Direction);
+            if (portRecord == null)
+            {
+                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Port record {port.Name} not found! Will use default value.", port.Name);
+                continue;
+            }
+
+            port.SetId(portRecord.Id);
+
+            await TryUpdatePortValueAsync(port, portRecord.Value);
+        }
+    }
+
     private async ValueTask<ICollection<IStepProxy>> ConvertStepsAsync(ICollection<StepRecord> stepRecords)
     {
         var steps = new List<IStepProxy>();
@@ -99,7 +121,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
                 Id = stepRecord.Id,
                 Name = stepRecord.Name
             };
-            await ChangePortsValues(stepProxy.Ports, stepRecord.Ports);
+            await UpdateValuesAsync(stepProxy.Ports, stepRecord.Ports);
             return stepProxy;
         }
         else
@@ -136,23 +158,6 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
             {
                 _logger.LogError(ex, "Failed to convert link {linkRecord.Id}.", linkRecord.Id);
             }
-        }
-    }
-
-    private async ValueTask ChangePortsValues(IEnumerable<IPort> ports, IEnumerable<PortRecord> portRecords)
-    {
-        foreach (IPort port in ports)
-        {
-            PortRecord? portRecord = portRecords.FirstOrDefault(x => x.Name == port.Name && x.Direction == port.Direction);
-            if (portRecord == null)
-            {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Port record {port.Name} not found! Will use default value.", port.Name);
-                continue;
-            }
-
-            port.SetId(portRecord.Id);
-
-            await TryUpdatePortValueAsync(port, portRecord.Value);
         }
     }
 }

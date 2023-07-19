@@ -16,13 +16,26 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
 
     public bool CanAdd => _deviceProvider.CanCreate;
 
+    public PluginMetaInfo MetaInfo { get; }
+
     public IReadOnlyCollection<IDeviceProxy> Devices => _devices;
 
-    public DeviceProviderProxy(ILoggerFactory loggerFactory, ILogger<DeviceProviderProxy> logger, IDeviceProvider deviceManager)
+    public DeviceProviderProxy(ILoggerFactory loggerFactory, ILogger<DeviceProviderProxy> logger, IDeviceProvider deviceProvider)
     {
         _loggerFactory = loggerFactory;
         _logger = logger;
-        _deviceProvider = deviceManager;
+        _deviceProvider = deviceProvider;
+
+        string typeName = deviceProvider.GetType().Name;
+        System.Reflection.Assembly assembly = deviceProvider.GetType().Assembly;
+        System.Reflection.AssemblyName? assemblyName = assembly?.GetName();
+
+        MetaInfo = new PluginMetaInfo
+        {
+            TypeName = typeName,
+            AssemblyName = assemblyName!.Name!,
+            AssemblyVersion = assemblyName!.Version!.ToString()
+        };
     }
 
     public async ValueTask<bool> TryInitializeAsync()
@@ -56,7 +69,7 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
         }
 
         IDevice device = await _deviceProvider.CreateAsync(options.DeviceId);
-        var deviceProxy = new DeviceProxy(_loggerFactory.CreateLogger<IDeviceProxy>(), _deviceProvider, device);
+        var deviceProxy = new DeviceProxy(_loggerFactory.CreateLogger<IDeviceProxy>(), _deviceProvider, device, options.IsActive);
         _devices = _devices.Add(deviceProxy);
         _logger.LogInformation((int)EventLogType.Plugin, "Added device '{id}'", options.DeviceId);
         return deviceProxy;

@@ -13,7 +13,7 @@ public sealed record DeviceRecord
 
     public string Name { get; init; }
 
-    public bool IsActive { get; init; }
+    public bool IsActive { get; set; }
 
     public PluginMetaInfoRecord MetaInfo { get; init; }
 

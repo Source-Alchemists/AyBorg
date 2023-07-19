@@ -20,4 +20,11 @@ public interface IRuntimeConverterService
     /// <param name="value">The value.</param>
     /// <returns></returns>
     ValueTask<bool> TryUpdatePortValueAsync(IPort port, object value);
+
+    /// <summary>
+    /// Updates the port values.
+    /// </summary>
+    /// <param name="ports">The ports.</param>
+    /// <param name="portRecords">The port records.</param>
+    ValueTask UpdateValuesAsync(IEnumerable<IPort> ports, IEnumerable<PortRecord> portRecords);
 }

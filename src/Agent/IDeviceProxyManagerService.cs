@@ -10,4 +10,5 @@ public interface IDeviceProxyManagerService
     ValueTask<IDeviceProxy> AddAsync(AddDeviceOptions options);
     ValueTask<IDeviceProxy> RemoveAsync(string deviceId);
     ValueTask<IDeviceProxy> ChangeStateAsync(ChangeDeviceStateOptions options);
+    ValueTask<IDeviceProxy> UpdateAsync(UpdateDeviceOptions options);
 }

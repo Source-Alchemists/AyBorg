@@ -47,9 +47,19 @@ public sealed class DeviceRepository : IDeviceRepository
     public async ValueTask<DeviceRecord> UpdateAsync(DeviceRecord device)
     {
         using DeviceContext context = await _contextFactory.CreateDbContextAsync();
-        EntityEntry<DeviceRecord> deviceEntry = context.Entry(device);
-        deviceEntry.State = EntityState.Modified;
+        DeviceRecord? targetDevice = await context.AyBorgDevices!.Include(d => d.Ports)
+                                                                .FirstOrDefaultAsync(d => d.Id.Equals(device.Id))
+                                                                ?? throw new KeyNotFoundException($"Device '{device.Id}' not found");
+
+        targetDevice.IsActive = device.IsActive;
+
+        foreach(DevicePortRecord? sp in device.Ports)
+        {
+            DevicePortRecord tp = targetDevice.Ports.Single(d => d.Id.Equals(sp.Id));
+            tp.Value = sp.Value;
+        }
+
         await context.SaveChangesAsync();
-        return deviceEntry.Entity;
+        return targetDevice;
     }
 }

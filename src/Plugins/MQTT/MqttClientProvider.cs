@@ -36,7 +36,7 @@ public sealed class MqttClientProvider : IDeviceProvider
 
     public async ValueTask<IDevice> CreateAsync(string id)
     {
-        var client = new MqttClient(_loggerFactory.CreateLogger<MqttClient>(), _clientProviderFactory, this, _communicationStateProvider, id);
+        var client = new MqttClient(_loggerFactory.CreateLogger<MqttClient>(), _clientProviderFactory, _communicationStateProvider, id);
         _logger.LogTrace((int)EventLogType.Plugin, "Added MQTT client '{id}'", id);
         return await ValueTask.FromResult(client);
     }

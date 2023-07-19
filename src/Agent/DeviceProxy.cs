@@ -29,9 +29,10 @@ public class DeviceProxy : IDeviceProxy
 
     public IDevice Native { get; }
 
-    public DeviceProxy(ILogger<IDeviceProxy> logger, IDeviceProvider parent, IDevice device)
+    public DeviceProxy(ILogger<IDeviceProxy> logger, IDeviceProvider parent, IDevice device, bool isActive)
     {
         Native = device;
+        IsActive = isActive;
         FillDeviceMetaInfo(device);
         FillDeviceProviderMetaInfo(parent);
     }

@@ -1,6 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Data.Mapper;
-using AyBorg.SDK.Common;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Projects;
 using Grpc.Core;
@@ -9,23 +8,17 @@ namespace AyBorg.Agent.Services.gRPC;
 
 public sealed class DeviceManagerServiceV1 : Ayborg.Gateway.Agent.V1.DeviceManager.DeviceManagerBase
 {
-    private readonly ILogger<DeviceManagerServiceV1> _logger;
     private readonly IDeviceProxyManagerService _deviceManagerService;
     private readonly IRuntimeMapper _runtimeMapper;
     private readonly IRpcMapper _rpcMapper;
-    private readonly IRuntimeConverterService _runtimeConverterService;
 
-    public DeviceManagerServiceV1(ILogger<DeviceManagerServiceV1> logger,
-                                    IDeviceProxyManagerService deviceManagerService,
+    public DeviceManagerServiceV1(IDeviceProxyManagerService deviceManagerService,
                                     IRuntimeMapper runtimeMapper,
-                                    IRpcMapper rpcMapper,
-                                    IRuntimeConverterService runtimeConverterService)
+                                    IRpcMapper rpcMapper)
     {
-        _logger = logger;
         _deviceManagerService = deviceManagerService;
         _runtimeMapper = runtimeMapper;
         _rpcMapper = rpcMapper;
-        _runtimeConverterService = runtimeConverterService;
     }
 
     public override Task<DeviceProviderCollectionResponse> GetAvailableProviders(DefaultAgentRequest request, ServerCallContext context)
@@ -79,21 +72,13 @@ public sealed class DeviceManagerServiceV1 : Ayborg.Gateway.Agent.V1.DeviceManag
 
     public override async Task<DeviceDto> UpdateDevice(UpdateDeviceRequest request, ServerCallContext context)
     {
-        IDeviceProxy device = _deviceManagerService.DeviceProviders.SelectMany(p => p.Devices).Single(d => d.Id.Equals(request.DeviceId, StringComparison.InvariantCultureIgnoreCase));
+        var tmpPorts = new List<SDK.Common.Models.Port>();
         foreach(PortDto? portDto in request.Ports)
         {
-            SDK.Common.Models.Port port = _rpcMapper.FromRpc(portDto);
-
-            SDK.Common.Ports.IPort targetPort = device.Native.Ports.First(p => p.Id.Equals(port.Id));
-            if(!await _runtimeConverterService.TryUpdatePortValueAsync(targetPort, port.Value!))
-            {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed to update port {portId} value to {portValue}", port.Id, port.Value);
-                continue;
-            }
-
-            _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Updated device [{deviceId}] port [{portName}] value to [{portValue}]", device.Id, port.Name, port.Value);
+            tmpPorts.Add(_rpcMapper.FromRpc(portDto));
         }
 
+        IDeviceProxy device = await _deviceManagerService.UpdateAsync(new UpdateDeviceOptions(request.DeviceId, tmpPorts));
         return ToDto(device, false);
     }
 

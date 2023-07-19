@@ -31,7 +31,7 @@ public abstract record PortRecord
     /// <summary>
     /// Gets or sets the value.
     /// </summary>
-    public string Value { get; init; } = string.Empty;
+    public string Value { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the brand.
