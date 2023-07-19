@@ -15,6 +15,7 @@ public sealed class DeviceToStorageMapper : IDeviceToStorageMapper
     {
         var config = new MapperConfiguration(config =>
         {
+            config.CreateMap<IDeviceProxy, DeviceRecord>();
             config.CreateMap<PluginMetaInfo, PluginMetaInfoRecord>().ReverseMap();
 
             // Ports

@@ -91,9 +91,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
 
     private async ValueTask<IStepProxy> ConvertStepAsync(StepRecord stepRecord)
     {
-        IStepProxy proxyInstance = _pluginsService.Find(stepRecord);
-        if (proxyInstance == null) throw new KeyNotFoundException(nameof(stepRecord.MetaInfo.TypeName));
-
+        IStepProxy proxyInstance = _pluginsService.Find(stepRecord) ?? throw new KeyNotFoundException(nameof(stepRecord.MetaInfo.TypeName));
         if (ActivatorUtilities.CreateInstance(_serviceProvider, proxyInstance.StepBody.GetType()) is IStepBody stepBody)
         {
             var stepProxy = new StepProxy(_loggerFactory.CreateLogger<StepProxy>(), stepBody, stepRecord.X, stepRecord.Y)

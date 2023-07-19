@@ -66,9 +66,14 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
                     b.Property<string>("Name")
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid?>("ProviderMetaInfoDbId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("DbId");
 
                     b.HasIndex("MetaInfoDbId");
+
+                    b.HasIndex("ProviderMetaInfoDbId");
 
                     b.ToTable("AyBorgDevices");
                 });
@@ -116,7 +121,13 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
                         .WithMany()
                         .HasForeignKey("MetaInfoDbId");
 
+                    b.HasOne("AyBorg.Data.Agent.PluginMetaInfoRecord", "ProviderMetaInfo")
+                        .WithMany()
+                        .HasForeignKey("ProviderMetaInfoDbId");
+
                     b.Navigation("MetaInfo");
+
+                    b.Navigation("ProviderMetaInfo");
                 });
 
             modelBuilder.Entity("AyBorg.Data.Agent.DeviceRecord", b =>

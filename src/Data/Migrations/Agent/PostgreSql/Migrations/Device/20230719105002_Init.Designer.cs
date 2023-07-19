@@ -5,44 +5,49 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
+namespace AyBorg.Data.Agent.Migrations.PostgreSql.Migrations.Device
 {
     [DbContext(typeof(DeviceContext))]
-    [Migration("20230719082041_Init")]
+    [Migration("20230719105002_Init")]
     partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "7.0.0")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("AyBorg.Data.Agent.DevicePortRecord", b =>
                 {
                     b.Property<Guid>("DbId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Brand")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("DeviceRecordId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<int>("Direction")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<string>("Value")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.HasKey("DbId");
 
@@ -55,23 +60,28 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
                 {
                     b.Property<Guid>("DbId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Id")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<bool>("IsActive")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("boolean");
 
                     b.Property<Guid?>("MetaInfoDbId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
+
+                    b.Property<Guid?>("ProviderMetaInfoDbId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("DbId");
 
                     b.HasIndex("MetaInfoDbId");
+
+                    b.HasIndex("ProviderMetaInfoDbId");
 
                     b.ToTable("AyBorgDevices");
                 });
@@ -80,22 +90,22 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
                 {
                     b.Property<Guid>("DbId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("AssemblyName")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<string>("AssemblyVersion")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<Guid>("Id")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("TypeName")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.HasKey("DbId");
 
@@ -119,7 +129,13 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
                         .WithMany()
                         .HasForeignKey("MetaInfoDbId");
 
+                    b.HasOne("AyBorg.Data.Agent.PluginMetaInfoRecord", "ProviderMetaInfo")
+                        .WithMany()
+                        .HasForeignKey("ProviderMetaInfoDbId");
+
                     b.Navigation("MetaInfo");
+
+                    b.Navigation("ProviderMetaInfo");
                 });
 
             modelBuilder.Entity("AyBorg.Data.Agent.DeviceRecord", b =>

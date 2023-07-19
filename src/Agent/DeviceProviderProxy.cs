@@ -56,7 +56,7 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
         }
 
         IDevice device = await _deviceProvider.CreateAsync(options.DeviceId);
-        var deviceProxy = new DeviceProxy(_loggerFactory.CreateLogger<IDeviceProxy>(), device);
+        var deviceProxy = new DeviceProxy(_loggerFactory.CreateLogger<IDeviceProxy>(), _deviceProvider, device);
         _devices = _devices.Add(deviceProxy);
         _logger.LogInformation((int)EventLogType.Plugin, "Added device '{id}'", options.DeviceId);
         return deviceProxy;

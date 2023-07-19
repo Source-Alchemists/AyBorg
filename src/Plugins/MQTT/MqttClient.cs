@@ -29,14 +29,17 @@ namespace AyBorg.Plugins.MQTT
 
         public bool IsConnected { get; private set; }
 
+        public IDeviceProvider Parent { get; }
+
         public IReadOnlyCollection<string> Categories { get; } = new List<string> { "Communication", "MQTT" };
 
         public IReadOnlyCollection<IPort> Ports { get; }
 
-        public MqttClient(ILogger<ICommunicationDevice> logger, IMqttClientProviderFactory clientProviderFactory, ICommunicationStateProvider communicationStateProvider, string id)
+        public MqttClient(ILogger<ICommunicationDevice> logger, IMqttClientProviderFactory clientProviderFactory, IDeviceProvider parent, ICommunicationStateProvider communicationStateProvider, string id)
         {
             _logger = logger;
             _clientProviderFactory = clientProviderFactory;
+            Parent = parent;
             _communicationStateProvider = communicationStateProvider;
             Id = id;
             Name = $"MQTT-Client ({id})";

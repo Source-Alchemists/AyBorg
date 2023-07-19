@@ -34,7 +34,8 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
                     Id = table.Column<string>(type: "TEXT", nullable: true),
                     Name = table.Column<string>(type: "TEXT", nullable: true),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false),
-                    MetaInfoDbId = table.Column<Guid>(type: "TEXT", nullable: true)
+                    MetaInfoDbId = table.Column<Guid>(type: "TEXT", nullable: true),
+                    ProviderMetaInfoDbId = table.Column<Guid>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -42,6 +43,11 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
                     table.ForeignKey(
                         name: "FK_AyBorgDevices_AyBorgDevicePluginMetaInfo_MetaInfoDbId",
                         column: x => x.MetaInfoDbId,
+                        principalTable: "AyBorgDevicePluginMetaInfo",
+                        principalColumn: "DbId");
+                    table.ForeignKey(
+                        name: "FK_AyBorgDevices_AyBorgDevicePluginMetaInfo_ProviderMetaInfoDbId",
+                        column: x => x.ProviderMetaInfoDbId,
                         principalTable: "AyBorgDevicePluginMetaInfo",
                         principalColumn: "DbId");
                 });
@@ -78,6 +84,11 @@ namespace AyBorg.Data.Agent.Migrations.SqlLite.Migrations.Device
                 name: "IX_AyBorgDevices_MetaInfoDbId",
                 table: "AyBorgDevices",
                 column: "MetaInfoDbId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AyBorgDevices_ProviderMetaInfoDbId",
+                table: "AyBorgDevices",
+                column: "ProviderMetaInfoDbId");
         }
 
         /// <inheritdoc />

@@ -17,5 +17,10 @@ public sealed record DeviceRecord
 
     public PluginMetaInfoRecord MetaInfo { get; init; }
 
+    /// <summary>
+    /// Gets or sets the provider meta information.
+    /// </summary>
+    public PluginMetaInfoRecord ProviderMetaInfo { get; init; }
+
     public IEnumerable<DevicePortRecord> Ports { get; init; }
 }
