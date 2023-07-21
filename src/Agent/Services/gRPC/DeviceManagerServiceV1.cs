@@ -30,6 +30,7 @@ public sealed class DeviceManagerServiceV1 : Ayborg.Gateway.Agent.V1.DeviceManag
             var provideDto = new DeviceProviderDto
             {
                 Name = provider.Name,
+                Prefix = NormalizeDevicePrefix(provider.Prefix),
                 CanAdd = provider.CanAdd
             };
 
@@ -48,7 +49,15 @@ public sealed class DeviceManagerServiceV1 : Ayborg.Gateway.Agent.V1.DeviceManag
 
     public override async Task<DeviceDto> Add(AddDeviceRequest request, ServerCallContext context)
     {
-        IDeviceProxy newDevice = await _deviceManagerService.AddAsync(new AddDeviceOptions(request.DeviceProviderName, request.DeviceId));
+        string deviceId = request.DeviceId;
+        string devicePrefix = request.DevicePrefix;
+        if(!string.IsNullOrEmpty(devicePrefix) && !string.IsNullOrWhiteSpace(devicePrefix))
+        {
+            devicePrefix = NormalizeDevicePrefix(devicePrefix);
+            deviceId = $"{devicePrefix}-{deviceId}";
+
+        }
+        IDeviceProxy newDevice = await _deviceManagerService.AddAsync(new AddDeviceOptions(request.DeviceProviderName, deviceId));
         return ToDto(newDevice);
     }
 
@@ -88,9 +97,11 @@ public sealed class DeviceManagerServiceV1 : Ayborg.Gateway.Agent.V1.DeviceManag
         {
             Id = device.Id,
             Name = device.Name,
+            Manufacturer = device.Manufacturer,
             IsActive = device.IsActive,
             IsConnected = device.IsConnected
         };
+
         foreach (string category in device.Categories)
         {
             deviceDto.Categories.Add(category);
@@ -105,5 +116,21 @@ public sealed class DeviceManagerServiceV1 : Ayborg.Gateway.Agent.V1.DeviceManag
         }
 
         return deviceDto;
+    }
+
+    private static string NormalizeDevicePrefix(string devicePrefix)
+    {
+        if(string.IsNullOrEmpty(devicePrefix) || string.IsNullOrWhiteSpace(devicePrefix))
+        {
+            return devicePrefix;
+        }
+
+        string newDevicePrefix = devicePrefix.Trim();
+        if(newDevicePrefix.EndsWith('-'))
+        {
+            newDevicePrefix = newDevicePrefix.Remove(newDevicePrefix.Length-1);
+        }
+
+        return newDevicePrefix;
     }
 }

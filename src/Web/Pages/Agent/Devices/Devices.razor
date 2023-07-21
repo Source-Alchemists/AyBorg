@@ -40,6 +40,7 @@ else
                         <MudTh Style="width: 30px">Connected</MudTh>
                         <MudTh>Id</MudTh>
                         <MudTh>Name</MudTh>
+                        <MudTh>Manufacturer</MudTh>
                         <MudTh Style="width: 30%">Categories</MudTh>
                         <MudTh Style="width: 30px"></MudTh>
                     </HeaderContent>
@@ -66,6 +67,7 @@ else
                         </MudTd>
                         <MudTd DataLabel="Id">@context.Id</MudTd>
                         <MudTd DataLabel="Name">@context.Name</MudTd>
+                        <MudTd DataLabel="Manufacturer">@context.Manufacturer</MudTd>
                         <MudTd DataLabel="Categories">
                             @foreach (var category in @context.Categories.Order())
                             {

@@ -14,6 +14,8 @@ public sealed class MqttClientProvider : IDeviceProvider
 
     public string Name => "MQTT Clients";
 
+    public string Prefix => "AyBM";
+
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { "Communication", "MQTT" };
 
     public bool CanCreate => true;

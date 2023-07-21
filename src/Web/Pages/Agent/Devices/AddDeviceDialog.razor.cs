@@ -15,12 +15,25 @@ public partial class AddDeviceDialog : ComponentBase
 
     private DeviceProviderMeta _selectedProvider = null!;
     private string _deviceId = string.Empty;
+    private string _devicePrefix = string.Empty;
     private string _providerError = string.Empty;
     private string _deviceError = string.Empty;
 
-    protected override void OnParametersSet() {
-         base.OnParametersSet();
-         _selectedProvider = DeviceProviders.FirstOrDefault()!;
+    protected override void OnParametersSet()
+    {
+        base.OnParametersSet();
+        _selectedProvider = DeviceProviders.FirstOrDefault()!;
+        OnSelectedProviderChanged();
+    }
+
+    private async void OnSelectedProviderChanged()
+    {
+        if (_selectedProvider != null)
+        {
+            _devicePrefix = _selectedProvider.Prefix;
+        }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     private void OnCloseClicked()
@@ -56,6 +69,7 @@ public partial class AddDeviceDialog : ComponentBase
         {
             await DeviceManagerService.AddDeviceAsync(new DeviceManagerService.AddDeviceRequestOptions(ServiceUniqueName,
                                                                                                 _selectedProvider!.Name,
+                                                                                                _devicePrefix,
                                                                                                 _deviceId));
         }
         catch (Exception)

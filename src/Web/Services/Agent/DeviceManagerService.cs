@@ -7,13 +7,11 @@ namespace AyBorg.Web.Services.Agent;
 
 public class DeviceManagerService : IDeviceManagerService
 {
-    private readonly ILogger<DeviceManagerService> _logger;
     private readonly DeviceManager.DeviceManagerClient _deviceManagerClient;
     private readonly IRpcMapper _rpcMapper;
 
-    public DeviceManagerService(ILogger<DeviceManagerService> logger, DeviceManager.DeviceManagerClient deviceManagerClient, IRpcMapper rpcMapper)
+    public DeviceManagerService(DeviceManager.DeviceManagerClient deviceManagerClient, IRpcMapper rpcMapper)
     {
-        _logger = logger;
         _deviceManagerClient = deviceManagerClient;
         _rpcMapper = rpcMapper;
     }
@@ -38,6 +36,7 @@ public class DeviceManagerService : IDeviceManagerService
             result.Add(new DeviceProviderMeta
             {
                 Name = dtoProvider.Name,
+                Prefix = dtoProvider.Prefix,
                 CanAdd = dtoProvider.CanAdd,
                 Devices = devices
             });
@@ -52,7 +51,8 @@ public class DeviceManagerService : IDeviceManagerService
         {
             AgentUniqueName = options.AgentUniqueName,
             DeviceProviderName = options.DeviceProviderName,
-            DeviceId = options.DeviceId
+            DeviceId = options.DeviceId,
+            DevicePrefix = options.DevicePrefix
         });
 
         return ToObject(response);
@@ -119,6 +119,7 @@ public class DeviceManagerService : IDeviceManagerService
         {
             Id = dtoDevice.Id,
             Name = dtoDevice.Name,
+            Manufacturer = dtoDevice.Manufacturer,
             IsActive = dtoDevice.IsActive,
             IsConnected = dtoDevice.IsConnected,
             Categories = dtoDevice.Categories,
@@ -127,7 +128,7 @@ public class DeviceManagerService : IDeviceManagerService
     }
 
     public sealed record CommonDeviceRequestOptions(string AgentUniqueName, string DeviceId);
-    public sealed record AddDeviceRequestOptions(string AgentUniqueName, string DeviceProviderName, string DeviceId);
+    public sealed record AddDeviceRequestOptions(string AgentUniqueName, string DeviceProviderName, string DevicePrefix, string DeviceId);
     public sealed record ChangeDeviceStateRequestOptions(string AgentUniqueName, string DeviceId, bool Activate);
     public sealed record UpdateDeviceRequestOptions(string AgentUniqueName, string DeviceId, IReadOnlyCollection<Port> Ports);
 }

@@ -12,14 +12,22 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
     private ImmutableList<IDeviceProxy> _devices = ImmutableList.Create<IDeviceProxy>();
     private bool _isDisposed = false;
 
+    /// <inheritdoc/>
     public string Name => _deviceProvider.Name;
 
+    /// <inheritdoc/>
+    public string Prefix => _deviceProvider.Prefix;
+
+    /// <inheritdoc/>
     public bool CanAdd => _deviceProvider.CanCreate;
 
+    /// <inheritdoc/>
     public PluginMetaInfo MetaInfo { get; }
 
+    /// <inheritdoc/>
     public IReadOnlyCollection<IDeviceProxy> Devices => _devices;
 
+    /// <inheritdoc/>
     public DeviceProviderProxy(ILoggerFactory loggerFactory, ILogger<DeviceProviderProxy> logger, IDeviceProvider deviceProvider)
     {
         _loggerFactory = loggerFactory;
@@ -38,6 +46,7 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
         };
     }
 
+    /// <inheritdoc/>
     public async ValueTask<bool> TryInitializeAsync()
     {
         try
@@ -56,6 +65,7 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
         }
     }
 
+    /// <inheritdoc/>
     public async ValueTask<IDeviceProxy> AddAsync(AddDeviceOptions options)
     {
         if (!_deviceProvider.CanCreate)
@@ -75,6 +85,7 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
         return deviceProxy;
     }
 
+    /// <inheritdoc/>
     public async ValueTask<IDeviceProxy> RemoveAsync(string id)
     {
 
@@ -99,7 +110,14 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
         return deviceProxy;
     }
 
-    public void Dispose(bool disposing)
+    /// <inheritdoc/>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
     {
         if (disposing && !_isDisposed)
         {
@@ -118,11 +136,5 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
 
             _isDisposed = true;
         }
-    }
-
-    public void Dispose()
-    {
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 }

@@ -6,6 +6,7 @@ public record DeviceMeta
 {
     public string Id { get; init; } = string.Empty;
     public string Name { get; init; } = string.Empty;
+    public string Manufacturer { get; init; } = string.Empty;
     public bool IsActive { get; init; } = false;
     public bool IsConnected { get; init; } = false;
     public IReadOnlyCollection<string> Categories { get; init; } = Array.Empty<string>();

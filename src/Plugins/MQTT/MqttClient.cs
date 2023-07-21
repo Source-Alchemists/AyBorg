@@ -27,6 +27,8 @@ namespace AyBorg.Plugins.MQTT
 
         public string Name { get; }
 
+        public string Manufacturer => "Source Alchemists";
+
         public bool IsConnected { get; private set; }
 
         public IReadOnlyCollection<string> Categories { get; } = new List<string> { "Communication", "MQTT" };

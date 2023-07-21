@@ -58,7 +58,7 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
                     continue;
                 }
 
-                _logger.LogInformation(new EventId((int)EventLogType.Plugin), "Device '{deviceId}' loaded from storage", device.Id);
+                _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Device '{deviceId}' loaded from storage", device.Id);
             }
             catch (Exception)
             {
@@ -136,6 +136,16 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
         DeviceRecord deviceRecord = _storageMapper.Map(device);
         await _deviceRepository.UpdateAsync(deviceRecord);
 
+        if (options.Activate)
+        {
+            _logger.LogInformation(new EventId((int)EventLogType.Plugin), "Device '{deviceId}' connected", options.DeviceId);
+        }
+        else
+        {
+            _logger.LogInformation(new EventId((int)EventLogType.Plugin), "Device '{deviceId}' disconnected", options.DeviceId);
+
+        }
+
         return device;
     }
 
@@ -170,6 +180,8 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
             {
                 return false;
             }
+
+            _logger.LogInformation(new EventId((int)EventLogType.Plugin), "Device '{deviceId}' connected", device.Id);
         }
 
         return true;

@@ -46,7 +46,7 @@ internal sealed class PluginsService : IPluginsService
     /// <summary>
     /// Loads this instance.
     /// </summary>
-    public void Load()
+    public async void Load()
     {
         _stepPlugins = _stepPlugins.Clear();
         _deviceProviderPlugins = _deviceProviderPlugins.Clear();
@@ -76,10 +76,8 @@ internal sealed class PluginsService : IPluginsService
                     string assemblyPath = $"{Path.Combine(pd, dllName)}";
                     Assembly assembly = PluginLoader.CreateFromAssemblyFile(assemblyPath, c => c.PreferSharedTypes = true)
                                                     .LoadDefaultAssembly();
-                    if (!TryLoadPlugins(assembly))
-                    {
-                        _logger.LogTrace("No plugins detected.");
-                    }
+
+                    await LoadPluginsAsync(assembly);
                 }
             }
         }
@@ -125,40 +123,59 @@ internal sealed class PluginsService : IPluginsService
         return new StepProxy(_loggerFactory.CreateLogger<StepProxy>(), newInstance);
     }
 
-    private bool TryLoadPlugins(Assembly assembly)
+    private async ValueTask LoadPluginsAsync(Assembly assembly)
     {
         Type stepBodyType = typeof(IStepBody);
         Type deviceManagerType = typeof(IDeviceProvider);
 
+        // Load step plugins
         IEnumerable<Type> stepPlugins = assembly.GetTypes().Where(p => stepBodyType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
-        IEnumerable<Type> deviceManagerPlugins = assembly.GetTypes().Where(p => deviceManagerType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
-        if (stepPlugins.Any())
+        LoadSteps(stepPlugins);
+
+        // Load device provider plugins
+        IEnumerable<Type> deviceProviderPlugins = assembly.GetTypes().Where(p => deviceManagerType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
+        await LoadDeviceProvidersAsync(deviceProviderPlugins);
+    }
+
+    private void LoadSteps(IEnumerable<Type> stepPlugins)
+    {
+        if (!stepPlugins.Any())
         {
-            foreach (Type sp in stepPlugins)
-            {
-                if (ActivatorUtilities.CreateInstance(_serviceProvider, sp) is IStepBody si)
-                {
-                    _stepPlugins = _stepPlugins.Add(new StepProxy(_loggerFactory.CreateLogger<StepProxy>(), si));
-                    _logger.LogTrace((int)EventLogType.Plugin, "Added step plugin '{si.GetType.Name}'.", si.GetType().Name);
-                }
-            }
-            return true;
+            return;
         }
 
-        if (deviceManagerPlugins.Any())
+        foreach (Type sp in stepPlugins)
         {
-            foreach (Type dm in deviceManagerPlugins)
+            if (ActivatorUtilities.CreateInstance(_serviceProvider, sp) is IStepBody si)
             {
-                if (ActivatorUtilities.CreateInstance(_serviceProvider, dm) is IDeviceProvider di)
-                {
-                    _deviceProviderPlugins = _deviceProviderPlugins.Add(new DeviceProviderProxy(_loggerFactory, _loggerFactory.CreateLogger<DeviceProviderProxy>(), di));
-                    _logger.LogTrace((int)EventLogType.Plugin, "Added device manager plugin '{di.GetType.Name}'.", di.GetType().Name);
-                }
+                _stepPlugins = _stepPlugins.Add(new StepProxy(_loggerFactory.CreateLogger<StepProxy>(), si));
+                _logger.LogTrace((int)EventLogType.Plugin, "Added step plugin '{si.GetType.Name}'.", si.GetType().Name);
             }
-            return true;
+        }
+    }
+
+    private async ValueTask LoadDeviceProvidersAsync(IEnumerable<Type> deviceProviderPlugins)
+    {
+        if (!deviceProviderPlugins.Any())
+        {
+            return;
         }
 
-        return false;
+        foreach (Type dm in deviceProviderPlugins)
+        {
+            if (ActivatorUtilities.CreateInstance(_serviceProvider, dm) is IDeviceProvider di)
+            {
+                var deviceProviderProxy = new DeviceProviderProxy(_loggerFactory, _loggerFactory.CreateLogger<DeviceProviderProxy>(), di);
+                if (!await deviceProviderProxy.TryInitializeAsync())
+                {
+                    _logger.LogWarning((int)EventLogType.Plugin, "Device provider plugin '{di.GetType.Name}' could not be initialized.", di.GetType().Name);
+                    continue;
+                }
+
+                _deviceProviderPlugins = _deviceProviderPlugins.Add(deviceProviderProxy);
+                _logger.LogTrace((int)EventLogType.Plugin, "Added device provider plugin '{di.GetType.Name}'.", di.GetType().Name);
+            }
+        }
     }
 
     private static bool IsSameType(Type type, PluginMetaInfoRecord metaInfo) => type.Name == metaInfo.TypeName && type.Assembly.GetName().Name == metaInfo.AssemblyName;

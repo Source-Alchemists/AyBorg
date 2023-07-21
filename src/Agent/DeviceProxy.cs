@@ -8,6 +8,7 @@ public class DeviceProxy : IDeviceProxy
 {
     public string Id => Native.Id;
     public string Name => Native.Name;
+    public string Manufacturer => Native.Manufacturer;
     public bool IsActive { get; private set; }
     public bool IsConnected => Native.IsConnected;
     public IReadOnlyCollection<string> Categories => Native.Categories;
