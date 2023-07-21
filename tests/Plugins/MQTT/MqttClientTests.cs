@@ -1,5 +1,5 @@
+using AyBorg.SDK.Common.Communication;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Communication;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.System.Runtime;
 using Microsoft.Extensions.Logging;

@@ -27,7 +27,7 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
         _runtimeConverter = runtimeConverter;
     }
 
-    public async void Load()
+    public async ValueTask LoadAsync()
     {
         foreach (DeviceRecord deviceRecord in await _deviceRepository.GetAllAsync())
         {

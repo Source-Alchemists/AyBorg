@@ -46,7 +46,7 @@ internal sealed class PluginsService : IPluginsService
     /// <summary>
     /// Loads this instance.
     /// </summary>
-    public async void Load()
+    public async ValueTask LoadAsync()
     {
         _stepPlugins = _stepPlugins.Clear();
         _deviceProviderPlugins = _deviceProviderPlugins.Clear();
@@ -128,13 +128,13 @@ internal sealed class PluginsService : IPluginsService
         Type stepBodyType = typeof(IStepBody);
         Type deviceManagerType = typeof(IDeviceProvider);
 
-        // Load step plugins
-        IEnumerable<Type> stepPlugins = assembly.GetTypes().Where(p => stepBodyType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
-        LoadSteps(stepPlugins);
-
         // Load device provider plugins
         IEnumerable<Type> deviceProviderPlugins = assembly.GetTypes().Where(p => deviceManagerType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
         await LoadDeviceProvidersAsync(deviceProviderPlugins);
+
+        // Load step plugins
+        IEnumerable<Type> stepPlugins = assembly.GetTypes().Where(p => stepBodyType.IsAssignableFrom(p) && p.IsClass && !p.IsAbstract);
+        LoadSteps(stepPlugins);
     }
 
     private void LoadSteps(IEnumerable<Type> stepPlugins)

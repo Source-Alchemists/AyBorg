@@ -21,6 +21,9 @@
     case PortBrand.Rectangle:
         <RectangleInputField Port="Port" ValueChanged="@OnPortValueChangedAsync" Disabled="@Disabled" />
         break;
+    case PortBrand.Select:
+        <SelectInputField Port="Port" ValueChanged="@OnPortValueChangedAsync" Disabled="@Disabled" />
+        break;
     case PortBrand.Enum:
         <EnumInputField Port="Port" ValueChanged="@OnPortValueChangedAsync" Disabled="@Disabled" />
         break;

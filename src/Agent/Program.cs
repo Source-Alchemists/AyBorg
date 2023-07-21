@@ -97,8 +97,8 @@ app.MapGet("/", () => "Communication with gRPC endpoints must be made through a 
 app.Services.GetService<IDbContextFactory<ProjectContext>>()!.CreateDbContext().Database.Migrate();
 app.Services.GetService<IDbContextFactory<DeviceContext>>()!.CreateDbContext().Database.Migrate();
 
-app.Services.GetService<IPluginsService>()!.Load();
-app.Services.GetService<IDeviceProxyManagerService>()!.Load();
+await app.Services.GetService<IPluginsService>()!.LoadAsync().AsTask()!;
+await app.Services.GetService<IDeviceProxyManagerService>()!.LoadAsync().AsTask()!;
 await app.Services.GetService<IProjectManagementService>()!.TryLoadActiveAsync().AsTask()!;
 
 app.Run();

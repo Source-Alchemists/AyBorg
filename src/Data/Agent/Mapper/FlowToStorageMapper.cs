@@ -33,6 +33,7 @@ public sealed class FlowToStorageMapper : IFlowToStorageMapper
             config.CreateMap<ImagePort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new ImageToRecordConverter()));
             config.CreateMap<RectanglePort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new RectangleToRecordConverter()));
             config.CreateMap<EnumPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new EnumToRecordConverter()));
+            config.CreateMap<SelectPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new SelectValueToRecordConverter()));
             // Port collections
             config.CreateMap<StringCollectionPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<string>()));
             config.CreateMap<NumericCollectionPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<double>()));

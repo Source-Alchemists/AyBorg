@@ -1,4 +1,5 @@
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.Web.Shared.Models.Agent;
@@ -7,11 +8,13 @@ namespace AyBorg.Web.Services.Agent;
 
 public class DeviceManagerService : IDeviceManagerService
 {
+    private readonly ILogger<DeviceManagerService> _logger;
     private readonly DeviceManager.DeviceManagerClient _deviceManagerClient;
     private readonly IRpcMapper _rpcMapper;
 
-    public DeviceManagerService(DeviceManager.DeviceManagerClient deviceManagerClient, IRpcMapper rpcMapper)
+    public DeviceManagerService(ILogger<DeviceManagerService> logger, DeviceManager.DeviceManagerClient deviceManagerClient, IRpcMapper rpcMapper)
     {
+        _logger = logger;
         _deviceManagerClient = deviceManagerClient;
         _rpcMapper = rpcMapper;
     }
@@ -55,6 +58,7 @@ public class DeviceManagerService : IDeviceManagerService
             DevicePrefix = options.DevicePrefix
         });
 
+        _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Device added: {DeviceId}", response.Id);
         return ToObject(response);
     }
 
@@ -66,6 +70,7 @@ public class DeviceManagerService : IDeviceManagerService
             DeviceId = options.DeviceId
         });
 
+        _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Device removed: {DeviceId}", response.Id);
         return ToObject(response);
     }
 
@@ -78,6 +83,7 @@ public class DeviceManagerService : IDeviceManagerService
             Activate = options.Activate
         });
 
+        _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Device state changed: {DeviceId}, active: {IsActive}", response.Id, response.IsActive);
         return ToObject(response);
     }
 
@@ -104,7 +110,9 @@ public class DeviceManagerService : IDeviceManagerService
             request.Ports.Add(_rpcMapper.ToRpc(port));
         }
 
-        return ToObject(await _deviceManagerClient.UpdateDeviceAsync(request));
+        DeviceDto response = await _deviceManagerClient.UpdateDeviceAsync(request);
+        _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Device updated: {DeviceId}", response.Id);
+        return ToObject(response);
     }
 
     private DeviceMeta ToObject(DeviceDto dtoDevice)

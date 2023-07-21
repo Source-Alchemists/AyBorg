@@ -26,6 +26,7 @@ public sealed class DeviceToStorageMapper : IDeviceToStorageMapper
             config.CreateMap<ImagePort, DevicePortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new ImageToRecordConverter()));
             config.CreateMap<RectanglePort, DevicePortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new RectangleToRecordConverter()));
             config.CreateMap<EnumPort, DevicePortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new EnumToRecordConverter()));
+            config.CreateMap<SelectPort, DevicePortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new SelectValueToRecordConverter()));
             // Port collections
             config.CreateMap<StringCollectionPort, DevicePortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<string>()));
             config.CreateMap<NumericCollectionPort, DevicePortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<double>()));

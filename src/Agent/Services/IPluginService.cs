@@ -19,7 +19,7 @@ public interface IPluginsService
     /// <summary>
     /// Loads this instance.
     /// </summary>
-    void Load();
+    ValueTask LoadAsync();
 
     /// <summary>
     /// Find plugin instance by step record.
