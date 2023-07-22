@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.Base.Communication;
 
-public abstract class CommunicationBase : IStepBody, IAfterInitialized, IDisposable
+public abstract class CommunicationBase : IStepBody, IAfterInitialized, IBeforeStart, IDisposable
 {
     private readonly ILogger<CommunicationBase> _logger;
     private string _lastDeviceId = string.Empty;
@@ -37,7 +37,13 @@ public abstract class CommunicationBase : IStepBody, IAfterInitialized, IDisposa
         return ValueTask.CompletedTask;
     }
 
-    private void ChangeDevice()
+    public virtual ValueTask BeforeStartAsync()
+    {
+        ChangeDevice();
+        return ValueTask.CompletedTask;
+    }
+
+    protected void ChangeDevice()
     {
         if (_devicePort.Value == null)
         {
@@ -105,9 +111,5 @@ public abstract class CommunicationBase : IStepBody, IAfterInitialized, IDisposa
         }
     }
 
-    public virtual ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
-    {
-        ChangeDevice();
-        return ValueTask.FromResult(true);
-    }
+    public abstract ValueTask<bool> TryRunAsync(CancellationToken cancellationToken);
 }

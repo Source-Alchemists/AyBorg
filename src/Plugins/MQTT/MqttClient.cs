@@ -166,7 +166,7 @@ namespace AyBorg.Plugins.MQTT
             var subscription = new MessageSubscription { Id = messageId };
             rawSub.MessageReceived += (message) =>
             {
-                subscription.Received?.Invoke(new Message
+                subscription.Next(new Message
                 {
                     ContentType = message.ContentType,
                     Payload = message.Payload

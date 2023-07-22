@@ -23,11 +23,6 @@ public abstract class CommunicationSendBase : CommunicationBase
 
     public override async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
-        if(!await base.TryRunAsync(cancellationToken))
-        {
-            return false;
-        }
-
         if (!_communicationStateProvider.IsResultCommunicationEnabled)
         {
             return true;
