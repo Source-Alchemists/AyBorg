@@ -1,17 +1,31 @@
 using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Ports;
+using AyBorg.SDK.System.Runtime;
 using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.Base.Communication;
 
-public class CommunicationSend : CommunicationBase
+public sealed class CommunicationSend : CommunicationSendBase
 {
-    private readonly ILogger<CommunicationSend> _logger;
+    private readonly StringPort _messageValuePort = new("Value", PortDirection.Input, string.Empty);
+
     public override string Name => "Communication.Send";
 
-    public CommunicationSend(ILogger<CommunicationSend> logger, IDeviceManager deviceManager) : base(deviceManager)
+    public CommunicationSend(ILogger<CommunicationSendBase> logger, IDeviceManager deviceManager, ICommunicationStateProvider communicationStateProvider) : base(logger, deviceManager, communicationStateProvider)
     {
-        _logger = logger;
+        _ports = _ports.Add(_messageValuePort);
     }
 
-    public override ValueTask<bool> TryRunAsync(CancellationToken cancellationToken) => throw new NotImplementedException();
+    protected override async ValueTask SendAsync(CancellationToken cancellationToken)
+    {
+        if(_device == null)
+        {
+            throw new InvalidOperationException("No device selected");
+        }
+
+        if(!await _device.TrySendAsync(_messageIdPort.Value, _messageValuePort))
+        {
+            throw new CommunicationException("Error while sending message to device");
+        }
+    }
 }

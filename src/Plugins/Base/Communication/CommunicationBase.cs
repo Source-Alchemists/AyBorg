@@ -2,27 +2,66 @@ using System.Collections.Immutable;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Communication;
 using AyBorg.SDK.Common.Ports;
+using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.Base.Communication;
 
-public abstract class CommunicationBase : IStepBody, IAfterInitialized
+public abstract class CommunicationBase : IStepBody, IAfterInitialized, IDisposable
 {
-    protected SelectPort _devicePort = new("Device", PortDirection.Input, null!);
+    private readonly ILogger<CommunicationBase> _logger;
+    private string _lastDeviceId = string.Empty;
+    private bool _isDisposed = false;
+    protected readonly SelectPort _devicePort = new("Device", PortDirection.Input, null!);
+    protected readonly StringPort _messageIdPort = new("Id", PortDirection.Input, string.Empty);
     protected ImmutableList<IPort> _ports = ImmutableList.Create<IPort>();
     protected IDeviceManager _deviceManager;
+    protected ICommunicationDevice? _device;
     public abstract string Name { get; }
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Communication };
     public IReadOnlyCollection<IPort> Ports => _ports;
 
-    protected CommunicationBase(IDeviceManager deviceManager)
+    protected CommunicationBase(ILogger<CommunicationBase> logger, IDeviceManager deviceManager)
     {
+        _logger = logger;
         _deviceManager = deviceManager;
         _ports = _ports.Add(_devicePort);
+        _deviceManager.DeviceCollectionChanged += OnDeviceCollectionChanged;
     }
 
     public ValueTask AfterInitializedAsync()
     {
         IEnumerable<ICommunicationDevice> devices = _deviceManager.GetDevices<ICommunicationDevice>();
+        UpdateDevicePort(devices);
+        ChangeDevice();
+
+        return ValueTask.CompletedTask;
+    }
+
+    private void ChangeDevice()
+    {
+        if (_devicePort.Value == null)
+        {
+            _lastDeviceId = string.Empty;
+            return;
+        }
+
+        if (_lastDeviceId.Equals(_devicePort.Value.SelectedValue))
+        {
+            return;
+        }
+
+        _device = _deviceManager.GetDevice<ICommunicationDevice>(_devicePort.Value.SelectedValue);
+        if (_device == null && _devicePort.Value != null && !string.IsNullOrEmpty(_devicePort.Value.SelectedValue))
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Device '{deviceId}' not found", _devicePort.Value.SelectedValue);
+            return;
+        }
+
+        _lastDeviceId = _devicePort.Value!.SelectedValue;
+    }
+
+    private void UpdateDevicePort(IEnumerable<ICommunicationDevice> devices)
+    {
         if (devices.Any())
         {
             string selectedId = string.Empty;
@@ -42,10 +81,33 @@ public abstract class CommunicationBase : IStepBody, IAfterInitialized
 
             _devicePort.Value = new SelectPort.ValueContainer(selectedId, devices.Select(d => d.Id).ToList());
         }
-
-        return ValueTask.CompletedTask;
     }
 
-    public abstract ValueTask<bool> TryRunAsync(CancellationToken cancellationToken);
+    private void OnDeviceCollectionChanged(object? sender, CollectionChangedEventArgs e)
+    {
+        IEnumerable<ICommunicationDevice> devices = _deviceManager.GetDevices<ICommunicationDevice>();
+        UpdateDevicePort(devices);
+        ChangeDevice();
+    }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool isDisposing)
+    {
+        if (!_isDisposed && isDisposing)
+        {
+            _deviceManager.DeviceCollectionChanged -= OnDeviceCollectionChanged;
+            _isDisposed = true;
+        }
+    }
+
+    public virtual ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
+    {
+        ChangeDevice();
+        return ValueTask.FromResult(true);
+    }
 }

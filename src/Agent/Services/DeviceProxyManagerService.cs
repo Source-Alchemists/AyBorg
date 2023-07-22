@@ -11,7 +11,8 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
     private readonly IDeviceToStorageMapper _storageMapper;
     private readonly IDeviceRepository _deviceRepository;
     private readonly IRuntimeConverterService _runtimeConverter;
-
+    public event EventHandler<ObjectChangedEventArgs>? DeviceChanged;
+    public event EventHandler<CollectionChangedEventArgs>? DeviceCollectionChanged;
     public IReadOnlyCollection<IDeviceProviderProxy> DeviceProviders => _pluginsService.DeviceProviders;
 
     public DeviceProxyManagerService(ILogger<DeviceProxyManagerService> logger,
@@ -66,6 +67,8 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
                 continue;
             }
         }
+
+        DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList()));
     }
 
     public async ValueTask<IDeviceProxy> AddAsync(AddDeviceOptions options)
@@ -84,6 +87,7 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
         try
         {
             await _deviceRepository.AddAsync(deviceRecord);
+            DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList()));
         }
         catch (Exception)
         {
@@ -102,6 +106,7 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
 
         DeviceRecord deviceRecord = _storageMapper.Map(removedDevice);
         await _deviceRepository.RemoveAsync(deviceRecord);
+        DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList()));
 
         return removedDevice;
     }
@@ -146,6 +151,7 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
 
         }
 
+        DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList()));
         return device;
     }
 
@@ -166,7 +172,7 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
 
         DeviceRecord deviceRecord = _storageMapper.Map(device);
         await _deviceRepository.UpdateAsync(deviceRecord);
-
+        DeviceChanged?.Invoke(this, new ObjectChangedEventArgs(device.Native));
         return device;
     }
 
