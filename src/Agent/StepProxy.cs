@@ -135,15 +135,15 @@ public sealed class StepProxy : IStepProxy
     }
 
     /// <summary>
-    /// Initializes the step.
+    /// Initializes the step before running it.
     /// </summary>
-    public async ValueTask<bool> TryInitializeAsync()
+    public async ValueTask<bool> TryBeforeStartAsync()
     {
         try
         {
-            if (StepBody is IInitializable initializable)
+            if (StepBody is IBeforeStart beforeStartable)
             {
-                await initializable.OnInitializeAsync();
+                await beforeStartable.BeforeStartAsync();
             }
 
             return true;
@@ -151,6 +151,27 @@ public sealed class StepProxy : IStepProxy
         catch (Exception ex)
         {
             _logger.LogWarning((int)EventLogType.Plugin, ex, "Failed to initialize step {Name}", Name);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Called after the step is created or loaded.
+    /// </summary>
+    public async ValueTask<bool> TryAfterInitializedAsync()
+    {
+        try
+        {
+            if (StepBody is IAfterInitialized afterInitializeable)
+            {
+                await afterInitializeable.AfterInitializedAsync();
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning((int)EventLogType.Plugin, ex, "Failed after initialize step {Name}", Name);
             return false;
         }
     }

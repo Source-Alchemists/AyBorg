@@ -42,5 +42,5 @@ public interface IPluginsService
     /// </summary>
     /// <param name="stepBody">The step body.</param>
     /// <returns></returns>
-    IStepProxy CreateInstance(IStepBody stepBody);
+    ValueTask<IStepProxy> CreateInstanceAsync(IStepBody stepBody);
 }

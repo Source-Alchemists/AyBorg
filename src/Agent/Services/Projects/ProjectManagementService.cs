@@ -202,7 +202,7 @@ internal sealed class ProjectManagementService : IProjectManagementService
                     pm.IsActive = false;
                     if (!await _projectRepository.TryUpdateAsync(pm))
                     {
-                        _logger.LogCritical(new EventId((int)EventLogType.ProjectState), "Could not deactivate project '{projectName}'.", pm.Name);
+                        _logger.LogError(new EventId((int)EventLogType.ProjectState), "Could not deactivate project '{projectName}'.", pm.Name);
                         continue;
                     }
                 }

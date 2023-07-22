@@ -161,7 +161,7 @@ public class FlowServiceTests
         if(pluginAvailable)
         {
             _mockPluginsService.Setup(x => x.Find(It.IsAny<Guid>())).Returns(new Mock<IStepProxy>().Object);
-            _mockPluginsService.Setup(x => x.CreateInstance(It.IsAny<IStepBody>())).Returns(mockStep.Object);
+            _mockPluginsService.Setup(x => x.CreateInstanceAsync(It.IsAny<IStepBody>())).ReturnsAsync(mockStep.Object);
         }
 
         Project project = new();
@@ -177,7 +177,7 @@ public class FlowServiceTests
             Assert.Single(project.Steps);
             mockStep.VerifySet(x => x.X = 123);
             mockStep.VerifySet(x => x.Y = 456);
-            _mockPluginsService.Verify(x => x.CreateInstance(It.IsAny<IStepBody>()), Times.Once);
+            _mockPluginsService.Verify(x => x.CreateInstanceAsync(It.IsAny<IStepBody>()), Times.Once);
         }
         else
         {

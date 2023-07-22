@@ -122,6 +122,7 @@ internal sealed class RuntimeConverterService : IRuntimeConverterService
                 Name = stepRecord.Name
             };
             await UpdateValuesAsync(stepProxy.Ports, stepRecord.Ports);
+            await stepProxy.TryAfterInitializedAsync();
             return stepProxy;
         }
         else

@@ -113,14 +113,16 @@ internal sealed class PluginsService : IPluginsService
     /// </summary>
     /// <param name="stepBody">The step body.</param>
     /// <returns></returns>
-    public IStepProxy CreateInstance(IStepBody stepBody)
+    public async ValueTask<IStepProxy> CreateInstanceAsync(IStepBody stepBody)
     {
         if (ActivatorUtilities.CreateInstance(_serviceProvider, stepBody.GetType()) is not IStepBody newInstance)
         {
             throw new InvalidOperationException($"Step body '{stepBody.GetType().FullName}' is not a valid step body.");
         }
 
-        return new StepProxy(_loggerFactory.CreateLogger<StepProxy>(), newInstance);
+        var stepProxy = new StepProxy(_loggerFactory.CreateLogger<StepProxy>(), newInstance);
+        await stepProxy.TryAfterInitializedAsync();
+        return stepProxy;
     }
 
     private async ValueTask LoadPluginsAsync(Assembly assembly)
