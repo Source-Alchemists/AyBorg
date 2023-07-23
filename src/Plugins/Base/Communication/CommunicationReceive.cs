@@ -9,13 +9,13 @@ namespace AyBorg.Plugins.Base.Communication;
 public sealed class CommunicationReceive : CommunicationReceiveBase
 {
     private readonly ILogger<CommunicationReceive> _logger;
-    private readonly StringPort _messagePort = new("Message", PortDirection.Output, string.Empty);
+    private readonly StringPort _valuePort = new("Value", PortDirection.Output, string.Empty);
     public override string Name => "Communication.Receive";
 
     public CommunicationReceive(ILogger<CommunicationReceive> logger, IDeviceManager deviceManager) : base(logger, deviceManager)
     {
         _logger = logger;
-        _ports = _ports.Add(_messagePort);
+        _ports = _ports.Add(_valuePort);
     }
 
     protected override void OnMessageReceived(object? sender, MessageEventArgs e)
@@ -23,10 +23,13 @@ public sealed class CommunicationReceive : CommunicationReceiveBase
         if (e.Message.Payload == null)
         {
             _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Received message with null payload");
-            return;
+            _valuePort.Value = string.Empty;
+        }
+        else
+        {
+            _valuePort.Value = Encoding.UTF8.GetString(e.Message.Payload);
         }
 
-        _messagePort.Value = Encoding.UTF8.GetString(e.Message.Payload);
         _hasNewMessage = true;
     }
 }
