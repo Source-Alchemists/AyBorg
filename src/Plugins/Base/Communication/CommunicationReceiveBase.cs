@@ -30,7 +30,7 @@ public abstract class CommunicationReceiveBase : CommunicationBase
     public override async ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
     {
         _hasNewMessage = false;
-
+        ChangeDevice();
         await SubcripeAsync();
 
         int count = 0;

@@ -28,6 +28,8 @@ public abstract class CommunicationSendBase : CommunicationBase
             return true;
         }
 
+        ChangeDevice();
+
         if (_parallelPort.Value)
         {
             if (_parallelTask != null)

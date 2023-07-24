@@ -113,7 +113,8 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
 
     public async ValueTask<IDeviceProxy> ChangeStateAsync(ChangeDeviceStateOptions options)
     {
-        IDeviceProxy device = DeviceProviders.Select(p => p.Devices.First(d => d.Id.Equals(options.DeviceId, StringComparison.InvariantCultureIgnoreCase))).Single();
+        IDeviceProviderProxy deviceProvider = DeviceProviders.First(p => p.Devices.Any(d => d.Id.Equals(options.DeviceId, StringComparison.InvariantCultureIgnoreCase)));
+        IDeviceProxy device = deviceProvider.Devices.Single(d => d.Id.Equals(options.DeviceId, StringComparison.InvariantCultureIgnoreCase));
         if (device.IsActive && device.IsConnected && options.Activate)
         {
             _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Device '{deviceId}' is already active", options.DeviceId);

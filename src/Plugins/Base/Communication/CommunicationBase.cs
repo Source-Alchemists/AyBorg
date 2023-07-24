@@ -9,10 +9,10 @@ namespace AyBorg.Plugins.Base.Communication;
 public abstract class CommunicationBase : IStepBody, IAfterInitialized, IBeforeStart, IDisposable
 {
     private readonly ILogger<CommunicationBase> _logger;
-    private string _lastDeviceId = string.Empty;
-    private bool _isDisposed = false;
     protected readonly SelectPort _devicePort = new("Device", PortDirection.Input, null!);
     protected readonly StringPort _messageIdPort = new("Id", PortDirection.Input, string.Empty);
+    private string _lastDeviceId = string.Empty;
+    private bool _isDisposed = false;
     protected ImmutableList<IPort> _ports = ImmutableList.Create<IPort>();
     protected IDeviceManager _deviceManager;
     protected ICommunicationDevice? _device;

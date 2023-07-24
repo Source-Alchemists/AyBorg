@@ -7,210 +7,211 @@ using ImageTorque.Processing;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
 
-namespace AyBorg.Plugins.MQTT
+namespace AyBorg.Plugins.MQTT;
+
+public sealed class MqttClient : ICommunicationDevice, IDisposable
 {
-    public sealed class MqttClient : ICommunicationDevice, IDisposable
+    private readonly ILogger<ICommunicationDevice> _logger;
+    private readonly StringPort _host = new("Host", PortDirection.Input, "localhost");
+    private readonly NumericPort _port = new("Port", PortDirection.Input, 1883);
+    private readonly EnumPort _qualityOfService = new("QoS", PortDirection.Input, MqttQualityOfServiceLevel.AtLeastOnce);
+    private readonly BooleanPort _retain = new("Retain", PortDirection.Input, false);
+    private readonly EnumPort _encoder = new("Encoder", PortDirection.Input, EncoderType.Jpeg);
+    private readonly IMqttClientProviderFactory _clientProviderFactory;
+    private readonly ICommunicationStateProvider _communicationStateProvider;
+    private readonly Dictionary<MessageSubscription, MqttSubscription> _subscriptions = new();
+    private IMqttClientProvider _mqttClientProvider = null!;
+    private bool _isDisposed;
+
+    public string Id { get; }
+
+    public string Name { get; }
+
+    public string Manufacturer => "Source Alchemists";
+
+    public bool IsConnected { get; private set; }
+
+    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultDeviceCategories.Communication, "MQTT" };
+
+    public IReadOnlyCollection<IPort> Ports { get; }
+
+    public MqttClient(ILogger<ICommunicationDevice> logger, IMqttClientProviderFactory clientProviderFactory, ICommunicationStateProvider communicationStateProvider, string id)
     {
-        private readonly ILogger<ICommunicationDevice> _logger;
-        private readonly StringPort _host = new("Host", PortDirection.Input, "localhost");
-        private readonly NumericPort _port = new("Port", PortDirection.Input, 1883);
-        private readonly EnumPort _qualityOfService = new("QoS", PortDirection.Input, MqttQualityOfServiceLevel.AtLeastOnce);
-        private readonly BooleanPort _retain = new("Retain", PortDirection.Input, false);
-        private readonly EnumPort _encoder = new("Encoder", PortDirection.Input, EncoderType.Jpeg);
-        private readonly IMqttClientProviderFactory _clientProviderFactory;
-        private readonly ICommunicationStateProvider _communicationStateProvider;
-        private readonly Dictionary<MessageSubscription, MqttSubscription> _subscriptions = new();
-        private IMqttClientProvider _mqttClientProvider = null!;
-        private bool _isDisposed;
+        _logger = logger;
+        _clientProviderFactory = clientProviderFactory;
+        _communicationStateProvider = communicationStateProvider;
+        Id = id;
+        Name = $"MQTT Client ({id})";
 
-        public string Id { get; }
-
-        public string Name { get; }
-
-        public string Manufacturer => "Source Alchemists";
-
-        public bool IsConnected { get; private set; }
-
-        public IReadOnlyCollection<string> Categories { get; } = new List<string> { "Communication", "MQTT" };
-
-        public IReadOnlyCollection<IPort> Ports { get; }
-
-        public MqttClient(ILogger<ICommunicationDevice> logger, IMqttClientProviderFactory clientProviderFactory, ICommunicationStateProvider communicationStateProvider, string id)
-        {
-            _logger = logger;
-            _clientProviderFactory = clientProviderFactory;
-            _communicationStateProvider = communicationStateProvider;
-            Id = id;
-            Name = $"MQTT-Client ({id})";
-
-            Ports = new List<IPort> {
+        Ports = new List<IPort> {
                 _host,
                 _port,
                 _qualityOfService,
                 _retain,
                 _encoder
             };
+    }
+
+    public async ValueTask<bool> TryUpdate(IReadOnlyCollection<IPort> ports)
+    {
+        bool prevConnected = IsConnected;
+        if (IsConnected && !await TryDisconnectAsync())
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed disconnecting from MQTT broker");
+            return false;
         }
 
-        public async ValueTask<bool> TryUpdate(IReadOnlyCollection<IPort> ports)
+        foreach (IPort port in ports)
         {
-            bool prevConnected = IsConnected;
-            if(IsConnected && !await TryDisconnectAsync())
+            IPort? targetPort = Ports.FirstOrDefault(p => p.Id.Equals(port.Id) && p.Brand.Equals(port.Brand));
+            if (targetPort == null)
             {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed disconnecting from MQTT broker");
-                return false;
+                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Port {PortId} not found", port.Id);
+                continue;
             }
 
-            foreach(IPort port in ports)
-            {
-                IPort? targetPort = Ports.FirstOrDefault(p => p.Id.Equals(port.Id) && p.Brand.Equals(port.Brand));
-                if(targetPort == null)
-                {
-                    _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Port {PortId} not found", port.Id);
-                    continue;
-                }
+            targetPort.UpdateValue(port);
+        }
 
-                targetPort.UpdateValue(port);
-            }
+        if (prevConnected && !await TryConnectAsync())
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed connecting to MQTT broker");
+            return false;
+        }
 
-            if(prevConnected && !await TryConnectAsync())
-            {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed connecting to MQTT broker");
-                return false;
-            }
+        _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Updated MQTT client");
+        return true;
+    }
 
-            _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Updated MQTT client");
+    public async ValueTask<bool> TryConnectAsync()
+    {
+        try
+        {
+            _mqttClientProvider?.Dispose();
+            _mqttClientProvider = _clientProviderFactory.Create(_logger, Name, _host.Value, Convert.ToInt32(_port.Value));
+            await _mqttClientProvider.ConnectAsync();
+            IsConnected = true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), ex, "Failed connecting to MQTT broker");
+            IsConnected = false;
+        }
+
+        return IsConnected;
+    }
+
+    public ValueTask<bool> TryDisconnectAsync()
+    {
+        try
+        {
+            _mqttClientProvider?.Dispose();
+            IsConnected = false;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), ex, "Failed disconnecting from MQTT broker");
+            IsConnected = true;
+        }
+
+        return ValueTask.FromResult(!IsConnected);
+    }
+
+    public async ValueTask<bool> TrySendAsync(string messageId, IPort port)
+    {
+        if (!IsConnected)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Not connected to MQTT broker");
+            return false;
+        }
+
+        if (!_communicationStateProvider.IsResultCommunicationEnabled)
+        {
+            _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Communication is disabled");
             return true;
         }
 
-        public async ValueTask<bool> TryConnectAsync()
+        try
         {
-            try
+            await _mqttClientProvider.PublishAsync(messageId, port, new MqttPublishOptions
             {
-                _mqttClientProvider?.Dispose();
-                _mqttClientProvider = _clientProviderFactory.Create(_logger, Name, _host.Value, Convert.ToInt32(_port.Value));
-                await _mqttClientProvider.ConnectAsync();
-                IsConnected = true;
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), ex, "Failed connecting to MQTT broker");
-                return false;
-            }
+                QualityOfServiceLevel = (MqttQualityOfServiceLevel)_qualityOfService.Value,
+                Retain = _retain.Value,
+                EncoderType = (EncoderType)_encoder.Value
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), ex, "Failed sending MQTT message");
+            return false;
         }
 
-        public ValueTask<bool> TryDisconnectAsync()
+        return true;
+    }
+
+    public async ValueTask<IMessageSubscription> SubscribeAsync(string messageId)
+    {
+        if (!IsConnected)
         {
-            try
-            {
-                _mqttClientProvider?.Dispose();
-                IsConnected = false;
-                return ValueTask.FromResult(true);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), ex, "Failed disconnecting from MQTT broker");
-                return ValueTask.FromResult(false);
-            }
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Not connected to MQTT broker");
+            throw new InvalidOperationException("Not connected to MQTT broker");
         }
 
-        public async ValueTask<bool> TrySendAsync(string messageId, IPort port)
+        MessageSubscription prevSub = _subscriptions.FirstOrDefault(p => p.Key.Id.Equals(messageId, StringComparison.InvariantCultureIgnoreCase)).Key;
+        if (prevSub != null)
         {
-            if (!IsConnected)
-            {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Not connected to MQTT broker");
-                return false;
-            }
-
-            if (!_communicationStateProvider.IsResultCommunicationEnabled)
-            {
-                _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Communication is disabled");
-                return true;
-            }
-
-            try
-            {
-                await _mqttClientProvider.PublishAsync(messageId, port, new MqttPublishOptions
-                {
-                    QualityOfServiceLevel = (MqttQualityOfServiceLevel)_qualityOfService.Value,
-                    Retain = _retain.Value,
-                    EncoderType = (EncoderType)_encoder.Value
-                });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), ex, "Failed sending MQTT message");
-                return false;
-            }
-
-            return true;
+            _logger.LogInformation(new EventId((int)EventLogType.Plugin), "Already subscribed to {messageId}", messageId);
+            return prevSub;
         }
 
-        public async ValueTask<IMessageSubscription> SubscribeAsync(string messageId)
+        MqttSubscription rawSub = await _mqttClientProvider.SubscribeAsync(messageId);
+        var subscription = new MessageSubscription { Id = messageId };
+        rawSub.MessageReceived += (message) =>
         {
-            if (!IsConnected)
+            subscription.Next(new Message
             {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Not connected to MQTT broker");
-                throw new InvalidOperationException("Not connected to MQTT broker");
-            }
+                ContentType = message.ContentType,
+                Payload = message.Payload
+            });
+        };
 
-            MessageSubscription prevSub = _subscriptions.FirstOrDefault(p => p.Key.Id.Equals(messageId, StringComparison.InvariantCultureIgnoreCase)).Key;
-            if (prevSub != null)
-            {
-                _logger.LogInformation(new EventId((int)EventLogType.Plugin), "Already subscribed to {messageId}", messageId);
-                return prevSub;
-            }
+        _subscriptions.Add(subscription, rawSub);
 
-            MqttSubscription rawSub = await _mqttClientProvider.SubscribeAsync(messageId);
-            var subscription = new MessageSubscription { Id = messageId };
-            rawSub.MessageReceived += (message) =>
-            {
-                subscription.Next(new Message
-                {
-                    ContentType = message.ContentType,
-                    Payload = message.Payload
-                });
-            };
+        return subscription;
+    }
 
-            _subscriptions.Add(subscription, rawSub);
-
-            return subscription;
+    public async ValueTask UnsubscribeAsync(IMessageSubscription subscription)
+    {
+        if (!IsConnected)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Not connected to MQTT broker");
+            throw new InvalidOperationException("Not connected to MQTT broker");
         }
 
-        public async ValueTask UnsubscribeAsync(IMessageSubscription subscription)
+        MessageSubscription prevSub = _subscriptions.FirstOrDefault(p => p.Key.Id.Equals(subscription.Id, StringComparison.InvariantCultureIgnoreCase)).Key;
+        if (prevSub == null)
         {
-            if (!IsConnected)
-            {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Not connected to MQTT broker");
-                throw new InvalidOperationException("Not connected to MQTT broker");
-            }
-
-            MessageSubscription prevSub = _subscriptions.FirstOrDefault(p => p.Key.Id.Equals(subscription.Id, StringComparison.InvariantCultureIgnoreCase)).Key;
-            if (prevSub == null)
-            {
-                _logger.LogInformation(new EventId((int)EventLogType.Plugin), "Not subscribed to {messageId}", subscription.Id);
-                return;
-            }
-
-            MqttSubscription rawSub = _subscriptions[prevSub];
-            await _mqttClientProvider.UnsubscribeAsync(rawSub);
-            _ = _subscriptions.Remove(prevSub);
+            _logger.LogInformation(new EventId((int)EventLogType.Plugin), "Not subscribed to {messageId}", subscription.Id);
+            return;
         }
 
-        public void Dispose()
-        {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
+        MqttSubscription rawSub = _subscriptions[prevSub];
+        await _mqttClientProvider.UnsubscribeAsync(rawSub);
+        _ = _subscriptions.Remove(prevSub);
+    }
 
-        private void Dispose(bool disposing)
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool disposing)
+    {
+        if (disposing && !_isDisposed)
         {
-            if (disposing && !_isDisposed)
-            {
-                _mqttClientProvider?.Dispose();
-                _isDisposed = true;
-            }
+            _mqttClientProvider?.Dispose();
+            _isDisposed = true;
         }
     }
 }
