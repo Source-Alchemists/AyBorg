@@ -61,7 +61,6 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
             catch (Exception)
             {
                 _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed to load device provider '{providerName}' for device '{deviceId}'", deviceRecord.ProviderMetaInfo.TypeName, deviceRecord.Id);
-                continue;
             }
         }
 

@@ -15,6 +15,7 @@ namespace AyBorg.Web.Pages.Agent.StepView;
 
 public partial class StepView : ComponentBase, IDisposable
 {
+    private readonly ConcurrentQueue<Guid?> _updateQueue = new();
     private bool _disposedValue;
     private HotKeysContext _hotKeysContext = null!;
     private string _serviceUniqueName;
@@ -69,7 +70,6 @@ public partial class StepView : ComponentBase, IDisposable
         }
     }
 
-    private readonly ConcurrentQueue<Guid?> _updateQueue = new();
     private async ValueTask UpdateNode(Guid? iterationId)
     {
         try
@@ -82,31 +82,36 @@ public partial class StepView : ComponentBase, IDisposable
 
             foreach (Guid? id in _updateQueue)
             {
-                Step fullStep = await FlowService.GetStepAsync(_serviceUniqueName, _step, id, true, false, false);
-
-                foreach (Port port in fullStep.Ports)
-                {
-                    if (port.Direction == PortDirection.Input)
-                    {
-                        Port inputPort = _ports.Find(p => p.Id.Equals(port.Id));
-                        if (inputPort == null || !_ports.Contains(inputPort)) continue;
-                        _ports = _ports.Replace(inputPort, port);
-                    }
-                    else if (port.Direction == PortDirection.Output)
-                    {
-                        Port outputPort = _ports.Find(p => p.Id.Equals(port.Id));
-                        if (outputPort == null || !_ports.Contains(outputPort)) continue;
-                        _ports = _ports.Replace(outputPort, port);
-                    }
-                }
-
-                await InvokeAsync(StateHasChanged);
+                await GetUpdatedStepAsync(id);
             }
         }
         catch (Exception ex)
         {
             Logger.LogWarning(new EventId((int)EventLogType.Engine), ex, "Error during update node");
         }
+    }
+
+    private async ValueTask GetUpdatedStepAsync(Guid? id)
+    {
+        Step fullStep = await FlowService.GetStepAsync(_serviceUniqueName, _step, id, true, false, false);
+
+        foreach (Port port in fullStep.Ports)
+        {
+            if (port.Direction == PortDirection.Input)
+            {
+                Port inputPort = _ports.Find(p => p.Id.Equals(port.Id));
+                if (inputPort == null || !_ports.Contains(inputPort)) continue;
+                _ports = _ports.Replace(inputPort, port);
+            }
+            else if (port.Direction == PortDirection.Output)
+            {
+                Port outputPort = _ports.Find(p => p.Id.Equals(port.Id));
+                if (outputPort == null || !_ports.Contains(outputPort)) continue;
+                _ports = _ports.Replace(outputPort, port);
+            }
+        }
+
+        await InvokeAsync(StateHasChanged);
     }
 
     private static bool IsDisabled(Port port)
