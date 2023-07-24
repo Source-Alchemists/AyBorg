@@ -53,6 +53,10 @@ public class CommunicationSendTests : IDisposable
         await _plugin.AfterInitializedAsync();
         await _plugin.BeforeStartAsync();
         bool result = await _plugin.TryRunAsync(CancellationToken.None);
+        if(parallel)
+        {
+            result = await _plugin.TryRunAsync(CancellationToken.None);
+        }
 
         // Assert
         Assert.Equal(expectedResult, result);
