@@ -90,7 +90,7 @@ public partial class Devices : ComponentBase
             await InvokeAsync(StateHasChanged);
             try
             {
-                DeviceMeta removedDevice = await DeviceManagerService.RemoveDeviceAsync(new DeviceManagerService.CommonDeviceRequestOptions(_serviceUniqueName, deviceMeta.Id));
+                _ = await DeviceManagerService.RemoveDeviceAsync(new DeviceManagerService.CommonDeviceRequestOptions(_serviceUniqueName, deviceMeta.Id));
                 _devices = _devices.Remove(deviceMeta);
                 _deviceProviders = await DeviceManagerService.GetDeviceProvidersAsync(_serviceUniqueName);
             }

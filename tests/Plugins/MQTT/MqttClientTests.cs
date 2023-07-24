@@ -31,7 +31,7 @@ namespace AyBorg.Plugins.MQTT.Tests
             bool result = await mqttClient.TryConnectAsync();
 
             // Assert
-            _clientProviderFactoryMock.Verify(f => f.Create(It.IsAny<ILogger>(), "MQTT-Client (mqtt-client)", It.IsAny<string>(), It.IsAny<int>()), Times.Once);
+            _clientProviderFactoryMock.Verify(f => f.Create(It.IsAny<ILogger>(), "MQTT Client (mqtt-client)", It.IsAny<string>(), It.IsAny<int>()), Times.Once);
             _clientProviderMock.Verify(p => p.ConnectAsync(), Times.Once);
             Assert.True(result);
         }

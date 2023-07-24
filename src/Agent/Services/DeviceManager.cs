@@ -6,11 +6,16 @@ internal sealed class DeviceManager : IDeviceManager
 {
     private readonly IDeviceProxyManagerService _deviceProxyManagerService;
 
+    /// <inheritdoc/>
     public event EventHandler<ObjectChangedEventArgs>? DeviceChanged;
+
+    /// <inheritdoc/>
     public event EventHandler<CollectionChangedEventArgs>? DeviceCollectionChanged;
 
-    public IEnumerable<IDevice> Devices => _deviceProxyManagerService.DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList();
-
+    /// <summary>
+    /// Initializes a new instance of the <see cref="DeviceManager"/> class.
+    /// </summary>
+    /// <param name="deviceProxyManagerService">The device proxy manager service.</param>
     public DeviceManager(IDeviceProxyManagerService deviceProxyManagerService)
     {
         _deviceProxyManagerService = deviceProxyManagerService;
@@ -25,6 +30,11 @@ internal sealed class DeviceManager : IDeviceManager
         };
     }
 
-    public T GetDevice<T>(string deviceId) where T : IDevice => (T)Devices.FirstOrDefault(d => d.Id.Equals(deviceId, StringComparison.InvariantCultureIgnoreCase))!;
-    public IEnumerable<T> GetDevices<T>() where T : IDevice => Devices.Where(d => d is T).Cast<T>();
+    /// <inheritdoc/>
+    public T GetDevice<T>(string deviceId) where T : IDevice => (T)GetDevices().FirstOrDefault(d => d.Id.Equals(deviceId, StringComparison.InvariantCultureIgnoreCase))!;
+
+    /// <inheritdoc/>
+    public IEnumerable<T> GetDevices<T>() where T : IDevice => GetDevices().Where(d => d is T).Cast<T>();
+
+    public IEnumerable<IDevice> GetDevices() => _deviceProxyManagerService.DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList();
 }

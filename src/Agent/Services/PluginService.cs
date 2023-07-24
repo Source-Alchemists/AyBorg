@@ -93,14 +93,14 @@ internal sealed class PluginsService : IPluginsService
     /// </summary>
     /// <param name="stepRecord">The step record.</param>
     /// <returns>Instance, else null.</returns>
-    public IStepProxy Find(StepRecord stepRecord) => _stepPlugins.FirstOrDefault(x => IsSameType(x.StepBody.GetType(), stepRecord.MetaInfo))!;
+    public IStepProxy Find(StepRecord stepRecord) => _stepPlugins.Find(x => IsSameType(x.StepBody.GetType(), stepRecord.MetaInfo))!;
 
     /// <summary>
     /// Finds the specified step.
     /// </summary>
     /// <param name="stepId">The step identifier.</param>
     /// <returns>Instance, else null.</returns>
-    public IStepProxy Find(Guid stepId) => _stepPlugins.FirstOrDefault(x => x.Id.Equals(stepId))!;
+    public IStepProxy Find(Guid stepId) => _stepPlugins.Find(x => x.Id.Equals(stepId))!;
 
     public IDeviceProviderProxy FindDeviceProvider(PluginMetaInfoRecord pluginMetaInfo)
     {

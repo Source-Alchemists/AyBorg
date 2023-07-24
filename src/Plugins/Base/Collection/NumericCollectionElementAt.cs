@@ -23,6 +23,6 @@ public sealed class NumericCollectionElementAt : CollectionElementAt, IStepBody
 
     protected override void GetAndUpdateElementAt()
     {
-        _outputValue.Value = _inputCollection.Value.ElementAt(Convert.ToInt32(_inputIndex.Value));
+        _outputValue.Value = _inputCollection.Value[Convert.ToInt32(_inputIndex.Value)];
     }
 }

@@ -41,7 +41,7 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
 
     private void PortValueChanged(object sender, PortValueChangedEventArgs args)
     {
-        FlowPort targetPort = _inputPorts.FirstOrDefault(p => p.Port.Id.Equals(args.Port.Id));
+        FlowPort targetPort = _inputPorts.Find(p => p.Port.Id.Equals(args.Port.Id));
         targetPort?.Update(args.Port);
     }
 

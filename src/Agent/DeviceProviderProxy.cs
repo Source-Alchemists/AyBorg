@@ -91,13 +91,10 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
 
         IDeviceProxy? deviceProxy = Devices.FirstOrDefault(d => d.Id.Equals(id, StringComparison.InvariantCultureIgnoreCase)) ?? throw new KeyNotFoundException($"Device with id '{id}' does not exist");
 
-        if (deviceProxy.IsConnected)
+        if (deviceProxy.IsConnected && !await deviceProxy.TryDisconnectAsync())
         {
-            if (!await deviceProxy.TryDisconnectAsync())
-            {
-                _logger.LogWarning((int)EventLogType.Plugin, "Failed to disconnect device '{id}'", id);
-                return deviceProxy;
-            }
+            _logger.LogWarning((int)EventLogType.Plugin, "Failed to disconnect device '{id}'", id);
+            return deviceProxy;
         }
 
         if (deviceProxy is IDisposable disposable)

@@ -41,7 +41,7 @@ public partial class ImageInputField : BaseInputField
 
     protected override async Task OnParametersSetAsync()
     {
-        if(AlternativeMode)
+        if (AlternativeMode)
         {
             _imageContainerClasses = "flow-node-field mud-full-width mud-full-height px-1 mb-4 absolute";
             _imageContainerStyle = "top: 70px; left: 0; height: calc(100% - 70px)";
@@ -52,11 +52,13 @@ public partial class ImageInputField : BaseInputField
         }
         else if (Port.Value is Image image)
         {
-            if(AlternativeMode)
+            if (AlternativeMode)
             {
                 _imageWidth = image.Width;
                 _imageHeight = image.Height;
-            } else {
+            }
+            else
+            {
                 _imageWidth = SVG_WIDTH;
                 _imageHeight = SVG_HEIGHT;
             }
@@ -76,13 +78,13 @@ public partial class ImageInputField : BaseInputField
         _labelRectangles.Clear();
         float scaleFactorX = _imageInfo.FactorX;
         float scaleFactorY = _imageInfo.FactorY;
-        foreach(Port shapePort in ShapePorts)
+        foreach (object? value in ShapePorts.Select(sh => sh.Value))
         {
-            if(shapePort.Value is Rectangle rectangle)
+            if (value is Rectangle rectangle)
             {
                 AddRectangle(scaleFactorX, scaleFactorY, rectangle);
             }
-            else if(shapePort.Value is ImmutableList<Rectangle> rectangeCollection)
+            else if (value is ImmutableList<Rectangle> rectangeCollection)
             {
                 foreach (Rectangle rect in rectangeCollection)
                 {
@@ -138,7 +140,7 @@ public partial class ImageInputField : BaseInputField
     {
         float scaleFactorW = 1f;
         float scaleFactorH = 1f;
-        if(AlternativeMode)
+        if (AlternativeMode)
         {
             scaleFactorW = (float)_boundingClientRect.Width / _imageWidth;
             scaleFactorH = (float)_boundingClientRect.Height / _imageHeight;

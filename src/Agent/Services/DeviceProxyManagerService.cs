@@ -36,13 +36,10 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
             {
                 IDeviceProviderProxy providerProxy = _pluginsService.FindDeviceProvider(deviceRecord.ProviderMetaInfo);
                 IDeviceProxy? existingDevice = providerProxy.Devices.FirstOrDefault(d => d.Id.Equals(deviceRecord.Id, StringComparison.InvariantCultureIgnoreCase));
-                if (existingDevice != null)
+                if (existingDevice != null && !await TryLoadDevice(existingDevice, deviceRecord))
                 {
-                    if (!await TryLoadDevice(existingDevice, deviceRecord))
-                    {
-                        _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed to load device '{deviceId}'", existingDevice.Id);
-                        continue;
-                    }
+                    _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed to load device '{deviceId}'", existingDevice.Id);
+                    continue;
                 }
 
                 if (!providerProxy.CanAdd)

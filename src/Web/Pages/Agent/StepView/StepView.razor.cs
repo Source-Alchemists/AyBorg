@@ -53,7 +53,6 @@ public partial class StepView : ComponentBase, IDisposable
 
             var stepGuid = Guid.Parse(StepId);
             _step = await FlowService.GetStepAsync(_serviceUniqueName, new Step { Id = stepGuid }, null, true, false, false);
-            var flowPorts = new List<FlowPort>();
 
             _ports = _ports.Clear();
             _ports = _ports.AddRange(_step.Ports);
@@ -76,13 +75,13 @@ public partial class StepView : ComponentBase, IDisposable
         {
             if (port.Direction == PortDirection.Input)
             {
-                Port inputPort = _ports.FirstOrDefault(p => p.Id.Equals(port.Id));
+                Port inputPort = _ports.Find(p => p.Id.Equals(port.Id));
                 if (inputPort == null || !_ports.Contains(inputPort)) continue;
                 _ports = _ports.Replace(inputPort, port);
             }
             else if (port.Direction == PortDirection.Output)
             {
-                Port outputPort = _ports.FirstOrDefault(p => p.Id.Equals(port.Id));
+                Port outputPort = _ports.Find(p => p.Id.Equals(port.Id));
                 if (outputPort == null || !_ports.Contains(outputPort)) continue;
                 _ports = _ports.Replace(outputPort, port);
             }

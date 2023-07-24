@@ -13,7 +13,7 @@ public abstract class CommunicationSendBase : CommunicationBase
     private bool _isDisposed = false;
     protected readonly BooleanPort _parallelPort = new("Parallel", PortDirection.Input, false);
 
-    public CommunicationSendBase(ILogger<CommunicationSendBase> logger, IDeviceManager deviceManager, ICommunicationStateProvider communicationStateProvider) : base(logger, deviceManager)
+    protected CommunicationSendBase(ILogger<CommunicationSendBase> logger, IDeviceManager deviceManager, ICommunicationStateProvider communicationStateProvider) : base(logger, deviceManager)
     {
         _logger = logger;
         _communicationStateProvider = communicationStateProvider;
