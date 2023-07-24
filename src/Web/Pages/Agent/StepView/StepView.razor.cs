@@ -1,7 +1,8 @@
+using System.Collections.Concurrent;
 using System.Collections.Immutable;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Shared.Models;
@@ -25,6 +26,7 @@ public partial class StepView : ComponentBase, IDisposable
     [Inject] public INotifyService NotifyService { get; init; }
     [Inject] IRegistryService RegistryService { get; init; }
     [Inject] NavigationManager NavigationManager { get; init; }
+    [Inject] ILogger<StepView> Logger { get; init; }
 
     private bool _isLoading = true;
     private Step _step = new();
@@ -67,37 +69,54 @@ public partial class StepView : ComponentBase, IDisposable
         }
     }
 
+    private readonly ConcurrentQueue<Guid?> _updateQueue = new();
     private async ValueTask UpdateNode(Guid? iterationId)
     {
-        Step fullStep = await FlowService.GetStepAsync(_serviceUniqueName, _step, iterationId, true, false, false);
-
-        foreach (Port port in fullStep.Ports)
+        try
         {
-            if (port.Direction == PortDirection.Input)
+            _updateQueue.Enqueue(iterationId);
+            if (_updateQueue.Count > 1)
             {
-                Port inputPort = _ports.Find(p => p.Id.Equals(port.Id));
-                if (inputPort == null || !_ports.Contains(inputPort)) continue;
-                _ports = _ports.Replace(inputPort, port);
+                _updateQueue.TryDequeue(out _);
             }
-            else if (port.Direction == PortDirection.Output)
+
+            foreach (Guid? id in _updateQueue)
             {
-                Port outputPort = _ports.Find(p => p.Id.Equals(port.Id));
-                if (outputPort == null || !_ports.Contains(outputPort)) continue;
-                _ports = _ports.Replace(outputPort, port);
+                Step fullStep = await FlowService.GetStepAsync(_serviceUniqueName, _step, id, true, false, false);
+
+                foreach (Port port in fullStep.Ports)
+                {
+                    if (port.Direction == PortDirection.Input)
+                    {
+                        Port inputPort = _ports.Find(p => p.Id.Equals(port.Id));
+                        if (inputPort == null || !_ports.Contains(inputPort)) continue;
+                        _ports = _ports.Replace(inputPort, port);
+                    }
+                    else if (port.Direction == PortDirection.Output)
+                    {
+                        Port outputPort = _ports.Find(p => p.Id.Equals(port.Id));
+                        if (outputPort == null || !_ports.Contains(outputPort)) continue;
+                        _ports = _ports.Replace(outputPort, port);
+                    }
+                }
+
+                await InvokeAsync(StateHasChanged);
             }
         }
-
-        await InvokeAsync(StateHasChanged);
+        catch (Exception ex)
+        {
+            Logger.LogWarning(new EventId((int)EventLogType.Engine), ex, "Error during update node");
+        }
     }
 
     private static bool IsDisabled(Port port)
     {
-        if(port.Direction == PortDirection.Output)
+        if (port.Direction == PortDirection.Output)
         {
             return true;
         }
 
-        if(port.IsConnected)
+        if (port.IsConnected)
         {
             return true;
         }
@@ -113,7 +132,7 @@ public partial class StepView : ComponentBase, IDisposable
 
     private void OnBackClicked()
     {
-         NavigationManager.NavigateTo($"/agents/editor/{ServiceId}");
+        NavigationManager.NavigateTo($"/agents/editor/{ServiceId}");
     }
 
     protected virtual void Dispose(bool disposing)
