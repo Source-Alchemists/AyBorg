@@ -6,7 +6,7 @@ using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.ImageTorque;
 
-public sealed class VirtualDevice : ICameraDevice
+public sealed class VirtualDevice : ICameraDevice, IDisposable
 {
     private readonly ILogger<VirtualDevice> _logger;
     private readonly IEnvironment _environment;
@@ -17,6 +17,7 @@ public sealed class VirtualDevice : ICameraDevice
     private string _lastFolderPath = string.Empty;
     private ImageContainer? _lastImageContainer;
     private long _imageCounter;
+    private bool _isDisposed = false;
 
     public string Id { get; }
 
@@ -92,7 +93,7 @@ public sealed class VirtualDevice : ICameraDevice
 
         return ValueTask.FromResult(!IsConnected);
     }
-    public async ValueTask<bool> TryUpdate(IReadOnlyCollection<IPort> ports)
+    public async ValueTask<bool> TryUpdateAsync(IReadOnlyCollection<IPort> ports)
     {
         bool prevConnected = IsConnected;
         if (IsConnected && !await TryDisconnectAsync())
@@ -149,5 +150,22 @@ public sealed class VirtualDevice : ICameraDevice
             _imageIndex++;
             return new ImageContainer(image, _imageCounter++, imageFileName);
         });
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool isDisposing)
+    {
+        if(isDisposing && !_isDisposed)
+        {
+            _preloadTask?.Wait();
+            _preloadTask?.Dispose();
+            _lastImageContainer?.Dispose();
+            _isDisposed = true;
+        }
     }
 }

@@ -52,7 +52,7 @@ public sealed class MqttClient : ICommunicationDevice, IDisposable
             };
     }
 
-    public async ValueTask<bool> TryUpdate(IReadOnlyCollection<IPort> ports)
+    public async ValueTask<bool> TryUpdateAsync(IReadOnlyCollection<IPort> ports)
     {
         bool prevConnected = IsConnected;
         if (IsConnected && !await TryDisconnectAsync())
