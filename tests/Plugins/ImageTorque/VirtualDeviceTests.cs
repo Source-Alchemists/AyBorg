@@ -83,7 +83,7 @@ public class VirtualDeviceTests : IDisposable
         };
 
         // Act
-        bool result = await _plugin.TryUpdateAsync(new List<IPort> { folderPortCopy });
+        bool result = await _plugin.TryUpdateAsync(new List<IPort> { folderPortCopy });
 
         // Assert
         Assert.True(result);
