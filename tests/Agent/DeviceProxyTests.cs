@@ -20,7 +20,7 @@ public class DeviceProxyTests
         _deviceMock.Setup(m => m.IsConnected).Returns(true);
 
         // Act
-        DeviceProxy deviceProxy = new(s_nullLogger, _deviceProviderMock.Object, _deviceMock.Object, true);
+        using DeviceProxy deviceProxy = new(s_nullLogger, _deviceProviderMock.Object, _deviceMock.Object, true);
 
         // Assert
         Assert.NotNull(deviceProxy.Native);
@@ -40,7 +40,7 @@ public class DeviceProxyTests
     {
         // Arrange
         _deviceMock.Setup(m => m.TryConnectAsync()).ReturnsAsync(true);
-        DeviceProxy deviceProxy = new(s_nullLogger, _deviceProviderMock.Object, _deviceMock.Object, false);
+        using DeviceProxy deviceProxy = new(s_nullLogger, _deviceProviderMock.Object, _deviceMock.Object, false);
 
         // Act
         bool result = await deviceProxy.TryConnectAsync();
@@ -55,7 +55,7 @@ public class DeviceProxyTests
     {
         // Arrange
         _deviceMock.Setup(m => m.TryDisconnectAsync()).ReturnsAsync(true);
-        DeviceProxy deviceProxy = new(s_nullLogger, _deviceProviderMock.Object, _deviceMock.Object, true);
+        using DeviceProxy deviceProxy = new(s_nullLogger, _deviceProviderMock.Object, _deviceMock.Object, true);
 
         // Act
         bool result = await deviceProxy.TryDisconnectAsync();

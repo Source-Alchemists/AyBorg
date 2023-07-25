@@ -73,7 +73,7 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
             throw new InvalidOperationException("Device manager does not support adding devices");
         }
 
-        if (Devices.Any(d => d.Name.Equals(options.DeviceId, StringComparison.InvariantCultureIgnoreCase)))
+        if (Devices.Any(d => d.Id.Equals(options.DeviceId, StringComparison.InvariantCultureIgnoreCase)))
         {
             throw new InvalidOperationException($"Device with name '{options.DeviceId}' already exists");
         }
@@ -93,14 +93,10 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
 
         if (deviceProxy.IsConnected && !await deviceProxy.TryDisconnectAsync())
         {
-            _logger.LogWarning((int)EventLogType.Plugin, "Failed to disconnect device '{id}'", id);
-            return deviceProxy;
+            throw new InvalidOperationException($"Failed to disconnect device '{id}'");
         }
 
-        if (deviceProxy is IDisposable disposable)
-        {
-            disposable.Dispose();
-        }
+        deviceProxy.Dispose();
 
         _devices = _devices.Remove(deviceProxy);
         _logger.LogInformation((int)EventLogType.Plugin, "Removed device '{id}'", id);
@@ -120,10 +116,7 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
         {
             foreach (IDeviceProxy deviceProxy in _devices)
             {
-                if (deviceProxy is IDisposable dis)
-                {
-                    dis.Dispose();
-                }
+                deviceProxy.Dispose();
             }
 
             if (_deviceProvider is IDisposable disposable)

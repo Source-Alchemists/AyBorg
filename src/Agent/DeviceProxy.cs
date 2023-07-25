@@ -6,6 +6,7 @@ namespace AyBorg.Agent;
 
 public class DeviceProxy : IDeviceProxy
 {
+    private bool _isDisposed = false;
     public string Id => Native.Id;
     public string Name => Native.Name;
     public string Manufacturer => Native.Manufacturer;
@@ -76,5 +77,24 @@ public class DeviceProxy : IDeviceProxy
     {
         IsActive = !await Native.TryDisconnectAsync();
         return !IsActive;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private void Dispose(bool isDisposing)
+    {
+        if (isDisposing && !_isDisposed)
+        {
+            if (Native is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
+
+            _isDisposed = true;
+        }
     }
 }
