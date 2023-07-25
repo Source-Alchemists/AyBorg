@@ -59,7 +59,7 @@ public abstract class CommunicationSendBase : CommunicationBase
 
     protected override void Dispose(bool isDisposing)
     {
-        if(!isDisposing && !_isDisposed)
+        if(isDisposing && !_isDisposed)
         {
             if (_parallelTask != null)
             {
