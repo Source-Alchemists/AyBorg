@@ -13,6 +13,12 @@ public class DeviceProxyTests
     [Fact]
     public void Test_Constructor()
     {
+        // Arrange
+        _deviceMock.Setup(m => m.Id).Returns("123");
+        _deviceMock.Setup(m => m.Name).Returns("TestDevice");
+        _deviceMock.Setup(m => m.Manufacturer).Returns("TestManufacturer");
+        _deviceMock.Setup(m => m.IsConnected).Returns(true);
+
         // Act
         DeviceProxy deviceProxy = new(s_nullLogger, _deviceProviderMock.Object, _deviceMock.Object, true);
 
@@ -23,6 +29,10 @@ public class DeviceProxyTests
         Assert.Equal("IDeviceProxy", deviceProxy.MetaInfo.TypeName);
         Assert.NotNull(deviceProxy.ProviderMetaInfo);
         Assert.Equal("IDeviceProviderProxy", deviceProxy.ProviderMetaInfo.TypeName);
+        Assert.Equal("123", deviceProxy.Id);
+        Assert.Equal("TestDevice", deviceProxy.Name);
+        Assert.Equal("TestManufacturer", deviceProxy.Manufacturer);
+        Assert.True(deviceProxy.IsConnected);
     }
 
     [Fact]
