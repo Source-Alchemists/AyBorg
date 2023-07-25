@@ -58,7 +58,7 @@ public class DeviceProxyManagerServiceTests
     [InlineData(true, true, true, true, true)]
     [InlineData(false, false, true, true, true)]
     [InlineData(false, true, false, true, true)]
-    [InlineData(false, true, true, false, true)]
+    [InlineData(true, true, true, false, true)]
     [InlineData(false, true, true, true, false)]
     public async Task Test_LoadAsync(bool expectedResult, bool repositoyHasDevices, bool hasProvider, bool hasProviderDevices, bool canProviderAdd)
     {
