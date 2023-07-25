@@ -48,6 +48,17 @@ public class DeviceManagerService : IDeviceManagerService
         return result;
     }
 
+    public async ValueTask<DeviceMeta> GetDeviceAsync(CommonDeviceRequestOptions options)
+    {
+        DeviceDto response = await _deviceManagerClient.GetDeviceAsync(new GetDeviceRequest
+        {
+            AgentUniqueName = options.AgentUniqueName,
+            DeviceId = options.DeviceId
+        });
+
+        return ToObject(response);
+    }
+
     public async ValueTask<DeviceMeta> AddDeviceAsync(AddDeviceRequestOptions options)
     {
         DeviceDto response = await _deviceManagerClient.AddAsync(new AddDeviceRequest
@@ -84,17 +95,6 @@ public class DeviceManagerService : IDeviceManagerService
         });
 
         _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Device state changed: {DeviceId}, active: {IsActive}", response.Id, response.IsActive);
-        return ToObject(response);
-    }
-
-    public async ValueTask<DeviceMeta> GetDeviceAsync(CommonDeviceRequestOptions options)
-    {
-        DeviceDto response = await _deviceManagerClient.GetDeviceAsync(new GetDeviceRequest
-        {
-            AgentUniqueName = options.AgentUniqueName,
-            DeviceId = options.DeviceId
-        });
-
         return ToObject(response);
     }
 

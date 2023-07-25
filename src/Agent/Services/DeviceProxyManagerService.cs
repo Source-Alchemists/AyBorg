@@ -30,15 +30,22 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
 
     public async ValueTask LoadAsync()
     {
+        var devicesAdded = new List<IDevice>();
         foreach (DeviceRecord deviceRecord in await _deviceRepository.GetAllAsync())
         {
             try
             {
-                IDeviceProviderProxy providerProxy = _pluginsService.FindDeviceProvider(deviceRecord.ProviderMetaInfo);
-                IDeviceProxy? existingDevice = providerProxy.Devices.FirstOrDefault(d => d.Id.Equals(deviceRecord.Id, StringComparison.InvariantCultureIgnoreCase));
-                if (existingDevice != null && !await TryLoadDevice(existingDevice, deviceRecord))
+                IDeviceProviderProxy? providerProxy = _pluginsService.FindDeviceProvider(deviceRecord.ProviderMetaInfo);
+                if (providerProxy == null)
                 {
-                    _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed to load device '{deviceId}'", existingDevice.Id);
+                    _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Device provider '{providerName}' not found", deviceRecord.ProviderMetaInfo.TypeName);
+                    continue;
+                }
+
+                IDeviceProxy? existingDevice = providerProxy.Devices.FirstOrDefault(d => d.Id.Equals(deviceRecord.Id, StringComparison.InvariantCultureIgnoreCase));
+                if (existingDevice == null || !await TryLoadDevice(existingDevice, deviceRecord))
+                {
+                    _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed to load device '{deviceId}'", deviceRecord.Id);
                     continue;
                 }
 
@@ -56,26 +63,28 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
                     continue;
                 }
 
+                devicesAdded.Add(device.Native);
+
                 _logger.LogTrace(new EventId((int)EventLogType.Plugin), "Device '{deviceId}' loaded from storage", device.Id);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed to load device provider '{providerName}' for device '{deviceId}'", deviceRecord.ProviderMetaInfo.TypeName, deviceRecord.Id);
+                _logger.LogWarning(new EventId((int)EventLogType.Plugin), ex, "Failed to load device provider '{providerName}' for device '{deviceId}'", deviceRecord.ProviderMetaInfo.TypeName, deviceRecord.Id);
             }
         }
 
-        DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList()));
+        DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList(), devicesAdded, Array.Empty<object>()));
     }
 
     public async ValueTask<IDeviceProxy> AddAsync(AddDeviceOptions options)
     {
+        IDeviceProviderProxy? provider = DeviceProviders.FirstOrDefault(p => p.Name.Equals(options.ProviderName))
+                                            ?? throw new KeyNotFoundException($"Device provider '{options.ProviderName}' not found");
+
         if (DeviceProviders.Any(p => p.Devices.Any(d => d.Id.Equals(options.DeviceId))))
         {
             throw new ArgumentException($"Device '{options.DeviceId}' already exists");
         }
-
-        IDeviceProviderProxy? provider = DeviceProviders.FirstOrDefault(p => p.Name.Equals(options.ProviderName))
-                                            ?? throw new KeyNotFoundException($"Device provider '{options.ProviderName}' not found");
 
         IDeviceProxy newDevice = await provider.AddAsync(options);
 
@@ -83,7 +92,7 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
         try
         {
             await _deviceRepository.AddAsync(deviceRecord);
-            DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList()));
+            DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList(), new List<IDevice> { newDevice.Native }, Array.Empty<object>()));
         }
         catch (Exception)
         {
@@ -102,7 +111,7 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
 
         DeviceRecord deviceRecord = _storageMapper.Map(removedDevice);
         await _deviceRepository.RemoveAsync(deviceRecord);
-        DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList()));
+        DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList(), Array.Empty<IDevice>(), new List<IDevice> { removedDevice.Native }));
 
         return removedDevice;
     }
@@ -148,7 +157,7 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
 
         }
 
-        DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList()));
+        DeviceCollectionChanged?.Invoke(this, new CollectionChangedEventArgs(DeviceProviders.SelectMany(p => p.Devices).Where(d => d.IsActive).Select(d => d.Native).ToList(), Array.Empty<IDevice>(), Array.Empty<IDevice>()));
         return device;
     }
 

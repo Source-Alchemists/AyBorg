@@ -102,10 +102,10 @@ internal sealed class PluginsService : IPluginsService
     /// <returns>Instance, else null.</returns>
     public IStepProxy Find(Guid stepId) => _stepPlugins.Find(x => x.Id.Equals(stepId))!;
 
-    public IDeviceProviderProxy FindDeviceProvider(PluginMetaInfoRecord pluginMetaInfo)
+    public IDeviceProviderProxy? FindDeviceProvider(PluginMetaInfoRecord pluginMetaInfo)
     {
         IEnumerable<IDeviceProviderProxy> matchingProviders = _deviceProviderPlugins.Where(p => p.MetaInfo.AssemblyName.Equals(pluginMetaInfo.AssemblyName, StringComparison.InvariantCultureIgnoreCase));
-        return matchingProviders.Single(p => p.MetaInfo.TypeName.Equals(pluginMetaInfo.TypeName, StringComparison.InvariantCultureIgnoreCase));
+        return matchingProviders.FirstOrDefault(p => p.MetaInfo.TypeName.Equals(pluginMetaInfo.TypeName, StringComparison.InvariantCultureIgnoreCase));
     }
 
     /// <summary>

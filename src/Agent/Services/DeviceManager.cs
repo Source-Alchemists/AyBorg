@@ -31,7 +31,7 @@ internal sealed class DeviceManager : IDeviceManager
     }
 
     /// <inheritdoc/>
-    public T GetDevice<T>(string deviceId) where T : IDevice => (T)GetDevices<T>().FirstOrDefault(d => d.Id.Equals(deviceId, StringComparison.InvariantCultureIgnoreCase))!;
+    public T GetDevice<T>(string deviceId) where T : IDevice => GetDevices<T>().FirstOrDefault(d => d.Id.Equals(deviceId, StringComparison.InvariantCultureIgnoreCase))!;
 
     /// <inheritdoc/>
     public IEnumerable<T> GetDevices<T>() where T : IDevice => GetDevices().Where(d => d is T).Cast<T>();

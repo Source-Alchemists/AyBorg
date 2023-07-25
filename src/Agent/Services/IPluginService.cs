@@ -35,7 +35,7 @@ public interface IPluginsService
     /// <returns>Instance, else null.</returns>
     IStepProxy Find(Guid stepId);
 
-    IDeviceProviderProxy FindDeviceProvider(PluginMetaInfoRecord pluginMetaInfo);
+    IDeviceProviderProxy? FindDeviceProvider(PluginMetaInfoRecord pluginMetaInfo);
 
     /// <summary>
     /// Creates new instance of step.
