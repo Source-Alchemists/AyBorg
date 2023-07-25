@@ -98,12 +98,14 @@ public class ImageAcquisitionTests : IDisposable
         var devicePort = (SelectPort)_plugin.Ports.First(p => p.Name.Equals("Device"));
         devicePort.Value = new SelectPort.ValueContainer("123", new List<string> { "123" });
 
-        if(hasDevice)
+        var imagePort = (ImagePort)_plugin.Ports.First(p => p.Name.Equals("Image"));
+
+        if (hasDevice)
         {
             _deviceManagerMock.Setup(m => m.GetDevice<ICameraDevice>("123")).Returns(_deviceMock.Object);
         }
 
-        if(hasImageContainer)
+        if (hasImageContainer)
         {
             _deviceMock.Setup(m => m.AcquisitionAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new ImageContainer(hasImage ? _image : null!, 1, "TestInfo"));
         }
@@ -113,6 +115,14 @@ public class ImageAcquisitionTests : IDisposable
 
         // Assert
         Assert.Equal(expectedResult, result);
+        if (expectedResult)
+        {
+            Assert.NotNull(imagePort.Value);
+        }
+        else
+        {
+            Assert.Null(imagePort.Value);
+        }
     }
 
     public void Dispose()
