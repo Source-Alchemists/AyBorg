@@ -19,8 +19,6 @@ public class DeviceManagerServiceV1Tests : BaseGrpcServiceTests<DeviceManagerSer
     private readonly Mock<IDevice> _deviceMock = new();
     private readonly StringPort _testPort;
 
-
-
     public DeviceManagerServiceV1Tests()
     {
         _testPort = new StringPort("TestPort", PortDirection.Input, "TestValue");
