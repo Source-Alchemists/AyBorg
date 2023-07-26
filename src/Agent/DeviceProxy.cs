@@ -4,7 +4,7 @@ using AyBorg.SDK.Projects;
 
 namespace AyBorg.Agent;
 
-public class DeviceProxy : IDeviceProxy
+public sealed class DeviceProxy : IDeviceProxy
 {
     private bool _isDisposed = false;
     public string Id => Native.Id;
