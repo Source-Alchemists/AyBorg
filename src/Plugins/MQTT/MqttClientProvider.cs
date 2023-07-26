@@ -28,14 +28,6 @@ public sealed class MqttClientProvider : IDeviceProvider
         _clientProviderFactory = new MqttClientProviderFactory();
     }
 
-    public MqttClientProvider(ILogger<MqttClientProvider> logger, ILoggerFactory loggerFactory, ICommunicationStateProvider communicationStateProvider, IMqttClientProviderFactory clientProviderFactory)
-    {
-        _logger = logger;
-        _loggerFactory = loggerFactory;
-        _communicationStateProvider = communicationStateProvider;
-        _clientProviderFactory = clientProviderFactory;
-    }
-
     public async ValueTask<IDevice> CreateAsync(string id)
     {
         var client = new MqttClient(_loggerFactory.CreateLogger<MqttClient>(), _clientProviderFactory, _communicationStateProvider, id);
