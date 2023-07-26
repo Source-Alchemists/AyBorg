@@ -46,7 +46,7 @@ public abstract class CommunicationReceiveBase : CommunicationBase
             }
         }
 
-        return true;
+        return !cancellationToken.IsCancellationRequested;
     }
 
     protected virtual async ValueTask SubcripeAsync()
