@@ -31,7 +31,7 @@ public class CommunicationImageSendTests
     public async Task Test_TryRunAsync(bool expectedResult, bool sendAllowed, bool hasDevice, bool deviceCanSend, bool parallel)
     {
         // Arrange
-        using var plugin = new CommunicationSend(s_nullLogger, _deviceManagerMock.Object, _communicationStateProviderMock.Object);
+        using var plugin = new CommunicationImageSend(s_nullLogger, _deviceManagerMock.Object, _communicationStateProviderMock.Object);
         _communicationStateProviderMock.Setup(m => m.IsResultCommunicationEnabled).Returns(sendAllowed);
         _deviceMock.Setup(m => m.TrySendAsync(It.IsAny<string>(), It.IsAny<IPort>())).ReturnsAsync(deviceCanSend);
 
