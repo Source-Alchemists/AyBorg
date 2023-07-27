@@ -13,11 +13,11 @@ public sealed class ImageScale : IStepBody, IDisposable
     private readonly NumericPort _scalePort = new("Scale factor", PortDirection.Input, 0.5d, 0.01d, 2d);
     private bool _disposedValue;
 
-    public string DefaultName => "Image.Scale";
+    public string Name => "Image.Scale";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public ImageScale()
     {

@@ -12,11 +12,11 @@ public sealed class ShapeRectangleCreate : IStepBody
     private readonly NumericPort _heightPort = new("Height", PortDirection.Input, 1d, 1d);
     private readonly RectanglePort _rectanglePort = new("Rectangle", PortDirection.Output, new Rectangle());
 
-    public string DefaultName => "Shape.Rectangle.Create";
+    public string Name => "Shape.Rectangle.Create";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.ImageShapes };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public ShapeRectangleCreate()
     {

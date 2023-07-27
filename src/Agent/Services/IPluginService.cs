@@ -9,15 +9,17 @@ public interface IPluginsService
     /// <summary>
     /// Gets the steps.
     /// </summary>
-    /// <value>
-    /// The steps.
-    /// </value>
-    IEnumerable<IStepProxy> Steps { get; }
+    IReadOnlyCollection<IStepProxy> Steps { get; }
+
+    /// <summary>
+    /// Gets the device providers.
+    /// </summary>
+    IReadOnlyCollection<IDeviceProviderProxy> DeviceProviders { get; }
 
     /// <summary>
     /// Loads this instance.
     /// </summary>
-    void Load();
+    ValueTask LoadAsync();
 
     /// <summary>
     /// Find plugin instance by step record.
@@ -33,10 +35,12 @@ public interface IPluginsService
     /// <returns>Instance, else null.</returns>
     IStepProxy Find(Guid stepId);
 
+    IDeviceProviderProxy? FindDeviceProvider(PluginMetaInfoRecord pluginMetaInfo);
+
     /// <summary>
     /// Creates new instance of step.
     /// </summary>
     /// <param name="stepBody">The step body.</param>
     /// <returns></returns>
-    IStepProxy CreateInstance(IStepBody stepBody);
+    ValueTask<IStepProxy> CreateInstanceAsync(IStepBody stepBody);
 }

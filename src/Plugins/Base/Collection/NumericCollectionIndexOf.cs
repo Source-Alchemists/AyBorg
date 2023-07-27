@@ -11,11 +11,11 @@ public sealed class NumericCollectionIndexOf : IStepBody
     private readonly NumericPort _inputSearchValue = new("Value", PortDirection.Input, 0);
     private readonly NumericPort _outputIndex = new("Index", PortDirection.Output, 0);
 
-    public string DefaultName => "Numeric.Collection.IndexOf";
+    public string Name => "Numeric.Collection.IndexOf";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Collection };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public NumericCollectionIndexOf(ILogger<NumericCollectionIndexOf> logger)
     {

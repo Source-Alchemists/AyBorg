@@ -10,11 +10,11 @@ public sealed class ImageGrayscale : IStepBody, IDisposable
     private readonly ImagePort _grayscaleImagePort = new("Grayscale image", PortDirection.Output, null!);
     private bool _disposedValue;
 
-    public string DefaultName => "Image.Grayscale";
+    public string Name => "Image.Grayscale";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public ImageGrayscale()
     {

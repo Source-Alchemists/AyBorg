@@ -15,9 +15,9 @@ public abstract class ImageAiDetectBase : IStepBody
     protected readonly RectangleCollectionPort _regionsPort = new("Regions", PortDirection.Output);
     protected readonly StringCollectionPort _labelsPort = new("Labels", PortDirection.Output);
     protected readonly NumericCollectionPort _scoredPort = new("Scores", PortDirection.Output);
-    public abstract string DefaultName { get; }
+    public abstract string Name { get; }
     public IReadOnlyCollection<string> Categories => new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.Ai };
-    public IEnumerable<IPort> Ports { get; protected set; } = null!;
+    public IReadOnlyCollection<IPort> Ports { get; protected set; } = null!;
     protected abstract bool SkipFilter(YoloPrediction prediction);
     protected abstract List<YoloPrediction> Predict();
 

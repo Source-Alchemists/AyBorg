@@ -9,11 +9,11 @@ public sealed class ImageObjectsDisplay : IStepBody
     private readonly RectangleCollectionPort _regionsPort = new("Regions", PortDirection.Input);
     private readonly StringCollectionPort _labelsPort = new("Labels", PortDirection.Input);
     private readonly NumericCollectionPort _scoresPort = new("Scores", PortDirection.Input);
-    public string DefaultName => "Image.Objects.Display";
+    public string Name => "Image.Objects.Display";
 
     public IReadOnlyCollection<string> Categories => new List<string> { DefaultStepCategories.Display, DefaultStepCategories.Ai };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public ImageObjectsDisplay()
     {

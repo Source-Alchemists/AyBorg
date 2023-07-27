@@ -22,7 +22,7 @@ namespace AyBorg.Plugins.ZXing
 
         private byte[] _tmpBuffer = null!;
 
-        public string DefaultName => "Image.Code.Read";
+        public string Name => "Image.Code.Read";
 
         public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
@@ -40,7 +40,7 @@ namespace AyBorg.Plugins.ZXing
             };
         }
 
-        public IEnumerable<IPort> Ports { get; }
+        public IReadOnlyCollection<IPort> Ports { get; }
 
         public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
         {

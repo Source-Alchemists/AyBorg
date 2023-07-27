@@ -20,7 +20,7 @@ public class StateService : IStateService
         AutomationFlowState = new AutomationFlowState(localStorageService);
     }
 
-    public async Task UpdateAgentStateFromLocalstorageAsync()
+    public async Task UpdateAgentStateFromSessionStorageAsync()
     {
         UiAgentState result = await _sessionStorageService.GetItemAsync<UiAgentState>("Agent_State");
         if (result != null)

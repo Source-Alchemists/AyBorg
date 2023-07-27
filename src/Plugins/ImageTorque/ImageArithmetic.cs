@@ -14,11 +14,11 @@ public sealed class ImageArithemtic : IStepBody, IDisposable
     private readonly EnumPort _opertionPort = new("Operation", PortDirection.Input, ImageMathMode.Add);
     private bool _disposedValue;
 
-    public string DefaultName => "Image.Arithmetic";
+    public string Name => "Image.Arithmetic";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing, DefaultStepCategories.Math };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public ImageArithemtic(ILogger<ImageArithemtic> logger)
     {

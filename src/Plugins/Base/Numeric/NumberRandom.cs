@@ -13,11 +13,11 @@ public sealed class NumberRandom : IStepBody
     private Random _random = null!;
     private int _seed = -1;
 
-    public string DefaultName => "Number.Random";
+    public string Name => "Number.Random";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Math };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public NumberRandom()
     {

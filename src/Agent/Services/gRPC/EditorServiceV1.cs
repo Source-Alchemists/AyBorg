@@ -338,7 +338,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             }
 
             using MemoryStream stream = s_memoryManager.GetStream();
-            targetImage.Save(stream, asThumbnail ? ImageTorque.Processing.EncoderType.Jpeg : ImageTorque.Processing.EncoderType.Png);
+            targetImage.Save(stream, ImageTorque.Processing.EncoderType.Jpeg);
             stream.Position = 0;
             long fullStreamLength = stream.Length;
             long bytesToSend = fullStreamLength;

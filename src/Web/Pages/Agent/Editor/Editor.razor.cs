@@ -24,8 +24,7 @@ public partial class Editor : ComponentBase
     /// <summary>
     /// Gets or sets the service identifier.
     /// </summary>
-    [Parameter]
-    public string ServiceId { get; init; } = string.Empty;
+    [Parameter] public string ServiceId { get; init; } = string.Empty;
 
     [Inject] IRegistryService? RegistryService { get; init; }
     [Inject] IProjectManagementService? ProjectManagementService { get; init; }
@@ -41,7 +40,6 @@ public partial class Editor : ComponentBase
             _areSubComponentsHidden = true;
             await InvokeAsync(StateHasChanged);
             IEnumerable<ServiceInfoEntry> services = await RegistryService!.ReceiveServicesAsync();
-
             ServiceInfoEntry? service = services.FirstOrDefault(s => s.Id.ToString() == ServiceId);
             if (service == null)
             {
@@ -99,9 +97,10 @@ public partial class Editor : ComponentBase
 
     private async Task OnCreateProjectClicked()
     {
-        var options = new DialogOptions();
-        var parameters = new DialogParameters();
-        IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New project", parameters, options);
+        IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New project", new DialogOptions {
+            MaxWidth = MaxWidth.Small,
+            FullWidth = true
+        });
         DialogResult result = await dialog.Result;
         if (!result.Cancelled)
         {

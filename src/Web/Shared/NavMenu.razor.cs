@@ -38,7 +38,7 @@ public partial class NavMenu : ComponentBase
         if (firstRender)
         {
             StateService.OnUpdate += OnUpdate;
-            await StateService.UpdateAgentStateFromLocalstorageAsync();
+            await StateService.UpdateAgentStateFromSessionStorageAsync();
         }
     }
 

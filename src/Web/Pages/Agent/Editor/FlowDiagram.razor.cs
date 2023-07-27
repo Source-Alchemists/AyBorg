@@ -298,6 +298,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             var tp = (FlowPort)linkModel.TargetPort;
             Port newPort = await FlowService.GetPortAsync(StateService.AgentState.UniqueName, tp.Port.Id);
             tp.Update(newPort);
+            await InvokeAsync(tp.Parent.RefreshAll);
         }
     }
 
@@ -407,6 +408,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
 
         Port newPort = await FlowService.GetPortAsync(StateService.AgentState.UniqueName, targetPort.Port.Id);
         targetPort.Update(newPort);
+        await InvokeAsync(targetPort.Parent.RefreshAll);
     }
 
     private async void OnNodeRemoved(NodeModel node)

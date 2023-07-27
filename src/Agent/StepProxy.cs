@@ -7,21 +7,24 @@ namespace AyBorg.Agent;
 
 public sealed class StepProxy : IStepProxy
 {
+    private readonly ILogger<StepProxy> _logger;
     private readonly Stopwatch _stopwatch = new();
     private bool _lastResult = false;
-    private bool _disposedValue;
+    private bool _isDisposed;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="StepProxy"/> class.
     /// </summary>
+    /// <param name="logger">The logger.</param>
     /// <param name="stepBody">The step body.</param>
     /// <param name="x">The x.</param>
     /// <param name="y">The y.</param>
-    public StepProxy(IStepBody stepBody, int x = -1, int y = -1)
+    public StepProxy(ILogger<StepProxy> logger, IStepBody stepBody, int x = -1, int y = -1)
     {
+        _logger = logger;
         StepBody = stepBody;
         Ports = stepBody.Ports;
-        Name = stepBody.DefaultName;
+        Name = stepBody.Name;
         Categories = stepBody.Categories;
         X = x;
         Y = y;
@@ -132,28 +135,57 @@ public sealed class StepProxy : IStepProxy
     }
 
     /// <summary>
-    /// Initializes the step.
+    /// Initializes the step before running it.
     /// </summary>
-    public async ValueTask InitializeAsync()
+    public async ValueTask<bool> TryBeforeStartAsync()
     {
-        if (StepBody is IInitializable initializable)
+        try
         {
-            await initializable.OnInitializeAsync();
+            if (StepBody is IBeforeStart beforeStartable)
+            {
+                await beforeStartable.BeforeStartAsync();
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning((int)EventLogType.Plugin, ex, "Failed to initialize step {Name}", Name);
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// Called after the step is created or loaded.
+    /// </summary>
+    public async ValueTask<bool> TryAfterInitializedAsync()
+    {
+        try
+        {
+            if (StepBody is IAfterInitialized afterInitializeable)
+            {
+                await afterInitializeable.AfterInitializedAsync();
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning((int)EventLogType.Plugin, ex, "Failed after initialize step {Name}", Name);
+            return false;
         }
     }
 
     public void Dispose(bool disposing)
     {
-        if (!_disposedValue)
+        if (disposing && !_isDisposed)
         {
-            if (disposing)
+            if (StepBody is IDisposable disposable)
             {
-                if (StepBody is IDisposable disposable)
-                {
-                    disposable.Dispose();
-                }
+                disposable.Dispose();
             }
-            _disposedValue = true;
+
+            _isDisposed = true;
         }
     }
 

@@ -12,7 +12,7 @@
 			<div Class="mud-full-width" Style="height: 40px">
 				<div Style="position: relative; float: right">
 				<MudTooltip Text="@port.Brand.ToString()">
-					<PortRenderer Port="port" class="@GetPortClass(port)"></PortRenderer>
+					<PortRenderer Port="port" class="@GetPortClass(port.Port)" />
 				</MudTooltip>
 				</div>
 				<span Style="float: right" Class="pt-1">@port.Name</span>
@@ -23,10 +23,10 @@
 		{
 			<div Style="position: absolute; float: left; left: -6px">
 				<MudTooltip Text="@port.Brand.ToString()">
-					<PortRenderer Port="port" class="@GetPortClass(port)"></PortRenderer>
+					<PortRenderer Port="port" class="@GetPortClass(port.Port)" />
 				</MudTooltip>
 			</div>
-            <PortResolver Port="@port" Ports="@_inputPorts" />
+            <PortResolver Port="@port.Port" Ports="@(_inputPorts.Select(p => p.Port))" Disabled="@port.Locked" />
 		}
 	</MudCardContent>
 	<MudCardActions>

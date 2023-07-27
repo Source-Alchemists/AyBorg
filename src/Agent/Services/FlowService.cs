@@ -109,7 +109,7 @@ internal sealed class FlowService : IFlowService
             return null!;
         }
 
-        IStepProxy stepProxy = _pluginsService.CreateInstance(pluginProxy.StepBody);
+        IStepProxy stepProxy = await _pluginsService.CreateInstanceAsync(pluginProxy.StepBody);
         stepProxy.X = x;
         stepProxy.Y = y;
 

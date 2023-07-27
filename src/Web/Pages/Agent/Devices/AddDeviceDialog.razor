@@ -1,0 +1,17 @@
+@using AyBorg.Web.Shared.Models.Agent;
+
+<MudDialog>
+    <DialogContent>
+        <MudSelect T="DeviceProviderMeta" Label="Device Provider" @bind-Value="@_selectedProvider" SelectedValuesChanged="OnSelectedProviderChanged" Error="@(!string.IsNullOrEmpty(_providerError))" ErrorText="@_providerError" Required>
+            @foreach (var provider in DeviceProviders.Where(p => p.CanAdd))
+            {
+                <MudSelectItem Value="@provider">@provider.Name</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField Label="Devide Identifier" Adornment="Adornment.Start" AdornmentText="@_devicePrefix" @bind-Value="_deviceId" Error="@(!string.IsNullOrEmpty(_deviceError))" ErrorText="@_deviceError" Required/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="@OnCloseClicked">Close</MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@OnValidSubmit">Add</MudButton>
+    </DialogActions>
+</MudDialog>

@@ -1,4 +1,6 @@
+using System.Collections.Immutable;
 using AyBorg.Diagrams.Core.Models;
+using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
@@ -17,14 +19,14 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
     [Inject] NavigationManager NavigationManager { get; init; }
     private string NodeClass => Node.Selected ? "flow node box selected" : "flow node box";
 
-    private IReadOnlyCollection<FlowPort> _outputPorts = Array.Empty<FlowPort>();
-    private IReadOnlyCollection<FlowPort> _inputPorts = Array.Empty<FlowPort>();
+    private ImmutableList<FlowPort> _outputPorts = ImmutableList.Create<FlowPort>();
+    private ImmutableList<FlowPort> _inputPorts = ImmutableList.Create<FlowPort>();
     private bool _disposedValue;
 
     protected override Task OnInitializedAsync()
     {
-        _inputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Left).Cast<FlowPort>().ToArray(); // Left for input
-        _outputPorts = Node.Ports.Where(p => p.Alignment == PortAlignment.Right).Cast<FlowPort>().ToArray(); // Right for output
+        _inputPorts = _inputPorts.AddRange(Node.Ports.Where(p => p.Alignment == PortAlignment.Left).Cast<FlowPort>()); // Left for input
+        _outputPorts = _outputPorts.AddRange(Node.Ports.Where(p => p.Alignment == PortAlignment.Right).Cast<FlowPort>()); // Right for output
 
         Node.StepChanged += OnNodeChangedAsync;
         FlowService.PortValueChanged += PortValueChanged;
@@ -39,16 +41,15 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
 
     private void PortValueChanged(object sender, PortValueChangedEventArgs args)
     {
-        FlowPort targetPort = _inputPorts.FirstOrDefault(p => p.Port.Id.Equals(args.Port.Id));
+        FlowPort targetPort = _inputPorts.Find(p => p.Port.Id.Equals(args.Port.Id));
         targetPort?.Update(args.Port);
     }
 
-    private static string GetPortClass(PortModel port)
+    private static string GetPortClass(Port port)
     {
-        var fp = (FlowPort)port;
-        string directionClass = fp.Direction == PortDirection.Input ? " input" : " output";
+        string directionClass = port.Direction == PortDirection.Input ? " input" : " output";
         string typeClass = string.Empty;
-        switch (fp.Brand)
+        switch (port.Brand)
         {
             case PortBrand.String:
             case PortBrand.Folder:
@@ -77,7 +78,7 @@ public partial class FlowNodeWidget : ComponentBase, IDisposable
 
     private void OnStepFullScreenClicked()
     {
-        NavigationManager.NavigateTo($"/agents/editor/{StateService.AgentState.UniqueName}/step/{Node.Step.Id}");
+        NavigationManager.NavigateTo($"/agents/editor/{StateService.AgentState.ServiceId}/step/{Node.Step.Id}");
     }
 
     protected virtual void Dispose(bool disposing)

@@ -10,7 +10,7 @@ public sealed class RectangleCollectionElementAt : CollectionElementAt, IStepBod
     private readonly RectangleCollectionPort _inputCollection = new("Collection", PortDirection.Input);
     private readonly RectanglePort _outputValue = new("Result", PortDirection.Output, new Rectangle());
 
-    public string DefaultName => "Rectangle.Collection.ElementAt";
+    public string Name => "Rectangle.Collection.ElementAt";
 
     public RectangleCollectionElementAt(ILogger<RectangleCollectionElementAt> logger) : base(logger)
     {
@@ -24,6 +24,6 @@ public sealed class RectangleCollectionElementAt : CollectionElementAt, IStepBod
 
     protected override void GetAndUpdateElementAt()
     {
-        _outputValue.Value = _inputCollection.Value.ElementAt(Convert.ToInt32(_inputIndex.Value));
+        _outputValue.Value = _inputCollection.Value[Convert.ToInt32(_inputIndex.Value)];
     }
 }

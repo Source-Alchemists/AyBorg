@@ -8,5 +8,5 @@ public interface IStateService
     UiAgentState AgentState { get; }
     AutomationFlowState AutomationFlowState { get; }
     Task SetAgentStateAsync(UiAgentState agentState);
-    Task UpdateAgentStateFromLocalstorageAsync();
+    Task UpdateAgentStateFromSessionStorageAsync();
 }

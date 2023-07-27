@@ -25,8 +25,8 @@ public class AuditMapperTests{
                     MetaInfo = new PluginMetaInfoRecord(),
                     X = 0,
                     Y = 0,
-                    Ports = new List<PortRecord> {
-                        new PortRecord {
+                    Ports = new List<StepPortRecord> {
+                        new StepPortRecord {
                             Id = Guid.NewGuid(),
                             Direction = SDK.Common.Ports.PortDirection.Input,
                             Name = "TestPort",

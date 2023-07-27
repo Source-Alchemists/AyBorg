@@ -9,48 +9,48 @@ public record StepRecord
     /// Gets or sets the database identifier.
     /// </summary>
     [Key]
-    public Guid DbId { get; set; }
+    public Guid DbId { get; init; }
 
     /// <summary>
     /// Gets or sets the identifier.
     /// </summary>
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
     /// <summary>
     /// Gets or sets the name.
     /// </summary>
-    public string Name { get; set; } = string.Empty;
+    public string Name { get; init; } = string.Empty;
 
     /// <summary>
     /// Gets or sets the meta information.
     /// </summary>
-    public PluginMetaInfoRecord MetaInfo { get; set; } = new PluginMetaInfoRecord();
+    public PluginMetaInfoRecord MetaInfo { get; init; } = new PluginMetaInfoRecord();
 
     /// <summary>
     /// Gets or sets the x.
     /// </summary>
-    public int X { get; set; }
+    public int X { get; init; }
 
     /// <summary>
     /// Gets or sets the y.
     /// </summary>
-    public int Y { get; set; }
+    public int Y { get; init; }
 
     /// <summary>
     /// Gets or sets the ports.
     /// </summary>
-    public List<PortRecord> Ports { get; set; } = new List<PortRecord>();
+    public List<StepPortRecord> Ports { get; init; } = new List<StepPortRecord>();
 
     /// <summary>
     /// Gets or sets the project record identifier.
     /// </summary>
-    /// <remarks>Used by entity.</remarks>
-    public Guid ProjectRecordId { get; set; }
+    /// <remarks>Used by entity for navigation.</remarks>
+    public Guid ProjectRecordId { get; init; }
 
     /// <summary>
     /// Gets or sets the project record.
     /// </summary>
-    /// <remarks>Used by entity.</remarks>
+    /// <remarks>Used by entity for navigation.</remarks>
     [JsonIgnore]
-    public ProjectRecord ProjectRecord { get; set; } = new ProjectRecord();
+    public ProjectRecord ProjectRecord { get; init; } = new ProjectRecord();
 }

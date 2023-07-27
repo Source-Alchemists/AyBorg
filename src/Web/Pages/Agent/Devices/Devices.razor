@@ -1,0 +1,106 @@
+@page "/agents/devices/{serviceId}"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
+
+@if (string.IsNullOrEmpty(_serviceName))
+{
+    <PageTitle>AyBorg - Devices</PageTitle>
+}
+else
+{
+    <PageTitle>AyBorg - Devices (@_serviceName)</PageTitle>
+}
+
+<AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudGrid class="pt-1">
+    <MudItem xs="12">
+        <MudCard Class="rounded-lg">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudIcon Icon="@Icons.Material.Filled.DeviceHub" Size="Size.Large" Color="Color.Default" />
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudBadge Content="@(_devices.Count)" Overlap="true" Color="Color.Primary">
+                        <MudText Typo="Typo.h6">Devices</MudText>
+                    </MudBadge>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox"
+                        Color="Color.Primary" OnClick="@OnAddDeviceClicked">Add Device</MudButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTable Items="@_devices" Hover="true" Elevation="0">
+                    <HeaderContent>
+                        <MudTh Style="width: 30px">Active</MudTh>
+                        <MudTh Style="width: 30px">Connected</MudTh>
+                        <MudTh>Id</MudTh>
+                        <MudTh>Name</MudTh>
+                        <MudTh>Manufacturer</MudTh>
+                        <MudTh Style="width: 30%">Categories</MudTh>
+                        <MudTh Style="width: 30px"></MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Active">
+                            @if (@context.IsActive)
+                            {
+                                <MudIcon Icon="@Icons.Filled.Check" />
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="Connected">
+                            @if (@context.IsConnected)
+                            {
+                                <MudTooltip Text="Connected">
+                                    <MudIcon Icon="@Icons.Material.Filled.Power" Color="Color.Success" />
+                                </MudTooltip>
+                            }
+                            else
+                            {
+                                <MudTooltip Text="Disconnected">
+                                    <MudIcon Icon="@Icons.Material.Filled.PowerOff" Color="Color.Warning" />
+                                </MudTooltip>
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="Id">@context.Id</MudTd>
+                        <MudTd DataLabel="Name">@context.Name</MudTd>
+                        <MudTd DataLabel="Manufacturer">@context.Manufacturer</MudTd>
+                        <MudTd DataLabel="Categories">
+                            @foreach (var category in @context.Categories.Order())
+                            {
+                                <MudChip Size="Size.Small" Text="@category" Disabled />
+                            }
+                        </MudTd>
+                        <MudTd DataLabel="Actions">
+                            <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
+                                @if (@context.IsConnected)
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.PowerOff" IconColor="Color.Warning" OnClick="() => OnDeactivateDeviceClicked(context)">
+                                        Deactivate
+                                    </MudMenuItem>
+                                }
+                                else
+                                {
+                                    <MudMenuItem Icon="@Icons.Material.Filled.Power" IconColor="Color.Success" OnClick="() => OnActivateDeviceClicked(context)">
+                                        Activate
+                                    </MudMenuItem>
+                                }
+
+                                <MudMenuItem Icon="@Icons.Material.Filled.Settings" OnClick="() => OnDeviceSettingsClicked(context)">
+                                    Settings
+                                </MudMenuItem>
+                                <MudDivider />
+                                <MudMenuItem Icon="@Icons.Material.Filled.Remove" IconColor="Color.Error" OnClick="() => OnRemoveDeviceClicked(context)" Disabled=@(!CanAdd(context))>
+                                    Remove
+                                </MudMenuItem>
+                            </MudMenu>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>

@@ -1,6 +1,5 @@
 using System.Collections.Immutable;
 using AyBorg.SDK.Common.Models;
-using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Shared.Utils;
 using Microsoft.AspNetCore.Components;
@@ -10,7 +9,7 @@ namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class ImageInputField : BaseInputField
 {
-    [Parameter, EditorRequired] public IReadOnlyCollection<FlowPort> ShapePorts { get; init; } = null!;
+    [Parameter, EditorRequired] public IReadOnlyCollection<Port> ShapePorts { get; init; } = null!;
     [Parameter] public bool AlternativeMode { get; init; } = false;
     [Inject] public IJSRuntime JSRuntime { get; init; } = null!;
 
@@ -42,7 +41,7 @@ public partial class ImageInputField : BaseInputField
 
     protected override async Task OnParametersSetAsync()
     {
-        if(AlternativeMode)
+        if (AlternativeMode)
         {
             _imageContainerClasses = "flow-node-field mud-full-width mud-full-height px-1 mb-4 absolute";
             _imageContainerStyle = "top: 70px; left: 0; height: calc(100% - 70px)";
@@ -53,11 +52,13 @@ public partial class ImageInputField : BaseInputField
         }
         else if (Port.Value is Image image)
         {
-            if(AlternativeMode)
+            if (AlternativeMode)
             {
                 _imageWidth = image.Width;
                 _imageHeight = image.Height;
-            } else {
+            }
+            else
+            {
                 _imageWidth = SVG_WIDTH;
                 _imageHeight = SVG_HEIGHT;
             }
@@ -77,13 +78,13 @@ public partial class ImageInputField : BaseInputField
         _labelRectangles.Clear();
         float scaleFactorX = _imageInfo.FactorX;
         float scaleFactorY = _imageInfo.FactorY;
-        foreach(Port shapePort in ShapePorts.Select(p => p.Port))
+        foreach (object? value in ShapePorts.Select(sh => sh.Value))
         {
-            if(shapePort.Value is Rectangle rectangle)
+            if (value is Rectangle rectangle)
             {
                 AddRectangle(scaleFactorX, scaleFactorY, rectangle);
             }
-            else if(shapePort.Value is ImmutableList<Rectangle> rectangeCollection)
+            else if (value is ImmutableList<Rectangle> rectangeCollection)
             {
                 foreach (Rectangle rect in rectangeCollection)
                 {
@@ -139,7 +140,7 @@ public partial class ImageInputField : BaseInputField
     {
         float scaleFactorW = 1f;
         float scaleFactorH = 1f;
-        if(AlternativeMode)
+        if (AlternativeMode)
         {
             scaleFactorW = (float)_boundingClientRect.Width / _imageWidth;
             scaleFactorH = (float)_boundingClientRect.Height / _imageHeight;
@@ -171,8 +172,8 @@ public partial class ImageInputField : BaseInputField
 
     private record struct ImagePosition(float X, float Y, float Width, float Height, float OrgWidth, float OrgHeight)
     {
-        public float FactorX => Width / OrgWidth;
-        public float FactorY => Height / OrgHeight;
+        public readonly float FactorX => Width / OrgWidth;
+        public readonly float FactorY => Height / OrgHeight;
     }
 
     private sealed record LabelRectangle(float X, float Y, float Width, float Height)

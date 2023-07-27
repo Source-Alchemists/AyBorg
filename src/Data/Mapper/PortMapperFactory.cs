@@ -13,6 +13,7 @@ public static class PortMapperFactory
             PortBrand.Numeric => new NumericPortMapper(),
             PortBrand.Boolean => new BooleanPortMapper(),
             PortBrand.Enum => new EnumPortMapper(),
+            PortBrand.Select => new SelectPortMapper(),
             PortBrand.Rectangle => new RectanglePortMapper(),
             PortBrand.Image => new ImagePortMapper(),
             PortBrand.StringCollection => new StringCollectionPortMapper(),

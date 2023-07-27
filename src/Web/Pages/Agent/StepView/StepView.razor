@@ -1,4 +1,4 @@
-@page "/agents/editor/{uniqueName}/step/{stepId}"
+@page "/agents/editor/{serviceId}/step/{stepId}"
 @using AyBorg.Web.Pages.Agent.Shared
 @using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
@@ -14,13 +14,22 @@ else{
 <MudToolBar Class="px-0">
     <MudGrid>
         <MudItem xs="4">
-            <MudText Typo="Typo.h6" Class="pl-3">@_step.Name</MudText>
+            <MudStack Row>
+                <MudTooltip Text="Back">
+                    <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small"
+                        OnClick="OnBackClicked" />
+                </MudTooltip>
+                <MudText Typo="Typo.h6" Class="pl-3">@_step.Name</MudText>
+            </MudStack>
         </MudItem>
         <MudItem xs="4">
-            <RuntimeToolbar ServiceUniqueName="@UniqueName" />
+            @if (!string.IsNullOrEmpty(_serviceUniqueName))
+            {
+                <RuntimeToolbar ServiceUniqueName="@_serviceUniqueName" />
+            }
         </MudItem>
         <MudItem xs="4" Class="overflow-y-auto" Style="height: 60px">
-            @foreach (var category in _step.Categories)
+            @foreach (var category in _step.Categories.Order())
             {
                 <MudChip Size="Size.Small" Text="@category" Style="float: right" Disabled/>
             }
@@ -46,14 +55,14 @@ else{
             </MudCardHeader>
             <MudCardContent Class="overflow-auto" Style="height: calc(100% - 65px)">
                 <MudList>
-                    @foreach (var port in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
+                    @foreach (var port in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Brand != SDK.Common.Ports.PortBrand.Image))
                     {
                         <MudListItem>
-                            <PortResolver Port="@port" Ports="@_ports" />
+                            <PortResolver Port="@port" Ports="@_ports" Disabled="@(IsDisabled(port))" />
                         </MudListItem>
                     }
                 </MudList>
-                @if(!_ports.Any(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
+                @if(!_ports.Any(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Brand != SDK.Common.Ports.PortBrand.Image))
                 {
                     <div class="center relative">
                         <LogoPlaceholder Watermark/>
@@ -83,14 +92,14 @@ else{
                     SDK.Common.Ports.PortBrand.Image))
                     {
                         <MudTabPanel Icon="@Icons.Material.Filled.Input" Text="@imagePort.Name">
-                            <PortResolver Port="@imagePort" Ports="@_ports"  AlternativeMode/>
+                            <PortResolver Port="@imagePort" Ports="@_ports" Disabled="@(IsDisabled(imagePort))"  AlternativeMode/>
                         </MudTabPanel>
                     }
                     @foreach (var imagePort in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Brand ==
                     SDK.Common.Ports.PortBrand.Image))
                     {
                         <MudTabPanel Icon="@Icons.Material.Filled.Output" Text="@imagePort.Name">
-                            <PortResolver Port="@imagePort" Ports="@_ports"  AlternativeMode/>
+                            <PortResolver Port="@imagePort" Ports="@_ports" Disabled="@(IsDisabled(imagePort))"  AlternativeMode/>
                         </MudTabPanel>
                     }
                 </MudTabs>
@@ -110,14 +119,14 @@ else{
             </MudCardHeader>
             <MudCardContent Class="overflow-auto" Style="height: calc(100% - 65px)">
                 <MudList>
-                    @foreach (var port in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
+                    @foreach (var port in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Brand != SDK.Common.Ports.PortBrand.Image))
                     {
                         <MudListItem>
-                            <PortResolver Port="@port" Ports="@_ports" />
+                            <PortResolver Port="@port" Ports="@_ports" Disabled="@(IsDisabled(port))"  />
                         </MudListItem>
                     }
                 </MudList>
-                @if(!_ports.Any(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Port.Brand != SDK.Common.Ports.PortBrand.Image))
+                @if(!_ports.Any(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Brand != SDK.Common.Ports.PortBrand.Image))
                 {
                     <div class="center relative">
                         <LogoPlaceholder Watermark/>

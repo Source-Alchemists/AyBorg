@@ -9,7 +9,7 @@ public sealed class NumericCollectionElementAt : CollectionElementAt, IStepBody
     private readonly NumericCollectionPort _inputCollection = new("Collection", PortDirection.Input);
     private readonly NumericPort _outputValue = new("Result", PortDirection.Output, 0);
 
-    public string DefaultName => "Numeric.Collection.ElementAt";
+    public string Name => "Numeric.Collection.ElementAt";
 
     public NumericCollectionElementAt(ILogger<NumericCollectionElementAt> logger) : base(logger)
     {
@@ -23,6 +23,6 @@ public sealed class NumericCollectionElementAt : CollectionElementAt, IStepBody
 
     protected override void GetAndUpdateElementAt()
     {
-        _outputValue.Value = _inputCollection.Value.ElementAt(Convert.ToInt32(_inputIndex.Value));
+        _outputValue.Value = _inputCollection.Value[Convert.ToInt32(_inputIndex.Value)];
     }
 }

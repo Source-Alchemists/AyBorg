@@ -8,8 +8,8 @@ namespace AyBorg.Web.Pages.Agent.Editor;
 
 public partial class StepsSelection : ComponentBase
 {
+    private readonly Dictionary<string, int> _availableCategories = new();
     private IEnumerable<Step> _availableSteps = new List<Step>();
-    private Dictionary<string, int> _availableCategories = new();
     private IEnumerable<Step> _filteredSteps = new List<Step>();
     private IEnumerable<string> _selectedCategories = new List<string>() { "All" };
 
@@ -57,10 +57,10 @@ public partial class StepsSelection : ComponentBase
 
     private void ApplySearchFilter()
     {
-        _filteredSteps = _availableSteps.Where(s => s.Name.Contains(_searchValue, StringComparison.InvariantCultureIgnoreCase));
+        _filteredSteps = _availableSteps.Where(s => s.Name.Contains(_searchValue, StringComparison.InvariantCultureIgnoreCase)).OrderBy(c => c.Name);
         if(!_selectedCategories.Contains("All"))
         {
-            _filteredSteps = _filteredSteps.Where(s => s.Categories.Contains(_selectedCategories.First()));
+            _filteredSteps = _filteredSteps.Where(s => s.Categories.Contains(_selectedCategories.First())).OrderBy(c => c.Name);
         }
 
     }

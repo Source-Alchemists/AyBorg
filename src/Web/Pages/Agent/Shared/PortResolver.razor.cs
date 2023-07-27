@@ -1,5 +1,5 @@
+using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Pages.Agent.Shared.Fields;
 using AyBorg.Web.Services.Agent;
 using Microsoft.AspNetCore.Components;
@@ -9,13 +9,16 @@ namespace AyBorg.Web.Pages.Agent.Shared;
 
 public partial class PortResolver : ComponentBase
 {
-    [Parameter, EditorRequired] public FlowPort Port { get; init; } = null!;
-    [Parameter, EditorRequired] public IReadOnlyCollection<FlowPort> Ports { get; init; } = Array.Empty<FlowPort>();
+    [Parameter, EditorRequired] public Port Port { get; set; } = null!;
+    [Parameter, EditorRequired] public IEnumerable<Port> Ports { get; init; } = Array.Empty<Port>();
+    [Parameter] public bool Disabled { get; init; } = false;
     [Parameter] public bool AlternativeMode { get; init; } = false;
+    [Parameter] public ListType Mode { get; init; } = ListType.Flow;
+    [Parameter] public EventCallback<ValueChangedEventArgs> ValueChanged { get; set; }
     [Inject] IFlowService FlowService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
 
-    private IReadOnlyCollection<FlowPort> _shapePorts = Array.Empty<FlowPort>();
+    private IReadOnlyCollection<Port> _shapePorts = Array.Empty<Port>();
 
     protected override void OnParametersSet()
     {
@@ -29,14 +32,32 @@ public partial class PortResolver : ComponentBase
     {
         try
         {
-            FlowPort port = Ports.First(p => p.Port.Id == e.Port.Id);
-            SDK.Common.Models.Port newPort = port.Port with { Value = e.Value };
-            port.Update(newPort);
-            await FlowService.TrySetPortValueAsync(port.Port);
+            Port newPort = Port with { Value = e.Value };
+
+            if (Mode == ListType.Flow)
+            {
+                if (await FlowService.TrySetPortValueAsync(newPort))
+                {
+                    Port = newPort;
+                }
+            }
+            else
+            {
+                Port = newPort;
+            }
+
+            await ValueChanged.InvokeAsync(new ValueChangedEventArgs(newPort, newPort.Value));
+            await InvokeAsync(StateHasChanged);
         }
         catch (Exception)
         {
             Snackbar.Add("Could not set port value", Severity.Warning);
         }
+    }
+
+    public enum ListType
+    {
+        Flow,
+        Device
     }
 }

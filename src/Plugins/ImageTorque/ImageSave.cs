@@ -17,11 +17,11 @@ public sealed class ImageSave : IStepBody
     private readonly FolderPort _folderPort = new("Folder", PortDirection.Input, string.Empty);
     private readonly StringPort _outputFileNamePort = new("File name", PortDirection.Output, string.Empty);
 
-    public string DefaultName => "Image.Save";
+    public string Name => "Image.Save";
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.ImageProcessing };
 
-    public IEnumerable<IPort> Ports { get; }
+    public IReadOnlyCollection<IPort> Ports { get; }
 
     public ImageSave(ILogger<ImageSave> logger, IEnvironment environment)
     {

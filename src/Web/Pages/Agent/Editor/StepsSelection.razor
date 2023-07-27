@@ -33,7 +33,9 @@
             {
                 <MudListItem Icon="@Icons.Filled.DragIndicator" IconColor="Color.Primary" draggable="true"
                 @ondragstart="(args) => OnDragStart(args, step)">
-                    <MudText>@step.Name</MudText>
+                    <MudTooltip Text="@step.Name">
+                        <MudText>@step.Name</MudText>
+                    </MudTooltip>
                 </MudListItem>
             }
         </MudList>
