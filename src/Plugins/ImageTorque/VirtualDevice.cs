@@ -130,7 +130,7 @@ public sealed class VirtualDevice : ICameraDevice, IDisposable
         {
             string absolutPath = Path.GetFullPath($"{_environment.StorageLocation}{_folderPort.Value}");
             string[] files = Directory.GetFiles(absolutPath);
-            IEnumerable<string> supportedFiles = files.Where(f => s_supportedFileTypes.Contains(Path.GetExtension(f), StringComparer.OrdinalIgnoreCase));
+            IEnumerable<string> supportedFiles = files.Where(f => s_supportedFileTypes.Contains(Path.GetExtension(f), StringComparer.OrdinalIgnoreCase)).Order();
             string[] imageFileNames = supportedFiles.ToArray();
             if (imageFileNames.Length == 0)
             {
