@@ -40,7 +40,7 @@ public class DeviceProviderProxyTests
         using var deviceProviderProxy = new DeviceProviderProxy(s_nullLoggerFactory, s_nullLogger, _deviceProviderMock.Object);
         if (!success)
         {
-            _deviceProviderMock.Setup(m => m.BeforeStartAsync()).Throws(new Exception());
+            _deviceProviderMock.Setup(m => m.AfterInitializedAsync()).Throws(new Exception());
         }
 
         // Act
@@ -124,5 +124,5 @@ public class DeviceProviderProxyTests
         }
     }
 
-    public interface ITestProvider : IDeviceProvider, IBeforeStart, IDisposable { }
+    public interface ITestProvider : IDeviceProvider, IAfterInitialized, IDisposable { }
 }

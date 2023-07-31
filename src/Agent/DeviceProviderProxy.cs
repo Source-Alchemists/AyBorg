@@ -51,9 +51,9 @@ public sealed class DeviceProviderProxy : IDeviceProviderProxy
     {
         try
         {
-            if (_deviceProvider is IBeforeStart initializable)
+            if (_deviceProvider is IAfterInitialized initializable)
             {
-                await initializable.BeforeStartAsync();
+                await initializable.AfterInitializedAsync();
             }
 
             return true;
