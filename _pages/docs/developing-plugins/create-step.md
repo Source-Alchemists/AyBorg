@@ -1,25 +1,23 @@
 ---
 title: Create a step
-description: How develop a workflow step plugin.
-sidebar: developing-flow-steps
-permalink: "/docs/developing-flow-steps/create-step.html"
+description: AyBorg's `IStepBody` interface is the primary means of extending AyBorg's functionality. In this guide, we'll walk through how to create a new plugin (step) using this interface.
+sidebar: developing-plugins
+permalink: "/docs/developing-plugins/create-step.html"
 ---
-
-## Creating a new step plugin for AyBorg: `IStepBody` interface
 
 AyBorg's `IStepBody` interface is the primary means of extending AyBorg's functionality. In this guide, we'll walk through how to create a new plugin (step) using this interface.
 
-### Prerequisites
+## Prerequisites
 
 - Familiarity with C# programming language
 - .NET 7+ installed on your machine
 - An IDE (e.g., Visual Studio, JetBrains Rider, or Visual Studio Code)
 
-### Using the AyBorg.SDK.Common SDK
+## Using the AyBorg.SDK.Common SDK
 
 In order to develop plugins for AyBorg, you will need to use the `AyBorg.SDK.Common` SDK. This SDK provides the necessary interfaces and classes to create plugins.
 
-### Understanding the IStepBody interface
+## Understanding the IStepBody interface
 
 The `IStepBody` interface is central to creating a new plugin in AyBorg. The interface ensures that your plugin has a `TryRunAsync` method that the AyBorg system can call when it's time to execute your step. It also requires that your plugin defines its `Name` and `Ports`. Here's the interface structure:
 
@@ -32,11 +30,11 @@ public interface IStepBody
 }
 ```
 
-### Creating a new step
+## Creating a new step
 
 To create a new step, you will need to create a new class that implements the `IStepBody` interface. We'll take the `ImageScale` class as a case study.
 
-#### Step 1: Define your class
+### Step 1: Define your class
 
 Your class should implement the `IStepBody` interface and optionally `IDisposable` if it requires cleanup after use. It should also include several `IPort` fields, representing inputs and outputs of your step. Here's the class definition:
 
@@ -71,7 +69,7 @@ public sealed class ImageScale : IStepBody, IDisposable
 }
 ```
 
-#### Step 2: Implement the TryRunAsync method
+### Step 2: Implement the TryRunAsync method
 
 The `TryRunAsync` method is where the main logic of your plugin will reside. For our `ImageScale` example, this method scales an image to a certain size:
 
@@ -95,7 +93,7 @@ public ValueTask<bool> TryRunAsync(CancellationToken cancellationToken)
 }
 ```
 
-#### Step 3: Implement the Dispose method (Optional)
+### Step 3: Implement the Dispose method (Optional)
 
 If your plugin acquires resources that need to be released, it should implement the `IDisposable` interface and its `Dispose` method:
 
@@ -116,14 +114,18 @@ private void Dispose(bool disposing)
 }
 ```
 
-#### Step 4: Build and deploy your step
+### Step 4: Build and deploy your step
 
 After you've implemented your plugin, you can build and deploy the resulting DLL to the AyBorg's plugins directory.
 
 That's it! You've just created a new plugin for AyBorg using the `IStepBody` interface. Remember, the logic inside the `TryRunAsync` method can be whatever you need for your specific use case.
 
-### Conclusion
+## Conclusion
 
 Creating plugins for AyBorg using the `IStepBody` interface allows developers to extend the functionality of AyBorg in powerful and flexible ways. With the ability to add new steps to workflows, the possibilities are endless. Happy coding!
 
-Please note: This guide assumes that you have a working knowledge of C# and .NET. If you're new to these technologies, you may need to familiarize yourself with them before you can create a plugin for AyBorg.
+*Please note: This guide assumes that you have a working knowledge of C# and .NET. If you're new to these technologies, you may need to familiarize yourself with them before you can create a plugin for AyBorg.*
+
+## See also
+
+- [Create a camera device]({{site.baseurl}}/docs/developing-plugins/create-camera-device)

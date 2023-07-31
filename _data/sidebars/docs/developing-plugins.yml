@@ -1,0 +1,9 @@
+docs:
+- title: Create a step
+  url: /docs/developing-plugins/create-step
+
+- title: Create a device provider
+  url: /docs/developing-plugins/create-device-provider
+
+- title: Create a camera device
+  url: /docs/developing-plugins/create-camera-device
