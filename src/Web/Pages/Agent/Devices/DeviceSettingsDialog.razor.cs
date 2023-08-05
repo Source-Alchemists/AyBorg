@@ -94,7 +94,7 @@ public partial class DeviceSettingsDialog : ComponentBase
             { "ContentText", "Are you sure you want to apply settings and connect this device?" }
         });
         DialogResult result = await dialogReference.Result;
-        if(result.Cancelled)
+        if (result.Cancelled)
         {
             return;
         }
@@ -111,6 +111,10 @@ public partial class DeviceSettingsDialog : ComponentBase
             }
 
             Device = updatedDevice;
+            if (Device.IsConnected)
+            {
+                Snackbar.Add("Device connected", Severity.Success);
+            }
         }
         catch (Exception)
         {
@@ -130,7 +134,7 @@ public partial class DeviceSettingsDialog : ComponentBase
             { "ContentText", "Are you sure you want disconnect this device?" }
         });
         DialogResult result = await dialogReference.Result;
-        if(result.Cancelled)
+        if (result.Cancelled)
         {
             return;
         }
