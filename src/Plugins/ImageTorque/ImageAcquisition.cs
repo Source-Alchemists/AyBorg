@@ -114,19 +114,16 @@ public sealed class ImageAcquisition : IStepBody, IAfterInitialized, IBeforeStar
     {
         string selectedId = string.Empty;
 
-        if (devices.Any())
+        if (devices.Any() && _devicePort.Value != null)
         {
-            if (_devicePort.Value != null)
+            ICameraDevice? selectedDevice = devices.FirstOrDefault(d => d.Id.Equals(_devicePort.Value.SelectedValue, StringComparison.InvariantCultureIgnoreCase));
+            if (selectedDevice != null)
             {
-                ICameraDevice? selectedDevice = devices.FirstOrDefault(d => d.Id.Equals(_devicePort.Value.SelectedValue, StringComparison.InvariantCultureIgnoreCase));
-                if (selectedDevice != null)
-                {
-                    selectedId = selectedDevice.Id;
-                }
-                else
-                {
-                    selectedId = devices.First().Id;
-                }
+                selectedId = selectedDevice.Id;
+            }
+            else
+            {
+                selectedId = devices.First().Id;
             }
         }
 

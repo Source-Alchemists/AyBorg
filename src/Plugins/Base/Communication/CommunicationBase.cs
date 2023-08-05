@@ -70,19 +70,16 @@ public abstract class CommunicationBase : IStepBody, IAfterInitialized, IBeforeS
     {
         string selectedId = string.Empty;
 
-        if (devices.Any())
+        if (devices.Any() && _devicePort.Value != null)
         {
-            if (_devicePort.Value != null)
+            ICommunicationDevice? selectedDevice = devices.FirstOrDefault(d => d.Id.Equals(_devicePort.Value.SelectedValue, StringComparison.InvariantCultureIgnoreCase));
+            if (selectedDevice != null)
             {
-                ICommunicationDevice? selectedDevice = devices.FirstOrDefault(d => d.Id.Equals(_devicePort.Value.SelectedValue, StringComparison.InvariantCultureIgnoreCase));
-                if (selectedDevice != null)
-                {
-                    selectedId = selectedDevice.Id;
-                }
-                else
-                {
-                    selectedId = devices.First().Id;
-                }
+                selectedId = selectedDevice.Id;
+            }
+            else
+            {
+                selectedId = devices.First().Id;
             }
         }
 
