@@ -48,8 +48,15 @@ public class ImageAcquisitionTests : IDisposable
         // Assert
         if (devicePortSet)
         {
-            Assert.Equal("123", devicePort.Value.SelectedValue);
-            _deviceManagerMock.Verify(m => m.GetDevice<ICameraDevice>(devicePort.Value.SelectedValue), Times.Once);
+            if (hasDevices)
+            {
+                Assert.Equal("123", devicePort.Value.SelectedValue);
+                _deviceManagerMock.Verify(m => m.GetDevice<ICameraDevice>(devicePort.Value.SelectedValue), Times.Once);
+            }
+            else
+            {
+                Assert.Equal(string.Empty, devicePort.Value.SelectedValue);
+            }
         }
         else
         {

@@ -23,6 +23,7 @@ public class CommunicationReceiveTests : IDisposable
         _deviceMock.Setup(m => m.Id).Returns("123");
         _deviceMock.Setup(m => m.SubscribeAsync(It.IsAny<string>())).ReturnsAsync(_subscriptionMock.Object);
 
+        _deviceManagerMock.Setup(m => m.GetDevices<ICommunicationDevice>()).Returns(new List<ICommunicationDevice> { _deviceMock.Object });
         _deviceManagerMock.Setup(m => m.GetDevice<ICommunicationDevice>("123")).Returns(_deviceMock.Object);
 
         _plugin = new CommunicationReceive(s_nullLogger, _deviceManagerMock.Object);
@@ -37,6 +38,11 @@ public class CommunicationReceiveTests : IDisposable
         // Arrange
         var devicePort = (SelectPort)_plugin.Ports.First(p => p.Name.Equals("Device"));
         devicePort.Value = new SelectPort.ValueContainer(hasDevice ? "123" : string.Empty, new List<string> { "123" });
+        if (!hasDevice)
+        {
+            _deviceManagerMock.Setup(m => m.GetDevices<ICommunicationDevice>()).Returns(Array.Empty<ICommunicationDevice>());
+        }
+
         var messageIdPort = (StringPort)_plugin.Ports.First(p => p.Name.Equals("Id"));
         messageIdPort.Value = "TestId";
         var timeoutPort = (NumericPort)_plugin.Ports.First(p => p.Name.Equals("Timeout (ms)"));
