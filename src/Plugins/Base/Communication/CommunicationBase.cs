@@ -68,10 +68,10 @@ public abstract class CommunicationBase : IStepBody, IAfterInitialized, IBeforeS
 
     private void UpdateDevicePort(IEnumerable<ICommunicationDevice> devices)
     {
+        string selectedId = string.Empty;
+
         if (devices.Any())
         {
-            string selectedId = string.Empty;
-
             if (_devicePort.Value != null)
             {
                 ICommunicationDevice? selectedDevice = devices.FirstOrDefault(d => d.Id.Equals(_devicePort.Value.SelectedValue, StringComparison.InvariantCultureIgnoreCase));
@@ -84,9 +84,9 @@ public abstract class CommunicationBase : IStepBody, IAfterInitialized, IBeforeS
                     selectedId = devices.First().Id;
                 }
             }
-
-            _devicePort.Value = new SelectPort.ValueContainer(selectedId, devices.Select(d => d.Id).ToList());
         }
+
+        _devicePort.Value = new SelectPort.ValueContainer(selectedId, devices.Select(d => d.Id).ToList());
     }
 
     private void OnDeviceCollectionChanged(object? sender, CollectionChangedEventArgs e)

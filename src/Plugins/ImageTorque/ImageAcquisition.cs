@@ -112,10 +112,10 @@ public sealed class ImageAcquisition : IStepBody, IAfterInitialized, IBeforeStar
 
     private void UpdateDevicePort(IEnumerable<ICameraDevice> devices)
     {
+        string selectedId = string.Empty;
+
         if (devices.Any())
         {
-            string selectedId = string.Empty;
-
             if (_devicePort.Value != null)
             {
                 ICameraDevice? selectedDevice = devices.FirstOrDefault(d => d.Id.Equals(_devicePort.Value.SelectedValue, StringComparison.InvariantCultureIgnoreCase));
@@ -128,9 +128,9 @@ public sealed class ImageAcquisition : IStepBody, IAfterInitialized, IBeforeStar
                     selectedId = devices.First().Id;
                 }
             }
-
-            _devicePort.Value = new SelectPort.ValueContainer(selectedId, devices.Select(d => d.Id).ToList());
         }
+
+        _devicePort.Value = new SelectPort.ValueContainer(selectedId, devices.Select(d => d.Id).ToList());
     }
 
     private void OnDeviceCollectionChanged(object? sender, CollectionChangedEventArgs e)
