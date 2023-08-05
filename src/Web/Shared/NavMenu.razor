@@ -1,5 +1,13 @@
 ﻿@using SDK.Authorization
 
+<AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
+    <Authorized>
+        <MudNavLink Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Primary"  href="dashboard" Match="NavLinkMatch.All" hidden="@(!_isDashboardAvailable)">
+            Dashboard
+        </MudNavLink>
+    </Authorized>
+</AuthorizeView>
+
 <AuthorizeView Roles="Administrator, Engineer, Reviewer">
     <Authorized>
         <MudNavGroup Title="Agents" Icon="@Icons.Filled.Workspaces" IconColor="Color.Primary" Expanded="true" hidden="@(!_isAnyAgentAvailable)">
