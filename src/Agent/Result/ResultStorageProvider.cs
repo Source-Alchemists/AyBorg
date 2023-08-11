@@ -18,7 +18,6 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
     private Guid _currentIterationId = Guid.Empty;
     private bool _isDisposed = false;
 
-
     public ResultStorageProvider(ILogger<ResultStorageProvider> logger, IEngineHost engineHost)
     {
         _logger = logger;
@@ -30,30 +29,17 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
 
     public void Add(PortResult result)
     {
-        bool isNewWorkflow = false;
-        WorkflowResult? activeWorkflowResult = _runningWorkflowResults.FirstOrDefault(wr => wr.IterationId.Equals(_currentIterationId));
-
-        if (activeWorkflowResult == null)
-        {
-            isNewWorkflow = true;
-            activeWorkflowResult = new WorkflowResult
-            {
-                IterationId = _currentIterationId,
-                StartTime = DateTime.UtcNow
-            };
-        }
+        WorkflowResult? activeWorkflowResult = _runningWorkflowResults.First(wr => wr.IterationId.Equals(_currentIterationId));
 
         if (activeWorkflowResult.PortResults.Any(pr => pr.Id.Equals(result.Id, StringComparison.InvariantCultureIgnoreCase)))
         {
             throw new InvalidOperationException($"PortResult with id '{result.Id}' already exists.");
         }
 
-        activeWorkflowResult.PortResults.Add(result);
-        if (isNewWorkflow)
+        if(!activeWorkflowResult.PortResults.TryAdd(result))
         {
-            _runningWorkflowResults = _runningWorkflowResults.Add(activeWorkflowResult);
+            throw new InvalidOperationException($"Failed to add PortResult with id '{result.Id}'.");
         }
-
     }
 
     public void Dispose()
@@ -66,6 +52,8 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
     {
         if (disposing && !_isDisposed)
         {
+             _engineHost.IterationStarted -= OnIterationStarted;
+            _engineHost.IterationFinished -= OnIterationFinished;
             _executionCancellationTokenSource.Cancel();
             _executionTask?.Wait();
             _executionTask?.Dispose();
@@ -83,7 +71,7 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
             }
             else if (_finishedWorkflowResults.TryDequeue(out WorkflowResult? finishedResult))
             {
-                _logger.LogInformation(new EventId((int)EventLogType.Result), "Workflow result for iteration '{iterationId}' processing...", finishedResult.IterationId);
+                _logger.LogInformation(new EventId((int)EventLogType.Result), "Workflow result for iteration '{iterationId}' processing...", finishedResult);
             }
         }
     }
@@ -91,6 +79,17 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
     private void OnIterationStarted(object? sender, IterationStartedEventArgs e)
     {
         _currentIterationId = e.IterationId;
+        WorkflowResult? activeWorkflowResult = _runningWorkflowResults.FirstOrDefault(wr => wr.IterationId.Equals(_currentIterationId));
+        if (activeWorkflowResult == null)
+        {
+            activeWorkflowResult = new WorkflowResult
+            {
+                IterationId = _currentIterationId,
+                StartTime = DateTime.UtcNow
+            };
+
+            _runningWorkflowResults = _runningWorkflowResults.Add(activeWorkflowResult);
+        }
     }
 
     private void OnIterationFinished(object? sender, IterationFinishedEventArgs e)
@@ -103,7 +102,9 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
         }
 
         finishedWorkflow.StopTime = DateTime.UtcNow;
+        finishedWorkflow.ElapsedMs = (int)(finishedWorkflow.StopTime - finishedWorkflow.StartTime).TotalMilliseconds;
         _runningWorkflowResults = _runningWorkflowResults.Remove(finishedWorkflow);
         _finishedWorkflowResults.Enqueue(finishedWorkflow);
+        _logger.LogInformation(new EventId((int)EventLogType.Result), "Workflow result for iteration '{iterationId}' finished.", e.IterationId);
     }
 }
