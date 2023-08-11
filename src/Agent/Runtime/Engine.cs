@@ -111,9 +111,6 @@ internal sealed class Engine : IEngine
         {
             _logger.LogTrace(new EventId((int)EventLogType.Engine), "Engine [{Id}] execution started.", Meta.Id);
         }
-
-        Meta.State = EngineState.Running;
-        StateChanged?.Invoke(this, Meta.State);
         return true;
     }
 
@@ -195,6 +192,8 @@ internal sealed class Engine : IEngine
 
     private async ValueTask ExecutePathAsync(IEnumerable<PathItem> pathItems, CancellationToken stopToken, CancellationToken abortToken)
     {
+        Meta.State = EngineState.Running;
+        StateChanged?.Invoke(this, Meta.State);
         var executers = new HashSet<PathExecuter>();
         var executingTasks = new List<Task<bool>>();
 
