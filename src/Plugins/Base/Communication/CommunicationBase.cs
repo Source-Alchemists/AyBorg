@@ -10,7 +10,7 @@ public abstract class CommunicationBase : IStepBody, IAfterInitialized, IBeforeS
 {
     private readonly ILogger<CommunicationBase> _logger;
     protected readonly SelectPort _devicePort = new("Device", PortDirection.Input, null!);
-    protected readonly StringPort _messageIdPort = new("Id", PortDirection.Input, string.Empty);
+    protected readonly StringPort _messageIdPort = new("Id", PortDirection.Input, "topic/id");
     private string _lastDeviceId = string.Empty;
     private bool _isDisposed = false;
     protected ImmutableList<IPort> _ports = ImmutableList.Create<IPort>();
