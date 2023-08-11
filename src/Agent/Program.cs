@@ -1,11 +1,13 @@
 using AyBorg.Agent;
 using AyBorg.Agent.Guards;
+using AyBorg.Agent.Result;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Services.gRPC;
 using AyBorg.Data.Agent;
 using AyBorg.Data.Mapper;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
+using AyBorg.SDK.Common.Result;
 using AyBorg.SDK.Communication.gRPC;
 using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Logging.Analytics;
@@ -54,6 +56,7 @@ builder.Services.AddSingleton<IEngineHost, EngineHost>();
 builder.Services.AddSingleton<ICacheService, CacheService>();
 builder.Services.AddSingleton<ICommunicationStateProvider, CommunicationStateProvider>();
 builder.Services.AddSingleton<IDeviceManager, DeviceManager>();
+builder.Services.AddSingleton<IResultStorageProvider, ResultStorageProvider>();
 
 builder.Services.AddTransient<IJwtConsumer, JwtConsumer>();
 // Repositories

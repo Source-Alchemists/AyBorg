@@ -1,12 +1,11 @@
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Projects;
 
 namespace AyBorg.Data.Mapper;
 
-public class RuntimeMapper : IRuntimeMapper
+public class RuntimeMapper : SDK.Common.IRuntimeMapper
 {
-    public Step FromRuntime(IStepProxy stepProxy, bool skipPorts = false)
+    public Step FromRuntime(SDK.Common.IStepProxy stepProxy, bool skipPorts = false)
     {
         var ports = new List<Port>();
         if (!skipPorts)

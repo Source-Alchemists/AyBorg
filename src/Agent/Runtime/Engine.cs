@@ -22,6 +22,11 @@ internal sealed class Engine : IEngine
     private bool _isDisposed = false;
 
     /// <summary>
+    /// Called when the iteration is started.
+    /// </summary>
+    public event EventHandler<IterationStartedEventArgs>? IterationStarted;
+
+    /// <summary>
     /// Called when the iteration is finished.
     /// </summary>
     public event EventHandler<IterationFinishedEventArgs>? IterationFinished;
@@ -201,11 +206,13 @@ internal sealed class Engine : IEngine
                 _logger.LogTrace(new EventId((int)EventLogType.Engine), "Engine [{Id}] iteration [{_iterationId}] started.", Meta.Id, iterationId);
             }
 
+            IterationStarted?.Invoke(this, new IterationStartedEventArgs(Meta.Id, iterationId));
+
             await StartExecuteAllPathItemsAsync(_pathExecuterLogger, iterationId, executers, pathItems, executingTasks, abortToken);
             await WaitAndClearExecutors(executers, executingTasks);
 
             // All steps are executed and the iteration is finished.
-            IterationFinished?.Invoke(this, new IterationFinishedEventArgs(iterationId, executers.All(e => e.State == PathExecutionState.Completed)));
+            IterationFinished?.Invoke(this, new IterationFinishedEventArgs(Meta.Id, iterationId, executers.All(e => e.State == PathExecutionState.Completed)));
 
             if (_logger.IsEnabled(LogLevel.Trace))
             {

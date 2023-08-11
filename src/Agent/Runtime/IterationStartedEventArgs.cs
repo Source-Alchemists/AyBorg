@@ -1,6 +1,6 @@
 namespace AyBorg.Agent.Runtime;
 
-public sealed class IterationFinishedEventArgs : EventArgs
+public sealed class IterationStartedEventArgs : EventArgs
 {
     /// <summary>
     /// Gets the engine identifier.
@@ -13,20 +13,13 @@ public sealed class IterationFinishedEventArgs : EventArgs
     public Guid IterationId { get; }
 
     /// <summary>
-    /// Gets the result.
-    /// </summary>
-    public bool Success { get; }
-
-    /// <summary>
-    /// Initializes a new instance of the <see cref="IterationFinishedEventArgs"/> class.
+    /// Initializes a new instance of the <see cref="IterationStartedEventArgs"/> class.
     /// </summary>
     /// <param name="engineId">The engine identifier.</param>
     /// <param name="iterationId">The iteration identifier.</param>
-    /// <param name="success">if set to <c>true</c> [success].</param>
-    public IterationFinishedEventArgs(Guid engineId, Guid iterationId, bool success)
+    public IterationStartedEventArgs(Guid engineId, Guid iterationId)
     {
         EngineId = engineId;
         IterationId = iterationId;
-        Success = success;
     }
 }

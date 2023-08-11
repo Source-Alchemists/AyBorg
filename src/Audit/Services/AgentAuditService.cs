@@ -30,12 +30,8 @@ public sealed class AgentAuditService : IAgentAuditService
     {
         try
         {
-            ProjectAuditRecord record = _projectAuditRepository.Find(auditId);
-            if (record == null)
-            {
-                throw new AuditException("Failed to find audit record.");
-            }
-            if(record.Timestamp < DateTime.UtcNow - TimeSpan.FromHours(1))
+            ProjectAuditRecord record = _projectAuditRepository.Find(auditId) ?? throw new AuditException("Failed to find audit record.");
+            if (record.Timestamp < DateTime.UtcNow - TimeSpan.FromHours(1))
             {
                 throw new AuditException("Audit record is older than 1 hour and can not be removed anymore.");
             }

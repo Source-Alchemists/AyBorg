@@ -183,12 +183,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid step id"));
         }
 
-        IStepProxy stepProxy = await _flowService.AddStepAsync(stepId, request.X, request.Y);
-        if (stepProxy == null)
-        {
-            throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
-        }
-
+        IStepProxy stepProxy = await _flowService.AddStepAsync(stepId, request.X, request.Y) ?? throw new RpcException(new Status(StatusCode.NotFound, "Step not found"));
         return new AddFlowStepResponse
         {
             Step = _rpcMapper.ToRpc(_runtimeMapper.FromRuntime(stepProxy))
@@ -243,11 +238,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
                 throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid target id"));
             }
 
-            PortLink newPortLink = await _flowService.LinkPortsAsync(sourceId, targetId);
-            if(newPortLink == null)
-            {
-                throw new RpcException(new Status(StatusCode.NotFound, "Invalid link"));
-            }
+            PortLink newPortLink = await _flowService.LinkPortsAsync(sourceId, targetId) ?? throw new RpcException(new Status(StatusCode.NotFound, "Invalid link"));
             return new LinkFlowPortsResponse
             {
                 LinkId = newPortLink.Id.ToString()

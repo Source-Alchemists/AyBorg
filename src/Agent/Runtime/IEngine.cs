@@ -5,9 +5,14 @@ namespace AyBorg.Agent.Runtime;
 public interface IEngine : IDisposable
 {
     /// <summary>
+    /// Called when the iteration is started.
+    /// </summary>
+    event EventHandler<IterationStartedEventArgs> IterationStarted;
+
+    /// <summary>
     /// Called when the iteration is finished.
     /// </summary>
-    event EventHandler<IterationFinishedEventArgs>? IterationFinished;
+    event EventHandler<IterationFinishedEventArgs> IterationFinished;
 
     /// <summary>
     /// Called when the engine state is changed.

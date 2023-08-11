@@ -1,3 +1,4 @@
+using AyBorg.Agent.Runtime;
 using AyBorg.SDK.Projects;
 using AyBorg.SDK.System.Runtime;
 
@@ -5,6 +6,16 @@ namespace AyBorg.Agent.Services;
 
 public interface IEngineHost : IDisposable
 {
+    /// <summary>
+    /// Occurs when [iteration started].
+    /// </summary>
+    event EventHandler<IterationStartedEventArgs> IterationStarted;
+
+    /// <summary>
+    /// Occurs when [iteration finished].
+    /// </summary>
+    event EventHandler<IterationFinishedEventArgs> IterationFinished;
+
     /// <summary>
     /// Gets the active project.
     /// </summary>
