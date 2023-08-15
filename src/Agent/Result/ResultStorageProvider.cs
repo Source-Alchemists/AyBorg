@@ -164,6 +164,5 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
         finishedWorkflow.Success = e.Success;
         _runningWorkflowResults = _runningWorkflowResults.Remove(finishedWorkflow);
         _finishedWorkflowResults.Enqueue(finishedWorkflow);
-        _logger.LogInformation(new EventId((int)EventLogType.Result), "Workflow result for iteration '{iterationId}' finished.", e.IterationId);
     }
 }
