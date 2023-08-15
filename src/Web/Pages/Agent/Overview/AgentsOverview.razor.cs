@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Components;
 using AyBorg.Web.Services.Agent;
+using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Overview;
 
@@ -9,6 +9,7 @@ public partial class AgentsOverview : ComponentBase, IAsyncDisposable
 
     private Task _updateTask = null!;
     private bool _terminated = false;
+    private bool _isDisposed = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -29,10 +30,21 @@ public partial class AgentsOverview : ComponentBase, IAsyncDisposable
 
     public async ValueTask DisposeAsync()
     {
-        _terminated = true;
-        if(_updateTask != null)
+        await DisposeAsync(true);
+        GC.SuppressFinalize(this);
+    }
+
+    private async ValueTask DisposeAsync(bool disposing)
+    {
+        if (disposing && !_isDisposed)
         {
-            await _updateTask;
+            _terminated = true;
+            if (_updateTask != null)
+            {
+                await _updateTask;
+                _updateTask?.Dispose();
+            }
+            _isDisposed = true;
         }
     }
 }

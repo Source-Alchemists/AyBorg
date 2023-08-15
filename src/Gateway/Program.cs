@@ -54,16 +54,22 @@ foreach (KeyValuePair<string, string?> config in builder.Configuration.AsEnumera
 app.UseAuthorization();
 app.UseJwtMiddleware();
 
+// Gateway
 app.MapGrpcService<RegisterServiceV1>();
+// Agent
 app.MapGrpcService<ProjectManagementPassthroughServiceV1>();
 app.MapGrpcService<ProjectSettingsPassthroughServiceV1>();
 app.MapGrpcService<EditorPassthroughServiceV1>();
 app.MapGrpcService<RuntimePassthroughServiceV1>();
 app.MapGrpcService<StoragePassthroughServiceV1>();
 app.MapGrpcService<NotifyPassthroughServiceV1>();
-app.MapGrpcService<EventLogPassthroughServiceV1>();
-app.MapGrpcService<AuditPassthroughServiceV1>();
 app.MapGrpcService<DeviceManagerPassthroughServiceV1>();
+// Analytics
+app.MapGrpcService<EventLogPassthroughServiceV1>();
+// Audit
+app.MapGrpcService<AuditPassthroughServiceV1>();
+// Result
+app.MapGrpcService<AyBorg.Gateway.Services.Result.StoragePassthroughServiceV1>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists

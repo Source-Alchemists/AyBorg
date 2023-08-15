@@ -1,24 +1,17 @@
-using System.Buffers;
-using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
-using AyBorg.Data.Mapper;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Models;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.gRPC;
-using AyBorg.SDK.Projects;
-using Google.Protobuf;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using ImageTorque;
-using Microsoft.IO;
 
 namespace AyBorg.Agent.Services.gRPC;
 
 public sealed class EditorServiceV1 : Editor.EditorBase
 {
-    private static readonly RecyclableMemoryStreamManager s_memoryManager = new();
     private readonly ILogger<EditorServiceV1> _logger;
     private readonly IPluginsService _pluginsService;
     private readonly IFlowService _flowService;
@@ -302,68 +295,11 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             return;
         }
 
-        await SendImageAsync(originalImage, responseStream, request.AsThumbnail, context.CancellationToken);
+        await ImageStreamer.SendImageAsync(originalImage, responseStream, request.AsThumbnail, context.CancellationToken);
 
         if (isOriginalPortModelCreated)
         {
             portModel.Dispose();
-        }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static async ValueTask SendImageAsync(Image originalImage, IServerStreamWriter<ImageChunkDto> responseStream, bool asThumbnail, CancellationToken cancellationToken)
-    {
-        const int chunkSize = 32768;
-        const int maxSize = 250;
-        IImage targetImage = null!;
-        try
-        {
-            if (originalImage.Width <= maxSize && originalImage.Height <= maxSize || !asThumbnail)
-            {
-                targetImage = originalImage;
-            }
-            else
-            {
-                originalImage.CalculateClampSize(maxSize, out int w, out int h);
-                targetImage = originalImage.Resize(w, h, ResizeMode.NearestNeighbor);
-            }
-
-            using MemoryStream stream = s_memoryManager.GetStream();
-            targetImage.Save(stream, ImageTorque.Processing.EncoderType.Jpeg);
-            stream.Position = 0;
-            long fullStreamLength = stream.Length;
-            long bytesToSend = fullStreamLength;
-            int bufferSize = fullStreamLength < chunkSize ? (int)fullStreamLength : chunkSize;
-            int offset = 0;
-            using IMemoryOwner<byte> memoryOwner = MemoryPool<byte>.Shared.Rent((int)fullStreamLength);
-            await stream.ReadAsync(memoryOwner.Memory, cancellationToken);
-
-            while (!cancellationToken.IsCancellationRequested && bytesToSend > 0)
-            {
-                if (bytesToSend < bufferSize)
-                {
-                    bufferSize = (int)bytesToSend;
-                }
-
-                Memory<byte> slice = memoryOwner.Memory.Slice(offset, bufferSize);
-
-                bytesToSend -= bufferSize;
-                offset += bufferSize;
-
-                await responseStream.WriteAsync(new ImageChunkDto
-                {
-                    Data = UnsafeByteOperations.UnsafeWrap(slice),
-                    FullWidth = originalImage.Width,
-                    FullHeight = originalImage.Height,
-                    FullStreamLength = fullStreamLength,
-                    ScaledWidth = targetImage.Width,
-                    ScaledHeight = targetImage.Height
-                }, cancellationToken);
-            }
-        }
-        finally
-        {
-            targetImage?.Dispose();
         }
     }
 }

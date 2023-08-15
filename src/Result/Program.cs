@@ -1,5 +1,6 @@
 
 using AyBorg.Result;
+using AyBorg.Result.Services;
 using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
@@ -19,7 +20,7 @@ builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
 
 WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.MapGrpcService<StorageServiceV1>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 app.Run();
