@@ -33,13 +33,14 @@ public sealed class StoragePassthroughServiceV1 : Storage.StorageBase
         await Parallel.ForEachAsync(channels, async (channel, token) =>
         {
             Storage.StorageClient client = _grpcChannelService.CreateClient<Storage.StorageClient>(channel.ServiceUniqueName);
-            AsyncClientStreamingCall<ImageChunkDto, Empty> requestCall = client.AddImage(cancellationToken: token);
-            await foreach (ImageChunkDto? imageChunk in requestStream.ReadAllAsync(cancellationToken: token))
+            using AsyncClientStreamingCall<ImageChunkDto, Empty> requestCall = client.AddImage(cancellationToken: context.CancellationToken);
+            await foreach (ImageChunkDto? imageChunk in requestStream.ReadAllAsync(cancellationToken: context.CancellationToken))
             {
-                await requestCall.RequestStream.WriteAsync(imageChunk, token);
+                await requestCall.RequestStream.WriteAsync(imageChunk, context.CancellationToken);
             }
 
             await requestCall.RequestStream.CompleteAsync();
+            await requestCall;
         });
 
         return new Empty();

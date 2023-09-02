@@ -4,6 +4,7 @@ using AyBorg.Result.Services;
 using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
+using StackExchange.Redis;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,12 @@ builder.AddAyBorgAnalyticsLogger();
 builder.Services.AddHostedService<RegistryBackgroundService>();
 
 builder.Services.AddSingleton<IServiceConfiguration, ServiceConfiguration>();
+builder.Services.AddSingleton<IDatabase>(cfg =>
+{
+    ConnectionMultiplexer redisConnection = ConnectionMultiplexer.Connect(builder.Configuration.GetConnectionString("Redis")!);
+    return redisConnection.GetDatabase();
+});
+builder.Services.AddSingleton<IRepository, RedisRepository>();
 
 WebApplication app = builder.Build();
 

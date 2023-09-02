@@ -90,12 +90,13 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
                 try
                 {
                     string resultId = finishedResult.Id.ToString();
+                    string iterationId = finishedResult.IterationId.ToString();
 
                     var request = new AddRequest
                     {
                         Id = resultId,
                         AgentUniqueName = _serviceConfiguration.UniqueName,
-                        IterationId = finishedResult.IterationId.ToString(),
+                        IterationId = iterationId,
                         StartTime = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(finishedResult.StartTime),
                         StopTime = Google.Protobuf.WellKnownTypes.Timestamp.FromDateTime(finishedResult.StopTime),
                         ElapsedMs = finishedResult.ElapsedMs,
@@ -120,7 +121,8 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
                         {
                             var cacheImage = (CacheImage)portResult.Port.Value!;
                             using Grpc.Core.AsyncClientStreamingCall<ImageChunkDto, Google.Protobuf.WellKnownTypes.Empty> imageStreamCall = _storageClient.AddImage(cancellationToken: cancellationToken);
-                            await ImageStreamer.SendImageAsync((Image)cacheImage.OriginalImage!, imageStreamCall.RequestStream, resultId, portResult.ScaleFactor, cancellationToken);
+                            await ImageStreamer.SendImageAsync((Image)cacheImage.OriginalImage!, imageStreamCall.RequestStream, iterationId, portResult.Id, portResult.ScaleFactor, cancellationToken);
+                            await imageStreamCall;
                         }
                     }
 

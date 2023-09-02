@@ -69,7 +69,7 @@ internal static class ImageStreamer
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask SendImageAsync(Image originalImage, IClientStreamWriter<Ayborg.Gateway.Result.V1.ImageChunkDto> responseStream, string resultId, float scaleFactor, CancellationToken cancellationToken)
+    public static async ValueTask SendImageAsync(Image originalImage, IClientStreamWriter<Ayborg.Gateway.Result.V1.ImageChunkDto> responseStream, string iterationId, string portId, float scaleFactor, CancellationToken cancellationToken)
     {
         IImage targetImage = null!;
         try
@@ -109,7 +109,8 @@ internal static class ImageStreamer
 
                 await responseStream.WriteAsync(new Ayborg.Gateway.Result.V1.ImageChunkDto
                 {
-                    ResultId = resultId,
+                    IterationId = iterationId,
+                    ResultId = portId,
                     Data = UnsafeByteOperations.UnsafeWrap(slice),
                     FullWidth = originalImage.Width,
                     FullHeight = originalImage.Height,

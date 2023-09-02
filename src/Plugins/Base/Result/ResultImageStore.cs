@@ -6,13 +6,13 @@ using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.Base;
 
-public sealed class ResultStore : ResultStoreBase
+public sealed class ResultImageStore : ResultStoreBase
 {
-    private readonly StringPort _valuePort = new("Value", PortDirection.Input, string.Empty);
+    private readonly ImagePort _valuePort = new("Value", PortDirection.Input, null!);
 
-    public override string Name => "Result.Store";
+    public override string Name => "Result.Image.Store";
 
-    public ResultStore(ILogger<ResultStore> logger, IResultStorageProvider resultStorageProvider, IRuntimeMapper runtimeMapper)
+    public ResultImageStore(ILogger<ResultStore> logger, IResultStorageProvider resultStorageProvider, IRuntimeMapper runtimeMapper)
                 : base(logger, resultStorageProvider, runtimeMapper)
     {
         _ports = _ports.Add(_valuePort);

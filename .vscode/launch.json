@@ -42,6 +42,21 @@
             }
         },
         {
+          "name": ".NET Core Launch (Result)",
+          "type": "coreclr",
+          "request": "launch",
+          "preLaunchTask": "build-result",
+          // If you have changed target frameworks, make sure to update the program path.
+          "program": "${workspaceFolder}/src/Result/bin/Debug/net7.0/AyBorg.Result.dll",
+          "args": [],
+          "cwd": "${workspaceFolder}/src/Result",
+          "stopAtEntry": false,
+          "requireExactSource": false,
+          "env": {
+              "ASPNETCORE_ENVIRONMENT": "Development"
+          }
+      },
+        {
             "name": ".NET Core Launch (Gateway)",
             "type": "coreclr",
             "request": "launch",
