@@ -62,6 +62,7 @@ public sealed class StorageServiceV1 : Storage.StorageBase
                     memoryOwner = MemoryPool<byte>.Shared.Rent((int)chunkDto.FullStreamLength);
                     imageResult = new ImageResult
                     {
+                        ServiceUniqueName = chunkDto.AgentUniqueName,
                         IterationId = chunkDto.IterationId,
                         PortId = chunkDto.ResultId,
                         Width = chunkDto.FullWidth,

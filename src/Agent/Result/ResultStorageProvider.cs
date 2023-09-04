@@ -121,7 +121,7 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
                         {
                             var cacheImage = (CacheImage)portResult.Port.Value!;
                             using Grpc.Core.AsyncClientStreamingCall<ImageChunkDto, Google.Protobuf.WellKnownTypes.Empty> imageStreamCall = _storageClient.AddImage(cancellationToken: cancellationToken);
-                            await ImageStreamer.SendImageAsync((Image)cacheImage.OriginalImage!, imageStreamCall.RequestStream, iterationId, portResult.Id, portResult.ScaleFactor, cancellationToken);
+                            await ImageStreamer.SendImageAsync((Image)cacheImage.OriginalImage!, imageStreamCall.RequestStream, _serviceConfiguration.UniqueName, iterationId, portResult.Id, portResult.ScaleFactor, cancellationToken);
                             await imageStreamCall;
                         }
                     }

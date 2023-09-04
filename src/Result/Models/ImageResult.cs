@@ -5,6 +5,7 @@ namespace AyBorg.Result;
 
 public record ImageResult
 {
+    public string ServiceUniqueName { get; init; } = string.Empty;
     public string IterationId { get; init; } = string.Empty;
     public string PortId { get; init; } = string.Empty;
     public IMemoryOwner<byte> Data { get; init; } = null!;

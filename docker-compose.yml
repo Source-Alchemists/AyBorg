@@ -19,11 +19,10 @@ services:
       - ./misc/demo/mosquitto/config:/mosquitto/config:ro
 
   rediscache:
-    image: redis:7.0.12-bookworm
+    image: redis/redis-stack-server:edge
     restart: always
     ports:
       - 6379:6379
-    command: redis-server --save 20 1 --loglevel warning --requirepass REPLACE_ME
     volumes:
       - rediscache:/data
 
