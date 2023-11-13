@@ -8,5 +8,5 @@ docs:
 - title: Change your password
   url: /docs/getting-started/change-password
 
-  - title: Reconfigure Elastic fleet output
+- title: Reconfigure Elastic fleet output
   url: /docs/getting-started/reconfigure-elastic-fleet-output
