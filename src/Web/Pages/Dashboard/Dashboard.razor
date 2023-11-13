@@ -7,3 +7,27 @@
 <div class="page-loading-bar">
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
 </div>
+
+<MudToolBar Class="px-0">
+    <MudGrid>
+        <MudItem xs="4"></MudItem>
+        <MudItem xs="4"></MudItem>
+        <MudItem xs="4">
+            <MudTooltip Text="Widgets">
+                <MudIconButton Icon="@Icons.Filled.Widgets" Color="Color.Primary" />
+            </MudTooltip>
+            <MudTooltip Text="Dashboard Settings">
+                <MudIconButton Icon="@Icons.Filled.Settings" Color="Color.Default" />
+            </MudTooltip>
+        </MudItem>
+    </MudGrid>
+</MudToolBar>
+
+<MudGrid class="grid-container">
+    <MudItem xs="12" md="4" xl="3">
+        <WidgetsSelection />
+    </MudItem>
+    <MudItem xs="12" md="8" lg="8" xl="9">
+
+    </MudItem>
+</MudGrid>

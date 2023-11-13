@@ -49,8 +49,8 @@ public partial class StepsSelection : ComponentBase
         {
             if(c != "All")
             {
-            int count = _availableSteps.Count(s => s.Categories.Contains(c));
-            _availableCategories.Add(c, count);
+                int count = _availableSteps.Count(s => s.Categories.Contains(c));
+                _availableCategories.Add(c, count);
             }
         }
     }
@@ -62,7 +62,6 @@ public partial class StepsSelection : ComponentBase
         {
             _filteredSteps = _filteredSteps.Where(s => s.Categories.Contains(_selectedCategories.First())).OrderBy(c => c.Name);
         }
-
     }
 
     private static void OnDragStart(DragEventArgs _, Step step)

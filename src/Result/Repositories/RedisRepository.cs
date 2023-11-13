@@ -10,8 +10,8 @@ public sealed class RedisRepository : IRepository
     private const string WORKFLOWRESULT_INDEX = "workflowResult_index";
     private const string PORTRESULT_INDEX = "portResult_index";
     private const string IMAGERESULT_INDEX = "imageResult_index";
-    private const string WORKFLOW_ELAPSED_TIME_KEY = "elapsed_ms";
-    private const string PORT_VALUE_KEY = "value";
+    private const string WORKFLOW_ELAPSED_TIME_KEY = "ts:elapsed_ms";
+    private const string PORTT_TIMESERIES_KEY = "ts";
     private readonly IDatabase _database;
     private readonly int _maxCacheWorkflowResults;
     private readonly long _maxStatisticsRetentionTime;
@@ -65,7 +65,7 @@ public sealed class RedisRepository : IRepository
 
             if (isNumeric)
             {
-                await timeSeriesCommand.AddAsync($"{result.ServiceUniqueName}:{PORT_VALUE_KEY}:{port.Name}", new NRedisStack.DataTypes.TimeStamp(workflowResultTimestamp), doubleValue, _maxStatisticsRetentionTime);
+                await timeSeriesCommand.AddAsync($"{result.ServiceUniqueName}:{PORTT_TIMESERIES_KEY}:{port.Name}", new NRedisStack.DataTypes.TimeStamp(workflowResultTimestamp), doubleValue, _maxStatisticsRetentionTime);
             }
         }
 
@@ -121,9 +121,7 @@ public sealed class RedisRepository : IRepository
         await PrepareDeleteEntries($"{serviceUniqueName}:{PORTRESULT_INDEX}", transaction, tmpPortKeys, ":portResult:");
         await PrepareDeleteEntries($"{serviceUniqueName}:{IMAGERESULT_INDEX}", transaction, tmpImageKeys, ":imageResult:");
 
-        long removeFromTimestamp = currentTimestamp - _maxStatisticsRetentionTime;
-        _ = transaction.SortedSetRemoveRangeByScoreAsync(SERVICE_INDEX, 0, removeFromTimestamp);
-        _ = transaction.SortedSetRemoveRangeByScoreAsync($"{serviceUniqueName}:{WORKFLOW_ELAPSED_TIME_KEY}", 0, removeFromTimestamp);
+        _ = transaction.SortedSetRemoveRangeByScoreAsync(SERVICE_INDEX, 0, currentTimestamp - _maxStatisticsRetentionTime);
 
         await transaction.ExecuteAsync();
     }
