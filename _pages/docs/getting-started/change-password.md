@@ -16,3 +16,4 @@ permalink: "/docs/getting-started/change-password.html"
 ## Next steps
 
 - [Create a new project]({{site.baseurl}}/docs/user-guide/agent-create-project)
+- [Reconfigure Elastic Fleet output]({{site.baseurl}}/docs/getting-started/reconfigure-elastic-fleet-output)

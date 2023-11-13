@@ -45,3 +45,4 @@ dotnet run -c release
 
 - [First start]({{site.baseurl}}/docs/getting-started/first-start)
 - [Change your password]({{site.baseurl}}/docs/getting-started/change-password)
+- [Reconfigure Elastic Fleet output]({{site.baseurl}}/docs/getting-started/reconfigure-elastic-fleet-output)
