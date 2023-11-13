@@ -11,17 +11,37 @@ using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.Analytics;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using Elastic.Apm.AspNetCore;
+using Elastic.Apm.GrpcClient;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+string serviceUniqueName = builder.Configuration.GetValue("AyBorg:Service:UniqueName", "AyBorg.Web")!;
+
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
+
+builder.Logging.AddOpenTelemetry(options => {
+    options.SetResourceBuilder(
+        ResourceBuilder.CreateDefault()
+        .AddService(serviceUniqueName));
+});
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(serviceUniqueName))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation())
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation());
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     _ = databaseProvider switch
@@ -118,6 +138,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseElasticApm(builder.Configuration, new GrpcClientDiagnosticSubscriber());
 
 app.MapControllers();
 app.MapBlazorHub();

@@ -2,8 +2,28 @@ using AyBorg.Analytics.Services;
 using AyBorg.Data.Analytics;
 using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.System.Configuration;
+using Elastic.Apm.AspNetCore;
+using Elastic.Apm.GrpcClient;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+
+string serviceUniqueName = builder.Configuration.GetValue("AyBorg:Service:UniqueName", "AyBorg.Analytics")!;
+
+builder.Logging.AddOpenTelemetry(options => {
+    options.SetResourceBuilder(
+        ResourceBuilder.CreateDefault()
+        .AddService(serviceUniqueName));
+});
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(serviceUniqueName))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation())
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation());
 
 // Add services to the container.
 builder.Services.AddGrpc();
@@ -22,6 +42,8 @@ builder.Services.AddSingleton<IEventLogRepository, EventLogRepository>();
 builder.Services.AddSingleton<IEventStorage, EventStorage>();
 
 WebApplication app = builder.Build();
+
+app.UseElasticApm(builder.Configuration, new GrpcClientDiagnosticSubscriber());
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<EventLogServiceV1>();

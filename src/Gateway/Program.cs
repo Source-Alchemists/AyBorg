@@ -7,12 +7,32 @@ using AyBorg.Gateway.Services.Audit;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
+using Elastic.Apm.AspNetCore;
+using Elastic.Apm.GrpcClient;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+string serviceUniqueName = builder.Configuration.GetValue("AyBorg:Service:UniqueName", "AyBorg.Gateway")!;
+
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
+
+builder.Logging.AddOpenTelemetry(options => {
+    options.SetResourceBuilder(
+        ResourceBuilder.CreateDefault()
+        .AddService(serviceUniqueName));
+});
+
+builder.Services.AddOpenTelemetry()
+    .ConfigureResource(resource => resource.AddService(serviceUniqueName))
+    .WithTracing(tracing => tracing
+        .AddAspNetCoreInstrumentation())
+    .WithMetrics(metrics => metrics
+        .AddAspNetCoreInstrumentation());
 
 builder.Services.AddDbContextFactory<RegistryContext>(options =>
     _ = databaseProvider switch
@@ -53,6 +73,8 @@ foreach (KeyValuePair<string, string?> config in builder.Configuration.AsEnumera
 
 app.UseAuthorization();
 app.UseJwtMiddleware();
+
+app.UseElasticApm(builder.Configuration, new GrpcClientDiagnosticSubscriber());
 
 app.MapGrpcService<RegisterServiceV1>();
 app.MapGrpcService<ProjectManagementPassthroughServiceV1>();
