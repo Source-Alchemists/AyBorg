@@ -29,6 +29,6 @@ USER $USERNAME
 ENV "ASPNETCORE_URLS"=""
 ENV "Kestrel:Endpoints:Http:Url"="http://*:6010"
 ENV "Kestrel:Endpoints:Https:Url"="https://*:6011"
-ENV "AyBorg:Service:Url"="https://web-1:6011"
-ENV "AyBorg:Gateway:Url"="http://gateway-1:6000"
-ENTRYPOINT ["dotnet", "AyBorg.Web.dll"]
+ENV "AyBorg:Service:Url"="https://web:6011"
+ENV "AyBorg:Gateway:Url"="http://gateway:6000"
+ENTRYPOINT ["./AyBorg.Web"]
