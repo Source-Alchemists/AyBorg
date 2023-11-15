@@ -39,4 +39,4 @@ ENV "Kestrel:Endpoints:gRPC:Url"="http://*:6020"
 ENV "AyBorg:Service:Url"="http://agent:6020"
 ENV "AyBorg:Gateway:Url"="http://gateway-1:6000"
 ENV "AyBorg:Plugins:Folder"="/bin/AyBorg/plugins"
-ENTRYPOINT ["dotnet", "AyBorg.Agent.dll"]
+ENTRYPOINT ["./AyBorg.Agent"]

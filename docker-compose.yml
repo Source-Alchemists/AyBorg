@@ -71,9 +71,9 @@ services:
         find . -type d -exec chmod 750 \{\} \;;
         find . -type f -exec chmod 640 \{\} \;;
         echo "Waiting for Elasticsearch availability";
-        until curl -s --cacert config/certs/ca/ca.crt https://es01:9200 | grep -q "missing authentication credentials"; do sleep 30; done;
+        until curl -s --cacert config/certs/ca/ca.crt ${ES_HOST}:${ES_PORT} | grep -q "missing authentication credentials"; do sleep 30; done;
         echo "Setting kibana_system password";
-        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" https://es01:9200/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
+        until curl -s -X POST --cacert config/certs/ca/ca.crt -u "elastic:${ELASTIC_PASSWORD}" -H "Content-Type: application/json" ${ES_HOST}:${ES_PORT}/_security/user/kibana_system/_password -d "{\"password\":\"${KIBANA_PASSWORD}\"}" | grep -q "^{}"; do sleep 10; done;
         echo "All done!";
       '
     healthcheck:
@@ -102,10 +102,6 @@ services:
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - bootstrap.memory_lock=true
       - xpack.security.enabled=true
-      - xpack.security.http.ssl.enabled=true
-      - xpack.security.http.ssl.key=certs/es01/es01.key
-      - xpack.security.http.ssl.certificate=certs/es01/es01.crt
-      - xpack.security.http.ssl.certificate_authorities=certs/ca/ca.crt
       - xpack.security.transport.ssl.enabled=true
       - xpack.security.transport.ssl.key=certs/es01/es01.key
       - xpack.security.transport.ssl.certificate=certs/es01/es01.crt
@@ -121,7 +117,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "curl -s --cacert config/certs/ca/ca.crt https://localhost:9200 | grep -q 'missing authentication credentials'",
+          "curl -s --cacert config/certs/ca/ca.crt http://localhost:9200 | grep -q 'missing authentication credentials'",
         ]
       interval: 10s
       timeout: 10s
@@ -143,7 +139,7 @@ services:
       - ${KIBANA_PORT}:5601
     environment:
       - SERVERNAME=kibana
-      - ELASTICSEARCH_HOSTS=https://es01:9200
+      - ELASTICSEARCH_HOSTS=${ES_HOST}:${ES_PORT}
       - ELASTICSEARCH_USERNAME=kibana_system
       - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
       - ELASTICSEARCH_SSL_CERTIFICATEAUTHORITIES=config/certs/ca/ca.crt
@@ -187,7 +183,7 @@ services:
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - ELASTIC_HOSTS=https://es01:9200
+      - ELASTIC_HOSTS=${ES_HOST}:${ES_PORT}
       - KIBANA_HOSTS=https://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
       - CA_CERT=certs/ca/ca.crt
@@ -215,7 +211,7 @@ services:
     environment:
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - ELASTIC_HOSTS=https://es01:9200
+      - ELASTIC_HOSTS=${ES_HOST}:${ES_PORT}
       - KIBANA_HOSTS=https://kibana:5601
       - LOGSTASH_HOSTS=http://logstash01:9600
       - CA_CERT=certs/ca/ca.crt
@@ -242,7 +238,7 @@ services:
       - xpack.monitoring.enabled=false
       - ELASTIC_USER=elastic
       - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
-      - ELASTIC_HOSTS=https://es01:9200
+      - ELASTIC_HOSTS=${ES_HOST}:${ES_PORT}
 
   fleet-server:
     container_name: fleet-server
@@ -270,8 +266,7 @@ services:
       - FLEET_CA=/certs/ca/ca.crt
       - FLEET_ENROLL=1
       - FLEET_INSECURE=true
-      - FLEET_SERVER_ELASTICSEARCH_CA=/certs/ca/ca.crt
-      - FLEET_SERVER_ELASTICSEARCH_HOST=https://es01:9200
+      - FLEET_SERVER_ELASTICSEARCH_HOST=${ES_HOST}:${ES_PORT}
       - FLEET_SERVER_ELASTICSEARCH_INSECURE=true
       - FLEET_SERVER_ENABLE=1
       - FLEET_SERVER_CERT=/certs/fleet-server/fleet-server.crt
@@ -296,7 +291,8 @@ services:
       - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
 
   gateway:
-    container_name: gateway-1
+    container_name: gateway
+    hostname: ayborg_gateway
     build:
       dockerfile: src/Gateway/Dockerfile
     networks:
@@ -306,11 +302,15 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     environment:
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
+      - Kestrel:Endpoints:gRPC:Url=http://ayborg_gateway:6000
+      - AyBorg:Service:Url=http://ayborg_gateway:6000
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
       - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
 
   analytics:
-    container_name: analytics-1
+    container_name: analytics
+    hostname: ayborg_analytics
     build:
       dockerfile: src/Analytics/Dockerfile
     depends_on:
@@ -319,11 +319,16 @@ services:
     networks:
       - backend
     environment:
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
+      - Kestrel:Endpoints:gRPC:Url=http://ayborg_analytics:6001
+      - AyBorg:Service:Url=http://ayborg_analytics:6001
+      - AyBorg:Gateway:Url=http://ayborg_gateway:6000
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
       - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
 
   audit:
-    container_name: audit-1
+    container_name: audit
+    hostname: ayborg_audit
     build:
       dockerfile: src/Audit/Dockerfile
     depends_on:
@@ -332,11 +337,16 @@ services:
     networks:
       - backend
     environment:
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
+      - Kestrel:Endpoints:gRPC:Url=http://ayborg_audit:6002
+      - AyBorg:Service:Url=http://ayborg_audit:6002
+      - AyBorg:Gateway:Url=http://ayborg_gateway:6000
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
       - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
 
   web:
-    container_name: web-1
+    container_name: web
+    hostname: ayborg_web
     build:
       dockerfile: src/Web/Dockerfile
     depends_on:
@@ -348,9 +358,11 @@ services:
       - 6010:6010
       - 6011:6011
     environment:
-      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=1234
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/demo-cert.pfx
+      - AyBorg:Service:Url=https://ayborg_web:6011
+      - AyBorg:Gateway:Url=http://ayborg_gateway:6000
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
       - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
     volumes:
@@ -358,6 +370,7 @@ services:
 
   agent-1:
     container_name: agent-internal-1
+    hostname: ayborg_agent-internal-1
     build:
       dockerfile: src/Agent/Dockerfile
     depends_on:
@@ -368,14 +381,23 @@ services:
     volumes:
       - ./misc/demo/img:/ayborg/img:rw
     environment:
-      - Kestrel:Endpoints:gRPC:Url=http://agent-internal-1:6020
-      - AyBorg:Service:Url=http://agent-internal-1:6020
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
+      - Kestrel:Endpoints:gRPC:Url=http://ayborg_agent-internal-1:6020
+      - AyBorg:Service:Url=http://ayborg_agent-internal-1:6020
       - AyBorg:Service:DisplayName=Agent.Internal-1
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-1
+      - AyBorg:Gateway:Url=http://ayborg_gateway:6000
       - Storage:Folder=/ayborg/img
+      - ElasticApm:Enabled=true
+      - ElasticApm:ServerUrl=http://host.docker.internal:8200
+      - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
+      - Logging:Elasticsearch:ShipTo:NodeUris:0=http://host.docker.internal:9200
+      - Logging:Elasticsearch:ShipTo:Username=elastic
+      - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
   agent-2:
     container_name: agent-internal-2
+    hostname: ayborg_agent-internal-2
     build:
       dockerfile: src/Agent/Dockerfile
     depends_on:
@@ -386,14 +408,23 @@ services:
     volumes:
       - ./misc/demo/img:/ayborg/img:rw
     environment:
-      - Kestrel:Endpoints:gRPC:Url=http://agent-internal-2:6020
-      - AyBorg:Service:Url=http://agent-internal-2:6020
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
+      - Kestrel:Endpoints:gRPC:Url=http://ayborg_agent-internal-2:6020
+      - AyBorg:Service:Url=http://ayborg_agent-internal-2:6020
       - AyBorg:Service:DisplayName=Agent.Internal-2
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-2
+      - AyBorg:Gateway:Url=http://ayborg_gateway:6000
       - Storage:Folder=/ayborg/img
+      - ElasticApm:Enabled=true
+      - ElasticApm:ServerUrl=http://host.docker.internal:8200
+      - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
+      - Logging:Elasticsearch:ShipTo:NodeUris:0=http://host.docker.internal:9200
+      - Logging:Elasticsearch:ShipTo:Username=elastic
+      - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
   agent-3:
     container_name: agent-internal-3
+    hostname: ayborg_agent-internal-3
     build:
       dockerfile: src/Agent/Dockerfile
     depends_on:
@@ -404,8 +435,11 @@ services:
     volumes:
       - ./misc/demo/img:/ayborg/img:rw
     environment:
-      - Kestrel:Endpoints:gRPC:Url=http://agent-internal-3:6020
-      - AyBorg:Service:Url=http://agent-internal-3:6020
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
+      - Kestrel:Endpoints:gRPC:Url=http://ayborg_agent-internal-3:6020
+      - AyBorg:Service:Url=http://ayborg_agent-internal-3:6020
       - AyBorg:Service:DisplayName=Agent.Internal-3
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-3
+      - AyBorg:Gateway:Url=http://ayborg_gateway:6000
       - Storage:Folder=/ayborg/img
+      - ElasticApm:Enabled=false
