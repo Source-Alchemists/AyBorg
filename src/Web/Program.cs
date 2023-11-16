@@ -11,17 +11,41 @@ using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.Analytics;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
+using Elastic.Apm.NetCoreAll;
+using Elastic.Extensions.Logging;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+string serviceUniqueName = builder.Configuration.GetValue("AyBorg:Service:UniqueName", "AyBorg.Web")!;
+bool isOpenTelemetryEnabled = builder.Configuration.GetValue("OpenTelemetry:Enabled", false)!;
+bool isElasticApmEnabled = builder.Configuration.GetValue("ElasticApm:Enabled", false)!;
+
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
+
+if (isOpenTelemetryEnabled)
+{
+    builder.Services.AddOpenTelemetry().WithTracing(builder => builder.AddAspNetCoreInstrumentation())
+        .ConfigureResource(resource => resource.AddService(serviceUniqueName))
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation())
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation());
+}
+
+if(isElasticApmEnabled)
+{
+    builder.Logging.AddElasticsearch();
+}
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     _ = databaseProvider switch
@@ -118,6 +142,11 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+if (isElasticApmEnabled)
+{
+    app.UseAllElasticApm(builder.Configuration);
+}
 
 app.MapControllers();
 app.MapBlazorHub();

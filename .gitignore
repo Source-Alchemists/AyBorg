@@ -11,3 +11,7 @@ bin/
 .DS_Store
 **/.DS_Store
 *.kra
+
+# ELK stack
+filebeat_ingest_data/
+logstash_ingest_data/

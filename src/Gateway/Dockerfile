@@ -26,5 +26,5 @@ WORKDIR /bin/AyBorg
 USER $USERNAME
 ENV "ASPNETCORE_URLS"=""
 ENV "Kestrel:Endpoints:gRPC:Url"="http://*:6000"
-ENV "AyBorg:Service:Url"="http://gateway-1:6000"
-ENTRYPOINT ["dotnet", "AyBorg.Gateway.dll"]
+ENV "AyBorg:Service:Url"="http://gateway:6000"
+ENTRYPOINT ["./AyBorg.Gateway"]
