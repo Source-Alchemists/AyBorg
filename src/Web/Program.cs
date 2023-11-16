@@ -11,8 +11,8 @@ using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.Analytics;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
-using Elastic.Apm.AspNetCore;
-using Elastic.Apm.GrpcClient;
+using Elastic.Apm.NetCoreAll;
+using Elastic.Extensions.Logging;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -26,22 +26,26 @@ using Toolbelt.Blazor.Extensions.DependencyInjection;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 string serviceUniqueName = builder.Configuration.GetValue("AyBorg:Service:UniqueName", "AyBorg.Web")!;
+bool isOpenTelemetryEnabled = builder.Configuration.GetValue("OpenTelemetry:Enabled", false)!;
+bool isElasticApmEnabled = builder.Configuration.GetValue("ElasticApm:Enabled", false)!;
 
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
 
-builder.Logging.AddOpenTelemetry(options => {
-    options.SetResourceBuilder(
-        ResourceBuilder.CreateDefault()
-        .AddService(serviceUniqueName));
-});
+if (isOpenTelemetryEnabled)
+{
+    builder.Services.AddOpenTelemetry().WithTracing(builder => builder.AddAspNetCoreInstrumentation())
+        .ConfigureResource(resource => resource.AddService(serviceUniqueName))
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation())
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation());
+}
 
-builder.Services.AddOpenTelemetry()
-    .ConfigureResource(resource => resource.AddService(serviceUniqueName))
-    .WithTracing(tracing => tracing
-        .AddAspNetCoreInstrumentation())
-    .WithMetrics(metrics => metrics
-        .AddAspNetCoreInstrumentation());
+if(isElasticApmEnabled)
+{
+    builder.Logging.AddElasticsearch();
+}
 
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     _ = databaseProvider switch
@@ -139,7 +143,10 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseElasticApm(builder.Configuration, new GrpcClientDiagnosticSubscriber());
+if (isElasticApmEnabled)
+{
+    app.UseAllElasticApm(builder.Configuration);
+}
 
 app.MapControllers();
 app.MapBlazorHub();

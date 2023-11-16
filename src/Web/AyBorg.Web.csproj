@@ -20,8 +20,6 @@
   <ItemGroup>
     <PackageReference Include="Blazored.LocalStorage" Version="4.3.0" />
     <PackageReference Include="Blazored.SessionStorage" Version="2.2.0" />
-    <PackageReference Include="Elastic.Apm.GrpcClient" Version="1.25.0" />
-    <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.25.0" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="7.0.0" />
@@ -31,9 +29,15 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="AyBorg.Diagrams" Version="0.1.0" />
+    <PackageReference Include="Toolbelt.Blazor.HotKeys2" Version="1.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Elastic.Apm.GrpcClient" Version="1.25.0" />
+    <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.25.0" />
+    <PackageReference Include="Elastic.Extensions.Logging" Version="8.6.1" />
     <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.6.0-beta.2" />
-    <PackageReference Include="Toolbelt.Blazor.HotKeys2" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup>

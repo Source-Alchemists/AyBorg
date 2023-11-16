@@ -21,8 +21,11 @@ using OpenTelemetry.Trace;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 string serviceUniqueName = builder.Configuration.GetValue("AyBorg:Service:UniqueName", "AyBorg.Agent")!;
-bool isOpenTelemetryEnabled = builder.Configuration.GetValue<bool>("OpenTelemetry:Enabled", false)!;
-bool isElasticApmEnabled = builder.Configuration.GetValue<bool>("ElasticApm:Enabled", false)!;
+bool isOpenTelemetryEnabled = builder.Configuration.GetValue("OpenTelemetry:Enabled", false)!;
+bool isElasticApmEnabled = builder.Configuration.GetValue("ElasticApm:Enabled", false)!;
+
+// Add services to the container.
+string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
 
 if (isOpenTelemetryEnabled)
 {
@@ -38,9 +41,6 @@ if(isElasticApmEnabled)
 {
     builder.Logging.AddElasticsearch();
 }
-
-// Add services to the container.
-string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
 
 builder.Services.AddDbContextFactory<ProjectContext>(options =>
     _ = databaseProvider switch

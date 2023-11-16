@@ -305,8 +305,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
       - Kestrel:Endpoints:gRPC:Url=http://ayborg_gateway:6000
       - AyBorg:Service:Url=http://ayborg_gateway:6000
+      - ElasticApm:Enabled=true
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
       - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
+      - Logging:Elasticsearch:ShipTo:NodeUris:0=http://host.docker.internal:9200
+      - Logging:Elasticsearch:ShipTo:Username=elastic
+      - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
   analytics:
     container_name: analytics
@@ -323,8 +327,12 @@ services:
       - Kestrel:Endpoints:gRPC:Url=http://ayborg_analytics:6001
       - AyBorg:Service:Url=http://ayborg_analytics:6001
       - AyBorg:Gateway:Url=http://ayborg_gateway:6000
+      - ElasticApm:Enabled=true
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
       - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
+      - Logging:Elasticsearch:ShipTo:NodeUris:0=http://host.docker.internal:9200
+      - Logging:Elasticsearch:ShipTo:Username=elastic
+      - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
   audit:
     container_name: audit
@@ -341,8 +349,12 @@ services:
       - Kestrel:Endpoints:gRPC:Url=http://ayborg_audit:6002
       - AyBorg:Service:Url=http://ayborg_audit:6002
       - AyBorg:Gateway:Url=http://ayborg_gateway:6000
+      - ElasticApm:Enabled=true
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
       - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
+      - Logging:Elasticsearch:ShipTo:NodeUris:0=http://host.docker.internal:9200
+      - Logging:Elasticsearch:ShipTo:Username=elastic
+      - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
   web:
     container_name: web
@@ -363,8 +375,12 @@ services:
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/demo-cert.pfx
       - AyBorg:Service:Url=https://ayborg_web:6011
       - AyBorg:Gateway:Url=http://ayborg_gateway:6000
+      - ElasticApm:Enabled=true
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
       - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
+      - Logging:Elasticsearch:ShipTo:NodeUris:0=http://host.docker.internal:9200
+      - Logging:Elasticsearch:ShipTo:Username=elastic
+      - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
     volumes:
       - ./misc/demo:/https:ro
 
@@ -409,37 +425,11 @@ services:
       - ./misc/demo/img:/ayborg/img:rw
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
-      - Kestrel:Endpoints:gRPC:Url=http://ayborg_agent-internal-2:6020
-      - AyBorg:Service:Url=http://ayborg_agent-internal-2:6020
+      - Kestrel:Endpoints:gRPC:Url=http://ayborg_agent-internal-3:6020
+      - AyBorg:Service:Url=http://ayborg_agent-internal-3:6020
       - AyBorg:Service:DisplayName=Agent.Internal-2
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-2
       - AyBorg:Gateway:Url=http://ayborg_gateway:6000
       - Storage:Folder=/ayborg/img
-      - ElasticApm:Enabled=true
-      - ElasticApm:ServerUrl=http://host.docker.internal:8200
-      - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
-      - Logging:Elasticsearch:ShipTo:NodeUris:0=http://host.docker.internal:9200
-      - Logging:Elasticsearch:ShipTo:Username=elastic
-      - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
-
-  agent-3:
-    container_name: agent-internal-3
-    hostname: ayborg_agent-internal-3
-    build:
-      dockerfile: src/Agent/Dockerfile
-    depends_on:
-      gateway:
-        condition: service_started
-    networks:
-      - backend
-    volumes:
-      - ./misc/demo/img:/ayborg/img:rw
-    environment:
-      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
-      - Kestrel:Endpoints:gRPC:Url=http://ayborg_agent-internal-3:6020
-      - AyBorg:Service:Url=http://ayborg_agent-internal-3:6020
-      - AyBorg:Service:DisplayName=Agent.Internal-3
-      - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-3
-      - AyBorg:Gateway:Url=http://ayborg_gateway:6000
-      - Storage:Folder=/ayborg/img
+      - OpenTelemetry:Enabled=false
       - ElasticApm:Enabled=false
