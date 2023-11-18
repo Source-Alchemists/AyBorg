@@ -31,11 +31,11 @@ public sealed class RedisRepository : IRepository
 
         var workFlowResultHash = new HashEntry[]
         {
-            new HashEntry("Service", result.ServiceUniqueName),
-            new HashEntry("startTime", result.StartTime.ToString()),
-            new HashEntry("stopTime", result.StopTime.ToString()),
-            new HashEntry("elapsedMs", result.ElapsedMs),
-            new HashEntry("success", result.Success)
+            new("Service", result.ServiceUniqueName),
+            new("startTime", result.StartTime.ToString()),
+            new("stopTime", result.StopTime.ToString()),
+            new("elapsedMs", result.ElapsedMs),
+            new("success", result.Success)
         };
 
         NRedisStack.TimeSeriesCommands timeSeriesCommand = _database.TS();
@@ -54,11 +54,11 @@ public sealed class RedisRepository : IRepository
             bool isNumeric = double.TryParse(stringValue, out double doubleValue);
             var portResultHash = new HashEntry[]
             {
-                new HashEntry("ID", port.Id.ToString()),
-                new HashEntry("Name", port.Name),
-                new HashEntry("Value", stringValue),
-                new HashEntry("Brand", isNumeric ? (int)PortBrand.Numeric : (int)port.Brand),
-                new HashEntry("Service", result.ServiceUniqueName)
+                new("ID", port.Id.ToString()),
+                new("Name", port.Name),
+                new("Value", stringValue),
+                new("Brand", isNumeric ? (int)PortBrand.Numeric : (int)port.Brand),
+                new("Service", result.ServiceUniqueName)
             };
             _ = transaction.SortedSetAddAsync($"{result.ServiceUniqueName}:{PORTRESULT_INDEX}", new RedisValue(portResultKey), workflowResultTimestamp);
             _ = transaction.HashSetAsync(portResultKey, portResultHash);
@@ -83,11 +83,11 @@ public sealed class RedisRepository : IRepository
 
         var imageResultHash = new HashEntry[]
         {
-            new HashEntry("Data", result.Data.Memory.ToArray()),
-            new HashEntry("Width", result.Width),
-            new HashEntry("Height", result.Height),
-            new HashEntry("ScaledWidth", result.ScaledWidth),
-            new HashEntry("ScaledHeight", result.ScaledHeight)
+            new("Data", result.Data.Memory.ToArray()),
+            new("Width", result.Width),
+            new("Height", result.Height),
+            new("ScaledWidth", result.ScaledWidth),
+            new("ScaledHeight", result.ScaledHeight)
         };
 
         _ = transaction.HashSetAsync(imageResultKey, imageResultHash);

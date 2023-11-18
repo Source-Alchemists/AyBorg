@@ -20,7 +20,7 @@ public abstract class ResultStoreBase : IStepBody
 
     public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultStepCategories.Result };
 
-    public ResultStoreBase(ILogger<ResultStoreBase> logger, IResultStorageProvider resultStorageProvider, IRuntimeMapper runtimeMapper)
+    protected ResultStoreBase(ILogger<ResultStoreBase> logger, IResultStorageProvider resultStorageProvider, IRuntimeMapper runtimeMapper)
     {
         _logger = logger;
         _resultStorageProvider = resultStorageProvider;

@@ -15,14 +15,12 @@ volumes:
     driver: local
   fleetserverdata:
     driver: local
+  rediscache:
+    driver: local
 
 networks:
   backend:
     driver: bridge
-
-volumes:
-  rediscache:
-    driver: local
 
 services:
   setup:
