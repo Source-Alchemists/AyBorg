@@ -35,24 +35,39 @@
                             <mask id="@_maskId">
                                 @if (_labelRectangles.Any())
                                 {
-                                    <rect x="@_imageInfo.X" y="@_imageInfo.Y" width="@_imageInfo.Width"
-                                        height="@_imageInfo.Height" fill="white" />
+                                    <rect x="@_imageInfo.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        y="@_imageInfo.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        width="@_imageInfo.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        height="@_imageInfo.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        fill="white" />
                                 }
                                 @foreach (var rectangle in _labelRectangles)
                                 {
-                                    <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height"
+                                    <rect x="@rectangle.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        y="@rectangle.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        width="@rectangle.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        height="@rectangle.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                                         fill="black" />
                                 }
                             </mask>
                         </defs>
-                        <g transform="scale(@_svgScaleFactor)">
-                            <image href="@_imageUrl" x="@_imageInfo.X" y="@_imageInfo.Y" width="@_imageInfo.Width"
-                                height="@_imageInfo.Height" />
-                            <rect x="@_imageInfo.X" y="@_imageInfo.Y" width="@_imageInfo.Width"
-                                height="@_imageInfo.Height" fill="#00000091" mask="url(#@_maskId)" />
+                        <g transform="scale(@_svgScaleFactor.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                            <image href="@_imageUrl"
+                                x="@_imageInfo.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                y="@_imageInfo.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                width="@_imageInfo.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                height="@_imageInfo.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                            <rect x="@_imageInfo.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                y="@_imageInfo.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                width="@_imageInfo.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                height="@_imageInfo.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                fill="#00000091" mask="url(#@_maskId)" />
                             @foreach (var rectangle in _labelRectangles)
                             {
-                                <rect x="@rectangle.X" y="@rectangle.Y" width="@rectangle.Width" height="@rectangle.Height"
+                                <rect x="@rectangle.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    y="@rectangle.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    width="@rectangle.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    height="@rectangle.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                                     style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:2" />
                             }
                         </g>
