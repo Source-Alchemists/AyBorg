@@ -13,12 +13,36 @@ using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
+using Elastic.Apm.NetCoreAll;
+using Elastic.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Resources;
+using OpenTelemetry.Trace;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
+string serviceUniqueName = builder.Configuration.GetValue("AyBorg:Service:UniqueName", "AyBorg.Agent")!;
+bool isOpenTelemetryEnabled = builder.Configuration.GetValue("OpenTelemetry:Enabled", false)!;
+bool isElasticApmEnabled = builder.Configuration.GetValue("ElasticApm:Enabled", false)!;
+
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
+
+if (isOpenTelemetryEnabled)
+{
+    builder.Services.AddOpenTelemetry().WithTracing(builder => builder.AddAspNetCoreInstrumentation())
+        .ConfigureResource(resource => resource.AddService(serviceUniqueName))
+        .WithTracing(tracing => tracing
+            .AddAspNetCoreInstrumentation())
+        .WithMetrics(metrics => metrics
+            .AddAspNetCoreInstrumentation());
+}
+
+if(isElasticApmEnabled)
+{
+    builder.Logging.AddElasticsearch();
+}
 
 builder.Services.AddDbContextFactory<ProjectContext>(options =>
     _ = databaseProvider switch
@@ -87,6 +111,11 @@ WebApplication app = builder.Build();
 app.UseAuthorization();
 app.UseJwtMiddleware();
 app.UseProjectStateGuardMiddleware();
+
+if (isElasticApmEnabled)
+{
+    app.UseAllElasticApm(builder.Configuration);
+}
 
 app.MapGrpcService<ProjectManagementServiceV1>();
 app.MapGrpcService<ProjectSettingsServiceV1>();
