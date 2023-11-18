@@ -33,8 +33,6 @@ public abstract class ImageAiDetectBase : IStepBody
             List<YoloPrediction> predictions = Predict();
             var results = new List<Result>();
             var rectangles = new List<Rectangle>();
-            var labels = new List<string>();
-            var scores = new List<double>();
 
             foreach (YoloPrediction pred in predictions)
             {
@@ -48,8 +46,6 @@ public abstract class ImageAiDetectBase : IStepBody
                 results.Add(new Result(pred.Rectangle, pred.Label.Name, pred.Score));
 
                 rectangles.Add(pred.Rectangle);
-                labels.Add(pred.Label.Name);
-                scores.Add(pred.Score);
             }
 
             results = results.OrderByDescending(r => r.Score).ToList();
