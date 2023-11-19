@@ -25,7 +25,7 @@ public partial class NavMenu : ComponentBase
 
             _isDashboardAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Dashboard));
             _isAnyAgentAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Agent));
-            _isAnalyticsAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Analytics));
+            _isAnalyticsAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Log));
             _isAuditAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Audit));
         }
         catch (Exception ex)

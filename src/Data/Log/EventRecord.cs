@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Logging;
 
-namespace AyBorg.Data.Analytics;
+namespace AyBorg.Data.Log;
 
 public record EventRecord
 {

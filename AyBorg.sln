@@ -11,9 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5E3E7E4F
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Agent.Tests", "tests\Agent\AyBorg.Agent.Tests.csproj", "{EFDE860E-5DBA-4A9A-B1AE-C09B9E33AA63}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Analytics", "src\Analytics\AyBorg.Analytics.csproj", "{976D4651-C7E9-4E2F-8E07-7ED8AE6C3A3B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Log", "src\Log\AyBorg.Log.csproj", "{976D4651-C7E9-4E2F-8E07-7ED8AE6C3A3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Analytics.Tests", "tests\Analytics\AyBorg.Analytics.Tests.csproj", "{2E8C733E-0C62-4C8F-A3AF-947125436DBF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Log.Tests", "tests\Log\AyBorg.Log.Tests.csproj", "{2E8C733E-0C62-4C8F-A3AF-947125436DBF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Gateway", "src\Gateway\AyBorg.Gateway.csproj", "{BB397DF0-5DE0-4C07-B477-3F6DB90B9F20}"
 EndProject
@@ -55,7 +55,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{4F11CB93-C
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Data.Agent.Tests", "tests\Data\Agent\AyBorg.Data.Agent.Tests.csproj", "{30DB63D2-0951-470C-8A9B-1466D81AD8EC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Data.Analytics", "src\Data\Analytics\AyBorg.Data.Analytics.csproj", "{3036EECB-8290-4623-B08C-A8107FB6FE10}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Data.Log", "src\Data\Log\AyBorg.Data.Log.csproj", "{3036EECB-8290-4623-B08C-A8107FB6FE10}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AyBorg.Data.Gateway", "src\Data\Gateway\AyBorg.Data.Gateway.csproj", "{11AE5311-32F2-4C69-BAF2-9A9D1D8FCDCE}"
 EndProject

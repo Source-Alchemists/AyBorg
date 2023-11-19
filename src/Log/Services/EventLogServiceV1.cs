@@ -1,9 +1,9 @@
 using Ayborg.Gateway.Analytics.V1;
-using AyBorg.Data.Analytics;
+using AyBorg.Data.Log;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
-namespace AyBorg.Analytics.Services;
+namespace AyBorg.Log.Services;
 
 public sealed class EventLogServiceV1 : EventLog.EventLogBase
 {

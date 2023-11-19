@@ -1,8 +1,8 @@
-using AyBorg.Data.Analytics;
+using AyBorg.Data.Log;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
-namespace AyBorg.Analytics.Services.Tests;
+namespace AyBorg.Log.Services.Tests;
 
 public class EventStorageTests
 {

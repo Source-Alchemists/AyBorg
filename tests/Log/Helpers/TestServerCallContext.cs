@@ -1,6 +1,6 @@
 using Grpc.Core;
 
-namespace AyBorg.Analytics.Helpers.Tests;
+namespace AyBorg.Log.Helpers.Tests;
 
 public class TestServerCallContext : ServerCallContext
     {

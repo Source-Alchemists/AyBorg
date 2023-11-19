@@ -2,7 +2,7 @@ using LiteDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
-namespace AyBorg.Data.Analytics;
+namespace AyBorg.Data.Log;
 
 public sealed class EventLogRepository : IEventLogRepository, IDisposable
 {

@@ -1,12 +1,12 @@
 using Ayborg.Gateway.Analytics.V1;
-using AyBorg.Analytics.Helpers.Tests;
-using AyBorg.Data.Analytics;
+using AyBorg.Log.Helpers.Tests;
+using AyBorg.Data.Log;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
-namespace AyBorg.Analytics.Services.Tests;
+namespace AyBorg.Log.Services.Tests;
 
 public class EventServiceV1Tests
 {

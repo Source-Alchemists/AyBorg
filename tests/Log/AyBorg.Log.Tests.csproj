@@ -23,7 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Analytics\AyBorg.Analytics.csproj" />
+    <ProjectReference Include="..\..\src\Log\AyBorg.Log.csproj" />
   </ItemGroup>
 
 </Project>

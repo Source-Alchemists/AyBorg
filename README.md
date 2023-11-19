@@ -99,7 +99,7 @@ In most cases the following setup makes sense:
 
 1. A MQTT broker (e.g. [Eclipse-Mosquitto](https://mosquitto.org))
 2. AyBorg.Gateway
-3. AyBorg.Analytics
+3. AyBorg.Log
 4. AyBorg.Audit
 5. AyBorg.Web
 6. One or more [AyBorg.Agent(s)](docs/agent/agent.md)
@@ -116,7 +116,7 @@ The default appsettings give you a good starting point and will also work locall
 | Service          | HTTP | HTTPS | gRPC |
 | ---------------- | ---- | ----- | ---- |
 | AyBorg.Gateway   |      |       | 6000 |
-| AyBorg.Analytics |      |       | 6001 |
+| AyBorg.Log |      |       | 6001 |
 | AyBorg.Audit     |      |       | 6002 |
 | AyBorg.Web       | 6010 | 6011  |      |
 | AyBorg.Agent     |      |       | 6020 |

@@ -323,11 +323,11 @@ services:
       - Logging:Elasticsearch:ShipTo:Username=elastic
       - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
-  analytics:
-    container_name: ayborg_analytics
-    hostname: ayborg_analytics
+  log:
+    container_name: ayborg_log
+    hostname: ayborg_log
     build:
-      dockerfile: src/Analytics/Dockerfile
+      dockerfile: src/Log/Dockerfile
     depends_on:
       gateway:
         condition: service_started
@@ -335,8 +335,8 @@ services:
       - backend
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
-      - Kestrel:Endpoints:gRPC:Url=http://ayborg_analytics:6001
-      - AyBorg:Service:Url=http://ayborg_analytics:6001
+      - Kestrel:Endpoints:gRPC:Url=http://ayborg_log:6001
+      - AyBorg:Service:Url=http://ayborg_log:6001
       - AyBorg:Gateway:Url=http://ayborg_gateway:6000
       - ElasticApm:Enabled=true
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
@@ -353,7 +353,7 @@ services:
     depends_on:
       gateway:
         condition: service_started
-      analytics:
+      log:
         condition: service_started
     networks:
       - backend
@@ -377,7 +377,7 @@ services:
     depends_on:
       gateway:
         condition: service_started
-      analytics:
+      log:
         condition: service_started
     networks:
       - backend
@@ -407,7 +407,7 @@ services:
     depends_on:
       gateway:
         condition: service_started
-      analytics:
+      log:
         condition: service_started
     networks:
       - backend
@@ -436,7 +436,7 @@ services:
     depends_on:
       gateway:
         condition: service_started
-      analytics:
+      log:
         condition: service_started
     networks:
       - backend

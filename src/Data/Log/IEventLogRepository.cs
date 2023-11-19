@@ -1,4 +1,4 @@
-namespace AyBorg.Data.Analytics;
+namespace AyBorg.Data.Log;
 
 public interface IEventLogRepository
 {

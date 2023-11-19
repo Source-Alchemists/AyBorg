@@ -1,6 +1,6 @@
-using AyBorg.Data.Analytics;
+using AyBorg.Data.Log;
 
-namespace AyBorg.Analytics.Services;
+namespace AyBorg.Log.Services;
 
 public interface IEventStorage
 {

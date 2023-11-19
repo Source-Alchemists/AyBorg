@@ -1,6 +1,6 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS BUILD
 COPY ["./src", "/src"]
-WORKDIR /src/Analytics
+WORKDIR /src/Log
 RUN dotnet publish -c release -o ../../artifacts
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS RUNTIME
@@ -26,6 +26,6 @@ WORKDIR /bin/AyBorg
 USER $USERNAME
 ENV "ASPNETCORE_URLS"=""
 ENV "Kestrel:Endpoints:gRPC:Url"="http://*:6001"
-ENV "AyBorg:Service:Url"="http://analytics:6001"
+ENV "AyBorg:Service:Url"="http://log:6001"
 ENV "AyBorg:Gateway:Url"="http://gateway:6000"
-ENTRYPOINT ["./AyBorg.Analytics"]
+ENTRYPOINT ["./AyBorg.Log"]
