@@ -293,6 +293,7 @@ services:
       - ./config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
 
   rediscache:
+    container_name: rediscache
     image: redis/redis-stack-server:edge
     restart: always
     ports:
@@ -323,7 +324,7 @@ services:
       - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
   analytics:
-    container_name: analytics
+    container_name: ayborg_analytics
     hostname: ayborg_analytics
     build:
       dockerfile: src/Analytics/Dockerfile
@@ -345,12 +346,14 @@ services:
       - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
   audit:
-    container_name: audit
+    container_name: ayborg_audit
     hostname: ayborg_audit
     build:
       dockerfile: src/Audit/Dockerfile
     depends_on:
       gateway:
+        condition: service_started
+      analytics:
         condition: service_started
     networks:
       - backend
@@ -366,13 +369,39 @@ services:
       - Logging:Elasticsearch:ShipTo:Username=elastic
       - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
+  result:
+    container_name: ayborg_result
+    hostname: ayborg_result
+    build:
+      dockerfile: src/Result/Dockerfile
+    depends_on:
+      gateway:
+        condition: service_started
+      analytics:
+        condition: service_started
+    networks:
+      - backend
+    environment:
+      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
+      - Kestrel:Endpoints:gRPC:Url=http://ayborg_result:6003
+      - AyBorg:Service:Url=http://ayborg_result:6003
+      - AyBorg:Gateway:Url=http://ayborg_gateway:6000
+      - ElasticApm:Enabled=true
+      - ElasticApm:ServerUrl=http://host.docker.internal:8200
+      - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
+      - Logging:Elasticsearch:ShipTo:NodeUris:0=http://host.docker.internal:9200
+      - Logging:Elasticsearch:ShipTo:Username=elastic
+      - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
+
   web:
-    container_name: web
+    container_name: ayborg_web
     hostname: ayborg_web
     build:
       dockerfile: src/Web/Dockerfile
     depends_on:
       gateway:
+        condition: service_started
+      analytics:
         condition: service_started
     networks:
       - backend
@@ -395,12 +424,14 @@ services:
       - ./misc/demo:/https:ro
 
   agent-1:
-    container_name: agent-internal-1
+    container_name: ayborg_agent-internal-1
     hostname: ayborg_agent-internal-1
     build:
       dockerfile: src/Agent/Dockerfile
     depends_on:
       gateway:
+        condition: service_started
+      analytics:
         condition: service_started
     networks:
       - backend
@@ -422,12 +453,14 @@ services:
       - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
   agent-2:
-    container_name: agent-internal-2
+    container_name: ayborg_agent-internal-2
     hostname: ayborg_agent-internal-2
     build:
       dockerfile: src/Agent/Dockerfile
     depends_on:
       gateway:
+        condition: service_started
+      analytics:
         condition: service_started
     networks:
       - backend
