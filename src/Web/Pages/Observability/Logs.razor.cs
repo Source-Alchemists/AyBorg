@@ -1,12 +1,12 @@
 using System.Runtime.CompilerServices;
-using AyBorg.Web.Pages.Analytics.Shared;
+using AyBorg.Web.Pages.Observability.Shared;
 using AyBorg.Web.Services.Analytics;
 using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
 
-namespace AyBorg.Web.Pages.Analytics;
+namespace AyBorg.Web.Pages.Observability;
 
-public partial class Analytics : ComponentBase
+public partial class Logs : ComponentBase
 {
     [Inject] IEventLogService EventLogService { get; set; } = null!;
 

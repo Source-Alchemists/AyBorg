@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 using MudBlazor;
 
-namespace AyBorg.Web.Pages.Analytics.Shared;
+namespace AyBorg.Web.Pages.Observability.Shared;
 
 public partial class EventLogTable : ComponentBase
 {

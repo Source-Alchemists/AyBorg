@@ -10,7 +10,7 @@ public partial class NavMenu : ComponentBase
     [Inject] IStateService StateService { get; set; } = null!;
     [Inject] IRegistryService RegistryService { get; set; } = null!;
 
-    private bool _isDashboardAvailable = false;
+private bool _isDashboardAvailable = false;
     private bool _isAnyAgentAvailable = false;
     private bool _isAnalyticsAvailable = false;
     private bool _isAuditAvailable = false;

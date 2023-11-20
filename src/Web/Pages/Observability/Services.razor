@@ -1,10 +1,10 @@
-@page "/admin/services"
-@attribute [Authorize(Roles = Roles.Administrator)]
+@page "/observability/services"
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}, {Roles.Auditor}")]
 @using SDK.Authorization
 @using AyBorg.Web.Shared.Models
 @inject AyBorg.Web.Services.IRegistryService registryService
 
-<PageTitle>AyBorg - Admin/Services</PageTitle>
+<PageTitle>AyBorg - Observability/Services</PageTitle>
 
 @if (serviceEntries == null)
 {
