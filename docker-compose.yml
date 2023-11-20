@@ -345,30 +345,6 @@ services:
       - Logging:Elasticsearch:ShipTo:Username=elastic
       - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
 
-  result:
-    container_name: ayborg_result
-    hostname: ayborg_result
-    build:
-      dockerfile: src/Result/Dockerfile
-    depends_on:
-      gateway:
-        condition: service_started
-      log:
-        condition: service_started
-    networks:
-      - backend
-    environment:
-      - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
-      - Kestrel:Endpoints:gRPC:Url=http://ayborg_result:6003
-      - AyBorg:Service:Url=http://ayborg_result:6003
-      - AyBorg:Gateway:Url=http://ayborg_gateway:6000
-      - ElasticApm:Enabled=true
-      - ElasticApm:ServerUrl=http://host.docker.internal:8200
-      - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
-      - Logging:Elasticsearch:ShipTo:NodeUris:0=http://host.docker.internal:9200
-      - Logging:Elasticsearch:ShipTo:Username=elastic
-      - Logging:Elasticsearch:ShipTo:Password=${ELASTIC_PASSWORD}
-
   web:
     container_name: ayborg_web
     hostname: ayborg_web
