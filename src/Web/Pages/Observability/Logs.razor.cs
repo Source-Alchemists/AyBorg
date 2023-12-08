@@ -98,7 +98,7 @@ public partial class Logs : ComponentBase
     {
         if(!entries.Any())
         {
-            return entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day));
+            return entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, 0, 0, 0, DateTimeKind.Utc));
         }
         IEnumerable<IGrouping<DateTime, EventLogEntry>> resultGroup;
         DateTime minTimestamp = entries.Min(e => e.Timestamp);
@@ -106,19 +106,19 @@ public partial class Logs : ComponentBase
         TimeSpan diffTime = maxTimestamp - minTimestamp;
         if (diffTime > TimeSpan.FromDays(1))
         {
-            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day));
+            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, 0, 0, 0, DateTimeKind.Utc));
         }
         else if (diffTime > TimeSpan.FromHours(1))
         {
-            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, 0, 0));
+            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, 0, 0, 0, DateTimeKind.Utc));
         }
         else if (diffTime > TimeSpan.FromMinutes(1))
         {
-            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, e.Timestamp.Minute, 0));
+            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, e.Timestamp.Minute, 0, 0, DateTimeKind.Utc));
         }
         else
         {
-            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, e.Timestamp.Minute, e.Timestamp.Second));
+            resultGroup = entries.OrderBy(e => e.Timestamp).GroupBy(e => new DateTime(e.Timestamp.Year, e.Timestamp.Month, e.Timestamp.Day, e.Timestamp.Hour, e.Timestamp.Minute, e.Timestamp.Second, DateTimeKind.Utc));
         }
 
         return resultGroup;
