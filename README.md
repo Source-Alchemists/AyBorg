@@ -28,56 +28,6 @@ Our editor makes it a breeze to program your own workflows using simple drag and
 
 ![Agent editor](docs/img/agent-editor-comb.png)
 
-### Work with multiple agents
-
-Work with as many agents as you want and distribute them across different systems. Thanks to seamless communication via the MQTT protocol, your creativity knows no bounds. Whether it's simple or complex scenarios, our agents enable you to perfectly realize your ideas!
-
-![Agent overview](docs/img/agent-overview-comb.png)
-
-### Project overview
-
-The project overview lays out all the projects and their current status. That way, you can see which projects have been given the green light for production.
-
-![Project overview](docs/img/agent-projects-comb.png)
-
-## Analytics
-
-Get an overview of all events at a glance, whether it's user interaction, system event, or exception. It is important that you can understand and control your system at all times.
-
-![Analytics](docs/img/analytics-comb.png)
-
-## Audit
-
-In industries such as **medicine**, **pharmaceuticals**, and **food**, it is becoming increasingly important to conduct automated processes in an auditable system. Such a system is particularly essential in highly regulated areas such as **[FDA 21 CFR Part 11](https://www.accessdata.fda.gov/scripts/cdrh/cfdocs/cfcfr/cfrsearch.cfm)**. AyBorg has focused on ensuring high auditability and can therefore be used in these areas as well.
-
-### Create new audit report
-
-![Audit changesets](docs/img/audit-changesets-comb.png)
-
-### Audit changes (diff)
-
-![Audit diff](docs/img/audit-diff-comb.png)
-
-### Save your reports
-
-AyBorg provides the ability to store and access **audit reports** at any time. By storing these reports, administrators and auditors can review past events and ensure that the system has been functioning properly.
-
-The ability to store and access audit reports offers a valuable way to monitor the system and **ensure compliance with requirements and standards**. Additionally, this can aid in troubleshooting by making it easier to identify the exact timing and cause of a problem.
-
-![Audit saved reports](docs/img/audit-saved-reports-comb.png)
-
-## Administration
-
-### Service overview
-
-![Service overview](docs/img/admin-service-overview-comb.png)
-
-### Usermanagement
-
-AyBorg has a **role-based user management system** that allows for precise control and management of access rights and functionalities within the application. With this approach, users can be organized into different roles, each with distinct permissions and access rights to various areas of the application.
-
-![Usermanagement](docs/img/admin-usermanagement-comb.png)
-
 ## Getting started
 
 ### Git clone
@@ -100,9 +50,8 @@ In most cases the following setup makes sense:
 1. A MQTT broker (e.g. [Eclipse-Mosquitto](https://mosquitto.org))
 2. AyBorg.Gateway
 3. AyBorg.Log
-4. AyBorg.Audit
-5. AyBorg.Web
-6. One or more [AyBorg.Agent(s)](docs/agent/agent.md)
+4. AyBorg.Web
+5. One or more [AyBorg.Agent(s)](docs/agent/agent.md)
 
 ### Default credentials
 
@@ -117,7 +66,6 @@ The default appsettings give you a good starting point and will also work locall
 | ---------------- | ---- | ----- | ---- |
 | AyBorg.Gateway   |      |       | 6000 |
 | AyBorg.Log |      |       | 6001 |
-| AyBorg.Audit     |      |       | 6002 |
 | AyBorg.Web       | 6010 | 6011  |      |
 | AyBorg.Agent     |      |       | 6020 |
 
