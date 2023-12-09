@@ -28,8 +28,12 @@
 
                 <MudDrawer @bind-Open="@_isDrawerOpen" Elevation="0" Variant="@DrawerVariant.Responsive">
                     <MudDrawerHeader>
-                        <MudImage Src="icons/logo.svg" Width="40" Height="40" />
-                        <MudText Typo="Typo.h5" hidden="@(!_isDrawerOpen)" Class="ml-3 mt-2 brand-text" Color="Color.Primary">AyBorg</MudText>
+                        <MudLink Href="/" Underline="Underline.None">
+                            <MudStack Row="true" Spacing="0">
+                                <MudImage Src="icons/logo.svg" Width="40" Height="40" />
+                                <MudText Typo="Typo.h5" hidden="@(!_isDrawerOpen)" Class="ml-3 mt-2 brand-text navigation" Color="Color.Primary">AyBorg</MudText>
+                            </MudStack>
+                        </MudLink>
                     </MudDrawerHeader>
                     <MudNavMenu Bordered="true" Color="Color.Primary">
                         <NavMenu />
