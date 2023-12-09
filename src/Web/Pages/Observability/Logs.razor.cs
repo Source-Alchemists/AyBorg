@@ -79,11 +79,14 @@ public partial class Logs : ComponentBase
         {
             // Smoother loading animation
             count++;
+            // False positive, the condition is tested.
+#pragma warning disable S2583
             if (count > 50)
             {
                 await InvokeAsync(StateHasChanged);
                 count = 0;
             }
+#pragma warning restore S2583
             tmpEvents.Add(entry);
         }
 

@@ -6,11 +6,11 @@
 
 @if (string.IsNullOrEmpty(_serviceName))
 {
-    <PageTitle>AyBorg - Editor</PageTitle>
+    <PageTitle>Editor</PageTitle>
 }
 else
 {
-    <PageTitle>AyBorg - Editor (@_serviceName)</PageTitle>
+    <PageTitle>Editor (@_serviceName)</PageTitle>
 }
 <AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
 @if (_isProjectLoaded)

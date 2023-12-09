@@ -4,7 +4,7 @@
 @using AyBorg.Web.Shared.Charts
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}, {Roles.Auditor}")]
 
-<PageTitle>AyBorg - Observability/Logs</PageTitle>
+<PageTitle>Observability/Logs</PageTitle>
 
 <div class="page-loading-bar">
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading && !_isEventLogTableLoading)"/>

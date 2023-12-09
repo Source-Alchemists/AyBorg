@@ -3,7 +3,7 @@
 @using AyBorg.Web.Pages.Audit.Shared
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Auditor}")]
 
-<PageTitle>AyBorg - Audit Report</PageTitle>
+<PageTitle>Audit Report</PageTitle>
 
 <div class="page-loading-bar">
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />

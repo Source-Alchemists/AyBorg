@@ -2,7 +2,7 @@
 @using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}, {Roles.Auditor}")]
 
-<PageTitle>AyBorg - Dashboard</PageTitle>
+<PageTitle>Dashboard</PageTitle>
 
 <div class="page-loading-bar">
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
