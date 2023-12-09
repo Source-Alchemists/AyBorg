@@ -471,6 +471,10 @@ public partial class FlowDiagram : ComponentBase, IDisposable
     private void OnCenterViewClicked()
     {
         IEnumerable<Diagrams.Core.Geometry.Point> positions = _diagram.Nodes.Select(n => n.Position);
+        if (!positions.Any())
+        {
+            return;
+        }
         double posX = positions.Average(p => p.X);
         double posY = positions.Average(p => p.Y);
         posX *= _diagram.Zoom;
