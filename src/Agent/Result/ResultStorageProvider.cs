@@ -13,7 +13,7 @@ using ImageTorque;
 
 namespace AyBorg.Agent.Result;
 
-public class ResultStorageProvider : IResultStorageProvider, IDisposable
+public sealed class ResultStorageProvider : IResultStorageProvider, IDisposable
 {
     private readonly ILogger<ResultStorageProvider> _logger;
     private readonly IServiceConfiguration _serviceConfiguration;
@@ -73,11 +73,12 @@ public class ResultStorageProvider : IResultStorageProvider, IDisposable
             _executionCancellationTokenSource.Cancel();
             _executionTask?.Wait();
             _executionTask?.Dispose();
+            _executionCancellationTokenSource.Dispose();
             _isDisposed = true;
         }
     }
 
-    private async void ExecutionLoop(CancellationToken cancellationToken)
+    private async ValueTask ExecutionLoop(CancellationToken cancellationToken)
     {
         while (!cancellationToken.IsCancellationRequested)
         {
