@@ -148,3 +148,52 @@ jobs:
           service: "Agent"
           artifact: "agent"
 
+  publish:
+    needs: [build-plugins, codesign]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: gateway
+          path: artifacts/gateway
+      - uses: actions/download-artifact@v3
+        with:
+          name: web
+          path: artifacts/web
+      - uses: actions/download-artifact@v3
+        with:
+          name: log
+          path: artifacts/log
+      - uses: actions/download-artifact@v3
+        with:
+          name: agent
+          path: artifacts/agent
+      - uses: actions/download-artifact@v3
+        with:
+          name: plugins
+          path: artifacts/plugins
+      - name: Copy plugins to agent
+        run: cp -r artifacts/plugins artifacts/agent
+      - name: Publish (Gateway)
+        uses: "./.github/templates/publish-release"
+        with:
+          service: "Gateway"
+          artifact: "gateway"
+      - name: Publish (Web)
+        uses: "./.github/templates/publish-release"
+        with:
+          service: "Web"
+          artifact: "web"
+      - name: Publish (Log)
+        uses: "./.github/templates/publish-release"
+        with:
+          service: "Log"
+          artifact: "log"
+      - name: Publish (Agent)
+        uses: "./.github/templates/publish-release"
+        with:
+          service: "Agent"
+          artifact: "agent"
+
