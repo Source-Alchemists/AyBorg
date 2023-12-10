@@ -21,16 +21,13 @@ runs:
         - name: Publish
           shell: bash
           working-directory: src/${{ inputs.service }}
-          run: dotnet publish -c release -r ${{ inputs.runtime }} --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/${{ inputs.runtime }}
+          run: dotnet publish -c release -r ${{ inputs.runtime }} --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=embedded -o ../../build/${{ inputs.runtime }}
         - name: Copy license
           shell: bash
           run: cp LICENSE build/${{ inputs.runtime }}
         - name: Delete appsettings.Development.json
           shell: bash
           run: rm build/${{ inputs.runtime }}/appsettings.Development.json
-        - name: Delete symbol files
-          shell: bash
-          run: rm build/${{ inputs.runtime }}/*.pdb
         - name: Upload artifacts
           uses: actions/upload-artifact@v3
           with:
