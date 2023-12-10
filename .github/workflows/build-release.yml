@@ -194,6 +194,12 @@ jobs:
         run: cp -r artifacts/log/${{ matrix.runtime }} runtime/${{ matrix.runtime }}/Log
       - name: Move Agent to runtime
         run: cp -r artifacts/agent/${{ matrix.runtime }} runtime/${{ matrix.runtime }}/Agent
+      - name: Zip
+        uses: vimtor/action-zip@v1.1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: runtime/${{ matrix.runtime }}
+          dest: AyBorg.${{ matrix.runtime }}.zip
       - name: Publish
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
