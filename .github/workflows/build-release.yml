@@ -8,6 +8,10 @@ on:
 jobs:
   build-gateway:
 
+      strategy:
+          matrix:
+              runtime: [osx-arm64, linux-x64, linux-arm64, win-x64]
+
       runs-on: ubuntu-latest
 
       steps:
@@ -20,8 +24,13 @@ jobs:
           with:
             service: "Gateway"
             artifact: "gateway"
+            runtime: ${{ matrix.runtime }}
 
   build-web:
+
+      strategy:
+          matrix:
+              runtime: [osx-arm64, linux-x64, linux-arm64, win-x64]
 
       runs-on: ubuntu-latest
 
@@ -38,8 +47,13 @@ jobs:
           with:
             service: "Web"
             artifact: "web"
+            runtime: ${{ matrix.runtime }}
 
   build-log:
+
+    strategy:
+        matrix:
+            runtime: [osx-arm64, linux-x64, linux-arm64, win-x64]
 
     runs-on: ubuntu-latest
 
@@ -53,8 +67,13 @@ jobs:
         with:
           service: "Log"
           artifact: "log"
+          runtime: ${{ matrix.runtime }}
 
   build-agent:
+
+    strategy:
+        matrix:
+            runtime: [osx-arm64, linux-x64, linux-arm64, win-x64]
 
     runs-on: ubuntu-latest
 
@@ -68,6 +87,7 @@ jobs:
         with:
           service: "Agent"
           artifact: "agent"
+          runtime: ${{ matrix.runtime }}
 
   build-plugins:
 

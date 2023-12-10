@@ -5,6 +5,8 @@ inputs:
     required: true
   artifact:
     required: true
+  runtime:
+    required: true
 
 runs:
   using: "composite"
@@ -16,27 +18,19 @@ runs:
         - name: Restore dependencies
           shell: bash
           run: dotnet restore
-        - name: Publish (osx-arm64)
+        - name: Publish
           shell: bash
           working-directory: src/${{ inputs.service }}
-          run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/osx-arm64
-        - name: Publish (linux-x64)
-          shell: bash
-          working-directory: src/${{ inputs.service }}
-          run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/linux-x64
-        - name: Publish (win-x64)
-          shell: bash
-          working-directory: src/${{ inputs.service }}
-          run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/win-x64
+          run: dotnet publish -c release -r ${{ inputs.runtime }} --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/${{ inputs.runtime }}
         - name: Copy license
           shell: bash
-          run: cp LICENSE build/osx-arm64 && cp LICENSE build/linux-x64 && cp LICENSE build/win-x64
+          run: cp LICENSE build/${{ inputs.runtime }}
         - name: Delete appsettings.Development.json
           shell: bash
-          run: rm build/osx-arm64/appsettings.Development.json && rm build/linux-x64/appsettings.Development.json && rm build/win-x64/appsettings.Development.json
+          run: rm build/${{ inputs.runtime }}/appsettings.Development.json
         - name: Delete symbol files
           shell: bash
-          run: rm build/osx-arm64/*.pdb && rm build/linux-x64/*.pdb && rm build/win-x64/*.pdb
+          run: rm build/${{ inputs.runtime }}/*.pdb
         - name: Upload artifacts
           uses: actions/upload-artifact@v3
           with:
