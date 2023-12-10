@@ -20,5 +20,5 @@ runs:
       uses: actions/upload-artifact@v3
       with:
         name: ${{ inputs.artifact }}
-        path: artifacts
+        path: artifacts/${{ inputs.artifact }}
         retention-days: 2
