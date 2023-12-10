@@ -23,7 +23,7 @@ jobs:
           run: dotnet restore
         - name: Publish (osx-arm64)
           working-directory: src/Gateway
-          run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -o ../../build/osx-arm64
+          run: dotnet publish -c release -r osx-arm64 --self-contained -o ../../build/osx-arm64
         - name: Publish (linux-x64)
           working-directory: src/Gateway
           run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ../../build/linux-x64
@@ -55,7 +55,7 @@ jobs:
           run: dotnet restore
         - name: Publish (osx-arm64)
           working-directory: src/Web
-          run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -o ../../build/osx-arm64
+          run: dotnet publish -c release -r osx-arm64 --self-contained -o ../../build/osx-arm64
         - name: Publish (linux-x64)
           working-directory: src/Web
           run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ../../build/linux-x64
