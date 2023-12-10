@@ -66,6 +66,34 @@ jobs:
           service: "Agent"
           artifact: "agent"
 
+  build-plugins:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          submodules: recursive
+      - name: Publish AyBorg.Plugins.Base
+        working-directory: src/Plugins/Base
+        run: dotnet publish -c release -o ../../../build/AyBorg.Plugins.Base
+      - name: Publish AyBorg.Plugins.ImageTorque
+        working-directory: src/Plugins/ImageTorque
+        run: dotnet publish -c release -o ../../../build/AyBorg.Plugins.ImageTorque
+      - name: Publish AyBorg.Plugins.MQTT
+        working-directory: src/Plugins/MQTT
+        run: dotnet publish -c release -o ../../../build/AyBorg.Plugins.MQTT
+      - name: Publish AyBorg.Plugins.ZXing
+        working-directory: src/Plugins/ZXing
+        run: dotnet publish -c release -o ../../../build/AyBorg.Plugins.ZXing
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Plugins
+          path: build
+          retention-days: 2
+
   codesign:
 
     needs: [build-gateway, build-web, build-log, build-agent]

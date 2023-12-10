@@ -16,3 +16,9 @@ runs:
     - name: Codesign (${{ inputs.artifact }})
       shell: bash
       run: codesign --force -s - --entitlements ./entitlements.plist artifacts/${{ inputs.artifact }}/osx-arm64/AyBorg.${{ inputs.service }}
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ inputs.artifact }}
+        path: artifacts
+        retention-days: 2
