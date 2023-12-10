@@ -4,11 +4,11 @@
 
 @if (string.IsNullOrEmpty(_serviceName))
 {
-    <PageTitle>AyBorg - Devices</PageTitle>
+    <PageTitle>Devices</PageTitle>
 }
 else
 {
-    <PageTitle>AyBorg - Devices (@_serviceName)</PageTitle>
+    <PageTitle>Devices (@_serviceName)</PageTitle>
 }
 
 <AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />

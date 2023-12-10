@@ -20,6 +20,7 @@ internal static class GrpcClientExtension
         CreateClientFactory<EventLog.EventLogClient>(builder, gatewayUrl);
         CreateClientFactory<Audit.AuditClient>(builder, gatewayUrl);
         CreateClientFactory<DeviceManager.DeviceManagerClient>(builder, gatewayUrl);
+        CreateClientFactory<Ayborg.Gateway.Result.V1.Storage.StorageClient>(builder, gatewayUrl);
         return builder;
     }
 

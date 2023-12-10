@@ -6,8 +6,6 @@ WORKDIR /src/Plugins/Base
 RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.Base
 WORKDIR /src/Plugins/ImageTorque
 RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.ImageTorque
-WORKDIR /src/Plugins/ImageTorque.AI
-RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.ImageTorque.AI
 WORKDIR /src/Plugins/MQTT
 RUN dotnet publish -c release -o ../../../artifacts/plugins/AyBorg.Plugins.MQTT
 WORKDIR /src/Plugins/ZXing
@@ -26,7 +24,7 @@ RUN groupadd --gid $USER_GID $USERNAME \
     #
     # [Optional] Add sudo support. Omit if you don't need to install software after connecting.
     && apt-get update \
-    && apt-get install -y sudo \
+    && apt-get --no-install-recommends install -y sudo && apt-get clean \
     && echo $USERNAME ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/$USERNAME \
     && chmod 0440 /etc/sudoers.d/$USERNAME
 

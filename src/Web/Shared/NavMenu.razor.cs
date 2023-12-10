@@ -10,6 +10,7 @@ public partial class NavMenu : ComponentBase
     [Inject] IStateService StateService { get; set; } = null!;
     [Inject] IRegistryService RegistryService { get; set; } = null!;
 
+private bool _isDashboardAvailable = false;
     private bool _isAnyAgentAvailable = false;
     private bool _isAnalyticsAvailable = false;
     private bool _isAuditAvailable = false;
@@ -22,8 +23,9 @@ public partial class NavMenu : ComponentBase
         {
             IEnumerable<Models.ServiceInfoEntry> services = await RegistryService.ReceiveServicesAsync();
 
+            _isDashboardAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Dashboard));
             _isAnyAgentAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Agent));
-            _isAnalyticsAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Analytics));
+            _isAnalyticsAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Log));
             _isAuditAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Audit));
         }
         catch (Exception ex)

@@ -169,13 +169,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// <exception cref="KeyNotFoundException">Thrown if the specified service is not found.</exception>
     public ServiceEntry? Unregister(Guid serviceId)
     {
-        ServiceEntry? matchingService = FindAvailableService(serviceId);
-
-        if (matchingService == null)
-        {
-            throw new KeyNotFoundException($"Service with id '{serviceId}' not found!");
-        }
-
+        ServiceEntry? matchingService = FindAvailableService(serviceId) ?? throw new KeyNotFoundException($"Service with id '{serviceId}' not found!");
         RemoveService(serviceId);
         return matchingService;
     }
@@ -188,13 +182,7 @@ public sealed class KeeperService : IKeeperService, IDisposable
     /// <returns>Task.</returns>
     public async ValueTask UpdateTimestamp(ServiceEntry serviceEntry)
     {
-        ServiceEntry? matchingService = FindAvailableService(serviceEntry);
-
-        if (matchingService == null)
-        {
-            throw new KeyNotFoundException($"Service with url '{serviceEntry.Url}' not found!");
-        }
-
+        ServiceEntry? matchingService = FindAvailableService(serviceEntry) ?? throw new KeyNotFoundException($"Service with url '{serviceEntry.Url}' not found!");
         matchingService.LastConnectionTime = DateTime.UtcNow;
 
         await ValueTask.CompletedTask;

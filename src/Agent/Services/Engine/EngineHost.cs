@@ -17,6 +17,21 @@ internal sealed class EngineHost : IEngineHost
     private bool _isDisposed = false;
 
     /// <summary>
+    /// Occurs when [iteration started].
+    /// </summary>
+    public event EventHandler<IterationStartedEventArgs>? IterationStarted;
+
+    /// <summary>
+    /// Occurs when [iteration finished].
+    /// </summary>
+    public event EventHandler<IterationFinishedEventArgs>? IterationFinished;
+
+    /// <summary>
+    /// Gets the active project.
+    /// </summary>
+    public Project? ActiveProject { get; private set; }
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="EngineHost"/> class.
     /// </summary>
     /// <param name="logger">The logger.</param>
@@ -36,11 +51,6 @@ internal sealed class EngineHost : IEngineHost
         _communicationStateProvider = (CommunicationStateProvider)communicationStateProvider;
         _notifyService = notifyService;
     }
-
-    /// <summary>
-    /// Gets the active project.
-    /// </summary>
-    public Project? ActiveProject { get; private set; }
 
     /// <summary>
     /// Tries to activate the specified project.
@@ -123,7 +133,8 @@ internal sealed class EngineHost : IEngineHost
 
         _engine = _engineFactory.CreateEngine(ActiveProject, executionType);
         _engine.StateChanged += EngineStateChanged;
-        _engine.IterationFinished += EngineIterationFinished;
+        _engine.IterationStarted += OnEngineIterationStarted;
+        _engine.IterationFinished += OnEngineIterationFinished;
         bool startResult = await _engine.TryStartAsync();
         if (!startResult)
         {
@@ -219,12 +230,18 @@ internal sealed class EngineHost : IEngineHost
     {
         if (_engine == null) return;
         _engine.StateChanged -= EngineStateChanged;
-        _engine.IterationFinished -= EngineIterationFinished;
+        _engine.IterationStarted -= OnEngineIterationStarted;
+        _engine.IterationFinished -= OnEngineIterationFinished;
         _engine.Dispose();
         _engine = null;
     }
 
-    private async void EngineIterationFinished(object? sender, IterationFinishedEventArgs e)
+    private void OnEngineIterationStarted(object? sender, IterationStartedEventArgs e)
+    {
+        IterationStarted?.Invoke(this, e);
+    }
+
+    private async void OnEngineIterationFinished(object? sender, IterationFinishedEventArgs e)
     {
         if (ActiveProject == null)
         {
@@ -233,6 +250,8 @@ internal sealed class EngineHost : IEngineHost
         }
 
         _cacheService.CreateCache(e.IterationId, ActiveProject);
+        IterationFinished?.Invoke(this, e);
+
         try
         {
             await _notifyService.SendIterationFinishedAsync(e.IterationId);

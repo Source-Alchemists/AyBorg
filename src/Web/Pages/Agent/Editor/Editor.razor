@@ -6,15 +6,19 @@
 
 @if (string.IsNullOrEmpty(_serviceName))
 {
-    <PageTitle>AyBorg - Editor</PageTitle>
+    <PageTitle>Editor</PageTitle>
 }
 else
 {
-    <PageTitle>AyBorg - Editor (@_serviceName)</PageTitle>
+    <PageTitle>Editor (@_serviceName)</PageTitle>
 }
 <AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
 @if (_isProjectLoaded)
 {
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
 <MudToolBar Class="px-0">
     <MudGrid>
         <MudItem xs="4">
@@ -56,11 +60,7 @@ else
     </MudGrid>
 </MudToolBar>
 
-<div class="page-loading-bar">
-    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
-</div>
-
-<MudGrid Class="editor-container">
+<MudGrid Class="grid-container">
     @if (_projectState == ProjectState.Draft)
     {
         <MudHidden Breakpoint="Breakpoint.Sm" Invert="false">

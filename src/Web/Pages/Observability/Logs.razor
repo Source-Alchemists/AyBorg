@@ -1,0 +1,60 @@
+@page "/observability/analytics"
+@using SDK.Authorization
+@using AyBorg.Web.Pages.Observability.Shared
+@using AyBorg.Web.Shared.Charts
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}, {Roles.Auditor}")]
+
+<PageTitle>Observability/Logs</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading && !_isEventLogTableLoading)"/>
+</div>
+<MudGrid Class="mud-full-width">
+    <MudItem xs="12" sm="12" md="6" lg="3">
+        <MudCard Class="rounded-lg">
+            <MudCardHeader Class="pb-0">
+                <MudText Typo="Typo.h6">Level Time Series</MudText>
+            </MudCardHeader>
+            <MudCardContent Class="flex-self-center pb-0" style="min-height:330px;">
+                <LineChart SeriesData="@_eventLevelOverTimeData" SeriesLabels="@_eventLevelOverTimeLabels" Height="250px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="12" md="6" lg="3">
+        <MudCard Class="rounded-lg">
+            <MudCardHeader Class="pb-0">
+                <MudText Typo="Typo.h6">Level Summary</MudText>
+            </MudCardHeader>
+            <MudCardContent Class="flex-self-center pb-0" style="min-height:330px">
+                <PieChart Labels="@_eventLevelSummaryLabels" Data="@_eventLevelSummaryData" Height="200px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="12" md="6" lg="3">
+        <MudCard Class="rounded-lg">
+            <MudCardHeader Class="pb-0">
+                <MudText Typo="Typo.h6">Service Summary</MudText>
+            </MudCardHeader>
+            <MudCardContent Class="flex-self-center pb-0" style="min-height:330px">
+                <PieChart Labels="@_eventServiceSummaryLabels" Data="@_eventServiceSummaryData" Height="200px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12" sm="12" md="6" lg="3">
+        <MudCard Class="rounded-lg">
+            <MudCardHeader Class="pb-0">
+                <MudText Typo="Typo.h6">Event Summary</MudText>
+            </MudCardHeader>
+            <MudCardContent Class="flex-self-center pb-0" style="min-height:330px">
+                <PieChart Labels="@_eventIdSummaryLabels" Data="@_eventIdSummaryData" Height="200px" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12">
+        <MudCard Class="rounded-lg">
+            <MudCardContent Class="pt-0">
+                <EventLogTable @ref="_eventLogTable" EventEntries="@_eventRecords" />
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>

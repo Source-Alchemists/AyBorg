@@ -1,2 +1,50 @@
 ﻿@page "/"
 @attribute [Authorize]
+
+<div class="logo-background">
+    <MudGrid class="grid-container start">
+        <MudItem xs="12">
+            <MudText Typo="Typo.h2"><span class="brand-text start">AyBorg</span></MudText>
+            <MudText Typo="Typo.h6">Automation made easY</MudText>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h5">Start</MudText>
+            <MudLink Href="/agents/overview" Underline="Underline.None">
+                <MudText>Agents Overview</MudText>
+            </MudLink>
+        </MudItem>
+        <MudItem xs="12" md="6">
+            <MudText Typo="Typo.h5">Tutorials</MudText>
+            <MudStack>
+                <MudLink Href="/tutorials/edit-workflows" Underline="Underline.None">
+                    <MudCard Class="rounded-lg">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">Edit Workflows</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardMedia Image="/img/tutorial/workflow_thumb.png" />
+                        <MudCardContent>
+                            <MudText Typo="Typo.body1">Learn the basics and start editing</MudText>
+                        </MudCardContent>
+                    </MudCard>
+                </MudLink>
+                <MudLink Href="/" Underline="Underline.None" hidden>
+                    <MudCard Class="rounded-lg">
+                        <MudCardHeader>
+                            <CardHeaderContent>
+                                <MudText Typo="Typo.h6">Connect Devices</MudText>
+                            </CardHeaderContent>
+                        </MudCardHeader>
+                        <MudCardMedia Image="/img/tutorial/devices_thumb.png" Height="200" />
+                        <MudCardContent>
+                        </MudCardContent>
+                    </MudCard>
+                </MudLink>
+                <MudLink Href="https://ayborg.io/docs" Target="_blank" Underline="Underline.None">
+                    <MudText Typo="Typo.body1">More...</MudText>
+                </MudLink>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
+</div>

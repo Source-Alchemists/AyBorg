@@ -2,6 +2,9 @@ using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Communication;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.System.Runtime;
+using ImageTorque;
+using ImageTorque.Buffers;
+using ImageTorque.Pixels;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 
@@ -44,6 +47,10 @@ public class CommunicationImageSendTests
             devicePort.Value = new SelectPort.ValueContainer("1", new List<string> { "1" });
             _deviceManagerMock.Setup(m => m.GetDevices<ICommunicationDevice>()).Returns(new List<ICommunicationDevice> { _deviceMock.Object });
         }
+
+        using var testImage = new Image(new PixelBuffer<L8>(2, 2, new L8[] { 0x00, 0x01, 0x80, 0xFF }));
+        var valuePort = (ImagePort)plugin.Ports.First(p => p.Name.Equals("Value"));
+        valuePort.Value = testImage;
 
         // Act
         // Simulate lifecycle

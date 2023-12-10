@@ -1,0 +1,19 @@
+<MudCard Style="height: calc(100vh - 148px)" Class="rounded-lg d-flex justify-center flex-column">
+    <MudCardHeader Class="order-0">
+        <CardHeaderAvatar>
+            <MudIcon Icon="@Icons.Filled.Widgets" />
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Widgets</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Close" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent style="height: calc(100% - 75px)" class="pt-0 mt-0 order-1">
+        <MudTextField T="string" Label="Search" TextChanged="@OnSearchTextChanged"
+                        Variant="Variant.Filled" Adornment="Adornment.End"
+                        AdornmentIcon="@Icons.Material.Filled.Search" Clearable="true"
+                        Immediate="true" Class="mt-3" />
+    </MudCardContent>
+</MudCard>

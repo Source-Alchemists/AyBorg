@@ -17,7 +17,7 @@ public sealed class EventLogPassthroughServiceV1 : EventLog.EventLogBase
 
     public override async Task<Empty> LogEvent(EventEntry request, ServerCallContext context)
     {
-        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Analytics);
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Log);
         foreach (ChannelInfo channel in channels)
         {
             EventLog.EventLogClient client = _channelService.CreateClient<EventLog.EventLogClient>(channel.ServiceUniqueName);
@@ -29,7 +29,7 @@ public sealed class EventLogPassthroughServiceV1 : EventLog.EventLogBase
 
     public override async Task GetLogEvents(GetEventsRequest request, IServerStreamWriter<EventEntry> responseStream, ServerCallContext context)
     {
-        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Analytics);
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Log);
         await Parallel.ForEachAsync(channels, async (channel, token) =>
         {
             EventLog.EventLogClient client = _channelService.CreateClient<EventLog.EventLogClient>(channel.ServiceUniqueName);

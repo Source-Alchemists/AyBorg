@@ -1,11 +1,11 @@
 ﻿<AuthorizeView>
     <NotAuthorized>
-        <MudLink Href="Identity/Account/Login" Underline="Underline.None">
+        <MudLink Href="Identity/Account/Login" Underline="Underline.None" Class="noprint">
             Login
         </MudLink>
     </NotAuthorized>
     <Authorized>
-        <MudMenu Label="@context.User.Identity!.Name" Color="Color.Inherit">
+        <MudMenu Label="@context.User.Identity!.Name" Color="Color.Inherit" Class="noprint">
             <MudLink Href="Identity/Account/Manage/ChangePassword" Underline="Underline.None">
                 <MudMenuItem Icon="@Icons.Filled.Password">
                     Change password

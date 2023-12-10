@@ -1,5 +1,4 @@
-﻿using AyBorg.Diagrams.Core.Geometry;
-using AyBorg.Diagrams.Core.Models;
+﻿using AyBorg.Diagrams.Core.Models;
 using AyBorg.SDK.Common.Models;
 
 namespace AyBorg.Web.Pages.Agent.Editor.Nodes;
@@ -27,7 +26,7 @@ public class FlowNode : NodeModel
     /// <param name="flowService">The flow service.</param>
     /// <param name="step">The step.</param>
     /// <param name="locked">Whether the node is locked.</param>
-    public FlowNode(Step step, bool locked = false) : base(step.Id.ToString(), new Point(step.X, step.Y))
+    public FlowNode(Step step, bool locked = false) : base(step.Id.ToString(), new Diagrams.Core.Geometry.Point(step.X, step.Y))
     {
         Title = step.Name;
         Step = step;

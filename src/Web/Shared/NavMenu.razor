@@ -1,5 +1,13 @@
 ﻿@using SDK.Authorization
 
+<AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
+    <Authorized>
+        <MudNavLink Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Primary"  href="dashboard" Match="NavLinkMatch.All" hidden="@(!_isDashboardAvailable)">
+            Dashboard
+        </MudNavLink>
+    </Authorized>
+</AuthorizeView>
+
 <AuthorizeView Roles="Administrator, Engineer, Reviewer">
     <Authorized>
         <MudNavGroup Title="Agents" Icon="@Icons.Filled.Workspaces" IconColor="Color.Primary" Expanded="true" hidden="@(!_isAnyAgentAvailable)">
@@ -9,11 +17,11 @@
             @if(StateService.AgentState != null)
             {
                 <MudNavGroup Title="@StateService.AgentState.Name" Icon="@Icons.Outlined.Workspaces" Expanded="true">
-                    <MudNavLink Href="@StateService.AgentState.EditorLink">
-                        Editor
-                    </MudNavLink>
                     <MudNavLink Href="@StateService.AgentState.ProjectsLink">
                         Projects
+                    </MudNavLink>
+                    <MudNavLink Href="@StateService.AgentState.EditorLink">
+                        Editor
                     </MudNavLink>
                     <MudNavLink Href="@StateService.AgentState.DevicesLink">
                         Devices
@@ -26,7 +34,14 @@
 
 <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
     <Authorized>
-        <MudNavLink Icon="@Icons.Material.Filled.Analytics" IconColor="Color.Primary" href="analytics" hidden="@(!_isAnalyticsAvailable)">Analytics</MudNavLink>
+        <MudNavGroup Title="Observability" Icon="@Icons.Material.Filled.Analytics" IconColor="Color.Primary" Expanded="true">
+            <MudNavLink href="observability/analytics" Match="NavLinkMatch.Prefix" hidden="@(!_isAnalyticsAvailable)">
+                Logs
+            </MudNavLink>
+            <MudNavLink Href="observability/services" Match="NavLinkMatch.Prefix">
+                Services
+            </MudNavLink>
+        </MudNavGroup>
     </Authorized>
 </AuthorizeView>
 
@@ -46,9 +61,6 @@
 <AuthorizeView Roles="@Roles.Administrator">
     <Authorized>
         <MudNavGroup Title="Administration" Icon="@Icons.Filled.AdminPanelSettings" IconColor="Color.Primary" Expanded="true">
-            <MudNavLink Href="admin/services" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.Storage">
-                Services
-            </MudNavLink>
             <MudNavLink Href="admin/usermanagement" Match="NavLinkMatch.All" Icon="@Icons.Filled.ManageAccounts">
                 User Management
             </MudNavLink>

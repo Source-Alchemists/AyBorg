@@ -57,6 +57,8 @@ public partial class Devices : ComponentBase
                 _devices = _devices.Add(device);
             }
         }
+
+        _devices = _devices.OrderBy(d => d.Id).ToImmutableList();
     }
 
     private async Task OnAddDeviceClicked()
