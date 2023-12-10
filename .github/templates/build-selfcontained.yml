@@ -8,10 +8,6 @@ inputs:
 
 runs:
   steps:
-        - uses: actions/checkout@v3
-          with:
-            fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-            submodules: recursive
         - name: Setup .NET
           uses: actions/setup-dotnet@v3
           with:

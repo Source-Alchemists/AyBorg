@@ -11,6 +11,10 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+            submodules: recursive
         - name: Build artifacts
           uses: "./.github/templates/build-selfcontained"
           with:
@@ -22,6 +26,10 @@ jobs:
       runs-on: ubuntu-latest
 
       steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+            submodules: recursive
         - name: Build artifacts
           uses: "./.github/templates/build-selfcontained"
           with:
@@ -33,6 +41,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          submodules: recursive
       - name: Build artifacts
         uses: "./.github/templates/build-selfcontained"
         with:
