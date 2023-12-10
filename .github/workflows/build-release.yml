@@ -23,17 +23,49 @@ jobs:
           run: dotnet restore
         - name: Publish (osx-arm64)
           working-directory: src/Gateway
-          run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -o ../../build/gateway/osx-arm64
+          run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -o ../../build/osx-arm64
         - name: Publish (linux-x64)
           working-directory: src/Gateway
-          run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ../../build/gateway/linux-x64
+          run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ../../build/linux-x64
         - name: Publish (win-x64)
           working-directory: src/Gateway
-          run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -o ../../build/gateway/win-x64
+          run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -o ../../build/win-x64
         - name: Copy license
-          run: cp LICENSE build/gateway/osx-arm64 && cp LICENSE build/gateway/linux-x64 && cp LICENSE build/gateway/win-x64
+          run: cp LICENSE build/osx-arm64 && cp LICENSE build/linux-x64 && cp LICENSE build/win-x64
         - name: Upload artifacts
           uses: actions/upload-artifact@v3
           with:
             name: gateway
-            path: build/gateway
+            path: build
+
+  build-web:
+
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+            submodules: recursive
+        - name: Setup .NET
+          uses: actions/setup-dotnet@v3
+          with:
+            dotnet-version: 7.0.x
+        - name: Restore dependencies
+          run: dotnet restore
+        - name: Publish (osx-arm64)
+          working-directory: src/Web
+          run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -o ../../build/osx-arm64
+        - name: Publish (linux-x64)
+          working-directory: src/Web
+          run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ../../build/linux-x64
+        - name: Publish (win-x64)
+          working-directory: src/Web
+          run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -o ../../build/win-x64
+        - name: Copy license
+          run: cp LICENSE build/osx-arm64 && cp LICENSE build/linux-x64 && cp LICENSE build/win-x64
+        - name: Upload artifacts
+          uses: actions/upload-artifact@v3
+          with:
+            name: web
+            path: build
