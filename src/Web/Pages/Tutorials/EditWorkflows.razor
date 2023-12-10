@@ -1,0 +1,178 @@
+@page "/tutorials/edit-workflows"
+
+<PageTitle>Tutorials/Edit Workflows</PageTitle>
+
+<div class="logo-background">
+    <MudGrid class="grid-container tutorial">
+        <MudItem xs="12">
+            <MudText Typo="Typo.h4">Tutorial: Edit Workflows</MudText>
+        </MudItem>
+        <MudItem xs="12" md="12" lg="6">
+            <MudText Typo="Typo.h5">Introduction</MudText>
+            <MudText Typo="Typo.body1">
+                Welcome to AyBorg, an advanced automation tool designed to streamline and automate processes. This tutorial will guide you through the process of editing a workflow using AyBorg.
+            </MudText>
+        </MudItem>
+        <MudItem xs="12" md="12" lg="6">
+            <MudText Typo="Typo.h5">Prerequisites</MudText>
+            <MudText Typo="Typo.body1">
+                <strong>Running AyBorg.Agent:</strong>
+                <ul class="list disc">
+                    <li>
+                        Confirm that at least one AyBorg.Agent is installed and operational. If not, contact your system administrator for assistance.
+                    </li>
+                </ul>
+            </MudText>
+        </MudItem>
+        <MudItem xs="12">
+            <MudExpansionPanels MultiExpansion>
+                <MudExpansionPanel IsInitiallyExpanded>
+                    <TitleContent>
+                        <div class="d-flex">
+                            <MudIcon Icon="@Icons.Material.Filled.Info" class="mr-3 mt-1" />
+                            <MudText Typo="Typo.h5">Initial Setup</MudText>
+                        </div>
+                    </TitleContent>
+                    <ChildContent>
+                        <MudText Typo="Typo.h6">Step 1: Choose an Agent</MudText>
+                        <MudText Typo="Typo.body1">
+                            <ul class="list disc">
+                                <li>
+                                    If you're already logged in, click on the "Agents -> Overview" link in the left navigation bar.
+                                </li>
+                                <li>
+                                    If there are multiple agents available, choose the one you want to work with.
+                                </li>
+                            </ul>
+                        </MudText>
+                        <MudText Typo="Typo.h6">Step 2: Create a Project</MudText>
+                        <MudText Typo="Typo.body1">
+                            <ul class="list disc">
+                                <li>
+                                    If the agent you want to work with has no project loaded, it will show as project "None".
+                                </li>
+                                <li>
+                                    Click on project "None" or the already loaded project name to navigate to the "Projects" page.
+                                </li>
+                                <li>
+                                    Click on "New Project" to set up a new project. Enter a name for your project.
+                                </li>
+                            </ul>
+                        </MudText>
+                        <MudText Typo="Typo.h6">Step 3: Load and Activate the Project</MudText>
+                        <MudText Typo="Typo.body1">
+                            <ul class="list disc">
+                                <li>
+                                    After creating the project, locate it in the project list.
+                                </li>
+                                <li>
+                                    Click on "Activate" to load and activate it. This step ensures that you are working within the context of the chosen project.
+                                </li>
+                            </ul>
+                        </MudText>
+                    </ChildContent>
+                </MudExpansionPanel>
+                <MudExpansionPanel IsInitiallyExpanded>
+                    <TitleContent>
+                        <div class="d-flex">
+                            <MudText Typo="Typo.h5">Editing a Workflow</MudText>
+                        </div>
+                    </TitleContent>
+                    <ChildContent>
+                        <MudText Typo="Typo.h6">Step 1: Open the Agent Editor</MudText>
+                        <MudText Typo="Typo.body1">
+                            <ul class="list disc">
+                                <li>
+                                    With the project loaded, find the "Agent -> Editor" link in the left navigation bar.
+                                </li>
+                                <li>
+                                    Click on "Agent -> Editor" to open the editor where you can create and edit workflows.
+                                </li>
+                            </ul>
+                        </MudText>
+                        <MudText Typo="Typo.h6">Step 2: Add Steps (Plugins) by Drag and Drop</MudText>
+                        <MudText Typo="Typo.body1">
+                            <ul class="list disc">
+                                <li>
+                                    On the Editor page, find the "Steps" selection.
+                                </li>
+                                <li>
+                                    Explore the available steps (plugins) that can be used in your workflow.
+                                </li>
+                                <li>
+                                    Drag and drop the desired steps onto the workflow canvas.
+                                </li>
+                                <li> (Optional) To delete steps, select them on the workflow canvas and press the delete key on your keyboard or click on the trash icon (visible when the step is selected).</li>
+                            </ul>
+                        </MudText>
+                        <MudText Typo="Typo.h6">Step 3: Connect Step Ports</MudText>
+                        <MudText Typo="Typo.body1">
+                            <ul class="list disc">
+                                <li>
+                                    Each step can have multiple input and output ports. Connect them by dragging a connection line from the output port of one step to the input port of another.
+                                </li>
+                                <li>
+                                    Define the flow of the workflow by connecting the appropriate ports.
+                                </li>
+                            </ul>
+                        </MudText>
+                        <MudText Typo="Typo.h6">Step 4: Change Step View</MudText>
+                        <MudText Typo="Typo.body1">
+                            <ul class="list disc">
+                                <li>
+                                    Select a step on the workflow canvas.
+                                </li>
+                                <li>
+                                    Click on the "Full Screen" button (visible when the step is selected) to change the view to a step-focused mode.
+                                </li>
+                                <li>
+                                    In this mode, you can edit the step in detail.
+                                </li>
+                            </ul>
+                        </MudText>
+                        <MudText Typo="Typo.h6">Step 5: Execute the Workflow</MudText>
+                        <MudText Typo="Typo.body1">
+                            <ul class="list disc">
+                                <li>
+                                    Locate the runtime toolbar at the top of the workflow canvas.
+                                </li>
+                                <li>
+                                    Find options such as "Single" or "Continuous" to execute the workflow.
+                                </li>
+                                <li>
+                                    Execute a run to ensure that the workflow behaves as expected.
+                                </li>
+                            </ul>
+                        </MudText>
+                        <MudText Typo="Typo.h6">Step 6: Save the Workflow</MudText>
+                        <MudText Typo="Typo.body1">
+                            <ul class="list disc">
+                                <li>
+                                    At the top of the workflow canvas, find the "Save" button.
+                                </li>
+                                <li>
+                                    Click "Save" or "Save as draft" to store your changes. Note that AyBorg does not save projects automatically.
+                                </li>
+                            </ul>
+                        </MudText>
+                    </ChildContent>
+                </MudExpansionPanel>
+                <MudExpansionPanel IsInitiallyExpanded>
+                    <TitleContent>
+                        <div class="d-flex">
+                            <MudText Typo="Typo.h5">Conclusion</MudText>
+                        </div>
+                    </TitleContent>
+                    <ChildContent>
+                        <MudText Typo="Typo.body1">
+                            You've successfully edited a workflow in AyBorg! By choosing an agent, creating and activating a project, opening the Agent Editor, and then adding steps, connecting ports, executing the workflow, saving your changes, deleting steps, and changing the step view, you've taken the necessary steps to automate processes effectively. Happy automating!
+                        </MudText>
+                    </ChildContent>
+                </MudExpansionPanel>
+            </MudExpansionPanels>
+        </MudItem>
+        <MudItem xs="12">
+
+        </MudItem>
+    </MudGrid>
+</div>
