@@ -8,7 +8,7 @@ on:
 jobs:
   build-gateway:
 
-      runs-on: macos-latest
+      runs-on: ubuntu-latest
 
       steps:
         - uses: actions/checkout@v3
@@ -23,13 +23,13 @@ jobs:
           run: dotnet restore
         - name: Publish (osx-arm64)
           working-directory: src/Gateway
-          run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -o ../../build/osx-arm64
+          run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/osx-arm64
         - name: Publish (linux-x64)
           working-directory: src/Gateway
-          run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ../../build/linux-x64
+          run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/linux-x64
         - name: Publish (win-x64)
           working-directory: src/Gateway
-          run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -o ../../build/win-x64
+          run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/win-x64
         - name: Copy license
           run: cp LICENSE build/osx-arm64 && cp LICENSE build/linux-x64 && cp LICENSE build/win-x64
         - name: Upload artifacts
@@ -40,7 +40,7 @@ jobs:
 
   build-web:
 
-      runs-on: macos-latest
+      runs-on: ubuntu-latest
 
       steps:
         - uses: actions/checkout@v3
@@ -55,13 +55,13 @@ jobs:
           run: dotnet restore
         - name: Publish (osx-arm64)
           working-directory: src/Web
-          run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -o ../../build/osx-arm64
+          run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/osx-arm64
         - name: Publish (linux-x64)
           working-directory: src/Web
-          run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ../../build/linux-x64
+          run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/linux-x64
         - name: Publish (win-x64)
           working-directory: src/Web
-          run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -o ../../build/win-x64
+          run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/win-x64
         - name: Copy license
           run: cp LICENSE build/osx-arm64 && cp LICENSE build/linux-x64 && cp LICENSE build/win-x64
         - name: Upload artifacts
@@ -72,7 +72,7 @@ jobs:
 
   build-log:
 
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -87,17 +87,32 @@ jobs:
         run: dotnet restore
       - name: Publish (osx-arm64)
         working-directory: src/Log
-        run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -o ../../build/osx-arm64
+        run: dotnet publish -c release -r osx-arm64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/osx-arm64
       - name: Publish (linux-x64)
         working-directory: src/Log
-        run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -o ../../build/linux-x64
+        run: dotnet publish -c release -r linux-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/linux-x64
       - name: Publish (win-x64)
         working-directory: src/Log
-        run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -o ../../build/win-x64
+        run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o ../../build/win-x64
       - name: Copy license
         run: cp LICENSE build/osx-arm64 && cp LICENSE build/linux-x64 && cp LICENSE build/win-x64
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: web
+          name: log
           path: build
+
+  codesign:
+
+    needs: [build-gateway]
+
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: gateway
+          path: artifacts/gateway
+      - name: Codesign
+        run: codesign --force -s AyBorg --entitlements ./entitlements.plist artifacts/gateway/osx-arm64/AyBorg.Gateway
