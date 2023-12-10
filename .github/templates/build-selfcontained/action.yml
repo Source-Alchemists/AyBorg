@@ -31,8 +31,12 @@ runs:
         - name: Copy license
           shell: bash
           run: cp LICENSE build/osx-arm64 && cp LICENSE build/linux-x64 && cp LICENSE build/win-x64
+        - name: Delete appsettings.Development.json
+          shell: bash
+          run: rm build/osx-arm64/appsettings.Development.json && rm build/linux-x64/appsettings.Development.json && rm build/win-x64/appsettings.Development.json
         - name: Upload artifacts
           uses: actions/upload-artifact@v3
           with:
             name: ${{ inputs.artifact }}
             path: build
+            retention-days: 2

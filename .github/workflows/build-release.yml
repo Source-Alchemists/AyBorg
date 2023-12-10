@@ -51,9 +51,24 @@ jobs:
           service: "Log"
           artifact: "log"
 
+  build-agent:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          submodules: recursive
+      - name: Build artifacts
+        uses: "./.github/templates/build-selfcontained"
+        with:
+          service: "Agent"
+          artifact: "agent"
+
   codesign:
 
-    needs: [build-gateway, build-web, build-log]
+    needs: [build-gateway, build-web, build-log, build-agent]
 
     runs-on: macos-latest
 
@@ -74,4 +89,9 @@ jobs:
         with:
           service: "Log"
           artifact: "log"
+      - name: Codesign (Agent)
+        uses: "./.github/templates/codesign"
+        with:
+          service: "Agent"
+          artifact: "agent"
 
