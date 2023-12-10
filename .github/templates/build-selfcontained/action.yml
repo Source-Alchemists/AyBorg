@@ -34,6 +34,9 @@ runs:
         - name: Delete appsettings.Development.json
           shell: bash
           run: rm build/osx-arm64/appsettings.Development.json && rm build/linux-x64/appsettings.Development.json && rm build/win-x64/appsettings.Development.json
+        - name: Delete symbol files
+          shell: bash
+          run: rm build/osx-arm64/*.pdb && rm build/linux-x64/*.pdb && rm build/win-x64/*.pdb
         - name: Upload artifacts
           uses: actions/upload-artifact@v3
           with:
