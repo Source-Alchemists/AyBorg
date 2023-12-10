@@ -149,6 +149,10 @@ jobs:
           artifact: "agent"
 
   publish:
+    strategy:
+        matrix:
+            runtime: [osx-arm64, linux-x64, linux-arm64, win-x64]
+
     needs: [build-plugins, codesign]
 
     runs-on: ubuntu-latest
@@ -175,25 +179,29 @@ jobs:
           name: plugins
           path: artifacts/plugins
       - name: Copy plugins to agent
-        run: cp -r artifacts/plugins artifacts/agent
+        run: cp -r artifacts/plugins artifacts/agent/${{ matrix.runtime }}
       - name: Publish (Gateway)
         uses: "./.github/templates/publish-release"
         with:
           service: "Gateway"
           artifact: "gateway"
+          runtime: ${{ matrix.runtime }}
       - name: Publish (Web)
         uses: "./.github/templates/publish-release"
         with:
           service: "Web"
           artifact: "web"
+          runtime: ${{ matrix.runtime }}
       - name: Publish (Log)
         uses: "./.github/templates/publish-release"
         with:
           service: "Log"
           artifact: "log"
+          runtime: ${{ matrix.runtime }}
       - name: Publish (Agent)
         uses: "./.github/templates/publish-release"
         with:
           service: "Agent"
           artifact: "agent"
+          runtime: ${{ matrix.runtime }}
 
