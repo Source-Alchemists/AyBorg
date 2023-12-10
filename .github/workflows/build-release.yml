@@ -30,6 +30,8 @@ jobs:
         - name: Publish (win-x64)
           working-directory: src/Gateway
           run: dotnet publish -c release -r win-x64 --self-contained -p:PublishSingleFile=true -o ../../build/gateway/win-x64
+        - name: Copy license
+          run: cp LICENSE build/gateway/osx-arm64 && cp LICENSE build/gateway/linux-x64 && cp LICENSE build/gateway/win-x64
         - name: Upload artifacts
           uses: actions/upload-artifact@v3
           with:
