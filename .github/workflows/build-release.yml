@@ -1,0 +1,208 @@
+name: Build & Release
+
+on:
+  push:
+    branches:
+      - 'main'
+      - 'release/*'
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build-gateway:
+
+      strategy:
+          matrix:
+              runtime: [osx-arm64, linux-x64, linux-arm64, win-x64]
+
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+            submodules: recursive
+        - name: Build artifacts
+          uses: "./.github/templates/build-selfcontained"
+          with:
+            service: "Gateway"
+            artifact: "gateway"
+            runtime: ${{ matrix.runtime }}
+
+  build-web:
+
+      strategy:
+          matrix:
+              runtime: [osx-arm64, linux-x64, linux-arm64, win-x64]
+
+      runs-on: ubuntu-latest
+
+      steps:
+        - uses: actions/checkout@v3
+          with:
+            fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+            submodules: recursive
+        - name: Move only HTTP appsettings
+          working-directory: src/Web
+          run: mv appsettings.OnlyHTTP.json appsettings.json
+        - name: Build artifacts
+          uses: "./.github/templates/build-selfcontained"
+          with:
+            service: "Web"
+            artifact: "web"
+            runtime: ${{ matrix.runtime }}
+
+  build-log:
+
+    strategy:
+        matrix:
+            runtime: [osx-arm64, linux-x64, linux-arm64, win-x64]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          submodules: recursive
+      - name: Build artifacts
+        uses: "./.github/templates/build-selfcontained"
+        with:
+          service: "Log"
+          artifact: "log"
+          runtime: ${{ matrix.runtime }}
+
+  build-agent:
+
+    strategy:
+        matrix:
+            runtime: [osx-arm64, linux-x64, linux-arm64, win-x64]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          submodules: recursive
+      - name: Build artifacts
+        uses: "./.github/templates/build-selfcontained"
+        with:
+          service: "Agent"
+          artifact: "agent"
+          runtime: ${{ matrix.runtime }}
+
+  build-plugins:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+          submodules: recursive
+      - name: Publish AyBorg.Plugins.Base
+        working-directory: src/Plugins/Base
+        run: dotnet publish -c release -o ../../../build/AyBorg.Plugins.Base
+      - name: Publish AyBorg.Plugins.ImageTorque
+        working-directory: src/Plugins/ImageTorque
+        run: dotnet publish -c release -o ../../../build/AyBorg.Plugins.ImageTorque
+      - name: Publish AyBorg.Plugins.MQTT
+        working-directory: src/Plugins/MQTT
+        run: dotnet publish -c release -o ../../../build/AyBorg.Plugins.MQTT
+      - name: Publish AyBorg.Plugins.ZXing
+        working-directory: src/Plugins/ZXing
+        run: dotnet publish -c release -o ../../../build/AyBorg.Plugins.ZXing
+      - name: Copy license
+        run: cp LICENSE build/AyBorg.Plugins.Base && cp LICENSE build/AyBorg.Plugins.ImageTorque && cp LICENSE build/AyBorg.Plugins.MQTT && cp LICENSE build/AyBorg.Plugins.ZXing
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: plugins
+          path: build
+          retention-days: 2
+
+  codesign:
+
+    needs: [build-gateway, build-web, build-log, build-agent]
+
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Codesign (Gateway)
+        uses: "./.github/templates/codesign"
+        with:
+          service: "Gateway"
+          artifact: "gateway"
+      - name: Codesign (Web)
+        uses: "./.github/templates/codesign"
+        with:
+          service: "Web"
+          artifact: "web"
+      - name: Codesign (Log)
+        uses: "./.github/templates/codesign"
+        with:
+          service: "Log"
+          artifact: "log"
+      - name: Codesign (Agent)
+        uses: "./.github/templates/codesign"
+        with:
+          service: "Agent"
+          artifact: "agent"
+
+  publish:
+    strategy:
+        matrix:
+            runtime: [osx-arm64, linux-x64, linux-arm64, win-x64]
+
+    needs: [build-plugins, codesign]
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/download-artifact@v3
+        with:
+          name: gateway
+          path: artifacts/gateway
+      - uses: actions/download-artifact@v3
+        with:
+          name: web
+          path: artifacts/web
+      - uses: actions/download-artifact@v3
+        with:
+          name: log
+          path: artifacts/log
+      - uses: actions/download-artifact@v3
+        with:
+          name: agent
+          path: artifacts/agent
+      - uses: actions/download-artifact@v3
+        with:
+          name: plugins
+          path: artifacts/plugins
+      - name: Copy plugins to agent
+        run: cp -r artifacts/plugins artifacts/agent/${{ matrix.runtime }}
+      - name: Create runtime folder
+        run: mkdir runtime && mkdir runtime/${{ matrix.runtime }}
+      - name: Move Gateway to runtime
+        run: cp -r artifacts/gateway/${{ matrix.runtime }} runtime/${{ matrix.runtime }}/Gateway
+      - name: Move Web to runtime
+        run: cp -r artifacts/web/${{ matrix.runtime }} runtime/${{ matrix.runtime }}/Web
+      - name: Move Log to runtime
+        run: cp -r artifacts/log/${{ matrix.runtime }} runtime/${{ matrix.runtime }}/Log
+      - name: Move Agent to runtime
+        run: cp -r artifacts/agent/${{ matrix.runtime }} runtime/${{ matrix.runtime }}/Agent
+      - name: Zip
+        uses: vimtor/action-zip@v1.1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: runtime/${{ matrix.runtime }}
+          dest: AyBorg.${{ matrix.runtime }}.zip
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+            files: AyBorg.${{ matrix.runtime }}.zip
+
