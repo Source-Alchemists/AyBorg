@@ -30,6 +30,9 @@ jobs:
           with:
             fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
             submodules: recursive
+        - name: Move only HTTP appsettings
+          working-directory: src/Web
+          run: mv appsettings.OnlyHTTP.json appsettings.json
         - name: Build artifacts
           uses: "./.github/templates/build-selfcontained"
           with:
@@ -87,10 +90,12 @@ jobs:
       - name: Publish AyBorg.Plugins.ZXing
         working-directory: src/Plugins/ZXing
         run: dotnet publish -c release -o ../../../build/AyBorg.Plugins.ZXing
+      - name: Copy license
+        run: cp LICENSE build/AyBorg.Plugins.Base && cp LICENSE build/AyBorg.Plugins.ImageTorque && cp LICENSE build/AyBorg.Plugins.MQTT && cp LICENSE build/AyBorg.Plugins.ZXing
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: Plugins
+          name: plugins
           path: build
           retention-days: 2
 
