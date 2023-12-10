@@ -10,7 +10,6 @@ runs:
   using: "composite"
   steps:
         - name: Setup .NET
-          shell: bash
           uses: actions/setup-dotnet@v3
           with:
             dotnet-version: 7.0.x
@@ -33,7 +32,6 @@ runs:
           shell: bash
           run: cp LICENSE build/osx-arm64 && cp LICENSE build/linux-x64 && cp LICENSE build/win-x64
         - name: Upload artifacts
-          shell: bash
           uses: actions/upload-artifact@v3
           with:
             name: ${{ inputs.artifact }}
