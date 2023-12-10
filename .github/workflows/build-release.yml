@@ -53,15 +53,25 @@ jobs:
 
   codesign:
 
-    needs: [build-gateway]
+    needs: [build-gateway, build-web, build-log]
 
     runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/download-artifact@v3
+      - name: Codesign (Gateway)
+        uses: "./.github/templates/codesign"
         with:
-          name: gateway
-          path: artifacts/gateway
-      - name: Codesign
-        run: codesign --force -s AyBorg --entitlements ./entitlements.plist artifacts/gateway/osx-arm64/AyBorg.Gateway
+          service: "Gateway"
+          artifact: "gateway"
+      - name: Codesign (Web)
+        uses: "./.github/templates/codesign"
+        with:
+          service: "Web"
+          artifact: "web"
+      - name: Codesign (Log)
+        uses: "./.github/templates/codesign"
+        with:
+          service: "Log"
+          artifact: "log"
+

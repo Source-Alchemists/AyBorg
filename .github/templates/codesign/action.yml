@@ -1,0 +1,18 @@
+name: Codesign
+
+inputs:
+  service:
+    required: true
+  artifact:
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/download-artifact@v3
+      with:
+        name: ${{ inputs.artifact }}
+        path: artifacts/${{ inputs.artifact }}
+    - name: Codesign (${{ inputs.artifact }})
+      shell: bash
+      run: codesign --force -s - --entitlements ./entitlements.plist artifacts/${{ inputs.artifact }}/osx-arm64/AyBorg.${{ inputs.service }}
