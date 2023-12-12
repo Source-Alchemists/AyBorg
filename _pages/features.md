@@ -1,6 +1,6 @@
 ---
-title: Features
-subtitle: Redefining what is possible.
+title: features.title
+subtitle: features.subtitle
 description: Overview of the main features of AyBorg.
 featured_image: /assets/img/brand/header.png
 ---

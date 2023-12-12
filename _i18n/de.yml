@@ -1,0 +1,72 @@
+page:
+  title: ""
+About: "Über"
+Documentation: "Dokumentation"
+Imprint: "Impressum"
+Blog: "Blog"
+GitHub: "GitHub"
+global:
+  download: "Herunterladen"
+home:
+  welcome:
+    subtitle: "Die neue Software-Generation für"
+    rotate1: "industrielle Bildverarbeitung."
+    rotate2: "Automatisierung."
+    rotate3: "industrielle IoT."
+    paragraph1: "AyBorg steht für Einfachheit in den Bereichen industrielle Bildverarbeitung, Prozessautomatisierung und industrielle IoT."
+    paragraph2: "AyBorg deckt mit seinem umfassenden \"All-in-one\"-Ansatz das gesamte Spektrum ab - von der Bilderfassung und -verarbeitung über integrierte Kommunikationsschnittstellen bis hin zur Ergebnisvisualisierung. Diese vielseitige Lösung geht über die industrielle Bildverarbeitung hinaus und bietet eine einheitliche Plattform für die Prozessautomatisierung und das industrielle IoT."
+    paragraph3: "Die Skalierbarkeit über verschiedene Systeme gewährleistet die Anpassungsfähigkeit und Effizienz von AyBorg und macht das System zur ersten Wahl für die Rationalisierung von Prozessen in verschiedenen industriellen Anwendungen."
+    paragraph4: "AyBorg ist für Windows-, Linux- und Mac-basierte PC-Systeme sowie für Arm®-basierte Embedded-Plattformen verfügbar."
+  editor:
+    title: "Ihr Konzept."
+    subtitle: "Ihre Prozessautomatisierung."
+    paragraph: "Entdecken Sie die Möglichkeiten unseres browserbasierten Flow-Editors. Es handelt sich dabei um ein präzise entwickeltes Werkzeug, das Ihnen helfen wird, den Workflow Ihrer Automatisierungsprozesse neu zu gestalten. Sie können schnell und unkompliziert Prozesse integrieren und optimieren, indem Sie eine Vielzahl von Plug-ins verwenden. Erleben Sie selbst, wie praktisch es ist, Änderungen in Echtzeit auf dem Workflow-Canvas vorzunehmen und dadurch Effizienz und Komfort zu steigern. AyBorg unterstützt Ihr Unternehmen mit einer einfachen Plattform für Engineering, Integration und Transformation."
+    f1:
+      title: "Low Code"
+      paragraph: "Lassen Sie Ihre Visionen ohne die Komplexität herkömmlicher Programmierung Wirklichkeit werden. Erstellen Sie Anwendungen nahtlos und passen Sie sie mit Leichtigkeit an."
+    f2:
+      title: "Geringe Komplexität"
+      paragraph: "Ermöglichen Sie es Integratoren-Teams, auch ohne Entwickler innovativ zu sein. Definieren Sie neue Möglichkeiten unter Reduzierung der Komplexität."
+    f3:
+      title: "Niedrige Latenzzeit"
+      paragraph: "Profitieren Sie von Echtzeitverarbeitung, um eine optimale Leistung und Reaktionsfähigkeit Ihrer Abläufe zu erreichen."
+  scale:
+    title: "Immer verbunden."
+    paragraph1: "Sie können eine unbegrenzte Anzahl von Ayborg-Agenten hosten, was eine hohe Skalierbarkeit und eine effiziente Verteilung der Arbeitslast ermöglicht.  AyBorgs Agenten sorgen für Datensicherheit und Vertraulichkeit, um Ihre wertvollen Informationen zu schützen. AyBorg ist darauf ausgelegt, leistungsstarke Anwendungen zu realisieren und die Anforderungen bei hoher Auslastung zu erfüllen und bietet umfassende technische Möglichkeiten für Ihre geschäftskritischen Prozesse."
+    paragraph2: "Darüber hinaus bietet AyBorg redundante Dienste an, um Ausfallzeiten zu reduzieren und eine kontinuierliche Verfügbarkeit und Zuverlässigkeit zu gewährleisten. Profitieren Sie von AyBorgs Engagement für erstklassige Leistung und Zuverlässigkeit, um Ihre Prozesse in einer stabilen und konsistenten Arbeitsumgebung optimal zu betreiben."
+  opensource:
+    title: "Open Source."
+    paragraph: "AyBorg bietet einen bemerkenswerten Vorteil durch seine Open-Source-Plattform. Diese ermöglicht eine individuelle Anpassung des Codes an spezifische Anforderungen, was Ihnen eine erhöhte Unabhängigkeit und Flexibilität bei der Implementierung von IIoT- und Machine Vision-Lösungen ermöglicht. Damit können Sie sich von den Zwängen der Anbieterbindung lösen und von höherer Transparenz bei der Implementierung von IIoT- und Machine-Vision-Lösungen profitieren.  Der Open-Source-Charakter von AyBorg ermöglicht es Ihnen, sich nicht nur von proprietären Einschränkungen zu befreien, sondern auch eine kostengünstige Ausgangsbasis ohne Anfangsinvestitionen zu schaffen. Nutzen Sie die Funktionen von AyBorg, um den Code an Ihre Anforderungen anzupassen und langfristig von den Vorteilen zu profitieren."
+    f1:
+      title: "Enfesselte Innovation"
+      paragraph: "Werden Sie Teil einer dynamischen Gemeinschaft von Entwicklern und Mitwirkenden und profitieren Sie vom kontinuierlichen Fortschritt. Nutzen Sie eine Vielzahl von Ressourcen, die die Effizienz und den Fortschritt Ihrer technischen Projekte fördern."
+    f2:
+      title: "Vertrauen und Transparenz"
+      paragraph: "Open Source fördert eine Kultur des Vertrauens und der Transparenz. Durch die Einsicht in den Quellcode können Sie die Sicherheit und Zuverlässigkeit der Software prüfen und verifizieren und so das Vertrauen Ihrer Nutzer stärken."
+  download:
+    title: "Kostenloser Download"
+    paragraph: "AyBorg wird mit allen nötigen Funktionen geliefert, inklusive Zugriff auf den Quellcode, und ist sofort einsatzbereit."
+    f1:
+      title: "Starten Sie kostenlos!"
+      paragraph: "AyBorg kann kostenlos genutzt werden. Alle wichtigen Basisfunktionen sind enthalten. Sie können beliebig viele Instanzen installieren."
+    f2:
+      title: "Weitere Lizenzoptionen"
+      paragraph: "Suchen Sie nach weiteren Funktionen, Premium-Support, privaten Schulungen? Sprechen Sie mit uns über eine AyBorg-Enterprise-Lizenz oder eine individuelle Lösung."
+features:
+  title: "Features"
+  subtitle: "Neu definieren, was möglich ist."
+  feature_browserbased:
+    title: "Browserbasierte Benutzeroberfläche"
+    paragraph: "Das browserbasierte Frontend von AyBorg bietet eine Reihe wesentlicher Vorteile. Die Nutzer werden von komplizierten Installationen befreit, da die Browseroberfläche den Zugang und die Nutzung vereinfacht. Dieser Ansatz verbessert nicht nur die Benutzerfreundlichkeit, sondern ermöglicht auch eine effiziente Zusammenarbeit über verschiedene Geräte hinweg und fördert so eine anpassungsfähigere und dynamischere Arbeitsumgebung. Darüber hinaus ermöglicht das AyBorg-Frontend den Benutzern den Zugriff auf Verarbeitungsinformationen von jedem beliebigen Standort aus, wodurch geografische Beschränkungen überwunden werden und ein höheres Maß an Zugänglichkeit und Flexibilität geboten wird."
+    f1:
+      title: "Mehrbenutzer-System"
+      paragraph: "Mit unserer intuitiven Plattform können Sie nahtlos zusammenarbeiten, Wissen austauschen und Ihre Produktivität steigern. Lassen Sie Ihre Integrationsteams zusammenarbeiten und nutzen Sie die Vorteile kollektiver Intelligenz."
+    f2:
+      title: "Keine Client-Installation"
+      paragraph: "Die Benutzer müssen keine Software installieren, um mit der Plattform interagieren zu können. Diese Eigenschaft macht AyBorg auch für den Einsatz in kritischen Umgebungen geeignet, in denen die Installation von Software eingeschränkt oder verboten ist. Dies erweitert die Anwendbarkeit von AyBorg auf ein breiteres Spektrum und gewährleistet eine nahtlose Integration in verschiedene Betriebsumgebungen."
+    f3:
+      title: "Nahtloser Betrieb auf jedem Gerät"
+      paragraph: "Ob PC, Laptop, Smartphone oder Tablet-PC - Sie haben Zugriff auf fortschrittliche Bildverarbeitungs- und Automatisierungsfunktionen. Steigern Sie Ihre Produktivität zu Ihren eigenen Bedingungen und nutzen Sie Ihr volles Potenzial unabhängig von Zeit und Ort."
+  feature_isolatedprocesses:
+    title: "Isolierte Prozesse"
+    paragraph: "Mit der Workflow-Sandbox von AyBorg arbeitet jeder Agent als separater Prozess. Selbst wenn bei einem Agenten ein Problem auftritt, wird sichergestellt, dass die anderen Agenten weiterhin reibungslos funktionieren."

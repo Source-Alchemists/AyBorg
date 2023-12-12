@@ -3,6 +3,13 @@ site: AyBorg
 url: https://ayborg.io
 baseurl: 
 
+languages: ["en", "de"]
+defaultLang: en
+languageNames:
+  en: English
+  de: Deutsch
+default_locale_in_subfolder: false
+
 collections:
   pages:
     output: true
@@ -45,6 +52,7 @@ sass:
 plugins:
   - jekyll-paginate
   - jekyll-sitemap
+  - jekyll-multiple-languages-plugin
 
 paginate: 6
 paginate_path: "/blog/page:num/"

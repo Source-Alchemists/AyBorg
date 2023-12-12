@@ -26,14 +26,14 @@
           {% else %}
           <li class="nav-item">
             <a href="{{ item.url | relative_url }}" class="nav-link">
-              <span class="nav-link-inner--text">{{ item.title }}</span>
+              <span class="nav-link-inner--text">{% if item.title %}{% t item.title %}{% else %}{{ item.title }}{% endif %}</span>
             </a>
           </li>
           {% endif %}
           {% endfor %}
           <li class="nav-item">
             <a href="{{site.baseurl}}/imprint" class="nav-link">
-              <span class="nav-link-inner--text">Imprint</span>
+              <span class="nav-link-inner--text">{% t Imprint %}</span>
             </a>
           </li>
         </ul>

@@ -55,7 +55,7 @@
                 {% if item.submenu_items %}
                   <li class="nav-item dropdown">
                     <a href="javascript:;" class="nav-link" data-toggle="dropdown" role="button">
-                      <span class="nav-link-inner--text">{{ item.title }}</span>
+                      <span class="nav-link-inner--text">{% if item.title %}{% t item.title %}{% else %}{{ item.title }}{% endif %}</span>
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
                       {% for subitem in item.submenu_items %}
@@ -69,14 +69,14 @@
                 {% else %}
                   <li class="nav-item">
                     <a href="{{ item.url | relative_url }}" class="nav-link">
-                      <span class="nav-link-inner--text">{{ item.title }}</span>
+                      <span class="nav-link-inner--text">{% if item.title %}{% t item.title %}{% else %}{{ item.title }}{% endif %}</span>
                     </a>
                   </li>
                 {% endif %}
               {% endfor %}
 
               <li class="nav-item">
-                <a class="btn btn-primary" href="{{site.baseurl}}/docs/getting-started/local">Get Started</a>
+                <a class="btn btn-primary" href="{{site.baseurl}}/download">{% t global.download %}</a>
               </li>
 
             </ul>

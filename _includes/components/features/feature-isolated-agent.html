@@ -2,10 +2,12 @@
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-12 text-right highlight">
-        <span class="display-1">Isolated agent processes</span>
+        <span class="display-1">{% t features.feature_isolatedprocesses.title %}</span>
       </div>
       <div class="col-lg-8 text-left">
-        <p class="lead">With AyBorg's workflow sandbox, each agent operates as a separate process, providing a robust level of isolation. Even if a problem occurs with one agent, it remains contained, ensuring that other agents continue to function smoothly. Enjoy a resilient ecosystem where stability is prioritised, minimising the impact of potential disruptions.</p>
+        <p class="lead">
+          {% t features.feature_isolatedprocesses.paragraph %}
+        </p>
       </div>
       <div class="col-lg-4 pl-5">
         <img class="d-block w-100" src="{{ '/assets/img/diagram/process-sandbox.png' | relative_url }}" alt="Mobile devices diagram"> 
