@@ -14,3 +14,5 @@ featured_image: /assets/img/brand/header.png
 {% include components/features/feature-plugins.html %}
 
 {% include components/features/feature-analytics-audit.html %}
+
+{% include components/home/home-download.html %}

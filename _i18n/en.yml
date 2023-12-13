@@ -1,5 +1,6 @@
 page:
   title: ""
+  subtitle: ""
 About: "About"
 Documentation: "Documentation"
 Imprint: "Imprint"
@@ -7,6 +8,10 @@ Blog: "Blog"
 GitHub: "GitHub"
 global:
   download: "Download"
+  download_now: "Download now"
+  contact: "Contact us"
+  contact_us: "Contact us"
+  get_in_touch: "Get in touch"
 home:
   welcome:
     subtitle: "The new software generation for"
@@ -70,3 +75,66 @@ features:
   feature_isolatedprocesses:
     title: "Isolated processes"
     paragraph: "With AyBorg's workflow sandbox, each agent operates as a separate process. Even if an issue arises with one agent, it ensures that the other agents continue to function smoothly."
+  feature_hybridhosting:
+    title: "Hybrid hosting"
+    paragraph: "Among the advantages of AyBorg's hybrid hosting solution is the potential for cost reduction through the use of edge and embedded devices. By integrating cost-effective devices, operational expenses can be lowered while maintaining the performance and flexibility of the infrastructure. This enables businesses to efficiently utilize resources and optimize the overall costs of service deployment."
+  feature_plugins:
+    title: "Plug-in collection"
+    paragraph: "For the fields of image processing, artificial intelligence, and data communication, a comprehensive selection of plug-ins is available. Streamline your automation processes and enhance your functionality with tailored plug-ins that precisely match your specific requirements. The AyBorg Plug-in Ecosystem facilitates a straightforward expansion of your capabilities. Moreover, you have the freedom to easily create and integrate your own plug-ins."
+  feature_analytics:
+    title: "Integrated analysis and audit reports"
+    paragraph: "AyBorg features integrated tools that simplify the creation of audit logs and data analysis. Enhance your monitoring to easily track and analyze critical events. With AyBorg, you can streamline your audit processes and extract valuable insights from your data to maximize efficiency and decision-making."
+about:
+  intro: "AyBorg is a platform that will revolutionize industrial automation. Founded by Levent Tasdemir in 2022, AyBorg is driven by a passionate community of developers, engineers, and industry experts committed to transforming manufacturing processes with a flexible and scalable approach."
+  f1:
+    title: "Our Vision"
+    paragraph: "Our vision at AyBorg is to drive digital transformation with an adaptive and intelligent automation platform. We harness the power of artificial intelligence to optimize industrial processes, enhance productivity, and enable seamless integration of cutting-edge technologies."
+  f2:
+    title: "Our values"
+    paragraph: "AyBorg is committed to promoting innovation, reliability, and openness in industrial automation. We believe in empowering users with a customizable platform that adapts to their specific needs. Transparency and collaboration are at the core of our values. We encourage knowledge sharing, community participation, and peer reviews to ensure the highest quality and reliability of the AyBorg platform."
+  f3:
+    title: "Get involved"
+    paragraph1: "We invite you to join the AyBorg community and contribute to the evolution of industrial automation:"
+    paragraph2: "Plug-in Development: Explore AyBorg's resources for plug-in development and contribute your own plug-ins tailored to specific industrial needs. Expand AyBorg's capabilities and share your expertise with the community."
+    paragraph3: "Spread the Word: Help us introduce AyBorg in industrial automation. Share your experiences, success stories, and use cases with AyBorg. Talk about AyBorg at conferences, workshops, and industry events."
+  f4:
+    title: "Join us in transforming industrial automation"
+    paragraph: "AyBorg is more than just an application; it's a collaborative movement to revolutionize industrial automation. Join us and shape the future of automation."
+license:
+  title: "Licensing Options"
+  subtitle: "We have optimized our licensing options to make your selection process easier. Do you have specific requirements? Contact us for a customized license."
+  standard_license:
+    title: "Standard License"
+    description: "For developers and businesses that do not require premium support or customized terms. Also suitable for students and educators."
+    price: "Free to get started"
+    price_description: "The download and use are free of charge."
+    content:
+      title: "Includes:"
+      f1: "Basic features of AyBorg"
+      f2: "Access to the source code of the basic functions"
+      f3: "Community Support"
+    suited:
+      title: "Best for:"
+      f1: "Small teams or projects"
+      f2: "Hobbyists"
+      f3: "Learning"
+  enterprise_license:
+    title: "Enterprise License"
+    description: "For professionals who need more features or desire premium support, private training, and/or customized license terms."
+    price: "Negotiable terms"
+    price_description: "Create a customized solution that aligns with your individual business requirements."
+    content:
+      title: "Includes:"
+      f1: "All features of AyBorg"
+      f2: "Premium support"
+      f3: "Options for private training"
+      f4: "All included in standard license"
+    suited:
+      title: "Best for:"
+      f1: "Enterprise organizations with specific requirements"
+      f2: "Developers requiring technical support from AyBorg"
+    info: "Get in touch, and we’ll work with you to create a licensing solution that works for your ideas and your business needs."
+  contact:
+    title: "We’ll work with you to find the right solution for your ideas."
+    description: "
+Are you looking for premium support, private training, or advanced features? Ask us for more information on your options. Contact us to provide your details, and we will get in touch to find the right solution for you."

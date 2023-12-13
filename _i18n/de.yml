@@ -7,6 +7,10 @@ Blog: "Blog"
 GitHub: "GitHub"
 global:
   download: "Herunterladen"
+  download_now: "Jetzt herunterladen"
+  contact: "Kontakt"
+  contact_us: "Kontaktieren"
+  get_in_touch: "Kontaktieren sie uns"
 home:
   welcome:
     subtitle: "Die neue Software-Generation für"
@@ -15,7 +19,7 @@ home:
     rotate3: "industrielle IoT."
     paragraph1: "AyBorg steht für Einfachheit in den Bereichen industrielle Bildverarbeitung, Prozessautomatisierung und industrielle IoT."
     paragraph2: "AyBorg deckt mit seinem umfassenden \"All-in-one\"-Ansatz das gesamte Spektrum ab - von der Bilderfassung und -verarbeitung über integrierte Kommunikationsschnittstellen bis hin zur Ergebnisvisualisierung. Diese vielseitige Lösung geht über die industrielle Bildverarbeitung hinaus und bietet eine einheitliche Plattform für die Prozessautomatisierung und das industrielle IoT."
-    paragraph3: "Die Skalierbarkeit über verschiedene Systeme gewährleistet die Anpassungsfähigkeit und Effizienz von AyBorg und macht das System zur ersten Wahl für die Rationalisierung von Prozessen in verschiedenen industriellen Anwendungen."
+    paragraph3: "Die Skalierbarkeit über verschiedene Systeme gewährleistet die Anpassungsfähigkeit und Effizienz von AyBorg und macht das System zur ersten Wahl für die Umsetzung von Prozessen in verschiedenen industriellen Anwendungen."
     paragraph4: "AyBorg ist für Windows-, Linux- und Mac-basierte PC-Systeme sowie für Arm®-basierte Embedded-Plattformen verfügbar."
   editor:
     title: "Ihr Konzept."
@@ -70,3 +74,65 @@ features:
   feature_isolatedprocesses:
     title: "Isolierte Prozesse"
     paragraph: "Mit der Workflow-Sandbox von AyBorg arbeitet jeder Agent als separater Prozess. Selbst wenn bei einem Agenten ein Problem auftritt, wird sichergestellt, dass die anderen Agenten weiterhin reibungslos funktionieren."
+  feature_hybridhosting:
+    title: "Hybrid Hosting"
+    paragraph: "Zu den Vorteilen der hybriden Hosting-Lösung von AyBorg gehört die Möglichkeit der Kostenreduzierung durch den Einsatz von Edge- und Embedded-Geräten. Durch die Integration kosteneffizienter Geräte können die Betriebskosten gesenkt und gleichzeitig die Leistung und Flexibilität der Infrastruktur erhöht werden. Dadurch können Unternehmen ihre Ressourcen effizient nutzen und die Gesamtkosten für die Bereitstellung von Diensten optimieren."
+  feature_plugins:
+    title: "Plug-in Sammlung"
+    paragraph: "Für die Bereiche Bildverarbeitung, künstliche Intelligenz und Datenkommunikation steht eine umfassende Auswahl an Plug-ins zur Verfügung. Optimieren Sie Ihre Automatisierungsprozesse und erweitern Sie Ihre Funktionalität mit den passenden Plug-ins, die genau auf Ihre spezifischen Anforderungen zugeschnitten sind. Das AyBorg Plug-in Ecosystem ermöglicht Ihnen eine unkomplizierte Erweiterung Ihrer Möglichkeiten. Darüber hinaus haben Sie die Freiheit, eigene Plug-ins einfach zu erstellen und zu integrieren."
+  feature_analytics:
+    title: "Integrierte Analyse- und Auditberichte"
+    paragraph: "AyBorg verfügt über integrierte Tools, die die Erstellung von Audit-Protokollen und die Datenanalyse erleichtern. Verbessern Sie Ihr Monitoring, um kritische Ereignisse leichter verfolgen und analysieren zu können. Mit AyBorg können Sie Ihre Audit-Prozesse vereinfachen und wertvolle Informationen aus Ihren Daten gewinnen, um die Effizienz und die Entscheidungsfindung zu maximieren."
+about:
+  intro: "AyBorg ist eine Plattform, die die industrielle Automatisierung revolutionieren wird. Gegründet von Levent Tasdemir im Jahr 2022, wird AyBorg von einer leidenschaftlichen Gemeinschaft von Entwicklern, Ingenieuren und Industrieexperten angetrieben, die sich der Transformation von Fertigungsprozessen mit einem flexiblen und skalierbaren Ansatz verschrieben haben."
+  f1:
+    title: "Unsere Vision"
+    paragraph: "Unsere Vision bei AyBorg ist es, die digitale Transformation mit einer anpassungsfähigen und intelligenten Automatisierungsplattform voranzutreiben. Wir nutzen die Kraft der künstlichen Intelligenz, um industrielle Prozesse zu optimieren, die Produktivität zu steigern und eine nahtlose Integration modernster Technologien zu ermöglichen."
+  f2:
+    title: "Unsere Werte"
+    paragraph: "AyBorg setzt sich für Innovation, Zuverlässigkeit und Offenheit in der industriellen Automatisierung ein. Wir glauben an die Unterstützung der Anwender mit einer anpassbaren Plattform, die sich an ihre spezifischen Bedürfnisse anpasst. Transparenz und Zusammenarbeit stehen im Mittelpunkt unserer Werte. Wir fördern den Austausch von Wissen, die Teilnahme an der Community und Peer-Reviews, um die höchste Qualität und Zuverlässigkeit der AyBorg-Plattform zu gewährleisten."
+  f3:
+    title: "Machen Sie mit"
+    paragraph1: "Wir laden Sie ein, sich der AyBorg-Community anzuschließen und zur Evolution der industriellen Automation beizutrage:"
+    paragraph2: "Plug-in-Entwicklung: Erkunden Sie AyBorgs Ressourcen für die Plug-in-Entwicklung und tragen Sie Ihre eigenen Plug-ins bei, die auf spezifische industrielle Anforderungen zugeschnitten sind. Erweitern Sie die Möglichkeiten von AyBorg und teilen Sie Ihr Fachwissen mit der Community."
+    paragraph3: "Erzählen Sie es weiter: Helfen Sie uns, AyBorg in der Industrieautomation bekannt zu machen. Teilen Sie Ihre Erfahrungen, Erfolgsgeschichten und Anwendungsbeispiele mit AyBorg. Sprechen Sie über AyBorg auf Konferenzen, Workshops und Industrieveranstaltungen."
+  f4:
+    title: "Schließen Sie sich uns an und gestalten Sie die Transformation der industriellen Automation mit"
+    paragraph: "AyBorg ist mehr als nur eine Anwendung; es ist eine gemeinsame Bewegung, um die industrielle Automation zu revolutionieren. Schließen Sie sich uns an und gestalten Sie die Zukunft der Automation."
+license:
+  title: "Lizenzierungsoptionen"
+  subtitle: "Wir haben unsere Lizenzoptionen optimiert, um Ihnen die Auswahl zu erleichtern. Haben Sie besondere Anforderungen? Kontaktieren Sie uns für eine maßgeschneiderte Lizenz."
+  standard_license:
+    title: "Standard-Lizenz"
+    description: "Für Entwickler und Unternehmen, die keinen Premium-Support oder individuelle Bedingungen benötigen. Auch für Studenten und Lehrkräfte geeignet."
+    price: "Gratis für den Einstieg"
+    price_description: "Der Download und die Verwendung sind kostenlos."
+    content:
+      title: "Umfasst:"
+      f1: "Basis Funktionen von AyBorg"
+      f2: "Zugriff auf den Quellcode der Basis Funktionen"
+      f3: "Unterstützung durch die Community"
+    suited:
+      title: "Am besten geeignet für:"
+      f1: "Kleine Teams oder Projekte"
+      f2: "Hobbyentwickler"
+      f3: "Lerninhalte"
+  enterprise_license:
+    title: "Enterprise-Lizenz"
+    description: "Für Profis, die mehr Funktionen benötigen oder die Premium-Support, private Schulungen und/oder individuelle Lizenzbedingungen wünschen."
+    price: "Bedingungen verhandelbar"
+    price_description: "Erstellen Sie eine maßgeschneiderte Lösung, die Ihren individuellen Geschäftsanforderungen entspricht."
+    content:
+      title: "Umfasst:"
+      f1: "Alle Funktionen von AyBorg"
+      f2: "Premium-Unterstützung"
+      f3: "Optionen für private Schulungen"
+      f4: "Alles aus der Standard-Lizenz"
+    suited:
+      title: "Am besten geeignet für:"
+      f1: "Unternehmensorganisationen mit besonderen Anforderungen"
+      f2: "Entwickler die Unterstützung von AyBorg benötigen"
+    info: "Setzen Sie sich mit uns in Verbindung und wir erarbeiten gemeinsam mit Ihnen eine Lizenzierungslösung, die Ihren Ideen und den Anforderungen Ihres Unternehmens gerecht wird."
+  contact:
+    title: "Gemeinsam mit Ihnen finden wir die passende Lösung."
+    description: "Suchen Sie nach Premiumunterstützung, privatem Training oder erweiterten Funktionen? Fragen Sie uns nach weiteren Informationen zu Ihren Möglichkeiten. Kontaktieren Sie uns, um uns Ihre Details zukommen zu lassen, und wir melden uns bei Ihnen, um die passende Lösung für Sie zu finden."
