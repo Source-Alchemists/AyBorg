@@ -69,6 +69,18 @@ ol ul{margin-bottom:1rem !important;}
     height: 150px;
 }
 
+.step-border {
+    width: 83px;
+    height: 83px;
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    border-radius: 50%;
+    border: 2px solid #594AE2;
+}
+
 //Creative Tim Below
 
 // Bootstrap Functions

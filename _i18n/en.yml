@@ -12,6 +12,9 @@ global:
   contact: "Contact us"
   contact_us: "Contact us"
   get_in_touch: "Get in touch"
+  lang:
+    english: English
+    german: German
 home:
   welcome:
     subtitle: "The new software generation for"
@@ -85,7 +88,7 @@ features:
     title: "Integrated analysis and audit reports"
     paragraph: "AyBorg features integrated tools that simplify the creation of audit logs and data analysis. Enhance your monitoring to easily track and analyze critical events. With AyBorg, you can streamline your audit processes and extract valuable insights from your data to maximize efficiency and decision-making."
 about:
-  intro: "AyBorg is a platform that will revolutionize industrial automation. Founded by Levent Tasdemir in 2022, AyBorg is driven by a passionate community of developers, engineers, and industry experts committed to transforming manufacturing processes with a flexible and scalable approach."
+  intro: "AyBorg is a platform that will revolutionize industrial automation. Founded by Levent Tasdemir, AyBorg is driven by a passionate community of developers, engineers, and industry experts committed to transforming manufacturing processes with a flexible and scalable approach."
   f1:
     title: "Our Vision"
     paragraph: "Our vision at AyBorg is to drive digital transformation with an adaptive and intelligent automation platform. We harness the power of artificial intelligence to optimize industrial processes, enhance productivity, and enable seamless integration of cutting-edge technologies."
@@ -101,7 +104,7 @@ about:
     title: "Join us in transforming industrial automation"
     paragraph: "AyBorg is more than just an application; it's a collaborative movement to revolutionize industrial automation. Join us and shape the future of automation."
 license:
-  title: "Licensing Options"
+  title: "Licensing options"
   subtitle: "We have optimized our licensing options to make your selection process easier. Do you have specific requirements? Contact us for a customized license."
   standard_license:
     title: "Standard License"
@@ -136,5 +139,24 @@ license:
     info: "Get in touch, and we’ll work with you to create a licensing solution that works for your ideas and your business needs."
   contact:
     title: "We’ll work with you to find the right solution for your ideas."
-    description: "
-Are you looking for premium support, private training, or advanced features? Ask us for more information on your options. Contact us to provide your details, and we will get in touch to find the right solution for you."
+    description: "Are you looking for premium support, private training, or advanced features? Ask us for more information on your options. Contact us to provide your details, and we will get in touch to find the right solution for you."
+download:
+  title: "Download AyBorg"
+  subtitle: "Download Instructions"
+  download_ayborg: "Download AyBorg"
+  actual_version: "Current version"
+  unpack: "Unpack the zip file into a directory of your choice"
+  execute: 
+    title: "Start the AyBorg services"
+    description: "A minimal setup consists of:"
+    s1: "AyBorg.Gateway"
+    s2: "AyBorg.Web"
+    s3: "AyBorg.Agent"
+  webfrontend:
+    title: "Open the AyBorg web frontend"
+    s1: "Open your web browser"
+    s2: "Navigate to <a href=\"http://localhost:6010\" target=\"_blank\">http://localhost:6010</a>"
+    s3: "Log in:"
+    s3_1: "Username: SystemAdmin"
+    s3_2: "Password: SystemAdmin123!"
+    s3_3: "We recommend changing the password immediately"

@@ -128,6 +128,10 @@ window.onload = function() {
       </div>
     </div>
     {% elsif page.title %}
+    {% if page.ignore_title %}
+    <div class="container pb-2 pt-1">
+    </div>
+    {% else %}
     <!-- Is a page without a banner -->
     <div class="container contentWrapper pb-2">
       <div class="text-left mt-5 mb-3">
@@ -137,6 +141,7 @@ window.onload = function() {
         {% endif %}
       </div>
     </div>
+    {% endif %}
     {% endif %}
     {% endif %}
 

@@ -11,6 +11,9 @@ global:
   contact: "Kontakt"
   contact_us: "Kontaktieren"
   get_in_touch: "Kontaktieren sie uns"
+  lang:
+    english: Englisch
+    german: Deutsch
 home:
   welcome:
     subtitle: "Die neue Software-Generation für"
@@ -84,7 +87,7 @@ features:
     title: "Integrierte Analyse- und Auditberichte"
     paragraph: "AyBorg verfügt über integrierte Tools, die die Erstellung von Audit-Protokollen und die Datenanalyse erleichtern. Verbessern Sie Ihr Monitoring, um kritische Ereignisse leichter verfolgen und analysieren zu können. Mit AyBorg können Sie Ihre Audit-Prozesse vereinfachen und wertvolle Informationen aus Ihren Daten gewinnen, um die Effizienz und die Entscheidungsfindung zu maximieren."
 about:
-  intro: "AyBorg ist eine Plattform, die die industrielle Automatisierung revolutionieren wird. Gegründet von Levent Tasdemir im Jahr 2022, wird AyBorg von einer leidenschaftlichen Gemeinschaft von Entwicklern, Ingenieuren und Industrieexperten angetrieben, die sich der Transformation von Fertigungsprozessen mit einem flexiblen und skalierbaren Ansatz verschrieben haben."
+  intro: "AyBorg ist eine Plattform, die die industrielle Automatisierung revolutionieren wird. Gegründet von Levent Tasdemir, wird AyBorg von einer leidenschaftlichen Gemeinschaft von Entwicklern, Ingenieuren und Industrieexperten angetrieben, die sich der Transformation von Fertigungsprozessen mit einem flexiblen und skalierbaren Ansatz verschrieben haben."
   f1:
     title: "Unsere Vision"
     paragraph: "Unsere Vision bei AyBorg ist es, die digitale Transformation mit einer anpassungsfähigen und intelligenten Automatisierungsplattform voranzutreiben. Wir nutzen die Kraft der künstlichen Intelligenz, um industrielle Prozesse zu optimieren, die Produktivität zu steigern und eine nahtlose Integration modernster Technologien zu ermöglichen."
@@ -136,3 +139,23 @@ license:
   contact:
     title: "Gemeinsam mit Ihnen finden wir die passende Lösung."
     description: "Suchen Sie nach Premiumunterstützung, privatem Training oder erweiterten Funktionen? Fragen Sie uns nach weiteren Informationen zu Ihren Möglichkeiten. Kontaktieren Sie uns, um uns Ihre Details zukommen zu lassen, und wir melden uns bei Ihnen, um die passende Lösung für Sie zu finden."
+download:
+  title: "AyBorg herunterladen"
+  subtitle: "Download-Anweisungen"
+  download_ayborg: "Laden Sie AyBorg herunter"
+  actual_version: "Aktuelle Version"
+  unpack: "Entpacken Sie die Zip-Datei in ein Verzeichnis Ihrer Wahl"
+  execute: 
+    title: "Starten Sie die AyBorg Dienste"
+    description: "Ein minimal Setup besteht aus:"
+    s1: "AyBorg.Gateway"
+    s2: "AyBorg.Web"
+    s3: "AyBorg.Agent"
+  webfrontend:
+    title: "Öffnen Sie das AyBorg Web-Frontend"
+    s1: "Öffnen Sie Ihren Webbrowser"
+    s2: "Navigieren Sie nach <a href=\"http://localhost:6010\" target=\"_blank\">http://localhost:6010</a>"
+    s3: "Melden Sie sich an:"
+    s3_1: "Benutzername: SystemAdmin"
+    s3_2: "Passwort: SystemAdmin123!"
+    s3_3: "Wir empfehlen das Passwort direkt zu ändern"

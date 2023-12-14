@@ -75,6 +75,22 @@
                 {% endif %}
               {% endfor %}
 
+              <li class="nav-item dropdown">
+                <a href="javascript:;" class="nav-link" data-toggle="dropdown" role="button">
+                  <i class="ni ni-world-2 nav-link-inner--text"></i>
+                </a>
+                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                  <a class="dropdown-item" href="{{ site.baseurl_root }}{{ page.url}}">
+                    {% if site.lang == "en" %}<i class="ni ni-world-2"></i>{% endif %}
+                    {% t global.lang.english %}
+                  </a>
+                  <a class="dropdown-item" href="{{{ site.baseurl_root }}/de{{ page.url}}">
+                    {% if site.lang == "de" %}<i class="ni ni-world-2"></i>{% endif %}
+                    {% t global.lang.german %}
+                  </a>
+                </div>
+              </li>
+
               <li class="nav-item">
                 <a class="btn btn-primary" href="{{site.baseurl}}/download">{% t global.download %}</a>
               </li>
