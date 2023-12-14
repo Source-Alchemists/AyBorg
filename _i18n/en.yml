@@ -16,6 +16,7 @@ global:
     english: English
     german: German
 home:
+  title: "The new software generation for machine vision"
   welcome:
     subtitle: "The new software generation for"
     rotate1: "machine vision."

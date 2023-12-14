@@ -8,7 +8,12 @@
 
   <!-- Page Info -->
   <link rel="shortcut icon" href="{{ site.data.settings.basic_settings.favicon_image | relative_url }}">
-  <title>{% if page.url == "/" %}{{ site.data.settings.basic_settings.site_title }} – {{ page.title }}
+  <title>{% if page.url == "/" %}
+    {% if page.title %}
+    {% t page.title %} - {{ site.data.settings.basic_settings.site_title }}
+    {% else %}
+    {{ site.data.settings.basic_settings.site_title }} – {{ page.title }}
+    {% endif %}
   {% else if page.title %}
   {% t page.title %} – {{ site.data.settings.basic_settings.site_title }}
   {% else %}

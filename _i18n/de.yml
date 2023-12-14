@@ -15,6 +15,7 @@ global:
     english: Englisch
     german: Deutsch
 home:
+  title: "Die neue Software-Generation für Machine Vision"
   welcome:
     subtitle: "Die neue Software-Generation für"
     rotate1: "industrielle Bildverarbeitung."
