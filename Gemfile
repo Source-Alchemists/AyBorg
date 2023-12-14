@@ -7,5 +7,4 @@ group :jekyll_plugins do
   gem 'jekyll-sitemap'
   gem 'jekyll-multiple-languages-plugin'
   gem 'kramdown-parser-gfm'
-  gem 'faraday-retry'
 end

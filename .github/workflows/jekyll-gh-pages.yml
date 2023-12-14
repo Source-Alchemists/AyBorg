@@ -33,11 +33,15 @@ jobs:
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.2'
-      - name: Build with Jekyll
-        uses: actions/jekyll-build-pages@v1
-        with:
-          source: ./
-          destination: ./_site
+    #   - name: Build with Jekyll
+    #     uses: actions/jekyll-build-pages@v1
+    #     with:
+    #       source: ./
+    #       destination: ./_site
+      - name: Bundle install
+        run: bundle install
+      - name: Build
+        run: bundle exec jekyll build
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
 
