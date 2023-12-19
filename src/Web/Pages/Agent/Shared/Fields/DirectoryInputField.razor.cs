@@ -30,7 +30,7 @@ public partial class DirectoryInputField : BaseInputField
         };
         IDialogReference dialog = DialogService.Show<DirectoryBrowser>("Directory browser", parameters, options);
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             _value = result.Data.ToString()!;
             await NotifyValueChangedAsync(_value);

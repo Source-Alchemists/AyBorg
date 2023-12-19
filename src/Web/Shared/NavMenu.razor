@@ -1,8 +1,10 @@
 ﻿@using SDK.Authorization
 
+<div class="nav-header-spacer"></div>
+
 <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
     <Authorized>
-        <MudNavLink Icon="@Icons.Material.Filled.Dashboard" IconColor="Color.Primary"  href="dashboard" Match="NavLinkMatch.All" hidden="@(!_isDashboardAvailable)">
+        <MudNavLink Icon="@Icons.Material.Filled.Dashboard" href="dashboard" Match="NavLinkMatch.All" Disabled="@(!_isDashboardAvailable)">
             Dashboard
         </MudNavLink>
     </Authorized>
@@ -10,13 +12,13 @@
 
 <AuthorizeView Roles="Administrator, Engineer, Reviewer">
     <Authorized>
-        <MudNavGroup Title="Agents" Icon="@Icons.Filled.Workspaces" IconColor="Color.Primary" Expanded="true" hidden="@(!_isAnyAgentAvailable)">
+        <MudNavGroup Title="Agents" Icon="@Icons.Material.Filled.Workspaces" Expanded="@(_isAnyAgentAvailable)" Disabled="@(!_isAnyAgentAvailable)" HideExpandIcon>
             <MudNavLink Href="agents/overview"  Match="NavLinkMatch.All">
                 Overview
             </MudNavLink>
             @if(StateService.AgentState != null)
             {
-                <MudNavGroup Title="@StateService.AgentState.Name" Icon="@Icons.Outlined.Workspaces" Expanded="true">
+                <MudNavGroup Title="@StateService.AgentState.Name" Icon="@Icons.Material.Outlined.Workspaces" Expanded="true" HideExpandIcon>
                     <MudNavLink Href="@StateService.AgentState.ProjectsLink">
                         Projects
                     </MudNavLink>
@@ -32,10 +34,23 @@
     </Authorized>
 </AuthorizeView>
 
+<AuthorizeView Roles="Administrator, Engineer, Reviewer">
+    <Authorized>
+        <MudNavGroup Title="Artificial Intelligence" Icon="@Icons.Material.Filled.Hive" Expanded="@(_isNetAvailable)" Disabled="@(!_isNetAvailable)" HideExpandIcon>
+            <MudNavLink Href="net/datasets" Match="NavLinkMatch.All">
+                Datasets
+            </MudNavLink>
+            <MudNavLink Href="net/models" Match="NavLinkMatch.All">
+                Models
+            </MudNavLink>
+        </MudNavGroup>
+    </Authorized>
+</AuthorizeView>
+
 <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
     <Authorized>
-        <MudNavGroup Title="Observability" Icon="@Icons.Material.Filled.Analytics" IconColor="Color.Primary" Expanded="true">
-            <MudNavLink href="observability/analytics" Match="NavLinkMatch.Prefix" hidden="@(!_isAnalyticsAvailable)">
+        <MudNavGroup Title="Observability" Icon="@Icons.Material.Filled.Analytics" Expanded="true" HideExpandIcon>
+            <MudNavLink href="observability/analytics" Match="NavLinkMatch.Prefix" Disabled="@(!_isAnalyticsAvailable)">
                 Logs
             </MudNavLink>
             <MudNavLink Href="observability/services" Match="NavLinkMatch.Prefix">
@@ -47,7 +62,7 @@
 
 <AuthorizeView Roles="Administrator, Auditor">
     <Authorized>
-        <MudNavGroup Title="Audit" Icon="@Icons.Material.Filled.Assignment" IconColor="Color.Primary" Expanded="true" hidden="@(!_isAuditAvailable)">
+        <MudNavGroup Title="Audit" Icon="@Icons.Material.Filled.Assignment" Expanded="@(_isAuditAvailable)" Disabled="@(!_isAuditAvailable)" HideExpandIcon>
             <MudNavLink Href="audit/reports/create" Match="NavLinkMatch.All" >
                 Create Report
             </MudNavLink>
@@ -60,8 +75,8 @@
 
 <AuthorizeView Roles="@Roles.Administrator">
     <Authorized>
-        <MudNavGroup Title="Administration" Icon="@Icons.Filled.AdminPanelSettings" IconColor="Color.Primary" Expanded="true">
-            <MudNavLink Href="admin/usermanagement" Match="NavLinkMatch.All" Icon="@Icons.Filled.ManageAccounts">
+        <MudNavGroup Title="Administration" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="true" HideExpandIcon>
+            <MudNavLink Href="admin/usermanagement" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ManageAccounts">
                 User Management
             </MudNavLink>
         </MudNavGroup>

@@ -17,7 +17,7 @@
                 </MudCardContent>
             </MudCard>
         </MudForm>
-        <MudAlert Severity="Severity.Info" class="mb-1"><strong>Password:</strong> @_password <MudIconButton Icon="@Icons.Filled.ContentCopy" Color="Color.Info" OnClick="@OnCopyToClipboardClicked" /></MudAlert>
+        <MudAlert Severity="Severity.Info" class="mb-1"><strong>Password:</strong> @_password <MudIconButton Icon="@Icons.Material.Filled.ContentCopy" Color="Color.Info" OnClick="@OnCopyToClipboardClicked" /></MudAlert>
         <MudAlert Severity="Severity.Warning">Make sure to copy the password. It is never displayed again!</MudAlert>
         @foreach (var error in _serviceErrors)
         {

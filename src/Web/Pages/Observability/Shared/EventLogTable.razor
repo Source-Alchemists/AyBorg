@@ -11,12 +11,12 @@
         </MudTooltip>
     </ToolBarContent>
     <Columns>
-        <Column T="EventLogEntry" Field="Timestamp" Title="Timestamp (UTC)" CellStyleFunc="@_timestampCellStyleFunc"/>
-        <Column T="EventLogEntry" Field="LogLevel" Title="Level" />
-        <Column T="EventLogEntry" Field="ServiceUniqueName" Title="Service Name" />
-        <Column T="EventLogEntry" Field="EventName" Title="Event" />
-        <Column T="EventLogEntry" Field="Message" />
-        <Column T="EventLogEntry" Field="ServiceType" Title="Service Type" Hidden="true" Filterable="false" />
-        <Column T="EventLogEntry" Field="EventId" Title="Event ID" Hidden="true" Filterable="false" />
+        <PropertyColumn Property="x => x.Timestamp" Title="Timestamp (UTC)" CellStyleFunc="@_timestampCellStyleFunc"/>
+        <PropertyColumn Property="x => x.LogLevel" Title="Level" />
+        <PropertyColumn Property="x => x.ServiceUniqueName" Title="Service Name" />
+        <PropertyColumn Property="x => x.EventName" Title="Event" />
+        <PropertyColumn Property="x => x.Message" />
+        <PropertyColumn Property="x => x.ServiceType" Title="Service Type" Hidden="true" Filterable="false" />
+        <PropertyColumn Property="x => x.EventId" Title="Event ID" Hidden="true" Filterable="false" />
     </Columns>
 </MudDataGrid>

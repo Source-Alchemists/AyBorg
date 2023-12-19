@@ -32,7 +32,7 @@ public sealed partial class ProjectSettingsDialog : ComponentBase
                                                 { "ContentText", "Are you sure you want to change the result communication?" }
                                             });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             _projectSettings.IsForceResultCommunicationEnabled = !_projectSettings.IsForceResultCommunicationEnabled;
             await UpdateCommunicationSettings();

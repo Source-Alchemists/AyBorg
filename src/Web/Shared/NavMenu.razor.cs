@@ -12,8 +12,11 @@ public partial class NavMenu : ComponentBase
 
 private bool _isDashboardAvailable = false;
     private bool _isAnyAgentAvailable = false;
+    private bool _isNetAvailable = false;
     private bool _isAnalyticsAvailable = false;
     private bool _isAuditAvailable = false;
+
+    private string _proVersion = "PRO";
 
     protected override async Task OnInitializedAsync()
     {
@@ -25,6 +28,7 @@ private bool _isDashboardAvailable = false;
 
             _isDashboardAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Dashboard));
             _isAnyAgentAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Agent));
+            _isNetAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Net));
             _isAnalyticsAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Log));
             _isAuditAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Audit));
         }

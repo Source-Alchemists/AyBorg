@@ -2,7 +2,7 @@
     <DialogContent>
         <MudTreeView T="DirectoryItem" Items="_items" Hover="true" @bind-SelectedValue="_selectedItem">
             <ItemTemplate>
-                <MudTreeViewItem Items="@context.Children" Value="@context" Text="@context.Name" Icon="@Icons.Filled.Folder" />
+                <MudTreeViewItem Items="@context.Children" Value="@context" Text="@context.Name" Icon="@Icons.Material.Filled.Folder" />
             </ItemTemplate>
         </MudTreeView>
     </DialogContent>

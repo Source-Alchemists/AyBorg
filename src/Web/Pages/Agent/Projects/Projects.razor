@@ -8,7 +8,7 @@
 }
 else
 {
-    <PageTitle>Projects (@_serviceName)</PageTitle>
+    <PageTitle>Projects - @_serviceName</PageTitle>
 }
 
 <AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
@@ -21,13 +21,13 @@ else
         <MudCard Class="rounded-lg">
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudIcon Icon="@Icons.Filled.GppBad" Size="Size.Large" Color="Color.Error" />
+                    <MudIcon Icon="@Icons.Material.Filled.GppBad" Size="Size.Large" Color="Color.Error" />
                 </CardHeaderAvatar>
                 <CardHeaderContent>
 				    <MudText Typo="Typo.h6">Draft</MudText>
                 </CardHeaderContent>
                 <CardHeaderActions>
-                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox" Color="Color.Primary" OnClick="@OnNewProjectClicked">New Project</MudButton>
+                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.AddBox" Color="Color.Primary" OnClick="@OnNewProjectClicked">New Project</MudButton>
                 </CardHeaderActions>
 			</MudCardHeader>
             <MudCardContent>
@@ -45,7 +45,7 @@ else
             <MudCard Class="rounded-lg">
                 <MudCardHeader>
                     <CardHeaderAvatar>
-                        <MudIcon Icon="@Icons.Filled.SafetyCheck" Size="Size.Large" Color="Color.Warning" />
+                        <MudIcon Icon="@Icons.Material.Filled.SafetyCheck" Size="Size.Large" Color="Color.Warning" />
                     </CardHeaderAvatar>
                     <CardHeaderContent>
                         <MudText Typo="Typo.h6">Review</MudText>
@@ -68,7 +68,7 @@ else
             <MudCard Class="rounded-lg">
                 <MudCardHeader>
                     <CardHeaderAvatar>
-                        <MudIcon Icon="@Icons.Filled.GppGood" Size="Size.Large" Color="Color.Info" />
+                        <MudIcon Icon="@Icons.Material.Filled.GppGood" Size="Size.Large" Color="Color.Info" />
                     </CardHeaderAvatar>
                     <CardHeaderContent>
                         <MudText Typo="Typo.h6">Ready</MudText>

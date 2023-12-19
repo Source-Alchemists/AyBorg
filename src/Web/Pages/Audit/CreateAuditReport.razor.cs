@@ -138,7 +138,7 @@ public partial class CreateAuditReport : ComponentBase
     {
         IDialogReference dialog = DialogService.Show<SaveAuditReportDialog>("Save audit report");
         DialogResult result = await dialog.Result;
-        if (result.Cancelled)
+        if (result.Canceled)
         {
             return;
         }

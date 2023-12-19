@@ -74,7 +74,7 @@ public partial class Devices : ComponentBase
             FullWidth = true
         });
         DialogResult result = await dialogReference.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             await UpdateProviderCollection();
         }
@@ -86,7 +86,7 @@ public partial class Devices : ComponentBase
             { "ContentText", $"Are you sure you want to remove device '{deviceMeta.Name}'?"  }
         });
         DialogResult result = await dialogReference.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             _isLoading = true;
             await InvokeAsync(StateHasChanged);
@@ -111,7 +111,7 @@ public partial class Devices : ComponentBase
             { "ContentText", $"Are you sure you want to activate device '{deviceMeta.Name}'?"  }
         });
         DialogResult result = await dialogReference.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateRequestOptions(_serviceUniqueName, deviceMeta.Id, true));
         }
@@ -123,7 +123,7 @@ public partial class Devices : ComponentBase
             { "ContentText", $"Are you sure you want to deactivate device '{deviceMeta.Name}'?"  }
         });
         DialogResult result = await dialogReference.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             await ChangeDeviceState(new DeviceManagerService.ChangeDeviceStateRequestOptions(_serviceUniqueName, deviceMeta.Id, false));
         }

@@ -89,7 +89,7 @@ public partial class Editor : ComponentBase
                                                                                 CloseButton = true
                                                                             });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             await InvokeAsync(StateHasChanged);
         }
@@ -102,7 +102,7 @@ public partial class Editor : ComponentBase
             FullWidth = true
         });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             _isLoading = true;
             await InvokeAsync(StateHasChanged);

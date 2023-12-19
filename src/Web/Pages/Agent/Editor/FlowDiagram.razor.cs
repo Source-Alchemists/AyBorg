@@ -452,7 +452,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         };
         IDialogReference dialog = DialogService.Show<ConfirmDialog>("Confirm deletion", dialogParameters, new DialogOptions());
         DialogResult result = await dialog.Result;
-        return !result.Cancelled;
+        return !result.Canceled;
     }
 
     private void OnZoomInClicked() => _diagram.SetZoom(_diagram.Zoom + 0.1);

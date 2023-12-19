@@ -94,7 +94,7 @@ public partial class DeviceSettingsDialog : ComponentBase
             { "ContentText", "Are you sure you want to apply settings and connect this device?" }
         });
         DialogResult result = await dialogReference.Result;
-        if (result.Cancelled)
+        if (result.Canceled)
         {
             return;
         }
@@ -134,7 +134,7 @@ public partial class DeviceSettingsDialog : ComponentBase
             { "ContentText", "Are you sure you want disconnect this device?" }
         });
         DialogResult result = await dialogReference.Result;
-        if (result.Cancelled)
+        if (result.Canceled)
         {
             return;
         }

@@ -75,7 +75,7 @@ public partial class Projects : ComponentBase
         };
         IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete Project", parameters, options);
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             if (await ProjectManagementService.TryDeleteAsync(project))
             {
@@ -96,7 +96,7 @@ public partial class Projects : ComponentBase
             FullWidth = true
         });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             ProjectSaveInfo stateChange = (ProjectSaveInfo)result.Data;
             if (await ProjectManagementService.TrySaveAsync(projectMeta, stateChange))
@@ -119,7 +119,7 @@ public partial class Projects : ComponentBase
         };
         IDialogReference dialog = DialogService.Show<ConfirmDialog>("Abandon review", parameters, options);
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             if (await ProjectManagementService.TrySaveAsync(projectMeta, new ProjectSaveInfo
             {
@@ -148,7 +148,7 @@ public partial class Projects : ComponentBase
             FullWidth = true
         });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             var resultProjectMetaDto = (ProjectMeta)result.Data;
             if (await ProjectManagementService.TryApproveAsync(projectMeta, new ProjectSaveInfo
@@ -172,7 +172,7 @@ public partial class Projects : ComponentBase
             FullWidth = true
         });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             await ReceiveProjectsAsync();
         }

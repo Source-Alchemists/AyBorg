@@ -31,7 +31,7 @@ public partial class RectangleInput : BaseInput
         IDialogReference dialog = DialogService.Show<EditRectangleDialog>("Edit rectangle", dialogParameters);
         DialogResult result = await dialog.Result;
 
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             _value = (Rectangle)result.Data;
             await NotifyValueChangedAsync(_value);

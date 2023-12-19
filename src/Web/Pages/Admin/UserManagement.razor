@@ -9,13 +9,13 @@
         <MudCard Class="rounded-lg">
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudIcon Icon="@Icons.Filled.ManageAccounts" Size="Size.Large" />
+                    <MudIcon Icon="@Icons.Material.Filled.ManageAccounts" Size="Size.Large" />
                 </CardHeaderAvatar>
                 <CardHeaderContent>
                     <MudText Typo="Typo.h6">Accounts</MudText>
                 </CardHeaderContent>
                 <CardHeaderActions>
-                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox" Color="Color.Primary" OnClick="@OnAddAccountClicked">Add Account</MudButton>
+                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.AddBox" Color="Color.Primary" OnClick="@OnAddAccountClicked">Add Account</MudButton>
                 </CardHeaderActions>
             </MudCardHeader>
             <MudCardContent>
@@ -36,24 +36,24 @@
                         <MudTd DataLabel="Lockout end">@context.LockoutEnd</MudTd>
                         <MudTd>
                             <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
-                                <MudMenuItem Icon="@Icons.Filled.Edit" @onclick="() => OnEditAccountClicked(context)">
+                                <MudMenuItem Icon="@Icons.Material.Filled.Edit" @onclick="() => OnEditAccountClicked(context)">
                                     Edit
                                 </MudMenuItem>
                                 @if(!@context.UserName!.Equals("SystemAdmin"))
                                 {
-                                    <MudMenuItem Icon="@Icons.Filled.Password" @onclick="() => OnResetPasswordClicked(context)">
+                                    <MudMenuItem Icon="@Icons.Material.Filled.Password" @onclick="() => OnResetPasswordClicked(context)">
                                         Reset Password
                                     </MudMenuItem>
                                 }
                                 @if(@context.LockoutEnd != null && @context.LockoutEnd > DateTime.UtcNow)
                                 {
-                                    <MudMenuItem Icon="@Icons.Filled.LockOpen" IconColor="Color.Warning" @onclick="() => OnUnlockAccountClicked(context)">
+                                    <MudMenuItem Icon="@Icons.Material.Filled.LockOpen" IconColor="Color.Warning" @onclick="() => OnUnlockAccountClicked(context)">
                                         Unlock
                                     </MudMenuItem>
                                 }
                                 else if(!@context.UserName.Equals("SystemAdmin"))
                                 {
-                                    <MudMenuItem Icon="@Icons.Filled.Lock" IconColor="Color.Warning" @onclick="() => OnLockAccountClicked(context)">
+                                    <MudMenuItem Icon="@Icons.Material.Filled.Lock" IconColor="Color.Warning" @onclick="() => OnLockAccountClicked(context)">
                                         Lock
                                     </MudMenuItem>
                                 }

@@ -35,7 +35,7 @@
                 <MudIconButton Icon="@Icons.Material.Filled.Fullscreen" Color="Color.Default" OnClick="@OnStepFullScreenClicked" Style="float: left" />
             </MudTooltip>
             <MudTooltip Text="Delete" hidden="@(!Node.Selected || Node.Locked)">
-			    <MudIconButton Icon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@OnRemoveNodeClicked" Style="float: left" />
+			    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@OnRemoveNodeClicked" Style="float: left" />
             </MudTooltip>
 			<span Style="float: right" Class="pr-3 pt-4">@Node!.Step!.ExecutionTimeMs ms</span>
 		</div>

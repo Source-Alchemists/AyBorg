@@ -100,7 +100,7 @@ public partial class SavedAuditReports : ComponentBase
                                                 { "ContentText", "Are you sure you want to delete the audit report?" }
                                             });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             if (!await AuditService.TryDeleteReport(report))
             {

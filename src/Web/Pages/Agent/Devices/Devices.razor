@@ -8,7 +8,7 @@
 }
 else
 {
-    <PageTitle>Devices (@_serviceName)</PageTitle>
+    <PageTitle>Devices - @_serviceName</PageTitle>
 }
 
 <AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
@@ -29,7 +29,7 @@ else
                     </MudBadge>
                 </CardHeaderContent>
                 <CardHeaderActions>
-                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Filled.AddBox"
+                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.AddBox"
                         Color="Color.Primary" OnClick="@OnAddDeviceClicked">Add Device</MudButton>
                 </CardHeaderActions>
             </MudCardHeader>
@@ -48,7 +48,7 @@ else
                         <MudTd DataLabel="Active">
                             @if (@context.IsActive)
                             {
-                                <MudIcon Icon="@Icons.Filled.Check" />
+                                <MudIcon Icon="@Icons.Material.Filled.Check" />
                             }
                         </MudTd>
                         <MudTd DataLabel="Connected">

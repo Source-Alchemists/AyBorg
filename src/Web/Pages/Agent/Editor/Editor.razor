@@ -10,7 +10,7 @@
 }
 else
 {
-    <PageTitle>Editor (@_serviceName)</PageTitle>
+    <PageTitle>Editor - @_serviceName</PageTitle>
 }
 <AyBorg.Web.Shared.Alerts.ServiceOfflineAlert IsVisible="@_hasServiceError" />
 @if (_isProjectLoaded)
@@ -24,17 +24,17 @@ else
         <MudItem xs="4">
             <MudStack Row="true" Spacing="0">
             <MudTooltip Text="Draft" hidden="@(_projectState != ProjectState.Draft)">
-                <MudIcon Icon="@Icons.Filled.GppBad" Size="Size.Large" Color="Color.Error" />
+                <MudIcon Icon="@Icons.Material.Filled.GppBad" Size="Size.Large" Color="Color.Error" />
             </MudTooltip>
             <MudTooltip Text="Review" hidden="@(_projectState != ProjectState.Review)">
-                <MudIcon Icon="@Icons.Filled.SafetyCheck" Size="Size.Large" Color="Color.Warning" />
+                <MudIcon Icon="@Icons.Material.Filled.SafetyCheck" Size="Size.Large" Color="Color.Warning" />
             </MudTooltip>
             <MudTooltip Text="Ready" hidden="@(_projectState != ProjectState.Ready)">
-                <MudIcon Icon="@Icons.Filled.GppGood" Size="Size.Large" Color="Color.Info" />
+                <MudIcon Icon="@Icons.Material.Filled.GppGood" Size="Size.Large" Color="Color.Info" />
             </MudTooltip>
             <MudText Typo="Typo.h5" Class="pl-3">@_projectName</MudText>
             <MudTooltip Text="Read only mode" hidden=@(_projectState == ProjectState.Draft)>
-                <MudIcon Icon="@Icons.Filled.Lock" Size="Size.Medium" Color="Color.Default" Class="pl-2" />
+                <MudIcon Icon="@Icons.Material.Filled.Lock" Size="Size.Medium" Color="Color.Default" Class="pl-2" />
             </MudTooltip>
             </MudStack>
         </MudItem>
@@ -49,11 +49,11 @@ else
         <MudItem xs="4">
             <div style="float: right">
                 <MudTooltip Text="Save as draft">
-                    <MudIconButton Icon="@Icons.Filled.SaveAlt" Color="Color.Primary" OnClick="@OnProjectSaveClicked"
+                    <MudIconButton Icon="@Icons.Material.Filled.SaveAlt" Color="Color.Primary" OnClick="@OnProjectSaveClicked"
                     Disabled=@(_projectState != ProjectState.Draft) />
                 </MudTooltip>
                 <MudTooltip Text="Settings">
-                    <MudIconButton Icon="@Icons.Filled.Settings" Color="Color.Default" OnClick="@OnProjectSettingsClicked" />
+                    <MudIconButton Icon="@Icons.Material.Filled.Settings" Color="Color.Default" OnClick="@OnProjectSettingsClicked" />
                 </MudTooltip>
             </div>
         </MudItem>
@@ -90,7 +90,7 @@ else
 {
     <PagePlaceholder>
         <MudButton Class="center-horizontal mt-1"
-                    StartIcon="@Icons.Filled.AddBox"
+                    StartIcon="@Icons.Material.Filled.AddBox"
                     Color="Color.Primary"
                     Variant="Variant.Filled"
                     OnClick="OnCreateProjectClicked"

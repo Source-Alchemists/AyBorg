@@ -178,6 +178,10 @@
     z-index: -1;
 }
 
+.nav-header-spacer {
+    height: 14px;
+}
+
 .page-loading-bar {
     height: 4px;
 }
