@@ -1,0 +1,5 @@
+@page "/net/projects"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
+
+<PageTitle>Projects - AI - AyBorg</PageTitle>

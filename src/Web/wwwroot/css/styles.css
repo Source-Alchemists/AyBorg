@@ -178,8 +178,14 @@
     z-index: -1;
 }
 
+.app-nav-bar-spacer {
+    width: 80px;
+}
+.app-bar-nav-item {
+    min-width: 100px;
+}
 .nav-header-spacer {
-    height: 14px;
+    height: 80px;
 }
 
 .page-loading-bar {

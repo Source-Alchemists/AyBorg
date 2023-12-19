@@ -4,7 +4,11 @@
 
 <PageTitle>Agents Overview</PageTitle>
 
-<MudGrid class="pt-6">
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudGrid class="pt-1">
     <MudItem xs="4">
         <MudCard Class="rounded-lg">
             <MudCardHeader>

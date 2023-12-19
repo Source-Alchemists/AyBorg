@@ -2,83 +2,103 @@
 
 <div class="nav-header-spacer"></div>
 
-<AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
-    <Authorized>
-        <MudNavLink Icon="@Icons.Material.Filled.Dashboard" href="dashboard" Match="NavLinkMatch.All" Disabled="@(!_isDashboardAvailable)">
-            Dashboard
-        </MudNavLink>
-    </Authorized>
-</AuthorizeView>
+@if (_category == Category.Dashboard)
+{
+    <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
+        <Authorized>
+            <MudNavLink Icon="@Icons.Material.Filled.Dashboard" href="dashboard" Match="NavLinkMatch.All" Disabled="@(!_isDashboardAvailable)">
+                @(_dashboardTitle)
+            </MudNavLink>
+        </Authorized>
+    </AuthorizeView>
+}
 
-<AuthorizeView Roles="Administrator, Engineer, Reviewer">
-    <Authorized>
-        <MudNavGroup Title="Agents" Icon="@Icons.Material.Filled.Workspaces" Expanded="@(_isAnyAgentAvailable)" Disabled="@(!_isAnyAgentAvailable)" HideExpandIcon>
+@if (_category == Category.Agents)
+{
+    <AuthorizeView Roles="Administrator, Engineer, Reviewer">
+        <Authorized>
             <MudNavLink Href="agents/overview"  Match="NavLinkMatch.All">
                 Overview
             </MudNavLink>
-            @if(StateService.AgentState != null)
+            @if (StateService.AgentState != null)
             {
-                <MudNavGroup Title="@StateService.AgentState.Name" Icon="@Icons.Material.Outlined.Workspaces" Expanded="true" HideExpandIcon>
-                    <MudNavLink Href="@StateService.AgentState.ProjectsLink">
-                        Projects
-                    </MudNavLink>
-                    <MudNavLink Href="@StateService.AgentState.EditorLink">
-                        Editor
-                    </MudNavLink>
-                    <MudNavLink Href="@StateService.AgentState.DevicesLink">
-                        Devices
-                    </MudNavLink>
-                </MudNavGroup>
+            <MudNavLink Href="@StateService.AgentState.ProjectsLink">
+                Projects
+            </MudNavLink>
+            <MudNavLink Href="@StateService.AgentState.EditorLink">
+                Editor
+            </MudNavLink>
+            <MudNavLink Href="@StateService.AgentState.DevicesLink">
+                Devices
+            </MudNavLink>
             }
-        </MudNavGroup>
-    </Authorized>
-</AuthorizeView>
+        </Authorized>
+    </AuthorizeView>
+}
 
-<AuthorizeView Roles="Administrator, Engineer, Reviewer">
-    <Authorized>
-        <MudNavGroup Title="Artificial Intelligence" Icon="@Icons.Material.Filled.Hive" Expanded="@(_isNetAvailable)" Disabled="@(!_isNetAvailable)" HideExpandIcon>
-            <MudNavLink Href="net/datasets" Match="NavLinkMatch.All">
+@if (_category == Category.Net)
+{
+    <AuthorizeView Roles="Administrator, Engineer, Reviewer">
+        <Authorized>
+            <MudNavLink Href="net/projects">
+                Projects
+            </MudNavLink>
+            <MudNavLink Href="net/upload">
+                Upload
+            </MudNavLink>
+            <MudNavLink Href="net/annotate">
+                Annotate
+            </MudNavLink>
+            <MudNavLink Href="net/Datasets">
                 Datasets
             </MudNavLink>
-            <MudNavLink Href="net/models" Match="NavLinkMatch.All">
+            <MudNavLink Href="net/generate">
+                Generate
+            </MudNavLink>
+            <MudNavLink Href="net/models">
                 Models
             </MudNavLink>
-        </MudNavGroup>
-    </Authorized>
-</AuthorizeView>
+        </Authorized>
+    </AuthorizeView>
+}
 
-<AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
-    <Authorized>
-        <MudNavGroup Title="Observability" Icon="@Icons.Material.Filled.Analytics" Expanded="true" HideExpandIcon>
-            <MudNavLink href="observability/analytics" Match="NavLinkMatch.Prefix" Disabled="@(!_isAnalyticsAvailable)">
-                Logs
-            </MudNavLink>
+@if (_category == Category.Observability)
+{
+    <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
+        <Authorized>
             <MudNavLink Href="observability/services" Match="NavLinkMatch.Prefix">
                 Services
             </MudNavLink>
-        </MudNavGroup>
-    </Authorized>
-</AuthorizeView>
-
-<AuthorizeView Roles="Administrator, Auditor">
-    <Authorized>
-        <MudNavGroup Title="Audit" Icon="@Icons.Material.Filled.Assignment" Expanded="@(_isAuditAvailable)" Disabled="@(!_isAuditAvailable)" HideExpandIcon>
-            <MudNavLink Href="audit/reports/create" Match="NavLinkMatch.All" >
-                Create Report
+            <MudNavLink href="observability/analytics" Match="NavLinkMatch.Prefix" Disabled="@(!_isAnalyticsAvailable)">
+                Logs
             </MudNavLink>
-            <MudNavLink Href="audit/reports" Match="NavLinkMatch.All" >
-                Saved Reports
-            </MudNavLink>
-        </MudNavGroup>
-    </Authorized>
-</AuthorizeView>
+        </Authorized>
+    </AuthorizeView>
+}
 
-<AuthorizeView Roles="@Roles.Administrator">
-    <Authorized>
-        <MudNavGroup Title="Administration" Icon="@Icons.Material.Filled.AdminPanelSettings" Expanded="true" HideExpandIcon>
+@if (_category == Category.Audit)
+{
+    <AuthorizeView Roles="Administrator, Auditor">
+        <Authorized>
+            <MudNavGroup Title="@(_auditTitle)" Icon="@Icons.Material.Filled.Assignment" Expanded="@(_isAuditAvailable)" Disabled="@(!_isAuditAvailable)" HideExpandIcon>
+                <MudNavLink Href="audit/reports/create" Match="NavLinkMatch.All" >
+                    Create Report
+                </MudNavLink>
+                <MudNavLink Href="audit/reports" Match="NavLinkMatch.All" >
+                    Saved Reports
+                </MudNavLink>
+            </MudNavGroup>
+        </Authorized>
+    </AuthorizeView>
+}
+
+@if (_category == Category.Admin)
+{
+    <AuthorizeView Roles="@Roles.Administrator">
+        <Authorized>
             <MudNavLink Href="admin/usermanagement" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.ManageAccounts">
-                User Management
+                    User Management
             </MudNavLink>
-        </MudNavGroup>
-    </Authorized>
-</AuthorizeView>
+        </Authorized>
+    </AuthorizeView>
+}
