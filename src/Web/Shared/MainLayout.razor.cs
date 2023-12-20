@@ -15,7 +15,7 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
     public string RouteName = string.Empty;
 
     private bool _isDarkMode = true;
-    private bool _isDrawerOpen = true;
+    private bool _isDrawerVisible = false;
     private bool _isDisposed = false;
 
     private readonly MudTheme _theme = new();
@@ -23,6 +23,7 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
     protected override void OnInitialized()
     {
         CreateTheme();
+        UpdateDrawerVisibility();
         RouteName = NavigationManager.Uri;
         NavigationManager.LocationChanged += HandleLocationChanged;
     }
@@ -55,7 +56,20 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
     private void HandleLocationChanged(object? sender, LocationChangedEventArgs args)
     {
         RouteName = args.Location;
+        UpdateDrawerVisibility();
         StateHasChanged();
+    }
+
+    private void UpdateDrawerVisibility()
+    {
+        if (NavigationManager.BaseUri.Equals(NavigationManager.Uri) || NavigationManager.Uri.Contains("/tutorials/"))
+        {
+            _isDrawerVisible = false;
+        }
+        else
+        {
+            _isDrawerVisible = true;
+        }
     }
 
     private async void OnThemeChanged(bool value)
@@ -63,11 +77,6 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
         _isDarkMode = !_isDarkMode;
         await JsRuntime.InvokeVoidAsync("switchTheme", _isDarkMode);
         await LocalStorageService.SetItemAsync("Theme.IsDarkModeDisabled", !_isDarkMode);
-    }
-
-    private void DrawerToggle()
-    {
-        _isDrawerOpen = !_isDrawerOpen;
     }
 
     private void CreateTheme()

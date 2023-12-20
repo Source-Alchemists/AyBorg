@@ -14,12 +14,6 @@
     <Authorized>
         <MudLayout Class="mud-full-height">
             <MudAppBar Elevation="0" Class="blur noprint">
-                <MudLink Href="/" Underline="Underline.None">
-                    <MudStack Row="true" Spacing="0">
-                        <MudImage Src="icons/logo.svg" Width="40" Height="40" />
-                        <MudText Typo="Typo.h5" Class="ml-3 mt-2 brand-text navigation" Color="Color.Primary">AyBorg</MudText>
-                    </MudStack>
-                </MudLink>
                 <AppBarMenu />
                 <MudSpacer />
                 <MudToggleIconButton Toggled="@_isDarkMode"
@@ -33,7 +27,7 @@
             </MudAppBar>
 
             <MudDrawerContainer Class="mud-full-height">
-                <MudDrawer @bind-Open="@_isDrawerOpen" Elevation="0" Variant="@DrawerVariant.Responsive" Class="noprint">
+                <MudDrawer @bind-Open="@_isDrawerVisible" Elevation="0" Variant="@DrawerVariant.Responsive" Class="noprint">
                     <MudNavMenu Color="Color.Secondary" Bordered>
                         <NavMenu />
                     </MudNavMenu>

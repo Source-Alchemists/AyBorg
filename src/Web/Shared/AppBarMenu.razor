@@ -1,48 +1,116 @@
-<div class="app-nav-bar-spacer"></div>
-<AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
-    <Authorized>
-        <MudButton Href="@DASHBOARD_URI" Class="@GetActiveClass(DASHBOARD_URI)" StartIcon="@Icons.Material.Filled.Dashboard" Disabled="@(!_isDashboardAvailable)">
-            Dashboard
-            @if(!_isDashboardAvailable)
-            {
-                <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
-            }
-        </MudButton>
-    </Authorized>
-</AuthorizeView>
+<MudHidden Breakpoint="Breakpoint.LgAndUp">
+    <MudMenu AnchorOrigin="Origin.TopLeft" TransformOrigin="Origin.TopLeft">
+        <ActivatorContent>
+            <MudIconButton Icon="@Icons.Material.Rounded.Notes" Color="Color.Inherit" />
+        </ActivatorContent>
+        <ChildContent>
+            <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
+                <Authorized>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Dashboard" Href="@DASHBOARD_URI"
+                        Disabled="@(!_isDashboardAvailable)">
+                        Dashboard
+                        @if (!_isDashboardAvailable)
+                        {
+                            <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
+                        }
+                    </MudMenuItem>
 
-<AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
-    <Authorized>
-        <MudButton Href="@AGENTS_URI" Class="@GetActiveClass(AGENTS_BASE_URI)" StartIcon="@Icons.Material.Filled.Workspaces">Agents</MudButton>
-    </Authorized>
-</AuthorizeView>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Workspaces" Href="@AGENTS_URI">
+                        Agents
+                    </MudMenuItem>
 
-<AuthorizeView Roles="Administrator, Engineer, Reviewer">
-    <Authorized>
-        <MudButton Href="@NET_URI" Class="@GetActiveClass(NET_BASE_URI)" StartIcon="@Icons.Material.Filled.Hive" Disabled="@(!_isNetAvailable)">
-            Net
-            @if(!_isNetAvailable)
-            {
-                <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
-            }
-        </MudButton>
-    </Authorized>
-</AuthorizeView>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Hive" Href="@NET_URI" Disabled="@(!_isNetAvailable)">
+                        Net
+                        @if (!_isNetAvailable)
+                        {
+                            <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
+                        }
+                    </MudMenuItem>
 
-<AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
-    <Authorized>
-        <MudButton Href="@OBSERVABILITY_URI" Class="@GetActiveClass(OBSERVABILITY_BASE_URI)" StartIcon="@Icons.Material.Filled.Analytics">Observability</MudButton>
-    </Authorized>
-</AuthorizeView>
 
-<AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
-    <Authorized>
-        <MudButton Href="@AUDIT_URI" Class="@GetActiveClass(AUDIT_BASE_URI)" StartIcon="@Icons.Material.Filled.Assignment" Disabled="@(!_isAuditAvailable)">
-            Audit
-            @if(!_isAuditAvailable)
-            {
-                <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
-            }
-        </MudButton>
-    </Authorized>
-</AuthorizeView>
+                    <MudMenuItem Icon="@Icons.Material.Filled.Analytics" Href="@OBSERVABILITY_URI">
+                        Observability
+                    </MudMenuItem>
+
+
+                    <MudMenuItem Icon="@Icons.Material.Filled.Assignment" Href="@AUDIT_URI"
+                        Disabled="@(!_isAuditAvailable)">
+                        Audit
+                        @if (!_isAuditAvailable)
+                        {
+                            <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
+                        }
+                    </MudMenuItem>
+                </Authorized>
+            </AuthorizeView>
+        </ChildContent>
+    </MudMenu>
+    <MudLink Href="/" Underline="Underline.None">
+        <MudStack Row="true" Spacing="0">
+            <MudImage Src="icons/logo.svg" Width="40" Height="40" />
+            <MudText Typo="Typo.h5" Class="ml-3 mt-2 brand-text navigation" Color="Color.Primary">AyBorg</MudText>
+        </MudStack>
+    </MudLink>
+</MudHidden>
+
+<MudHidden Breakpoint="Breakpoint.LgAndUp" Invert="true">
+    <MudLink Href="/" Underline="Underline.None">
+        <MudStack Row="true" Spacing="0">
+            <MudImage Src="icons/logo.svg" Width="40" Height="40" />
+            <MudText Typo="Typo.h5" Class="ml-3 mt-2 brand-text navigation" Color="Color.Primary">AyBorg</MudText>
+        </MudStack>
+    </MudLink>
+    <div class="app-nav-bar-spacer"></div>
+    <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
+        <Authorized>
+            <MudButton Href="@DASHBOARD_URI" Class="@GetActiveClass(DASHBOARD_URI)"
+                StartIcon="@Icons.Material.Filled.Dashboard" Disabled="@(!_isDashboardAvailable)">
+                Dashboard
+                @if (!_isDashboardAvailable)
+                {
+                    <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
+                }
+            </MudButton>
+        </Authorized>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
+        <Authorized>
+            <MudButton Href="@AGENTS_URI" Class="@GetActiveClass(AGENTS_BASE_URI)"
+                StartIcon="@Icons.Material.Filled.Workspaces">Agents</MudButton>
+        </Authorized>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Administrator, Engineer, Reviewer">
+        <Authorized>
+            <MudButton Href="@NET_URI" Class="@GetActiveClass(NET_BASE_URI)" StartIcon="@Icons.Material.Filled.Hive"
+                Disabled="@(!_isNetAvailable)">
+                Net
+                @if (!_isNetAvailable)
+                {
+                    <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
+                }
+            </MudButton>
+        </Authorized>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
+        <Authorized>
+            <MudButton Href="@OBSERVABILITY_URI" Class="@GetActiveClass(OBSERVABILITY_BASE_URI)"
+                StartIcon="@Icons.Material.Filled.Analytics">Observability</MudButton>
+        </Authorized>
+    </AuthorizeView>
+
+    <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
+        <Authorized>
+            <MudButton Href="@AUDIT_URI" Class="@GetActiveClass(AUDIT_BASE_URI)"
+                StartIcon="@Icons.Material.Filled.Assignment" Disabled="@(!_isAuditAvailable)">
+                Audit
+                @if (!_isAuditAvailable)
+                {
+                    <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
+                }
+            </MudButton>
+        </Authorized>
+    </AuthorizeView>
+</MudHidden>
