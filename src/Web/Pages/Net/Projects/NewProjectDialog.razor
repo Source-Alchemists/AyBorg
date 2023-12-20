@@ -1,0 +1,47 @@
+@using AyBorg.Web.Shared.Models.Net
+
+<MudDialog>
+    <DialogContent>
+        <MudSelect T="string" Label="Project Type" @bind-Value="_selectedProjectType">
+            @foreach (var type in _projectTypes)
+            {
+                <MudSelectItem T="string" value="@type">@type</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField @ref="_tagField" 
+                T="string"
+                @bind-Value="_tmpTag"
+                Label="What are you detection?" 
+                Placeholder="e.g. 'person' or 'cat' or 'car'" 
+                Variant="Variant.Text" 
+                Immediate="true"
+                Adornment="Adornment.End"
+                AdornmentIcon="@Icons.Material.Filled.Add"
+                AdornmentAriaLabel="Add Tag"
+                AdornmentColor="Color.Secondary"
+                OnAdornmentClick="OnTagAdornmentClicked"
+                OnKeyDown="OnTagsKeyUp"
+                TextUpdateSuppression="true"
+                Class="mt-2" />
+        <MudChipSet AllClosable="true" OnClose="TagRemoved">
+            @foreach(var tag in _addedTags)
+            {
+                <MudChip Text="@tag" Color="Color.Secondary" />
+            }
+        </MudChipSet>
+        <MudTextField T="string"
+                @bind-Value="_projectName"
+                Label="Project Name"
+                Placeholder="e.g. 'Person Detection' or 'Animals' or 'Car Models'" 
+                Variant="Variant.Text"
+                Class="mt-2"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="OnCloseClicked">
+            Cancel
+        </MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OnCreateClicked">
+            Create Project
+        </MudButton>
+    </DialogActions>
+</MudDialog>

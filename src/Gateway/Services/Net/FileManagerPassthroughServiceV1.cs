@@ -7,11 +7,11 @@ using Grpc.Core;
 
 namespace AyBorg.Gateway.Services.Net;
 
-public sealed class FilemanagerPassthroughServiceV1 : Filemanager.FilemanagerBase
+public sealed class FileManagerPassthroughServiceV1 : FileManager.FileManagerBase
 {
     private readonly IGrpcChannelService _channelService;
 
-    public FilemanagerPassthroughServiceV1(IGrpcChannelService grpcChannelService)
+    public FileManagerPassthroughServiceV1(IGrpcChannelService grpcChannelService)
     {
         _channelService = grpcChannelService;
     }
@@ -22,7 +22,7 @@ public sealed class FilemanagerPassthroughServiceV1 : Filemanager.FilemanagerBas
 
         await Parallel.ForEachAsync(channels, async (channel, token) =>
         {
-            Filemanager.FilemanagerClient client = _channelService.CreateClient<Filemanager.FilemanagerClient>(channel.ServiceUniqueName);
+            FileManager.FileManagerClient client = _channelService.CreateClient<FileManager.FileManagerClient>(channel.ServiceUniqueName);
             AsyncClientStreamingCall<ImageUploadRequest, Empty> requestCall = client.UploadImage(cancellationToken: context.CancellationToken);
             await foreach (ImageUploadRequest? imageChunk in requestStream.ReadAllAsync(cancellationToken: context.CancellationToken))
             {

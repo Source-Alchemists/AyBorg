@@ -100,7 +100,8 @@ app.MapGrpcService<AuditPassthroughServiceV1>();
 // Result
 app.MapGrpcService<AyBorg.Gateway.Services.Result.StoragePassthroughServiceV1>();
 // Net
-app.MapGrpcService<AyBorg.Gateway.Services.Net.FilemanagerPassthroughServiceV1>();
+app.MapGrpcService<AyBorg.Gateway.Services.Net.FileManagerPassthroughServiceV1>();
+app.MapGrpcService<AyBorg.Gateway.Services.Net.ProjectManagerPassthroughServiceV1>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists

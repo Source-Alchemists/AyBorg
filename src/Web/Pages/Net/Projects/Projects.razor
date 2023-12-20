@@ -1,5 +1,44 @@
 @page "/net/projects"
 @using SDK.Authorization
+@using SDK.Common
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 
 <PageTitle>Projects - AI - AyBorg</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudGrid class="pt-1">
+    <MudItem xs="12">
+        <MudCard Class="rounded-lg">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                        <MudIcon Icon="@Icons.Material.Filled.Hive" Size="Size.Large" Color="Color.Default" />
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+				    <MudBadge Content="@(_projects.Count)" Overlap="true" Color="Color.Primary">
+                        <MudText Typo="Typo.h6">Projects</MudText>
+                    </MudBadge>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.AddBox" Color="Color.Primary" OnClick="@OnNewProjectClicked">New Project</MudButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTable Items="@_projects" Elevation="0" Hover>
+                    <HeaderContent>
+                        <MudTh>Name</MudTh>
+                        <MudTh>Type</MudTh>
+                        <MudTh>Tags</MudTh>
+                        <MudTh Style="width: 30px"></MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Name">@context.Name</MudTd>
+                        <MudTd DataLabel="Type">@context.Type.GetDescription()</MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>
