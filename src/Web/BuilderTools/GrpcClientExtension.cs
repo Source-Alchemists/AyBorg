@@ -1,6 +1,7 @@
 using Ayborg.Gateway.Agent.V1;
 using Ayborg.Gateway.Analytics.V1;
 using Ayborg.Gateway.Audit.V1;
+using Ayborg.Gateway.Net.V1;
 using Ayborg.Gateway.V1;
 using AyBorg.Web.Services;
 using Grpc.Core;
@@ -9,7 +10,7 @@ namespace AyBorg.Web;
 
 internal static class GrpcClientExtension
 {
-    private const string FallbackUrl = "http://localhost:5000";
+    private const string FallbackUrl = "http://localhost:6000";
     private const string GatewayUrlConfig = "AyBorg:Gateway:Url";
 
     public static WebApplicationBuilder RegisterGrpcClients(this WebApplicationBuilder builder)
@@ -20,13 +21,17 @@ internal static class GrpcClientExtension
         CreateClientFactory<Notify.NotifyClient>(builder, gatewayUrl, false);
         CreateClientFactory<EventLog.EventLogClient>(builder, gatewayUrl, false);
         // Secured endpoints
+        // AyBorg.Agent
         CreateClientFactory<ProjectManagement.ProjectManagementClient>(builder, gatewayUrl);
         CreateClientFactory<ProjectSettings.ProjectSettingsClient>(builder, gatewayUrl);
         CreateClientFactory<Editor.EditorClient>(builder, gatewayUrl);
         CreateClientFactory<Runtime.RuntimeClient>(builder, gatewayUrl);
         CreateClientFactory<Storage.StorageClient>(builder, gatewayUrl);
-        CreateClientFactory<Audit.AuditClient>(builder, gatewayUrl);
         CreateClientFactory<DeviceManager.DeviceManagerClient>(builder, gatewayUrl);
+        // AyBorg.Audit
+        CreateClientFactory<Audit.AuditClient>(builder, gatewayUrl);
+        // AyBorg.Net
+        CreateClientFactory<ProjectManager.ProjectManagerClient>(builder, gatewayUrl);
         return builder;
     }
 

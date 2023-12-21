@@ -106,15 +106,20 @@ builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IRpcMapper, RpcMapper>();
 
 builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
+builder.Services.AddScoped<IStateService, StateService>();
+builder.Services.AddScoped<IEventLogService, EventLogService>();
+
+// AyBorg.Agent
 builder.Services.AddScoped<IProjectManagementService, ProjectManagementService>();
 builder.Services.AddScoped<IProjectSettingsService, ProjectSettingsService>();
 builder.Services.AddScoped<PluginsService>();
 builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IRuntimeService, RuntimeService>();
 builder.Services.AddScoped<IAgentOverviewService, AgentsOverviewService>();
-builder.Services.AddScoped<IStateService, StateService>();
-builder.Services.AddScoped<IEventLogService, EventLogService>();
 builder.Services.AddScoped<IDeviceManagerService, DeviceManagerService>();
+
+// AyBorg.NET
+builder.Services.AddScoped<AyBorg.Web.Services.Net.IProjectManagerService, AyBorg.Web.Services.Net.ProjectManagerService>();
 
 builder.Services.AddTransient<ITokenProvider, TokenProvider>();
 builder.Services.AddTransient<IStorageService, StorageService>();

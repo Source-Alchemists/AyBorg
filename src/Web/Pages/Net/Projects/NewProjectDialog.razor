@@ -34,6 +34,7 @@
                 Label="Project Name"
                 Placeholder="e.g. 'Person Detection' or 'Animals' or 'Car Models'" 
                 Variant="Variant.Text"
+                Error="@(!string.IsNullOrEmpty(_projectNameError))" ErrorText="@_projectNameError" Required
                 Class="mt-2"/>
     </DialogContent>
     <DialogActions>

@@ -1,7 +1,10 @@
 using System.Collections.Immutable;
 using AyBorg.SDK.Common;
-using AyBorg.Web.Shared.Modals.Net;
+using AyBorg.Web.Services.Net;
+using AyBorg.Web.Shared.Models.Net;
+using Grpc.Core;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using MudBlazor;
 
@@ -12,23 +15,39 @@ namespace AyBorg.Web.Pages.Net.Projects;
 public partial class NewProjectDialog : ComponentBase
 {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+    [Inject] IProjectManagerService ProjectManagerService { get; init; }
+    [Inject] ISnackbar Snackbar { get; init; }
     private string[] _projectTypes = Array.Empty<string>();
     private string _selectedProjectType = string.Empty;
     private ImmutableList<string> _addedTags = ImmutableList<string>.Empty;
     private string _tmpTag = string.Empty;
     private string _projectName = string.Empty;
+    private string _username = string.Empty;
     private MudTextField<string> _tagField;
+    private string _projectNameError;
 
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        base.OnInitialized();
+        await base.OnInitializedAsync();
+        if (AuthenticationState is not null)
+        {
+            AuthenticationState authState = await AuthenticationState;
+            System.Security.Claims.ClaimsPrincipal user = authState?.User;
+
+            if (user?.Identity is not null)
+            {
+                _username = user.Identity.Name!;
+            }
+        }
+
         _projectTypes = new[] { ProjectType.ObjectDetection.GetDescription() };
         _selectedProjectType = _projectTypes[0];
     }
 
-    private async void OnTagAdornmentClicked()
+    private void OnTagAdornmentClicked()
     {
-        if(string.IsNullOrEmpty(_tmpTag) || string.IsNullOrWhiteSpace(_tmpTag))
+        if (string.IsNullOrEmpty(_tmpTag) || string.IsNullOrWhiteSpace(_tmpTag))
         {
             return;
         }
@@ -56,7 +75,7 @@ public partial class NewProjectDialog : ComponentBase
 
     private async void OnTagsKeyUp(KeyboardEventArgs args)
     {
-        if(args.Code.Equals("Space", StringComparison.InvariantCultureIgnoreCase)
+        if (args.Code.Equals("Space", StringComparison.InvariantCultureIgnoreCase)
             || args.Code.Equals("Enter", StringComparison.InvariantCultureIgnoreCase)
             || args.Code.Equals("NumpadEnter", StringComparison.InvariantCultureIgnoreCase))
         {
@@ -69,7 +88,34 @@ public partial class NewProjectDialog : ComponentBase
 
     private async void OnCreateClicked()
     {
+        _projectNameError = string.Empty;
+        if(string.IsNullOrEmpty(_projectName) || string.IsNullOrWhiteSpace(_projectName))
+        {
+            _projectNameError = "Please enter a project name";
+            return;
+        }
 
+        int selectedProjectTypeIndex = Array.FindIndex(_projectTypes, p => p.Equals(_selectedProjectType, StringComparison.InvariantCultureIgnoreCase));
+        ImmutableList<Tag> tags = ImmutableList<Tag>.Empty;
+        foreach (string addedTag in _addedTags)
+        {
+            tags = tags.Add(new Tag { Name = addedTag });
+        }
+        try
+        {
+            await ProjectManagerService.CreateProjectAsync(new ProjectManagerService.CreateProjectRequestOptions(
+                _projectName,
+                (ProjectType)selectedProjectTypeIndex,
+                _username,
+                tags
+            ));
+
+            MudDialog.Close();
+        }
+        catch (RpcException)
+        {
+            Snackbar.Add("Could not create project", Severity.Warning);
+        }
     }
 
     private void OnCloseClicked()

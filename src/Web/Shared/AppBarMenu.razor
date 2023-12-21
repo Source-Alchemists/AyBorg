@@ -7,7 +7,7 @@
             <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
                 <Authorized>
                     <MudMenuItem Icon="@Icons.Material.Filled.Dashboard" Href="@DASHBOARD_URI"
-                        Disabled="@(!_isDashboardAvailable)">
+                        Disabled="@(!_isDashboardAvailable)" hidden>
                         Dashboard
                         @if (!_isDashboardAvailable)
                         {
@@ -64,7 +64,7 @@
     <AuthorizeView Roles="Administrator, Engineer, Reviewer, Auditor">
         <Authorized>
             <MudButton Href="@DASHBOARD_URI" Class="@GetActiveClass(DASHBOARD_URI)"
-                StartIcon="@Icons.Material.Filled.Dashboard" Disabled="@(!_isDashboardAvailable)">
+                StartIcon="@Icons.Material.Filled.Dashboard" Disabled="@(!_isDashboardAvailable)" hidden>
                 Dashboard
                 @if (!_isDashboardAvailable)
                 {

@@ -1,5 +1,8 @@
 using Ayborg.Gateway.Net.V1;
+using AyBorg.Gateway.Models;
 using AyBorg.SDK.Authorization;
+using AyBorg.SDK.System;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 
 namespace AyBorg.Gateway.Services.Net;
@@ -16,7 +19,29 @@ public sealed class ProjectManagerPassthroughServiceV1 : ProjectManager.ProjectM
     public override async Task<ProjectMeta> Create(CreateProjectRequest request, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
-        ProjectManager.ProjectManagerClient client = _channelService.CreateClient<ProjectManager.ProjectManagerClient>(request.ServiceUniqueName);
-        return await client.CreateAsync(request, headers);
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+        ProjectMeta lastResponse = null!;
+        foreach (ChannelInfo channel in channels)
+        {
+            ProjectManager.ProjectManagerClient client = _channelService.CreateClient<ProjectManager.ProjectManagerClient>(channel.ServiceUniqueName);
+            lastResponse = await client.CreateAsync(request, headers);
+        }
+        return lastResponse;
+    }
+
+    public override async Task GetMetas(Empty request, IServerStreamWriter<ProjectMeta> responseStream, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Auditor });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+
+        await Parallel.ForEachAsync(channels, async (channel, token) =>
+        {
+            ProjectManager.ProjectManagerClient client = _channelService.CreateClient<ProjectManager.ProjectManagerClient>(channel.ServiceUniqueName);
+            var response = client.GetMetas(request, headers: headers, cancellationToken: context.CancellationToken);
+            await foreach (ProjectMeta? changeset in response.ResponseStream.ReadAllAsync(cancellationToken: context.CancellationToken))
+            {
+                await responseStream.WriteAsync(changeset, cancellationToken: context.CancellationToken);
+            }
+        });
     }
 }

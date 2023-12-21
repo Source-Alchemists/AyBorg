@@ -30,12 +30,16 @@
                     <HeaderContent>
                         <MudTh>Name</MudTh>
                         <MudTh>Type</MudTh>
+                        <MudTh>Creator</MudTh>
+                        <MudTh>Created</MudTh>
                         <MudTh>Tags</MudTh>
                         <MudTh Style="width: 30px"></MudTh>
                     </HeaderContent>
                     <RowTemplate>
                         <MudTd DataLabel="Name">@context.Name</MudTd>
                         <MudTd DataLabel="Type">@context.Type.GetDescription()</MudTd>
+                        <MudTd DataLabel="Creator">@context.Name</MudTd>
+                        <MudTd DataLabel="Created">@context.Created</MudTd>
                     </RowTemplate>
                 </MudTable>
             </MudCardContent>

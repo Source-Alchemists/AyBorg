@@ -71,13 +71,12 @@ public partial class AddDeviceDialog : ComponentBase
                                                                                                 _selectedProvider!.Name,
                                                                                                 _devicePrefix,
                                                                                                 _deviceId));
+
+            MudDialog.Close();
         }
         catch (Exception)
         {
             Snackbar.Add("Could not add Device", Severity.Warning);
-            return;
         }
-
-        MudDialog.Close();
     }
 }

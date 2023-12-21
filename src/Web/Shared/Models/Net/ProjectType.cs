@@ -1,8 +1,8 @@
 using System.ComponentModel;
 
-namespace AyBorg.Web.Shared.Modals.Net;
+namespace AyBorg.Web.Shared.Models.Net;
 
-internal enum ProjectType 
+public enum ProjectType 
 {
     [Description("Object Detection [Bounding Box]")]
     ObjectDetection = 0

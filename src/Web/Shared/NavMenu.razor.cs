@@ -12,7 +12,6 @@ public partial class NavMenu : ComponentBase
     [Inject] NavigationManager NavigationManager { get; set; } = null!;
 
     private bool _isDashboardAvailable = false;
-    private bool _isAnyAgentAvailable = false;
     private bool _isNetAvailable = false;
     private bool _isAnalyticsAvailable = false;
     private bool _isAuditAvailable = false;
@@ -24,6 +23,10 @@ public partial class NavMenu : ComponentBase
     private string _auditTitle = "Audit";
 
     private Category _category = Category.None;
+    private bool _isAgentSelected => StateService.AgentState != null;
+    private string _agentProjectLink => StateService.AgentState == null ? string.Empty : StateService.AgentState.ProjectsLink;
+    private string _agentEditorLink => StateService.AgentState == null ? string.Empty : StateService.AgentState.EditorLink;
+    private string _agentDevicesLink => StateService.AgentState == null ? string.Empty : StateService.AgentState.DevicesLink;
 
 
     protected override async Task OnInitializedAsync()
@@ -38,7 +41,6 @@ public partial class NavMenu : ComponentBase
             IEnumerable<Models.ServiceInfoEntry> services = await RegistryService.ReceiveServicesAsync();
 
             _isDashboardAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Dashboard));
-            _isAnyAgentAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Agent));
             _isNetAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Net));
             _isAnalyticsAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Log));
             _isAuditAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Audit));
