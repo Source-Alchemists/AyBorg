@@ -2,6 +2,7 @@ using System.Collections.Immutable;
 using Ayborg.Gateway.Net.V1;
 using AyBorg.SDK.Common;
 using AyBorg.Web.Shared.Models.Net;
+using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using ProjectMeta = AyBorg.Web.Shared.Models.Net.ProjectMeta;
 
@@ -18,7 +19,27 @@ public class ProjectManagerService : IProjectManagerService
         _projectManagerClient = projectManagerClient;
     }
 
-    public async ValueTask<ProjectMeta> CreateProjectAsync(CreateProjectRequestOptions options)
+    public async ValueTask<IEnumerable<ProjectMeta>> GetMetasAsync()
+    {
+        try
+        {
+            var metas = new List<ProjectMeta>();
+            AsyncServerStreamingCall<Ayborg.Gateway.Net.V1.ProjectMeta> response = _projectManagerClient.GetMetas(new Empty());
+            await foreach (Ayborg.Gateway.Net.V1.ProjectMeta? metaDto in response.ResponseStream.ReadAllAsync())
+            {
+                metas.Add(ToModel(metaDto));
+            }
+
+            return metas;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.Connect), ex, "Failed to connect");
+            throw;
+        }
+    }
+
+    public async ValueTask<ProjectMeta> CreateAsync(CreateRequestOptions options)
     {
         var request = new CreateProjectRequest
         {
@@ -43,9 +64,28 @@ public class ProjectManagerService : IProjectManagerService
             _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Project created: {ProjectName}", response.Name);
             return ToModel(response);
         }
-        catch (RpcException ex)
+        catch (Exception ex)
         {
             _logger.LogWarning(new EventId((int)EventLogType.ProjectSaved), ex, "Failed to create project");
+            throw;
+        }
+    }
+
+    public async ValueTask DeleteAsync(DeleteRequestOptions options)
+    {
+        try
+        {
+            await _projectManagerClient.DeleteAsync(new Ayborg.Gateway.Net.V1.ProjectMeta
+            {
+                Id = options.ProjectId,
+                CreatedBy = options.Username
+            });
+
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Project deleted: {ProjectId}", options.ProjectId);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectRemoved), ex, "Failed to delete project");
             throw;
         }
     }
@@ -69,10 +109,11 @@ public class ProjectManagerService : IProjectManagerService
             Name = projectMetaDto.Name,
             Type = (ProjectType)projectMetaDto.Type,
             Creator = projectMetaDto.CreatedBy,
-            Created = projectMetaDto.CreationDate.ToDateTime().ToUniversalTime(),
+            Created = projectMetaDto.CreationDate.ToDateTime(),
             Tags = tags
         };
     }
 
-    public record CreateProjectRequestOptions(string Name, ProjectType Type, string Creator, IEnumerable<Shared.Models.Net.Tag> Tags);
+    public record CreateRequestOptions(string Name, ProjectType Type, string Creator, IEnumerable<Shared.Models.Net.Tag> Tags);
+    public record DeleteRequestOptions(string ProjectId, string Username);
 }

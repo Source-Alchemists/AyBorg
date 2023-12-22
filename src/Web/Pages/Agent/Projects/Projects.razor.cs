@@ -71,16 +71,14 @@ public partial class Projects : ComponentBase
         var options = new DialogOptions();
         var parameters = new DialogParameters
         {
-            { "ContentText", $"Are you sure you want to delete project '{project.Name}'?" }
+            {"NeedPassword", true},
+            { "ContentText", $"Are you sure you want to delete project '{project.Name}'? This action cannot be undone." }
         };
         IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete Project", parameters, options);
         DialogResult result = await dialog.Result;
-        if (!result.Canceled)
+        if (!result.Canceled && await ProjectManagementService.TryDeleteAsync(project))
         {
-            if (await ProjectManagementService.TryDeleteAsync(project))
-            {
-                await ReceiveProjectsAsync();
-            }
+            await ReceiveProjectsAsync();
         }
     }
 

@@ -2,7 +2,6 @@ using System.Collections.Immutable;
 using AyBorg.SDK.Common;
 using AyBorg.Web.Services.Net;
 using AyBorg.Web.Shared.Models.Net;
-using Grpc.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -89,7 +88,7 @@ public partial class NewProjectDialog : ComponentBase
     private async void OnCreateClicked()
     {
         _projectNameError = string.Empty;
-        if(string.IsNullOrEmpty(_projectName) || string.IsNullOrWhiteSpace(_projectName))
+        if (string.IsNullOrEmpty(_projectName) || string.IsNullOrWhiteSpace(_projectName))
         {
             _projectNameError = "Please enter a project name";
             return;
@@ -103,16 +102,17 @@ public partial class NewProjectDialog : ComponentBase
         }
         try
         {
-            await ProjectManagerService.CreateProjectAsync(new ProjectManagerService.CreateProjectRequestOptions(
+            await ProjectManagerService.CreateAsync(new ProjectManagerService.CreateRequestOptions(
                 _projectName,
                 (ProjectType)selectedProjectTypeIndex,
                 _username,
                 tags
             ));
 
+            Snackbar.Add($"Project '{_projectName}' created", Severity.Info);
             MudDialog.Close();
         }
-        catch (RpcException)
+        catch (Exception)
         {
             Snackbar.Add("Could not create project", Severity.Warning);
         }

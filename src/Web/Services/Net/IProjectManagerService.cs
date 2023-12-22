@@ -5,5 +5,7 @@ namespace AyBorg.Web.Services.Net;
 
 public interface IProjectManagerService
 {
-    ValueTask<ProjectMeta> CreateProjectAsync(CreateProjectRequestOptions options);
+    ValueTask<IEnumerable<ProjectMeta>> GetMetasAsync();
+    ValueTask<ProjectMeta> CreateAsync(CreateRequestOptions options);
+    ValueTask DeleteAsync(DeleteRequestOptions options);
 }

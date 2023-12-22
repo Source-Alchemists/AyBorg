@@ -24,9 +24,18 @@ public partial class NavMenu : ComponentBase
 
     private Category _category = Category.None;
     private bool _isAgentSelected => StateService.AgentState != null;
-    private string _agentProjectLink => StateService.AgentState == null ? string.Empty : StateService.AgentState.ProjectsLink;
-    private string _agentEditorLink => StateService.AgentState == null ? string.Empty : StateService.AgentState.EditorLink;
-    private string _agentDevicesLink => StateService.AgentState == null ? string.Empty : StateService.AgentState.DevicesLink;
+    private string _agentName => _isAgentSelected ? StateService.AgentState.Name : "-";
+    private string _agentProjectLink => _isAgentSelected ? StateService.AgentState.ProjectsLink : string.Empty;
+    private string _agentEditorLink => _isAgentSelected ? StateService.AgentState.EditorLink : string.Empty;
+    private string _agentDevicesLink => _isAgentSelected ? StateService.AgentState.DevicesLink : string.Empty;
+
+    private bool _isNetProjectSelected => StateService.NetState != null;
+    private string _netProjectName => _isNetProjectSelected ? StateService.NetState.ProjectName : "-";
+    private string _netUploadLink => _isNetProjectSelected ? $"net/upload/{StateService.NetState.ProjectId}" : string.Empty;
+    private string _netAnnotateLink => _isNetProjectSelected ? $"net/annotate/{StateService.NetState.ProjectId}" : string.Empty;
+    private string _netDatasetsLink => _isNetProjectSelected ? $"net/datasets/{StateService.NetState.ProjectId}" : string.Empty;
+    private string _netGenerateLink => _isNetProjectSelected ? $"net/generate/{StateService.NetState.ProjectId}" : string.Empty;
+    private string _netModelsLink => _isNetProjectSelected ? $"net/models/{StateService.NetState.ProjectId}" : string.Empty;
 
 
     protected override async Task OnInitializedAsync()
@@ -72,7 +81,7 @@ public partial class NavMenu : ComponentBase
         if (firstRender)
         {
             StateService.OnUpdate += OnUpdate;
-            await StateService.UpdateAgentStateFromSessionStorageAsync();
+            await StateService.UpdateStateFromSessionStorageAsync();
         }
     }
 

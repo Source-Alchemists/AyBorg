@@ -29,6 +29,19 @@ public sealed class ProjectManagerPassthroughServiceV1 : ProjectManager.ProjectM
         return lastResponse;
     }
 
+    public override async Task<Empty> Delete(ProjectMeta request, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+        foreach (ChannelInfo channel in channels)
+        {
+            ProjectManager.ProjectManagerClient client = _channelService.CreateClient<ProjectManager.ProjectManagerClient>(channel.ServiceUniqueName);
+            await client.DeleteAsync(request, headers);
+        }
+
+        return new Empty();
+    }
+
     public override async Task GetMetas(Empty request, IServerStreamWriter<ProjectMeta> responseStream, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Auditor });

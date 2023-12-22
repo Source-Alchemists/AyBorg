@@ -23,6 +23,9 @@
                 Overview
             </MudText>
         </MudNavLink>
+        <MudText Typo="Typo.subtitle1" Class="ml-3">
+            <strong>@_agentName</strong>
+        </MudText>
         <MudNavLink Href="@_agentProjectLink" Disabled="@(!_isAgentSelected)">
             Projects
         </MudNavLink>
@@ -45,19 +48,22 @@
                 Projects
             </MudText>
         </MudNavLink>
-        <MudNavLink Href="net/upload">
+        <MudText Typo="Typo.subtitle1" Class="ml-3">
+            <strong>@_netProjectName</strong>
+        </MudText>
+        <MudNavLink Href="@_netUploadLink" Disabled="@(!_isNetProjectSelected)">
             Upload
         </MudNavLink>
-        <MudNavLink Href="net/annotate">
+        <MudNavLink Href="@_netAnnotateLink" Disabled="@(!_isNetProjectSelected)">
             Annotate
         </MudNavLink>
-        <MudNavLink Href="net/Datasets">
+        <MudNavLink Href="@_netDatasetsLink" Disabled="@(!_isNetProjectSelected)">
             Datasets
         </MudNavLink>
-        <MudNavLink Href="net/generate">
+        <MudNavLink Href="@_netGenerateLink" Disabled="@(!_isNetProjectSelected)">
             Generate
         </MudNavLink>
-        <MudNavLink Href="net/models">
+        <MudNavLink Href="@_netModelsLink" Disabled="@(!_isNetProjectSelected)">
             Models
         </MudNavLink>
     </Authorized>

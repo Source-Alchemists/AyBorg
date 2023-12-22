@@ -1,0 +1,6 @@
+@page "/net/upload/{projectId}"
+@using SDK.Authorization
+@using SDK.Common
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+
+<PageTitle>@_projectName | Upload/AI | AyBorg</PageTitle>
