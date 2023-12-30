@@ -4,3 +4,69 @@
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
 
 <PageTitle>@_projectName | Upload/AI | AyBorg</PageTitle>
+
+<MudGrid class="pt-1">
+    <MudItem xs="6" Class="pt-5 pl-8">
+        <MudText Typo="Typo.h5">
+            Upload
+        </MudText>
+    </MudItem>
+    <MudItem xs="6" Class="pt-5 pr-8">
+        <div style="float: right;">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_imageSources.Any())">
+                Save and Continue
+            </MudButton>
+        </div>
+    </MudItem>
+    <MudItem xs="12" Class="pl-8 pr-8">
+        <MudTextField T="string" Label="Batch Name" Clearable />
+    </MudItem>
+    <MudItem xs="12">
+        <div @ref="_fileDropContainerRef" class="mud-paper rounded-lg border-dashed border-2 pa-6 ma-8 @_dragHoverClass" 
+        dropzone="copy" 
+        @ondragenter="OnDragHighlight"
+        @ondragenter:preventDefault="true"
+        @ondragenter:stopPropagation="true"
+        @ondragover="OnDragHighlight" 
+        @ondragover:preventDefault="true"
+        @ondragover:stopPropagation="true"
+        @ondragleave="OnDragUnhighlight" 
+        @ondragleave:preventDefault="true"
+        @ondragleave:stopPropagation="true"
+        @ondrop="OnDrop"
+        @ondrop:preventDefault="true"
+        @ondrop:stopPropagation="true">
+        <MudGrid>
+            <MudItem xs="12" Class="d-flex justify-center">
+                <MudIcon Icon="@Icons.Material.Filled.Upload" Size="Size.Large" Color="Color.Primary" />
+            </MudItem>
+            <MudItem xs="12" Class="d-flex justify-center">
+                <MudText Typo="Typo.h6" Color="Color.Primary">
+                    Drag and drop images to upload them.
+                </MudText>
+            </MudItem>
+            <MudItem xs="12" Class="d-flex justify-center">
+                <MudText Typo="Typo.subtitle1">
+                    Or
+                </MudText>
+            </MudItem>
+            <MudItem xs="12" Class="d-flex justify-center">
+                <InputFile @ref="_inputFileRef" OnChange="@OnInputFileChange" multiple hidden />
+
+                <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="OnUploadFilesChanged" Accept=".png, .jpg">
+                    <ButtonTemplate>
+                        <MudButton HtmlTag="label" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DriveFolderUpload" for="@context.Id">Select Files</MudButton>
+                    </ButtonTemplate>
+                </MudFileUpload>
+            </MudItem>
+
+            @foreach(var imageSource in _imageSources)
+            {
+                <MudItem xs="12" md="3">
+                    <MudImage Src="@imageSource" Class="mud-full-width rounded-lg"/>
+                </MudItem>
+            }
+        </MudGrid>
+        </div>
+    </MudItem>
+</MudGrid>
