@@ -49,7 +49,7 @@
                             <MudChipSet>
                                 @foreach (var tag in @context.Tags.Take(5))
                                 {
-                                    <MudChip Text="@tag.Name" Disabled />
+                                    <MudChip Text="@tag" Disabled />
                                 }
                                 @if (context.Tags.Count > 5)
                                 {

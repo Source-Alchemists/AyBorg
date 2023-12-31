@@ -9,5 +9,6 @@ public record ProjectMeta
     public string Creator { get; init; } = string.Empty;
     public DateTime Created { get; init; }
     public ProjectType Type { get; init; } = ProjectType.ObjectDetection;
-    public ImmutableList<Tag> Tags { get; init; } = ImmutableList<Tag>.Empty;
+    public ImmutableList<string> Tags { get; init; } = ImmutableList<string>.Empty;
+    public ImmutableList<Label> Labels { get; init; } = ImmutableList<Label>.Empty;
 }

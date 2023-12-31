@@ -95,10 +95,10 @@ public partial class NewProjectDialog : ComponentBase
         }
 
         int selectedProjectTypeIndex = Array.FindIndex(_projectTypes, p => p.Equals(_selectedProjectType, StringComparison.InvariantCultureIgnoreCase));
-        ImmutableList<Tag> tags = ImmutableList<Tag>.Empty;
+        ImmutableList<string> tags = ImmutableList<string>.Empty;
         foreach (string addedTag in _addedTags)
         {
-            tags = tags.Add(new Tag { Name = addedTag });
+            tags = tags.Add(addedTag);
         }
         try
         {

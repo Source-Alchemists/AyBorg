@@ -48,13 +48,9 @@ public class ProjectManagerService : IProjectManagerService
             CreatedBy = options.Creator,
         };
 
-        foreach (Shared.Models.Net.Tag tag in options.Tags)
+        foreach (string tag in options.Tags)
         {
-            request.Tags.Add(new Ayborg.Gateway.Net.V1.Tag
-            {
-                Name = tag.Name,
-                ColorCode = tag.ColorCode
-            });
+            request.Tags.Add(tag);
         }
 
         try
@@ -92,14 +88,19 @@ public class ProjectManagerService : IProjectManagerService
 
     private static ProjectMeta ToModel(Ayborg.Gateway.Net.V1.ProjectMeta projectMetaDto)
     {
-        ImmutableList<Shared.Models.Net.Tag> tags = ImmutableList<Shared.Models.Net.Tag>.Empty;
-
-        foreach (Ayborg.Gateway.Net.V1.Tag? tagDto in projectMetaDto.Tags)
+        ImmutableList<string> tags = ImmutableList<string>.Empty;
+        foreach (string tag in projectMetaDto.Tags)
         {
-            tags = tags.Add(new Shared.Models.Net.Tag
+            tags = tags.Add(tag);
+        }
+
+        ImmutableList<Shared.Models.Net.Label> labels = ImmutableList<Shared.Models.Net.Label>.Empty;
+        foreach (Ayborg.Gateway.Net.V1.Label? LabelDto in projectMetaDto.Labels)
+        {
+            labels = labels.Add(new Shared.Models.Net.Label
             {
-                Name = tagDto.Name,
-                ColorCode = tagDto.ColorCode
+                Name = LabelDto.Name,
+                ColorCode = LabelDto.ColorCode
             });
         }
 
@@ -110,10 +111,11 @@ public class ProjectManagerService : IProjectManagerService
             Type = (ProjectType)projectMetaDto.Type,
             Creator = projectMetaDto.CreatedBy,
             Created = projectMetaDto.CreationDate.ToDateTime(),
-            Tags = tags
+            Tags = tags,
+            Labels = labels
         };
     }
 
-    public record CreateRequestOptions(string Name, ProjectType Type, string Creator, IEnumerable<Shared.Models.Net.Tag> Tags);
+    public record CreateRequestOptions(string Name, ProjectType Type, string Creator, IEnumerable<string> Tags);
     public record DeleteRequestOptions(string ProjectId, string Username);
 }
