@@ -14,14 +14,14 @@
                 Label="What are you detection?" 
                 Placeholder="e.g. 'persons' or 'cats' or 'cars'" 
                 Variant="Variant.Text" 
-                Immediate="true"
                 Adornment="Adornment.End"
                 AdornmentIcon="@Icons.Material.Filled.Add"
                 AdornmentAriaLabel="Add Tag"
                 AdornmentColor="Color.Secondary"
                 OnAdornmentClick="OnTagAdornmentClicked"
                 OnKeyDown="OnTagsKeyUp"
-                TextUpdateSuppression="true"
+                TextUpdateSuppression
+                Immediate
                 Class="mt-2" />
         <MudChipSet AllClosable="true" OnClose="TagRemoved">
             @foreach(var tag in _addedTags)

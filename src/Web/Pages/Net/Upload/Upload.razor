@@ -5,6 +5,10 @@
 
 <PageTitle>@_projectName | Upload/AI | AyBorg</PageTitle>
 
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
 <MudGrid class="pt-1">
     <MudItem xs="6" Class="pt-5 pl-8">
         <MudText Typo="Typo.h5">
@@ -14,14 +18,42 @@
     <MudItem xs="6" Class="pt-5 pr-8">
         <div style="float: right;">
             <MudBadge Content="@(_imageSources.Count())" Origin="Origin.BottomLeft" Overlap>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!_imageSources.Any())">
+                <MudButton Variant="Variant.Filled" 
+                    Color="Color.Primary" 
+                    OnClick="@OnSave"
+                    Disabled="@(!_imageSources.Any())">
                     Save and Continue
                 </MudButton>
             </MudBadge>
         </div>
     </MudItem>
-    <MudItem xs="12" Class="pl-8 pr-8">
-        <MudTextField T="string" Label="Batch Name" Clearable />
+    <MudItem xs="12" md="6" Class="pl-8 pr-8">
+        <MudAutocomplete @ref="_tagField" T="string" Label="Tags" 
+            Placeholder="Search or add tags for images" 
+            HelperText="Tagging images can help you to find them again later"
+            AdornmentIcon="@Icons.Material.Filled.Search"
+            MaxItems="null"
+            Strict="false"
+            CoerceText="false"
+            SearchFunc="@SearchTags"
+            OnKeyDown="OnTagsKeyUp"
+            ValueChanged="OnTagsValueChanged"
+            ResetValueOnEmptyText
+            TextUpdateSuppression
+            Clearable
+            SelectValueOnTab />
+        <MudChipSet AllClosable="true" OnClose="TagRemoved">
+            @foreach(var tag in _selectedTags)
+            {
+                <MudChip Text="@tag" Color="Color.Secondary" />
+            }
+        </MudChipSet>
+    </MudItem>
+    <MudItem xs="12" md="6" Class="pl-8 pr-8">
+        <MudTextField T="string" Label="Batch Name" 
+            Placeholder="@_batchPlaceholder"
+            @bind-Value="_batchName"
+            Clearable />
     </MudItem>
     <MudItem xs="12">
         <div @ref="_fileDropContainerRef" class="mud-paper rounded-lg border-dashed border-2 pa-6 ma-8 @_dragHoverClass"
@@ -47,8 +79,10 @@
                 <MudItem xs="12" Class="d-flex justify-center">
                     <InputFile @ref="_inputFileRef" OnChange="@OnInputFileChange" multiple hidden />
 
-                    <MudFileUpload T="IReadOnlyList<IBrowserFile>" FilesChanged="OnUploadFilesChanged"
-                        Accept=".png, .jpg">
+                    <MudFileUpload T="IReadOnlyList<IBrowserFile>" 
+                        Accept=".png, .jpg"
+                        MaximumFileCount="@int.MaxValue"
+                        FilesChanged="OnUploadFilesChanged">
                         <ButtonTemplate>
                             <MudButton HtmlTag="label" Variant="Variant.Filled"
                                 StartIcon="@Icons.Material.Filled.DriveFolderUpload" for="@context.Id">Select Files
@@ -60,7 +94,14 @@
                 @foreach (var imageSource in _imageSources)
                 {
                     <MudItem xs="12" md="3">
-                        <MudImage Src="@imageSource" Class="mud-full-width rounded-lg" />
+                        <div class="object-fill object-center mud-full-width">
+                            <MudImage Src="@(ToBase64String(imageSource))" Class="mud-full-width rounded-lg" />
+                            <button type="button" class="mud-button-root mud-fab mud-fab-error mud-fab-size-small mud-ripple image-delete-button">
+                                <span class="mud-fab-label">
+                                    <MudIcon Icon="@Icons.Material.Filled.Delete" class="mud-icon-root mud-svg-icon mud-icon-size-small" />
+                                </span>
+                            </button>
+                        </div>
                     </MudItem>
                 }
 

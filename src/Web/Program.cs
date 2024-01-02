@@ -26,6 +26,7 @@ using Toolbelt.Blazor.Extensions.DependencyInjection;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 string serviceUniqueName = builder.Configuration.GetValue("AyBorg:Service:UniqueName", "AyBorg.Web")!;
+int maximumReceiveMessageSize = builder.Configuration.GetValue("MaximumReceiveMessageSize", 256);
 bool isOpenTelemetryEnabled = builder.Configuration.GetValue("OpenTelemetry:Enabled", false)!;
 bool isElasticApmEnabled = builder.Configuration.GetValue("ElasticApm:Enabled", false)!;
 
@@ -42,7 +43,7 @@ if (isOpenTelemetryEnabled)
             .AddAspNetCoreInstrumentation());
 }
 
-if(isElasticApmEnabled)
+if (isElasticApmEnabled)
 {
     builder.Logging.AddElasticsearch();
 }
@@ -83,7 +84,11 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddServerSideBlazor()
+                .AddHubOptions(options =>
+{
+    options.MaximumReceiveMessageSize = maximumReceiveMessageSize * 1024;
+});
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddMudServices(config =>
 {

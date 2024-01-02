@@ -1,5 +1,5 @@
 export function initializeFileDropZone(dropZoneElement, inputFile) {
-    
+
     function onPaste(e) {
         inputFile.files = e.clipboardData.files;
         const event = new Event('change', { bubbles: true });

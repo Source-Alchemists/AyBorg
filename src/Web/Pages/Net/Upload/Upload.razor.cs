@@ -1,9 +1,13 @@
+using System.Collections.Immutable;
+using System.Security.Cryptography;
+using System.Text;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
+using MudBlazor;
 
 namespace AyBorg.Web.Pages.Net.Upload;
 
@@ -19,10 +23,17 @@ public partial class Upload : ComponentBase, IAsyncDisposable
     private string _dragHoverClass = "mud-border-primary mud-elevation-1";
     private ElementReference _fileDropContainerRef;
     private InputFile _inputFileRef = null!;
+    private MudAutocomplete<string> _tagField = null!;
     private IJSObjectReference _fileDropModule = null!;
     private IJSObjectReference _fileDropFunctionReference = null!;
-    private HashSet<string> _imageSources = new();
+    private HashSet<ImageSource> _imageSources = new();
+    private IEnumerable<string> _projectTags = new List<string>();
+    private IEnumerable<string> _availableTags => _projectTags.Where(t => !_selectedTags.Contains(t));
+    private ImmutableList<string> _selectedTags = ImmutableList<string>.Empty;
+    private bool _isLoading = true;
     private bool _isDisposed = false;
+    private string _batchPlaceholder = string.Empty;
+    private string _batchName = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -34,14 +45,14 @@ public partial class Upload : ComponentBase, IAsyncDisposable
             _fileDropFunctionReference = await _fileDropModule.InvokeAsync<IJSObjectReference>("initializeFileDropZone", _fileDropContainerRef, _inputFileRef.Element);
 
             await StateService.UpdateStateFromSessionStorageAsync();
+            IEnumerable<Shared.Models.Net.ProjectMeta> metas = await ProjectManagerService.GetMetasAsync();
+            Shared.Models.Net.ProjectMeta? targetMeta = metas.FirstOrDefault(m => m.Id.Equals(ProjectId, StringComparison.InvariantCultureIgnoreCase));
             if (StateService.NetState != null)
             {
                 _projectName = StateService.NetState.ProjectName;
             }
             else
             {
-                IEnumerable<Shared.Models.Net.ProjectMeta> metas = await ProjectManagerService.GetMetasAsync();
-                Shared.Models.Net.ProjectMeta? targetMeta = metas.FirstOrDefault(m => m.Id.Equals(ProjectId, StringComparison.InvariantCultureIgnoreCase));
                 if (targetMeta != null)
                 {
                     _projectName = targetMeta.Name;
@@ -49,8 +60,70 @@ public partial class Upload : ComponentBase, IAsyncDisposable
                 }
             }
 
+            if (targetMeta != null)
+            {
+                _projectTags = targetMeta.Tags;
+            }
+
+            _batchPlaceholder = $"Uploaded on {DateTime.UtcNow}";
+
+            _isLoading = false;
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+    private async Task<IEnumerable<string>> SearchTags(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return _availableTags;
+        }
+
+        return await Task.FromResult(
+            _availableTags.Where(
+                t => t.Contains(value, StringComparison.InvariantCultureIgnoreCase))
+                .OrderBy(t => t)
+            );
+    }
+
+    private async void OnTagsKeyUp(KeyboardEventArgs args)
+    {
+        if (args.Code.Equals("Space", StringComparison.InvariantCultureIgnoreCase)
+            || args.Code.Equals("Enter", StringComparison.InvariantCultureIgnoreCase)
+            || args.Code.Equals("NumpadEnter", StringComparison.InvariantCultureIgnoreCase)
+            || args.Code.Equals("Tab", StringComparison.InvariantCultureIgnoreCase))
+        {
+            AddTag(_tagField.Text);
+            await _tagField.BlurAsync();
+            await _tagField.Clear();
+            await _tagField.FocusAsync();
+        }
+    }
+
+    private void OnTagsValueChanged(string value)
+    {
+        AddTag(value);
+        _tagField.Clear();
+    }
+
+    private void TagRemoved(MudChip chip)
+    {
+        _selectedTags = _selectedTags.Remove(chip.Text);
+    }
+
+    private void AddTag(string value)
+    {
+        if (string.IsNullOrEmpty(value))
+        {
+            return;
+        }
+
+        if (_selectedTags.Contains(value))
+        {
+            return;
+        }
+
+        _selectedTags = _selectedTags.Add(value);
     }
 
     private void OnDragHighlight(DragEventArgs dragEvent)
@@ -70,9 +143,17 @@ public partial class Upload : ComponentBase, IAsyncDisposable
 
     private async void OnUploadFilesChanged(IReadOnlyList<IBrowserFile> files)
     {
-        foreach (IBrowserFile file in files)
+        _isLoading = true;
+        try
         {
-            await AddBase64ImageSourceAsync(file);
+            foreach (IBrowserFile file in files)
+            {
+                await AddImageSourceAsync(file);
+            }
+        }
+        finally
+        {
+            _isLoading = false;
         }
 
         await InvokeAsync(StateHasChanged);
@@ -81,19 +162,54 @@ public partial class Upload : ComponentBase, IAsyncDisposable
 
     private async Task OnInputFileChange(InputFileChangeEventArgs eventArgs)
     {
-        foreach (IBrowserFile file in eventArgs.GetMultipleFiles(maximumFileCount: int.MaxValue).Where(f => f.ContentType.StartsWith("image/")))
+        _isLoading = true;
+        try
         {
-            await AddBase64ImageSourceAsync(file);
+            foreach (IBrowserFile file in eventArgs.GetMultipleFiles(maximumFileCount: int.MaxValue).Where(f => f.ContentType.StartsWith("image/")))
+            {
+                await AddImageSourceAsync(file);
+            }
+        }
+        finally
+        {
+            _isLoading = false;
         }
     }
 
-    private async ValueTask AddBase64ImageSourceAsync(IBrowserFile file)
+    private async Task OnSave()
+    {
+        if (string.IsNullOrEmpty(_batchName))
+        {
+            _batchName = _batchPlaceholder;
+        }
+    }
+
+    private async ValueTask AddImageSourceAsync(IBrowserFile file)
     {
         using Stream stream = file.OpenReadStream(maxAllowedSize: MAX_FILE_SIZE);
         using var ms = new MemoryStream();
         await stream.CopyToAsync(ms);
-        string imageSource = $"data:{file.ContentType};base64,{Convert.ToBase64String(ms.ToArray())}";
-        _imageSources.Add(imageSource);
+        byte[] data = ms.ToArray();
+        using var hashAlgorithm = SHA256.Create();
+        byte[] hashBytes = hashAlgorithm.ComputeHash(data);
+        var stringBuilder = new StringBuilder();
+        for (int index = 0; index < hashBytes.Length; index++)
+        {
+            stringBuilder.Append(hashBytes[index].ToString("x2"));
+        }
+
+        string hashValue = stringBuilder.ToString();
+        if (_imageSources.Any(s => s.Hash.Equals(hashValue, StringComparison.InvariantCultureIgnoreCase)))
+        {
+            return;
+        }
+
+        _imageSources.Add(new ImageSource(data, file.ContentType, hashValue));
+    }
+
+    private static string ToBase64String(ImageSource imageSource)
+    {
+        return $"data:{imageSource.ContentType};base64,{Convert.ToBase64String(imageSource.Data)}";
     }
 
     public async ValueTask DisposeAsync()
@@ -128,4 +244,6 @@ public partial class Upload : ComponentBase, IAsyncDisposable
             _isDisposed = true;
         }
     }
+
+    private sealed record ImageSource(byte[] Data, string ContentType, string Hash);
 }
