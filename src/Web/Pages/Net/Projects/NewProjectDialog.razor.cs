@@ -102,7 +102,7 @@ public partial class NewProjectDialog : ComponentBase
         }
         try
         {
-            await ProjectManagerService.CreateAsync(new ProjectManagerService.CreateRequestOptions(
+            await ProjectManagerService.CreateAsync(new ProjectManagerService.CreateRequestParameters(
                 _projectName,
                 (ProjectType)selectedProjectTypeIndex,
                 _username,

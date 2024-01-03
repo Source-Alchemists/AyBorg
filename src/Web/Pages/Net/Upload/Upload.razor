@@ -96,7 +96,9 @@
                     <MudItem xs="12" md="3">
                         <div class="object-fill object-center mud-full-width">
                             <MudImage Src="@(ToBase64String(imageSource))" Class="mud-full-width rounded-lg" />
-                            <button type="button" class="mud-button-root mud-fab mud-fab-error mud-fab-size-small mud-ripple image-delete-button">
+                            <button type="button" 
+                                onclick="@(() => OnDeleteImageClicked(imageSource.Hash))"
+                                class="mud-button-root mud-fab mud-fab-error mud-fab-size-small mud-ripple image-delete-button">
                                 <span class="mud-fab-label">
                                     <MudIcon Icon="@Icons.Material.Filled.Delete" class="mud-icon-root mud-svg-icon mud-icon-size-small" />
                                 </span>
@@ -109,7 +111,7 @@
                 {
                     <MudItem xs="12" Class="d-flex justify-center">
                         <MudText Typo="Typo.subtitle1">
-                            @_imageSources.Count() images ready to upload
+                            <strong>@_imageSources.Count() images ready to save</strong>
                         </MudText>
                     </MudItem>
                 }

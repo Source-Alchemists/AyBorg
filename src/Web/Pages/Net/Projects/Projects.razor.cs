@@ -85,7 +85,7 @@ public partial class Projects : ComponentBase
         DialogResult result = await dialogReference.Result;
         if(!result.Canceled)
         {
-            await ProjectManagerService.DeleteAsync(new ProjectManagerService.DeleteRequestOptions(
+            await ProjectManagerService.DeleteAsync(new ProjectManagerService.DeleteRequestParameters(
                 ProjectId: projectMeta.Id,
                 Username: _username
             ));

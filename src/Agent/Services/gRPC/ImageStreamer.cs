@@ -9,7 +9,7 @@ namespace AyBorg.Agent.Services.gRPC;
 
 internal static class ImageStreamer
 {
-    private const int ChunkSize = 32768;
+    private const int CHUNK_SIZE = 32768;
     private static readonly RecyclableMemoryStreamManager s_memoryManager = new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -34,7 +34,7 @@ internal static class ImageStreamer
             stream.Position = 0;
             long fullStreamLength = stream.Length;
             long bytesToSend = fullStreamLength;
-            int bufferSize = fullStreamLength < ChunkSize ? (int)fullStreamLength : ChunkSize;
+            int bufferSize = fullStreamLength < CHUNK_SIZE ? (int)fullStreamLength : CHUNK_SIZE;
             int offset = 0;
             using IMemoryOwner<byte> memoryOwner = MemoryPool<byte>.Shared.Rent((int)fullStreamLength);
             await stream.ReadAsync(memoryOwner.Memory, cancellationToken);
@@ -69,7 +69,7 @@ internal static class ImageStreamer
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask SendImageAsync(Image originalImage, IClientStreamWriter<Ayborg.Gateway.Result.V1.ImageChunkDto> responseStream, string serviceUniqueName, string iterationId, string portId, float scaleFactor, CancellationToken cancellationToken)
+    public static async ValueTask SendImageAsync(Image originalImage, IClientStreamWriter<Ayborg.Gateway.Result.V1.ImageChunkDto> requestStream, string serviceUniqueName, string iterationId, string portId, float scaleFactor, CancellationToken cancellationToken)
     {
         IImage targetImage = null!;
         try
@@ -90,7 +90,7 @@ internal static class ImageStreamer
             stream.Position = 0;
             long fullStreamLength = stream.Length;
             long bytesToSend = fullStreamLength;
-            int bufferSize = fullStreamLength < ChunkSize ? (int)fullStreamLength : ChunkSize;
+            int bufferSize = fullStreamLength < CHUNK_SIZE ? (int)fullStreamLength : CHUNK_SIZE;
             int offset = 0;
             using IMemoryOwner<byte> memoryOwner = MemoryPool<byte>.Shared.Rent((int)fullStreamLength);
             await stream.ReadAsync(memoryOwner.Memory, cancellationToken);
@@ -107,7 +107,7 @@ internal static class ImageStreamer
                 bytesToSend -= bufferSize;
                 offset += bufferSize;
 
-                await responseStream.WriteAsync(new Ayborg.Gateway.Result.V1.ImageChunkDto
+                await requestStream.WriteAsync(new Ayborg.Gateway.Result.V1.ImageChunkDto
                 {
                     AgentUniqueName = serviceUniqueName,
                     IterationId = iterationId,
@@ -121,7 +121,7 @@ internal static class ImageStreamer
                 }, cancellationToken);
             }
 
-            await responseStream.CompleteAsync();
+            await requestStream.CompleteAsync();
         }
         finally
         {

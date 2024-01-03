@@ -39,16 +39,16 @@ public class ProjectManagerService : IProjectManagerService
         }
     }
 
-    public async ValueTask<ProjectMeta> CreateAsync(CreateRequestOptions options)
+    public async ValueTask<ProjectMeta> CreateAsync(CreateRequestParameters parameters)
     {
         var request = new CreateProjectRequest
         {
-            Name = options.Name,
-            Type = (int)options.Type,
-            CreatedBy = options.Creator,
+            Name = parameters.Name,
+            Type = (int)parameters.Type,
+            CreatedBy = parameters.Creator,
         };
 
-        foreach (string tag in options.Tags)
+        foreach (string tag in parameters.Tags)
         {
             request.Tags.Add(tag);
         }
@@ -67,17 +67,17 @@ public class ProjectManagerService : IProjectManagerService
         }
     }
 
-    public async ValueTask DeleteAsync(DeleteRequestOptions options)
+    public async ValueTask DeleteAsync(DeleteRequestParameters parameters)
     {
         try
         {
             await _projectManagerClient.DeleteAsync(new Ayborg.Gateway.Net.V1.ProjectMeta
             {
-                Id = options.ProjectId,
-                CreatedBy = options.Username
+                Id = parameters.ProjectId,
+                CreatedBy = parameters.Username
             });
 
-            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Project deleted: {ProjectId}", options.ProjectId);
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Project deleted: {ProjectId}", parameters.ProjectId);
         }
         catch (RpcException ex)
         {
@@ -116,6 +116,6 @@ public class ProjectManagerService : IProjectManagerService
         };
     }
 
-    public record CreateRequestOptions(string Name, ProjectType Type, string Creator, IEnumerable<string> Tags);
-    public record DeleteRequestOptions(string ProjectId, string Username);
+    public record CreateRequestParameters(string Name, ProjectType Type, string Creator, IEnumerable<string> Tags);
+    public record DeleteRequestParameters(string ProjectId, string Username);
 }

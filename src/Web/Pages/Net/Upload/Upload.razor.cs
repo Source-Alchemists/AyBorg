@@ -3,9 +3,11 @@ using System.Security.Cryptography;
 using System.Text;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
+using Grpc.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.IO;
 using Microsoft.JSInterop;
 using MudBlazor;
 
@@ -16,9 +18,14 @@ public partial class Upload : ComponentBase, IAsyncDisposable
     [Parameter] public string ProjectId { get; init; } = string.Empty;
     [Inject] IStateService StateService { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
+    [Inject] IFileManagerService FileManagerService { get; init; } = null!;
+    [Inject] IDialogService DialogService { get; init; } = null!;
+    [Inject] ISnackbar Snackbar { get; init; } = null!;
+    [Inject] NavigationManager NavigationManager { get; init; } = null!;
     [Inject] IJSRuntime JSRuntime { get; init; } = null!;
 
     private const int MAX_FILE_SIZE = 51200000; // 50MB
+    private static readonly RecyclableMemoryStreamManager s_memoryManager = new();
     private string _projectName = string.Empty;
     private string _dragHoverClass = "mud-border-primary mud-elevation-1";
     private ElementReference _fileDropContainerRef;
@@ -178,20 +185,75 @@ public partial class Upload : ComponentBase, IAsyncDisposable
 
     private async Task OnSave()
     {
+
+        IDialogReference dialogReference = DialogService.Show<ImagesDistributionDialog>("How should the images be organised?", new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        });
+
+        DialogResult result = await dialogReference.Result;
+        if (result.Canceled)
+        {
+            return;
+        }
+
+        _isLoading = true;
+        await InvokeAsync(StateHasChanged);
+        ImagesDistributionDialog.Result distribution = (ImagesDistributionDialog.Result)result.Data;
+
         if (string.IsNullOrEmpty(_batchName))
         {
             _batchName = _batchPlaceholder;
+        }
+
+        try
+        {
+            int imageIndex = 0;
+            int imageCount = _imageSources.Count;
+            string collectionId = Guid.NewGuid().ToString();
+            foreach (ImageSource image in _imageSources)
+            {
+                await FileManagerService.SendImageAsync(
+                    new FileManagerService.SendImageParameters(
+                        ProjectId,
+                        image.Data,
+                        image.ContentType,
+                        collectionId,
+                        imageIndex,
+                        imageCount)
+                    );
+                imageIndex++;
+            }
+
+            await FileManagerService.ConfirmUpload(new FileManagerService.ConfirmUploadParameters(
+                ProjectId,
+                collectionId,
+                _batchName,
+                _selectedTags,
+                new int[] { distribution.TrainFactor, distribution.ValidFactor, distribution.TestFactor }));
+
+            Snackbar.Add("Upload finished!", Severity.Info);
+            NavigationManager.NavigateTo($"net/annotate/{ProjectId}");
+        }
+        catch (RpcException)
+        {
+            Snackbar.Add("Failed to upload images!", Severity.Warning);
+        }
+        finally
+        {
+            _isLoading = false;
+            await InvokeAsync(StateHasChanged);
         }
     }
 
     private async ValueTask AddImageSourceAsync(IBrowserFile file)
     {
         using Stream stream = file.OpenReadStream(maxAllowedSize: MAX_FILE_SIZE);
-        using var ms = new MemoryStream();
+        using MemoryStream ms = s_memoryManager.GetStream();
         await stream.CopyToAsync(ms);
         byte[] data = ms.ToArray();
-        using var hashAlgorithm = SHA256.Create();
-        byte[] hashBytes = hashAlgorithm.ComputeHash(data);
+        byte[] hashBytes = SHA256.HashData(data);
         var stringBuilder = new StringBuilder();
         for (int index = 0; index < hashBytes.Length; index++)
         {
@@ -205,6 +267,16 @@ public partial class Upload : ComponentBase, IAsyncDisposable
         }
 
         _imageSources.Add(new ImageSource(data, file.ContentType, hashValue));
+    }
+
+    private async void OnDeleteImageClicked(string hashValue)
+    {
+        ImageSource? targetImage = _imageSources.FirstOrDefault(s => s.Hash.Equals(hashValue, StringComparison.InvariantCultureIgnoreCase));
+        if (targetImage != null)
+        {
+            _imageSources.Remove(targetImage);
+            await InvokeAsync(StateHasChanged);
+        }
     }
 
     private static string ToBase64String(ImageSource imageSource)

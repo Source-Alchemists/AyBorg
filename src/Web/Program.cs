@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
+using MudExtensions.Services;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -94,6 +95,7 @@ builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
 });
+builder.Services.AddMudExtensions();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddHotKeys2();
@@ -125,6 +127,7 @@ builder.Services.AddScoped<IDeviceManagerService, DeviceManagerService>();
 
 // AyBorg.NET
 builder.Services.AddScoped<AyBorg.Web.Services.Net.IProjectManagerService, AyBorg.Web.Services.Net.ProjectManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Net.IFileManagerService, AyBorg.Web.Services.Net.FileManagerService>();
 
 builder.Services.AddTransient<ITokenProvider, TokenProvider>();
 builder.Services.AddTransient<IStorageService, StorageService>();
