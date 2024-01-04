@@ -1,0 +1,105 @@
+@page "/net/browse/{projectId}"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+
+<PageTitle>@_projectName | Annotate/NET | AyBorg</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudCard Class="rounded-lg mud-full-width">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Browse</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Deselect">De-Select</MudButton>
+            <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.SelectAll">Select all</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddBox">Add to Dataset</MudButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudGrid class="pt-1">
+            <MudItem xs="12">
+                <MudAutocomplete T="string" Label="Search Batch" AdornmentIcon="@Icons.Material.Filled.Search"
+                    SearchFunc="@SearchBatch"
+                    ValueChanged="@BatchValueChanged"
+                    MaxItems="null" Strict="false" CoerceText="false" ResetValueOnEmptyText TextUpdateSuppression
+                    Clearable SelectValueOnTab />
+            </MudItem>
+            <MudItem xs="12" md="7">
+                <MudText Typo="Typo.caption">Split</MudText>
+                <MudRadioGroup T="SplitGroup" Value="@_selectedGroup" ValueChanged="@SplitGroupChanged">
+                    <MudRadio Value="@SplitGroup.All">All</MudRadio>
+                    <MudRadio Value="@SplitGroup.Train">Train</MudRadio>
+                    <MudRadio Value="@SplitGroup.Valid">Valid</MudRadio>
+                    <MudRadio Value="@SplitGroup.Test">Test</MudRadio>
+                </MudRadioGroup>
+            </MudItem>
+            <MudItem xs="12" md="5">
+                <MudSelect T="string" Label="Tags" SelectedValuesChanged="@SelectedTagsChanged" MultiSelection>
+                    @foreach (var tag in _projectTags)
+                    {
+                        <MudSelectItem T="string" Value="@tag">@tag</MudSelectItem>
+                    }
+                </MudSelect>
+            </MudItem>
+            <MudItem xs="12">
+                <MudTabs ActivePanelIndexChanged="@OnActivePanalIndexChanged" Centered>
+                    <MudTabPanel>
+                        <TabWrapperContent>
+                            @context
+                        </TabWrapperContent>
+                        <TabContent>
+                            <MudStack>
+                            <MudText>All</MudText>
+                                <MudText Typo="Typo.caption">@_allImageNames.Count()</MudText>
+                            </MudStack>
+                        </TabContent>
+                        <ChildContent>
+                            @if (_tabIndex == 0)
+                            {
+                                <ImagesGrid ImageNames="@_allImageNames" />
+                            }
+                        </ChildContent>
+                    </MudTabPanel>
+                    <MudTabPanel>
+                        <TabWrapperContent>
+                            @context
+                        </TabWrapperContent>
+                        <TabContent>
+                            <MudStack>
+                            <MudText>Unannotated</MudText>
+                                <MudText Typo="Typo.caption">@_imageCollectionMeta.UnannotatedFileNames.Count()</MudText>
+                            </MudStack>
+                        </TabContent>
+                        <ChildContent>
+                            @if (_tabIndex == 1)
+                            {
+                                <ImagesGrid ImageNames="@_imageCollectionMeta.UnannotatedFileNames" />
+                            }
+                        </ChildContent>
+                    </MudTabPanel>
+                    <MudTabPanel>
+                        <TabWrapperContent>
+                            @context
+                        </TabWrapperContent>
+                        <TabContent>
+                            <MudStack>
+                            <MudText>Annotated</MudText>
+                                <MudText Typo="Typo.caption">@_imageCollectionMeta.AnnotatedFileNames.Count()</MudText>
+                            </MudStack>
+                        </TabContent>
+                        <ChildContent>
+                            @if (_tabIndex == 2)
+                            {
+                                <ImagesGrid ImageNames="@_imageCollectionMeta.AnnotatedFileNames" />
+                            }
+                        </ChildContent>
+                    </MudTabPanel>
+                </MudTabs>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>

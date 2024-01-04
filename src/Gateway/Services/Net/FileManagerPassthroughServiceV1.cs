@@ -50,4 +50,34 @@ public sealed class FileManagerPassthroughServiceV1 : FileManager.FileManagerBas
 
         return new Empty();
     }
+
+    public override async Task<ImageCollectionMeta> GetImageCollectionMeta(GetImageCollectionMetaRequest request, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Auditor, Roles.Reviewer });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+        ImageCollectionMeta clientResponse = null!;
+        foreach (ChannelInfo channel in channels)
+        {
+            FileManager.FileManagerClient client = _channelService.CreateClient<FileManager.FileManagerClient>(channel.ServiceUniqueName);
+            clientResponse = await client.GetImageCollectionMetaAsync(request, headers);
+        }
+
+        return clientResponse;
+    }
+
+    public override async Task DownloadImage(ImageDownloadRequest request, IServerStreamWriter<ImageChunk> responseStream, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Auditor, Roles.Reviewer });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+
+        await Parallel.ForEachAsync(channels, async (channel, token) =>
+        {
+            FileManager.FileManagerClient client = _channelService.CreateClient<FileManager.FileManagerClient>(channel.ServiceUniqueName);
+            AsyncServerStreamingCall<ImageChunk> requestCall = client.DownloadImage(request, headers: headers, cancellationToken: context.CancellationToken);
+            await foreach (ImageChunk imageChunk in requestCall.ResponseStream.ReadAllAsync(cancellationToken: context.CancellationToken))
+            {
+                await responseStream.WriteAsync(imageChunk, cancellationToken: context.CancellationToken);
+            }
+        });
+    }
 }

@@ -234,7 +234,7 @@ public partial class Upload : ComponentBase, IAsyncDisposable
                 new int[] { distribution.TrainFactor, distribution.ValidFactor, distribution.TestFactor }));
 
             Snackbar.Add("Upload finished!", Severity.Info);
-            NavigationManager.NavigateTo($"net/annotate/{ProjectId}");
+            NavigationManager.NavigateTo($"net/browse/{ProjectId}");
         }
         catch (RpcException)
         {

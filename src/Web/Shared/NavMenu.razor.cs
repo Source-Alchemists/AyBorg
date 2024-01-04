@@ -32,9 +32,8 @@ public partial class NavMenu : ComponentBase
     private bool _isNetProjectSelected => StateService.NetState != null;
     private string _netProjectName => _isNetProjectSelected ? StateService.NetState.ProjectName : "-";
     private string _netUploadLink => _isNetProjectSelected ? $"net/upload/{StateService.NetState.ProjectId}" : string.Empty;
-    private string _netAnnotateLink => _isNetProjectSelected ? $"net/annotate/{StateService.NetState.ProjectId}" : string.Empty;
+    private string _netAnnotateLink => _isNetProjectSelected ? $"net/browse/{StateService.NetState.ProjectId}" : string.Empty;
     private string _netDatasetsLink => _isNetProjectSelected ? $"net/datasets/{StateService.NetState.ProjectId}" : string.Empty;
-    private string _netGenerateLink => _isNetProjectSelected ? $"net/generate/{StateService.NetState.ProjectId}" : string.Empty;
     private string _netModelsLink => _isNetProjectSelected ? $"net/models/{StateService.NetState.ProjectId}" : string.Empty;
 
 

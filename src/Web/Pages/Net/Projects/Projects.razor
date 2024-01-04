@@ -3,7 +3,7 @@
 @using SDK.Common
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 
-<PageTitle>Projects/AI | AyBorg</PageTitle>
+<PageTitle>Projects/NET | AyBorg</PageTitle>
 
 <div class="page-loading-bar">
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
@@ -22,7 +22,7 @@
                     </MudBadge>
                 </CardHeaderContent>
                 <CardHeaderActions>
-                    <MudButton class="pt-3" Variant="Variant.Text" StartIcon="@Icons.Material.Filled.AddBox"
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddBox"
                         Color="Color.Primary" OnClick="@OnNewProjectClicked">New Project</MudButton>
                 </CardHeaderActions>
             </MudCardHeader>

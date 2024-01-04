@@ -44,7 +44,7 @@ public class FileManagerService : IFileManagerService
                 {
                     ProjectId = parameters.ProjectId,
                     StreamLength = parameters.Data.Length,
-                    Chunk = UnsafeByteOperations.UnsafeWrap(slice),
+                    Data = UnsafeByteOperations.UnsafeWrap(slice),
                     CollectionId = parameters.CollectionId,
                     CollectionIndex = parameters.CollectionIndex,
                     CollectionSize = parameters.CollectionSize,
@@ -94,6 +94,38 @@ public class FileManagerService : IFileManagerService
         }
     }
 
+    public async ValueTask<ImageCollectionMeta> GetImageCollectionMetaAsync(GetImageCollectionMetaParameters parameters)
+    {
+        try
+        {
+            var request = new GetImageCollectionMetaRequest
+            {
+                ProjectId = parameters.ProjectId,
+                BatchName = parameters.BatchName ?? string.Empty,
+                SplitGroup = parameters.SplitGroup ?? string.Empty,
+            };
+            foreach (string tag in parameters.Tags)
+            {
+                request.Tags.Add(tag);
+            }
+
+            Ayborg.Gateway.Net.V1.ImageCollectionMeta response = await _fileManagerClient.GetImageCollectionMetaAsync(request);
+            return new ImageCollectionMeta(
+                UnannotatedFileNames: response.UnannotatedFileNames,
+                AnnotatedFileNames: response.AnnotatedFilesNames,
+                BatchNames: response.BatchNames,
+                Tags: response.Tags
+                );
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning((int)EventLogType.Download, ex, "Failed to receive image collection meta informations!");
+            throw;
+        }
+    }
+
     public sealed record SendImageParameters(string ProjectId, byte[] Data, string ContentType, string CollectionId, int CollectionIndex = 0, int CollectionSize = 1);
     public sealed record ConfirmUploadParameters(string ProjectId, string CollectionId, string BatchName, IEnumerable<string> Tags, IEnumerable<int> Distribution);
+    public sealed record GetImageCollectionMetaParameters(string ProjectId, string BatchName, string SplitGroup, IEnumerable<string> Tags);
+    public sealed record ImageCollectionMeta(IEnumerable<string> UnannotatedFileNames, IEnumerable<string> AnnotatedFileNames, IEnumerable<string> BatchNames, IEnumerable<string> Tags);
 }
