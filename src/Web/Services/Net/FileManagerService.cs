@@ -1,3 +1,4 @@
+using System.Buffers;
 using Ayborg.Gateway.Net.V1;
 using AyBorg.SDK.Common;
 using Google.Protobuf;
@@ -17,7 +18,7 @@ public class FileManagerService : IFileManagerService
         _fileManagerClient = client;
     }
 
-    public async ValueTask SendImageAsync(SendImageParameters parameters)
+    public async ValueTask UploadImageAsync(UploadImageParameters parameters)
     {
         try
         {
@@ -64,7 +65,7 @@ public class FileManagerService : IFileManagerService
         }
     }
 
-    public async ValueTask ConfirmUpload(ConfirmUploadParameters parameters)
+    public async ValueTask ConfirmUploadAsync(ConfirmUploadParameters parameters)
     {
         try
         {
@@ -92,6 +93,50 @@ public class FileManagerService : IFileManagerService
             _logger.LogWarning((int)EventLogType.Upload, ex, "Failed to confirm upload [{UploadId}]!", parameters.CollectionId);
             throw;
         }
+    }
+
+    public async ValueTask<ImageContainer> DownloadImageAsync(DownloadImageParameters parameters)
+    {
+        IMemoryOwner<byte> memoryOwner = null!;
+        string contentType = string.Empty;
+        ImageContainer resultContainer = null!;
+
+        try
+        {
+            AsyncServerStreamingCall<ImageChunk> response = _fileManagerClient.DownloadImage(new ImageDownloadRequest
+            {
+                ProjectId = parameters.ProjectId,
+                ImageName = parameters.ImageName,
+                AsThumbnail = parameters.AsThumbnail
+            });
+
+            int offset = 0;
+            await foreach (ImageChunk? chunk in response.ResponseStream.ReadAllAsync())
+            {
+                if (memoryOwner == null)
+                {
+                    memoryOwner = MemoryPool<byte>.Shared.Rent((int)chunk.StreamLength);
+                    contentType = chunk.ContentType;
+                }
+
+                Memory<byte> targetMemorySlice = memoryOwner.Memory.Slice(offset, chunk.Data.Length);
+                offset += chunk.Data.Length;
+                chunk.Data.Memory.CopyTo(targetMemorySlice);
+            }
+
+            resultContainer = new ImageContainer(parameters.ImageName, Convert.ToBase64String(memoryOwner.Memory.Span), contentType);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning((int)EventLogType.Download, ex, "Failed to download image [{ImageName}] from project [{ProjectId}]!", parameters.ImageName, parameters.ProjectId);
+            throw;
+        }
+        finally
+        {
+            memoryOwner?.Dispose();
+        }
+
+        return resultContainer;
     }
 
     public async ValueTask<ImageCollectionMeta> GetImageCollectionMetaAsync(GetImageCollectionMetaParameters parameters)
@@ -124,8 +169,10 @@ public class FileManagerService : IFileManagerService
         }
     }
 
-    public sealed record SendImageParameters(string ProjectId, byte[] Data, string ContentType, string CollectionId, int CollectionIndex = 0, int CollectionSize = 1);
+    public sealed record UploadImageParameters(string ProjectId, byte[] Data, string ContentType, string CollectionId, int CollectionIndex = 0, int CollectionSize = 1);
     public sealed record ConfirmUploadParameters(string ProjectId, string CollectionId, string BatchName, IEnumerable<string> Tags, IEnumerable<int> Distribution);
+    public sealed record DownloadImageParameters(string ProjectId, string ImageName, bool AsThumbnail);
     public sealed record GetImageCollectionMetaParameters(string ProjectId, string BatchName, string SplitGroup, IEnumerable<string> Tags);
     public sealed record ImageCollectionMeta(IEnumerable<string> UnannotatedFileNames, IEnumerable<string> AnnotatedFileNames, IEnumerable<string> BatchNames, IEnumerable<string> Tags);
+    public sealed record ImageContainer(string ImageName, string Base64Image, string ContentType);
 }

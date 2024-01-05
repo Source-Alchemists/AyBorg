@@ -1,0 +1,9 @@
+<div class="object-fill object-center mud-full-width">
+    <img src="/img/brand/logo-white.svg" class="mud-full-width mud-full-height image-placeholder" hidden="@(_imageContainer != null)" />
+    <div class="mud-paper mud-card mud-elevation-2">
+        <MudImage Src="@ToBase64String(_imageContainer!)" Class="mud-full-width rounded-lg" />
+        <div class="mud-card-actions">
+            <MudCheckBox T="bool" Size="Size.Medium" Color="Color.Secondary" />
+        </div>
+    </div>
+</div>

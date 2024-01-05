@@ -214,8 +214,8 @@ public partial class Upload : ComponentBase, IAsyncDisposable
             string collectionId = Guid.NewGuid().ToString();
             foreach (ImageSource image in _imageSources)
             {
-                await FileManagerService.SendImageAsync(
-                    new FileManagerService.SendImageParameters(
+                await FileManagerService.UploadImageAsync(
+                    new FileManagerService.UploadImageParameters(
                         ProjectId,
                         image.Data,
                         image.ContentType,
@@ -226,7 +226,7 @@ public partial class Upload : ComponentBase, IAsyncDisposable
                 imageIndex++;
             }
 
-            await FileManagerService.ConfirmUpload(new FileManagerService.ConfirmUploadParameters(
+            await FileManagerService.ConfirmUploadAsync(new FileManagerService.ConfirmUploadParameters(
                 ProjectId,
                 collectionId,
                 _batchName,

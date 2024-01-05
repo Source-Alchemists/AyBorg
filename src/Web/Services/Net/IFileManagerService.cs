@@ -4,7 +4,8 @@ namespace AyBorg.Web.Services.Net;
 
 public interface IFileManagerService
 {
-    ValueTask SendImageAsync(SendImageParameters parameters);
-    ValueTask ConfirmUpload(ConfirmUploadParameters parameters);
+    ValueTask UploadImageAsync(UploadImageParameters parameters);
+    ValueTask ConfirmUploadAsync(ConfirmUploadParameters parameters);
+    ValueTask<ImageContainer> DownloadImageAsync(DownloadImageParameters parameters);
     ValueTask<ImageCollectionMeta> GetImageCollectionMetaAsync(GetImageCollectionMetaParameters parameters);
 }

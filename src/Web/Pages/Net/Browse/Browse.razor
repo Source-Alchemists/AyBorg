@@ -14,19 +14,22 @@
             <MudText Typo="Typo.h6">Browse</MudText>
         </CardHeaderContent>
         <CardHeaderActions>
-            <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Deselect">De-Select</MudButton>
-            <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.SelectAll">Select all</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddBox">Add to Dataset</MudButton>
+            <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Deselect">
+                    De-Select</MudButton>
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.SelectAll">
+                    Select all</MudButton>
+            </MudHidden>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddBox">Add to
+                Dataset</MudButton>
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
         <MudGrid class="pt-1">
             <MudItem xs="12">
                 <MudAutocomplete T="string" Label="Search Batch" AdornmentIcon="@Icons.Material.Filled.Search"
-                    SearchFunc="@SearchBatch"
-                    ValueChanged="@BatchValueChanged"
-                    MaxItems="null" Strict="false" CoerceText="false" ResetValueOnEmptyText TextUpdateSuppression
-                    Clearable SelectValueOnTab />
+                    SearchFunc="@SearchBatch" ValueChanged="@BatchValueChanged" MaxItems="null" Strict="false"
+                    CoerceText="false" ResetValueOnEmptyText TextUpdateSuppression Clearable SelectValueOnTab />
             </MudItem>
             <MudItem xs="12" md="7">
                 <MudText Typo="Typo.caption">Split</MudText>
@@ -46,22 +49,21 @@
                 </MudSelect>
             </MudItem>
             <MudItem xs="12">
-                <MudTabs ActivePanelIndexChanged="@OnActivePanalIndexChanged" Centered>
+                <MudTabs Centered>
                     <MudTabPanel>
                         <TabWrapperContent>
                             @context
                         </TabWrapperContent>
                         <TabContent>
                             <MudStack>
-                            <MudText>All</MudText>
-                                <MudText Typo="Typo.caption">@_allImageNames.Count()</MudText>
+                                <MudText>Unannotated</MudText>
+                                <MudText Typo="Typo.caption">@_imageCollectionMeta.UnannotatedFileNames.Count()
+                                </MudText>
                             </MudStack>
                         </TabContent>
                         <ChildContent>
-                            @if (_tabIndex == 0)
-                            {
-                                <ImagesGrid ImageNames="@_allImageNames" />
-                            }
+                            <ImagesGrid ProjectId="@ProjectId"
+                                ImageNames="@_imageCollectionMeta.UnannotatedFileNames" />
                         </ChildContent>
                     </MudTabPanel>
                     <MudTabPanel>
@@ -70,32 +72,12 @@
                         </TabWrapperContent>
                         <TabContent>
                             <MudStack>
-                            <MudText>Unannotated</MudText>
-                                <MudText Typo="Typo.caption">@_imageCollectionMeta.UnannotatedFileNames.Count()</MudText>
-                            </MudStack>
-                        </TabContent>
-                        <ChildContent>
-                            @if (_tabIndex == 1)
-                            {
-                                <ImagesGrid ImageNames="@_imageCollectionMeta.UnannotatedFileNames" />
-                            }
-                        </ChildContent>
-                    </MudTabPanel>
-                    <MudTabPanel>
-                        <TabWrapperContent>
-                            @context
-                        </TabWrapperContent>
-                        <TabContent>
-                            <MudStack>
-                            <MudText>Annotated</MudText>
+                                <MudText>Annotated</MudText>
                                 <MudText Typo="Typo.caption">@_imageCollectionMeta.AnnotatedFileNames.Count()</MudText>
                             </MudStack>
                         </TabContent>
                         <ChildContent>
-                            @if (_tabIndex == 2)
-                            {
-                                <ImagesGrid ImageNames="@_imageCollectionMeta.AnnotatedFileNames" />
-                            }
+                            <ImagesGrid ProjectId="@ProjectId" ImageNames="@_imageCollectionMeta.AnnotatedFileNames" />
                         </ChildContent>
                     </MudTabPanel>
                 </MudTabs>

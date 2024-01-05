@@ -1,4 +1,3 @@
-using System.Drawing.Printing;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
 using Grpc.Core;
@@ -21,7 +20,6 @@ public partial class Browse : ComponentBase
     private FileManagerService.ImageCollectionMeta _imageCollectionMeta = new(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>());
     private List<string> _allImageNames = new();
     private IEnumerable<string> _allBatchNames = Array.Empty<string>();
-    private int _tabIndex = 0;
     private SplitGroup _selectedGroup = SplitGroup.All;
     private string _selectedGroupName = "ALL";
     private string _selectedBatchName = string.Empty;
@@ -132,11 +130,6 @@ public partial class Browse : ComponentBase
         _isLoading = true;
         _selectedTags = values;
         await FetchImageCollectionMeta();
-    }
-
-    private void OnActivePanalIndexChanged(int index)
-    {
-        _tabIndex = index;
     }
 
     private async Task FetchImageCollectionMeta()
