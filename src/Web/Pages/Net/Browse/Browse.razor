@@ -15,12 +15,17 @@
         </CardHeaderContent>
         <CardHeaderActions>
             <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
-                <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Deselect">
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.Deselect" OnClick="@DeselectAllClicked">
                     De-Select</MudButton>
-                <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.SelectAll">
+                <MudButton Variant="Variant.Text" Color="Color.Secondary" StartIcon="@Icons.Material.Filled.SelectAll" OnClick="@SelectAllClicked">
                     Select all</MudButton>
             </MudHidden>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddBox">Add to
+            <MudHidden Breakpoint="Breakpoint.MdAndUp">
+                <MudIconButton Variant="Variant.Text" Color="Color.Secondary" Icon="@Icons.Material.Filled.Deselect" OnClick="@DeselectAllClicked" />
+                <MudIconButton Variant="Variant.Text" Color="Color.Secondary" Icon="@Icons.Material.Filled.SelectAll" OnClick="@SelectAllClicked" />
+            </MudHidden>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Draw" Disabled="@(!_isEditButtonEnabled)" hidden="@(!_isAnnotateVisible)">Annotate</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddBox" Disabled="@(!_isEditButtonEnabled)" hidden="@(!_isAddToDatasetVisible)">Add to
                 Dataset</MudButton>
         </CardHeaderActions>
     </MudCardHeader>
@@ -49,7 +54,7 @@
                 </MudSelect>
             </MudItem>
             <MudItem xs="12">
-                <MudTabs Centered>
+                <MudTabs ActivePanelIndexChanged="@ActivePanaelIndexChanged" Centered>
                     <MudTabPanel>
                         <TabWrapperContent>
                             @context
@@ -63,7 +68,9 @@
                         </TabContent>
                         <ChildContent>
                             <ImagesGrid ProjectId="@ProjectId"
-                                ImageNames="@_imageCollectionMeta.UnannotatedFileNames" />
+                                ImageNames="@_imageCollectionMeta.UnannotatedFileNames"
+                                SelectedImageNames="@_selectedImageNames"
+                                OnThumbnailSelectionChanged="@ThumbnailSelectionChanged" />
                         </ChildContent>
                     </MudTabPanel>
                     <MudTabPanel>
@@ -77,7 +84,10 @@
                             </MudStack>
                         </TabContent>
                         <ChildContent>
-                            <ImagesGrid ProjectId="@ProjectId" ImageNames="@_imageCollectionMeta.AnnotatedFileNames" />
+                            <ImagesGrid ProjectId="@ProjectId" 
+                                ImageNames="@_imageCollectionMeta.AnnotatedFileNames"
+                                SelectedImageNames="@_selectedImageNames"
+                                OnThumbnailSelectionChanged="@ThumbnailSelectionChanged" />
                         </ChildContent>
                     </MudTabPanel>
                 </MudTabs>

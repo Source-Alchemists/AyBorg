@@ -8,8 +8,10 @@ public partial class ImagesGrid : ComponentBase
 {
     [Parameter, EditorRequired] public string ProjectId { get; init; } = string.Empty;
     [Parameter, EditorRequired] public IEnumerable<string> ImageNames { get; init; } = null!;
+    [Parameter, EditorRequired] public List<string> SelectedImageNames { get; init; } = null!;
+    [Parameter] public EventCallback OnThumbnailSelectionChanged { get; set; }
 
-    private const int MAX_IMAGES_PER_PAGE = 40;
+    private const int MAX_IMAGES_PER_PAGE = 20;
     private IEnumerable<IEnumerable<string>> _imageNameBatches = new List<List<string>>();
     private ImmutableList<string> _lastImageNames = ImmutableList<string>.Empty;
 
@@ -19,12 +21,13 @@ public partial class ImagesGrid : ComponentBase
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        _selectedPage = 1;
 
         if (ImageNames.Any() && _lastImageNames.SequenceEqual(ImageNames))
         {
             return;
         }
+
+        _selectedPage = 1;
 
         _lastImageNames = _lastImageNames.Clear();
         _lastImageNames = _lastImageNames.AddRange(ImageNames);
@@ -48,5 +51,31 @@ public partial class ImagesGrid : ComponentBase
 
         _selectedImageNameBatch = _selectedImageNameBatch.Clear();
         _selectedImageNameBatch = _selectedImageNameBatch.AddRange(batch);
+    }
+
+    private async void OnThumbnailSelectChanged(ImageThumbnail.SelectChangedArgs args)
+    {
+        bool exists = SelectedImageNames.Exists(n => n.Equals(args.ImageName, StringComparison.InvariantCultureIgnoreCase));
+        if (args.Value)
+        {
+            if (!exists)
+            {
+                SelectedImageNames.Add(args.ImageName);
+                await OnThumbnailSelectionChanged.InvokeAsync();
+            }
+        }
+        else
+        {
+            if (exists)
+            {
+                SelectedImageNames.Remove(args.ImageName);
+                await OnThumbnailSelectionChanged.InvokeAsync();
+            }
+        }
+    }
+
+    private bool IsSelectedImageName(string imageName)
+    {
+        return SelectedImageNames.Exists(x => x.Equals(imageName, StringComparison.InvariantCultureIgnoreCase));
     }
 }

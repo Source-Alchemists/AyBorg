@@ -1,3 +1,4 @@
+using System.Collections.Immutable;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
 using Grpc.Core;
@@ -14,8 +15,9 @@ public partial class Browse : ComponentBase
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
 
+    private readonly List<string> _selectedImageNames = new();
+    private readonly List<string> _projectTags = new();
     private string _projectName = string.Empty;
-    private IEnumerable<string> _projectTags = new List<string>();
     private bool _isLoading = true;
     private FileManagerService.ImageCollectionMeta _imageCollectionMeta = new(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>());
     private List<string> _allImageNames = new();
@@ -24,6 +26,10 @@ public partial class Browse : ComponentBase
     private string _selectedGroupName = "ALL";
     private string _selectedBatchName = string.Empty;
     private IEnumerable<string> _selectedTags = Array.Empty<string>();
+    private int _activePanelIndex = 0;
+    private bool _isAnnotateVisible => _activePanelIndex == 0;
+    private bool _isAddToDatasetVisible => _activePanelIndex == 1;
+    private bool _isEditButtonEnabled => _selectedImageNames.Any();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -52,7 +58,8 @@ public partial class Browse : ComponentBase
 
                 if (targetMeta != null)
                 {
-                    _projectTags = targetMeta.Tags;
+                    _projectTags.Clear();
+                    _projectTags.AddRange(targetMeta.Tags);
                 }
 
                 await UpdateImageCollectionMeta(string.Empty, string.Empty, Array.Empty<string>());
@@ -77,6 +84,7 @@ public partial class Browse : ComponentBase
                             batchName,
                             splitGroup,
                             tags));
+        _selectedImageNames.Clear();
         _allImageNames.Clear();
         _allImageNames.AddRange(_imageCollectionMeta.UnannotatedFileNames);
         _allImageNames.AddRange(_imageCollectionMeta.AnnotatedFileNames);
@@ -130,6 +138,28 @@ public partial class Browse : ComponentBase
         _isLoading = true;
         _selectedTags = values;
         await FetchImageCollectionMeta();
+    }
+
+    private async Task ThumbnailSelectionChanged()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private void ActivePanaelIndexChanged(int value)
+    {
+        _activePanelIndex = value;
+        _selectedImageNames.Clear();
+    }
+
+    private void DeselectAllClicked()
+    {
+        _selectedImageNames.Clear();
+    }
+
+    private void SelectAllClicked()
+    {
+        _selectedImageNames.Clear();
+        _selectedImageNames.AddRange(_allImageNames);
     }
 
     private async Task FetchImageCollectionMeta()

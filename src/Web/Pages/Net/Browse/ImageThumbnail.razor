@@ -3,7 +3,16 @@
     <div class="mud-paper mud-card mud-elevation-2">
         <MudImage Src="@ToBase64String(_imageContainer!)" Class="mud-full-width rounded-lg" />
         <div class="mud-card-actions">
-            <MudCheckBox T="bool" Size="Size.Medium" Color="Color.Secondary" />
+            <MudGrid>
+                <MudItem xs="6">
+                <MudCheckBox T="bool" Size="Size.Medium" Color="Color.Secondary" Value="@Selected" ValueChanged="@OnSelectedChanged" />
+                </MudItem>
+                <MudItem xs="6" Class="d-flex flex-wrap justify-end">
+                    <MudTooltip Text="Annotate">
+                        <MudIconButton Icon="@Icons.Material.Filled.Draw" Color="Color.Primary" />
+                    </MudTooltip>
+                </MudItem>
+            </MudGrid>
         </div>
     </div>
 </div>
