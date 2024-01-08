@@ -1,33 +1,31 @@
 <header class="header-1 fullWidth">
-  <div class="page-header">
-    <div class="page-header-image opacity-2 mt-6"
-      style="background-image: url('{{ '/assets/img/brand/logo-white.svg' | relative_url }}')"></div>
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-lg-8 col-md-8 mr-auto text-left">
-          <h1 class="display-1"><span class="text-span">AyBorg</span></h1>
-          <h2 class="display-3">{% t home.welcome.subtitle %} <br />
-            <div class="txt-rotate-container">
-              <span class="txt-rotate" data-period="1200"
-                data-rotate='[ "{% t home.welcome.rotate1 %}", "{% t home.welcome.rotate2 %}", "{% t home.welcome.rotate3 %}" ]'></span>
-            </div>
-          </h2>
-        </div>
-        <div class="col-lg-8 col-md-8 mt-4">
-          <div class="pr-md-5">
-            <p class="lead">
-              {% t home.welcome.paragraph1 %}
-            </p>
-            <p class="lead">
-              {% t home.welcome.paragraph2 %}
-            </p>
-            <p class="lead">
-              {% t home.welcome.paragraph3 %}
-            </p>
-            <p class="lead">
-              {% t home.welcome.paragraph4 %}
-            </p>
+  <div class="fullWidth page-header page-header-image opacity-2 mt-5"
+    style="background-image: url('{{ '/assets/img/brand/logo-white.svg' | relative_url }}')"></div>
+  <div class="container py-header">
+    <div class="row align-items-center">
+      <div class="col-lg-8 col-md-8 mr-auto text-left">
+        <h1 class="display-logo"><span class="text-span">AyBorg</span></h1>
+        <h2 class="display-logo-subtitle">{% t home.welcome.subtitle %} <br />
+          <div class="txt-rotate-container">
+            <span class="txt-rotate" data-period="1200"
+              data-rotate='[ "{% t home.welcome.rotate1 %}", "{% t home.welcome.rotate2 %}", "{% t home.welcome.rotate3 %}" ]'></span>
           </div>
+        </h2>
+      </div>
+      <div class="col-lg-8 col-md-8 mt-4">
+        <div class="pr-md-5">
+          <p class="lead">
+            {% t home.welcome.paragraph1 %}
+          </p>
+          <p class="lead">
+            {% t home.welcome.paragraph2 %}
+          </p>
+          <p class="lead">
+            {% t home.welcome.paragraph3 %}
+          </p>
+          <p class="lead">
+            {% t home.welcome.paragraph4 %}
+          </p>
         </div>
       </div>
     </div>

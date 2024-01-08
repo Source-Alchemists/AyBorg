@@ -41,11 +41,53 @@ ol ul{margin-bottom:1rem !important;}
     min-height: 70px;
 }
 
+.py-header {
+    padding-top: 200px;
+    padding-bottom: 70px;
+}
+
+.display-logo {
+    font-size: 3.3rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.display-logo span {
+    display: block;
+    font-weight: 700;
+}
+
+.display-logo-subtitle {
+    font-size: 2.0rem;
+    font-weight: 600;
+    line-height: 1.5;
+}
+
 @media (max-width: 991.98px) {
     .navbar-collapse .collapse-brand img {
         height: auto !important;
         width: auto !important;
         max-height:50px;
+    }
+
+    .display-logo-subtitle {
+        font-size: 1.5rem;
+    }
+
+    .display-1 {
+        font-size: 1.8rem !important;
+    }
+
+    .display-2 {
+        font-size: 2.1rem !important;
+    }
+
+    .display-2 {
+        font-size: 2.0rem !important;
+    }
+
+    .display-4 {
+        font-size: 1.6rem !important;
     }
 }
 
