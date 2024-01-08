@@ -10,6 +10,7 @@ public partial class ImagesGrid : ComponentBase
     [Parameter, EditorRequired] public IEnumerable<string> ImageNames { get; init; } = null!;
     [Parameter, EditorRequired] public List<string> SelectedImageNames { get; init; } = null!;
     [Parameter] public EventCallback OnThumbnailSelectionChanged { get; set; }
+    [Parameter] public EventCallback<string> OnThumbnailAnnotateClicked { get; set; }
 
     private const int MAX_IMAGES_PER_PAGE = 20;
     private IEnumerable<IEnumerable<string>> _imageNameBatches = new List<List<string>>();
@@ -40,7 +41,7 @@ public partial class ImagesGrid : ComponentBase
         }
     }
 
-    private void OnSelectedPageChanged(int value)
+    private void SelectedPageChanged(int value)
     {
         _selectedPage = value;
         IEnumerable<string>? batch = _imageNameBatches.ElementAtOrDefault(value - 1);
@@ -53,7 +54,7 @@ public partial class ImagesGrid : ComponentBase
         _selectedImageNameBatch = _selectedImageNameBatch.AddRange(batch);
     }
 
-    private async void OnThumbnailSelectChanged(ImageThumbnail.SelectChangedArgs args)
+    private async void ThumbnailSelectChanged(ImageThumbnail.SelectChangedArgs args)
     {
         bool exists = SelectedImageNames.Exists(n => n.Equals(args.ImageName, StringComparison.InvariantCultureIgnoreCase));
         if (args.Value)
@@ -72,6 +73,11 @@ public partial class ImagesGrid : ComponentBase
                 await OnThumbnailSelectionChanged.InvokeAsync();
             }
         }
+    }
+
+    private async Task ThumbnailAnnotateClicked(string value)
+    {
+        await OnThumbnailAnnotateClicked.InvokeAsync(value);
     }
 
     private bool IsSelectedImageName(string imageName)

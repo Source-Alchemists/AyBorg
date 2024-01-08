@@ -1,4 +1,5 @@
 using AyBorg.Web.Services.Net;
+using Grpc.Core;
 using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Net.Browse;
@@ -9,6 +10,7 @@ public partial class ImageThumbnail : ComponentBase
     [Parameter, EditorRequired] public string ImageName { get; init; } = string.Empty;
     [Parameter, EditorRequired] public bool Selected { get; set; } = false;
     [Parameter] public EventCallback<SelectChangedArgs> OnSelectChanged { get; set; }
+    [Parameter] public EventCallback<string> OnAnnotateClicked { get; set; }
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
 
     private FileManagerService.ImageContainer _imageContainer = null!;
@@ -23,14 +25,21 @@ public partial class ImageThumbnail : ComponentBase
             return;
         }
 
-        _imageContainer = await FileManagerService.DownloadImageAsync(new FileManagerService.DownloadImageParameters(
-                ProjectId: ProjectId,
-                ImageName: ImageName,
-                AsThumbnail: true
-                ));
+        try
+        {
+            _imageContainer = await FileManagerService.DownloadImageAsync(new FileManagerService.DownloadImageParameters(
+                    ProjectId: ProjectId,
+                    ImageName: ImageName,
+                    AsThumbnail: true
+                    ));
+        }
+        catch (RpcException)
+        {
+            // Already logged.
+        }
     }
 
-    private async void OnSelectedChanged(bool value)
+    private async void SelectedChanged(bool value)
     {
         if (value != Selected)
         {
@@ -39,14 +48,9 @@ public partial class ImageThumbnail : ComponentBase
         }
     }
 
-    private static string ToBase64String(FileManagerService.ImageContainer imageContainer)
+    private async Task AnnotateClicked()
     {
-        if (imageContainer == null)
-        {
-            return string.Empty;
-        }
-
-        return $"data:{imageContainer.ContentType};base64,{imageContainer.Base64Image}";
+        await OnAnnotateClicked.InvokeAsync(ImageName);
     }
 
     public sealed record SelectChangedArgs(string ImageName, bool Value);

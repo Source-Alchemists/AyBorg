@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using AyBorg.SDK.Common;
+using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
 using AyBorg.Web.Shared.Models.Net;
 using Microsoft.AspNetCore.Components;
@@ -16,6 +17,8 @@ public partial class NewProjectDialog : ComponentBase
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
     [Inject] IProjectManagerService ProjectManagerService { get; init; }
+    [Inject] IStateService StateService { get; init; }
+    [Inject] NavigationManager NavigationManager { get; init; }
     [Inject] ISnackbar Snackbar { get; init; }
     private string[] _projectTypes = Array.Empty<string>();
     private string _selectedProjectType = string.Empty;
@@ -44,7 +47,7 @@ public partial class NewProjectDialog : ComponentBase
         _selectedProjectType = _projectTypes[0];
     }
 
-    private void OnTagAdornmentClicked()
+    private void TagAdornmentClicked()
     {
         if (string.IsNullOrEmpty(_tmpTag) || string.IsNullOrWhiteSpace(_tmpTag))
         {
@@ -72,20 +75,21 @@ public partial class NewProjectDialog : ComponentBase
         _addedTags = _addedTags.Remove(chip.Text);
     }
 
-    private async void OnTagsKeyUp(KeyboardEventArgs args)
+    private async Task TagsKeyUp(KeyboardEventArgs args)
     {
         if (args.Code.Equals("Space", StringComparison.InvariantCultureIgnoreCase)
             || args.Code.Equals("Enter", StringComparison.InvariantCultureIgnoreCase)
-            || args.Code.Equals("NumpadEnter", StringComparison.InvariantCultureIgnoreCase))
+            || args.Code.Equals("NumpadEnter", StringComparison.InvariantCultureIgnoreCase)
+            || args.Code.Equals("Tab", StringComparison.InvariantCultureIgnoreCase))
         {
-            OnTagAdornmentClicked();
+            TagAdornmentClicked();
             await _tagField.BlurAsync();
             await _tagField.Clear();
             await _tagField.FocusAsync();
         }
     }
 
-    private async void OnCreateClicked()
+    private async Task CreateClicked()
     {
         _projectNameError = string.Empty;
         if (string.IsNullOrEmpty(_projectName) || string.IsNullOrWhiteSpace(_projectName))
@@ -102,7 +106,7 @@ public partial class NewProjectDialog : ComponentBase
         }
         try
         {
-            await ProjectManagerService.CreateAsync(new ProjectManagerService.CreateRequestParameters(
+            ProjectMeta projectMeta = await ProjectManagerService.CreateAsync(new ProjectManagerService.CreateRequestParameters(
                 _projectName,
                 (ProjectType)selectedProjectTypeIndex,
                 _username,
@@ -110,6 +114,11 @@ public partial class NewProjectDialog : ComponentBase
             ));
 
             Snackbar.Add($"Project '{_projectName}' created", Severity.Info);
+            if (StateService.NetState == null || string.IsNullOrEmpty(StateService.NetState.ProjectId))
+            {
+                await StateService.SetNetStateAsync(new Shared.Models.UiNetState(projectMeta));
+                NavigationManager.NavigateTo($"net/upload/{projectMeta.Id}");
+            }
             MudDialog.Close();
         }
         catch (Exception)
@@ -118,7 +127,7 @@ public partial class NewProjectDialog : ComponentBase
         }
     }
 
-    private void OnCloseClicked()
+    private void CloseClicked()
     {
         MudDialog.Close();
     }

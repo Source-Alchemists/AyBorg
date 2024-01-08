@@ -89,6 +89,12 @@ public partial class Projects : ComponentBase
                 ProjectId: projectMeta.Id,
                 Username: _username
             ));
+
+            if(projectMeta.Id.Equals(StateService.NetState.ProjectId, StringComparison.InvariantCultureIgnoreCase))
+            {
+                await StateService.SetNetStateAsync(new Shared.Models.UiNetState(new ProjectMeta()));
+            }
+
             await UpdateProjectList();
             await InvokeAsync(StateHasChanged);
         }

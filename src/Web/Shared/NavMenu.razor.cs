@@ -29,8 +29,8 @@ public partial class NavMenu : ComponentBase
     private string _agentEditorLink => _isAgentSelected ? StateService.AgentState.EditorLink : string.Empty;
     private string _agentDevicesLink => _isAgentSelected ? StateService.AgentState.DevicesLink : string.Empty;
 
-    private bool _isNetProjectSelected => StateService.NetState != null;
-    private string _netProjectName => _isNetProjectSelected ? StateService.NetState.ProjectName : "-";
+    private bool _isNetProjectSelected => StateService.NetState != null && !string.IsNullOrEmpty(StateService.NetState.ProjectId);
+    private string _netProjectName => _isNetProjectSelected ?  StateService.NetState.ProjectName : "-";
     private string _netUploadLink => _isNetProjectSelected ? $"net/upload/{StateService.NetState.ProjectId}" : string.Empty;
     private string _netAnnotateLink => _isNetProjectSelected ? $"net/browse/{StateService.NetState.ProjectId}" : string.Empty;
     private string _netDatasetsLink => _isNetProjectSelected ? $"net/datasets/{StateService.NetState.ProjectId}" : string.Empty;

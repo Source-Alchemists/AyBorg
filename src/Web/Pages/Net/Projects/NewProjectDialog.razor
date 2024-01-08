@@ -18,8 +18,8 @@
                 AdornmentIcon="@Icons.Material.Filled.Add"
                 AdornmentAriaLabel="Add Tag"
                 AdornmentColor="Color.Secondary"
-                OnAdornmentClick="OnTagAdornmentClicked"
-                OnKeyDown="OnTagsKeyUp"
+                OnAdornmentClick="TagAdornmentClicked"
+                OnKeyDown="TagsKeyUp"
                 TextUpdateSuppression
                 Immediate
                 Class="mt-2" />
@@ -38,10 +38,10 @@
                 Class="mt-2"/>
     </DialogContent>
     <DialogActions>
-        <MudButton Color="Color.Default" OnClick="OnCloseClicked">
+        <MudButton Color="Color.Default" OnClick="CloseClicked">
             Cancel
         </MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="OnCreateClicked">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateClicked">
             Create Project
         </MudButton>
     </DialogActions>

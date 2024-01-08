@@ -1,4 +1,3 @@
-using System.Collections.Immutable;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
 using Grpc.Core;
@@ -14,6 +13,7 @@ public partial class Browse : ComponentBase
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
+    [Inject] NavigationManager NavigationManager { get; init; } = null!;
 
     private readonly List<string> _selectedImageNames = new();
     private readonly List<string> _projectTags = new();
@@ -160,6 +160,28 @@ public partial class Browse : ComponentBase
     {
         _selectedImageNames.Clear();
         _selectedImageNames.AddRange(_allImageNames);
+    }
+
+    private async Task AnnotateClicked()
+    {
+        if(!_selectedImageNames.Any())
+        {
+            return;
+        }
+
+        await ShowAnnotateAsync(_selectedImageNames[0]);
+    }
+
+    private async Task ThumbnailAnnotateClicked(string value)
+    {
+        await ShowAnnotateAsync(value);
+    }
+
+    private async ValueTask ShowAnnotateAsync(string selectedImageName)
+    {
+        await StateService.SetNetStateAsync(StateService.NetState with { Annotation = new Shared.Models.UiNetState.AnnotationState(_selectedImageNames.OrderBy(n => n), 0) });
+
+        NavigationManager.NavigateTo($"net/browse/{ProjectId}/annotate/{selectedImageName}");
     }
 
     private async Task FetchImageCollectionMeta()

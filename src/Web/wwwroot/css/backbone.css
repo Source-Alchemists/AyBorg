@@ -22,10 +22,17 @@ legend {
 .mud-drawer {
     position: fixed !important;
 }
-.mud-card-header {
+.mud-card-header,
+.mud-dialog-title {
     border-bottom: 4px solid;
     border-image-slice: 1;
     border-image-source: linear-gradient(to left, var(--mud-palette-primary), var(--mud-palette-secondary));
+}
+.mud-dialog-title {
+    padding: 12px 24px !important;
+}
+.mud-dialog-fullscreen {
+    background-color: var(--mud-palette-background);
 }
 .mud-tabs-panels {
     height: 100%;

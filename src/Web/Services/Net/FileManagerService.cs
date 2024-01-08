@@ -174,5 +174,11 @@ public class FileManagerService : IFileManagerService
     public sealed record DownloadImageParameters(string ProjectId, string ImageName, bool AsThumbnail);
     public sealed record GetImageCollectionMetaParameters(string ProjectId, string BatchName, string SplitGroup, IEnumerable<string> Tags);
     public sealed record ImageCollectionMeta(IEnumerable<string> UnannotatedFileNames, IEnumerable<string> AnnotatedFileNames, IEnumerable<string> BatchNames, IEnumerable<string> Tags);
-    public sealed record ImageContainer(string ImageName, string Base64Image, string ContentType);
+    public sealed record ImageContainer(string ImageName, string Base64Image, string ContentType)
+    {
+        public string ToBase64String()
+        {
+            return $"data:{ContentType};base64,{Base64Image}";
+        }
+    }
 }

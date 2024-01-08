@@ -2,7 +2,7 @@
 @using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
 
-<PageTitle>@_projectName | Annotate/NET | AyBorg</PageTitle>
+<PageTitle>@_projectName | Browse/NET | AyBorg</PageTitle>
 
 <div class="page-loading-bar">
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
@@ -24,8 +24,11 @@
                 <MudIconButton Variant="Variant.Text" Color="Color.Secondary" Icon="@Icons.Material.Filled.Deselect" OnClick="@DeselectAllClicked" />
                 <MudIconButton Variant="Variant.Text" Color="Color.Secondary" Icon="@Icons.Material.Filled.SelectAll" OnClick="@SelectAllClicked" />
             </MudHidden>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Draw" Disabled="@(!_isEditButtonEnabled)" hidden="@(!_isAnnotateVisible)">Annotate</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddBox" Disabled="@(!_isEditButtonEnabled)" hidden="@(!_isAddToDatasetVisible)">Add to
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Draw" 
+                Disabled="@(!_isEditButtonEnabled)" hidden="@(!_isAnnotateVisible)"
+                OnClick="@AnnotateClicked">Annotate</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddBox" 
+                Disabled="@(!_isEditButtonEnabled)" hidden="@(!_isAddToDatasetVisible)">Add to
                 Dataset</MudButton>
         </CardHeaderActions>
     </MudCardHeader>
@@ -49,7 +52,7 @@
                 <MudSelect T="string" Label="Tags" SelectedValuesChanged="@SelectedTagsChanged" MultiSelection>
                     @foreach (var tag in _projectTags)
                     {
-                        <MudSelectItem T="string" Value="@tag">@tag</MudSelectItem>
+                            <MudSelectItem T="string" Value="@tag">@tag</MudSelectItem>
                     }
                 </MudSelect>
             </MudItem>
@@ -70,7 +73,8 @@
                             <ImagesGrid ProjectId="@ProjectId"
                                 ImageNames="@_imageCollectionMeta.UnannotatedFileNames"
                                 SelectedImageNames="@_selectedImageNames"
-                                OnThumbnailSelectionChanged="@ThumbnailSelectionChanged" />
+                                OnThumbnailSelectionChanged="@ThumbnailSelectionChanged"
+                                OnThumbnailAnnotateClicked="@ThumbnailAnnotateClicked" />
                         </ChildContent>
                     </MudTabPanel>
                     <MudTabPanel>

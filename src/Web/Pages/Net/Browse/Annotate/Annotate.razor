@@ -1,0 +1,48 @@
+@page "/net/browse/{projectId}/annotate/{imageName}"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+
+<PageTitle>@_projectName | Annotate/NET | AyBorg</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudToolBar Class="px-0">
+    
+</MudToolBar>
+
+<MudGrid class="grid-container">
+    <MudItem xs="6" md="3" class="mud-full-height">
+        <!-- Annotations container -->
+        <MudCard class="mud-full-height">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Annotations</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="6" md="9" class="mud-full-height">
+        <!-- Image container -->
+        <MudCard class="mud-full-height">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Image</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <div class="d-flex" style="height: calc(100vh - 320px);">
+
+                </div>
+            </MudCardContent>
+            <MudCardActions>
+                <div class="d-flex flex-column mud-full-width">
+                    <MudPagination class="mx-auto" Count="@_selectedImageNames.Count()" 
+                        Selected="@_selectedImageNumber" 
+                        SelectedChanged="@SelectedImageNumberChanged"
+                        SelectedChanged:preventDefault="true" />
+                </div>
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+</MudGrid>
