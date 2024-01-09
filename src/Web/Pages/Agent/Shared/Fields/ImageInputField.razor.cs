@@ -1,5 +1,6 @@
 using System.Collections.Immutable;
 using AyBorg.SDK.Common.Models;
+using AyBorg.Web.Shared;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Shared.Utils;
 using Microsoft.AspNetCore.Components;
@@ -168,17 +169,5 @@ public partial class ImageInputField : BaseInputField
         _userScaleFactor -= 0.1f;
         _userScaleFactor = MathF.Max(1f, _userScaleFactor);
         await CalculateScaleFactorAndUpdateAsync();
-    }
-
-    private record struct ImagePosition(float X, float Y, float Width, float Height, float OrgWidth, float OrgHeight)
-    {
-        public readonly float FactorX => Width / OrgWidth;
-        public readonly float FactorY => Height / OrgHeight;
-    }
-
-    private sealed record LabelRectangle(float X, float Y, float Width, float Height)
-    {
-        public string Color { get; } = "#af4ae2ff";
-        public string FillColor { get; } = "transparent";
     }
 }

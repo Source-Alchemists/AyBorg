@@ -32,7 +32,10 @@
             </MudCardHeader>
             <MudCardContent>
                 <div class="d-flex" style="height: calc(100vh - 320px);">
-
+                    <AyBorg.Web.Shared.Display.Display2D 
+                        Base64Image="@(_imageContainer != null ? _imageContainer.ToBase64String() : string.Empty)" 
+                        ImageWidth="@(_imageContainer != null ? _imageContainer.Width : 0)"
+                        ImageHeight="@(_imageContainer != null ? _imageContainer.Height : 0)" />
                 </div>
             </MudCardContent>
             <MudCardActions>

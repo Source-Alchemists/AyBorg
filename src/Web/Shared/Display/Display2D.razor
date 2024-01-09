@@ -1,0 +1,79 @@
+<MudGrid Spacing="0" Style="@_containerStyle">
+    <MudItem xs="12" hidden="@(!ToolbarVisible)">
+        <MudToolBar>
+            <MudSpacer />
+            <MudButtonGroup Variant="Variant.Filled" Color="Color.Default" DisableElevation>
+                <MudTooltip Text="Zoom in">
+                    <MudIconButton Icon="@Icons.Material.Filled.ZoomIn" OnClick="@ZoomIn" />
+                </MudTooltip>
+                <MudTooltip Text="Fit to screen">
+                    <MudIconButton Icon="@Icons.Material.Filled.FitScreen" OnClick="@FitToScreen" />
+                </MudTooltip>
+                <MudTooltip Text="Zoom out">
+                    <MudIconButton Icon="@Icons.Material.Filled.ZoomOut" OnClick="@ZoomOut" />
+                </MudTooltip>
+            </MudButtonGroup>
+            <MudSpacer />
+        </MudToolBar>
+    </MudItem>
+    <MudItem xs="12" Class="mud-full-height">
+        <div class="mud-full-width mud-full-height corners">
+            <div @ref="@_containerRef" class="image-container overflow-auto">
+                @if (!string.IsNullOrEmpty(Base64Image))
+                {
+                    <div class="force-center">
+                        <MudTooltip Text="@_imageTooltip" Placement="Placement.Bottom">
+                        <svg preserveAspectRatio="none" width="@_svgWidth" height="@_svgHeight">
+                            <defs>
+                                <mask id="@_maskId">
+                                    @if (_labelRectangles.Any())
+                                    {
+                                        <rect x="@_imagePosition.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                            y="@_imagePosition.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                            width="@_imagePosition.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                            height="@_imagePosition.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                            fill="white" />
+                                    }
+                                    @foreach (var rectangle in _labelRectangles)
+                                    {
+                                        <rect x="@rectangle.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                            y="@rectangle.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                            width="@rectangle.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                            height="@rectangle.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                            fill="black" />
+                                    }
+                                </mask>
+                            </defs>
+                            <g
+                                transform="scale(@_svgScaleFactor.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                                <image href="@Base64Image"
+                                    x="@_imagePosition.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    y="@_imagePosition.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    width="@_imagePosition.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    height="@_imagePosition.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                                <rect x="@_imagePosition.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    y="@_imagePosition.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    width="@_imagePosition.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    height="@_imagePosition.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    fill="#00000091" mask="url(#@_maskId)" />
+                                @foreach (var rectangle in _labelRectangles)
+                                {
+                                    <rect x="@rectangle.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        y="@rectangle.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        width="@rectangle.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        height="@rectangle.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                        style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:2" />
+                                }
+                            </g>
+                        </svg>
+                        </MudTooltip>
+                    </div>
+                }
+                else
+                {
+                    <LogoPlaceholder Watermark />
+                }
+            </div>
+        </div>
+    </MudItem>
+</MudGrid>

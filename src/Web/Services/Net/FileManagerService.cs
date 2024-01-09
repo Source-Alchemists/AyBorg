@@ -99,6 +99,8 @@ public class FileManagerService : IFileManagerService
     {
         IMemoryOwner<byte> memoryOwner = null!;
         string contentType = string.Empty;
+        int width = 0;
+        int height = 0;
         ImageContainer resultContainer = null!;
 
         try
@@ -117,6 +119,8 @@ public class FileManagerService : IFileManagerService
                 {
                     memoryOwner = MemoryPool<byte>.Shared.Rent((int)chunk.StreamLength);
                     contentType = chunk.ContentType;
+                    width = chunk.Width;
+                    height = chunk.Height;
                 }
 
                 Memory<byte> targetMemorySlice = memoryOwner.Memory.Slice(offset, chunk.Data.Length);
@@ -124,7 +128,10 @@ public class FileManagerService : IFileManagerService
                 chunk.Data.Memory.CopyTo(targetMemorySlice);
             }
 
-            resultContainer = new ImageContainer(parameters.ImageName, Convert.ToBase64String(memoryOwner.Memory.Span), contentType);
+            resultContainer = new ImageContainer(parameters.ImageName, 
+                                                Convert.ToBase64String(memoryOwner.Memory.Span), 
+                                                contentType, 
+                                                width, height);
         }
         catch (RpcException ex)
         {
@@ -174,7 +181,7 @@ public class FileManagerService : IFileManagerService
     public sealed record DownloadImageParameters(string ProjectId, string ImageName, bool AsThumbnail);
     public sealed record GetImageCollectionMetaParameters(string ProjectId, string BatchName, string SplitGroup, IEnumerable<string> Tags);
     public sealed record ImageCollectionMeta(IEnumerable<string> UnannotatedFileNames, IEnumerable<string> AnnotatedFileNames, IEnumerable<string> BatchNames, IEnumerable<string> Tags);
-    public sealed record ImageContainer(string ImageName, string Base64Image, string ContentType)
+    public sealed record ImageContainer(string ImageName, string Base64Image, string ContentType, int Width, int Height)
     {
         public string ToBase64String()
         {

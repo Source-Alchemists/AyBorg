@@ -57,6 +57,8 @@ public partial class Annotate : ComponentBase
         }
 
         _imageContainer = await FileManagerService.DownloadImageAsync(new FileManagerService.DownloadImageParameters(ProjectId, ImageName, false));
+
+        await InvokeAsync(StateHasChanged);
     }
 
     private async Task SelectedImageNumberChanged(int value)
