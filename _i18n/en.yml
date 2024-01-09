@@ -22,9 +22,9 @@ home:
     rotate1: "machine vision."
     rotate2: "automation."
     rotate3: "industrial IoT."
-    paragraph1: "AyBorg stands for simplicity in the fields of machine vision, process automation and industrial IoT."
-    paragraph2: "With its comprehensive \"all-in-one\" approach, AyBorg covers the entire spectrum - from image acquisition and processing to integrated communication interfaces and results visualization. This versatile solution goes beyond machine vision and provides a unified platform for process automation and industrial IoT."
-    paragraph3: "The scalability across different systems ensures the adaptability and efficiency of AyBorg and makes the system the first choice for streamlining processes in various industrial applications."
+    paragraph1: "AyBorg stands for simplicity in the areas of image processing, process automation and industrial IoT."
+    paragraph2: "With its comprehensive \"all-in-one\" approach, AyBorg covers the entire spectrum from image acquisition and processing to integrated communication interfaces and visualization of the results. This versatile solution goes beyond machine vision and offers a standardized platform for industry 4.0."
+    paragraph3: "The scalability across different systems guarantees the adaptability and efficiency of AyBorg and makes the system the first choice for the realization of processes in various industrial applications."
     paragraph4: "AyBorg is available for Windows-, Linux- and Mac-based PC systems as well as for Arm®-based embedded platforms."
   editor:
     title: "Your concept."

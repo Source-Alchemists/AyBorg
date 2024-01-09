@@ -30,6 +30,12 @@ ol ul{margin-bottom:1rem !important;}
 .page-header.header-filter:before {background-color: rgba(0,0,0,0.25) !important;} 
 .footnotes{border-top: 0.0625rem solid rgba(0,0,0,0.1); padding-top:20px;}
 
+.overflow-x {
+    &.none {
+        overflow-x: hidden;
+    }
+}
+
 .text-span {
     background: linear-gradient(135deg, #594ae2 10%, #f969cd 40%);
     -webkit-background-clip: text;
@@ -43,7 +49,11 @@ ol ul{margin-bottom:1rem !important;}
 
 .py-header {
     padding-top: 200px;
-    padding-bottom: 70px;
+    min-height: 100vh;
+}
+
+.page-header-logo {
+ height: 100vh;
 }
 
 .display-logo {
