@@ -12,7 +12,7 @@ public partial class PortResolver : ComponentBase
     [Parameter, EditorRequired] public Port Port { get; set; } = null!;
     [Parameter, EditorRequired] public IEnumerable<Port> Ports { get; init; } = Array.Empty<Port>();
     [Parameter] public bool Disabled { get; init; } = false;
-    [Parameter] public bool AlternativeMode { get; init; } = false;
+    [Parameter] public bool OnlyThumbnail { get; init; } = false;
     [Parameter] public ListType Mode { get; init; } = ListType.Flow;
     [Parameter] public EventCallback<ValueChangedEventArgs> ValueChanged { get; set; }
     [Inject] IFlowService FlowService { get; init; } = null!;

@@ -8,17 +8,19 @@ namespace AyBorg.Web.Shared.Display;
 
 public partial class Display2D : ComponentBase
 {
-    [Parameter, EditorRequired] public string Base64Image { get; set; } = string.Empty;
-    [Parameter, EditorRequired] public int ImageWidth { get; set; }
-    [Parameter, EditorRequired] public int ImageHeight { get; set; }
+    [Parameter, EditorRequired] public string Base64Image { get; init; } = string.Empty;
+    [Parameter, EditorRequired] public int ImageWidth { get; init; }
+    [Parameter, EditorRequired] public int ImageHeight { get; init; }
+    [Parameter] public int ContainerWidth { get; init; } = -1;
+    [Parameter] public int ContainerHeight { get; init; } = -1;
+    [Parameter] public IEnumerable<LabelRectangle> Shapes { get; init; } = Array.Empty<LabelRectangle>();
     [Parameter] public bool ToolbarVisible { get; init; } = true;
     [Inject] public IJSRuntime JSRuntime { get; init; } = null!;
-    private readonly List<LabelRectangle> _labelRectangles = new();
     private readonly string _maskId = $"mask_{Guid.NewGuid()}";
     private ElementReference _containerRef;
     private BoundingClientRect _boundingClientRect;
     private string _containerStyle = "height: calc(100% - 60px)";
-    private Rectangle _imagePosition;
+    private Rectangle _imagePosition = new();
     private int _svgWidth;
     private int _svgHeight;
     private float _svgScaleFactor = 1f;
@@ -30,6 +32,12 @@ public partial class Display2D : ComponentBase
     {
         await base.OnAfterRenderAsync(firstRender);
         _boundingClientRect = await ElementUtils.GetBoundingClientRectangleAsync(JSRuntime, _containerRef);
+
+        // Workaround for cases where the parent container gets scaled.
+        if (ContainerWidth > 0 && ContainerHeight > 0)
+        {
+            _boundingClientRect = _boundingClientRect with { Width = ContainerWidth, Height = ContainerHeight };
+        }
         await CalculateScaleFactorAndUpdateAsync();
     }
 
@@ -46,6 +54,8 @@ public partial class Display2D : ComponentBase
             Width = ImageWidth,
             Height = ImageHeight
         };
+
+        await CalculateScaleFactorAndUpdateAsync();
     }
 
     private async ValueTask CalculateScaleFactorAndUpdateAsync()

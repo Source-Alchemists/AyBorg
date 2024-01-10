@@ -51,9 +51,9 @@
                                 {
                                     <MudChip Text="@tag" Disabled />
                                 }
-                                @if (context.Tags.Count > 5)
+                                @if (context.Tags.Count() > 5)
                                 {
-                                    <MudBadge Content="@(context.Tags.Count - 5)" Color="Color.Default" Overlap>
+                                    <MudBadge Content="@(context.Tags.Count() - 5)" Color="Color.Default" Overlap>
                                         <MudChip Text="..." Disabled />
                                     </MudBadge>
                                 }

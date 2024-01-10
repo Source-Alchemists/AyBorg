@@ -80,4 +80,20 @@ public sealed class FileManagerPassthroughServiceV1 : FileManager.FileManagerBas
             }
         });
     }
+
+    public override async Task<ImageAnnotationMeta> GetImageAnnotationMeta(GetImageAnnotationMetaRequest request, ServerCallContext context) 
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Auditor, Roles.Reviewer });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+
+        ImageAnnotationMeta result = new();
+
+        foreach (ChannelInfo channel in channels)
+        {
+            FileManager.FileManagerClient client = _channelService.CreateClient<FileManager.FileManagerClient>(channel.ServiceUniqueName);
+            result = await client.GetImageAnnotationMetaAsync(request, headers: headers, cancellationToken: context.CancellationToken);
+        }
+
+        return result;
+    }
 }

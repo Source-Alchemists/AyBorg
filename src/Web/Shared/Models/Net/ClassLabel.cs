@@ -1,6 +1,6 @@
 namespace AyBorg.Web.Shared.Models.Net;
 
-public record Label
+public record ClassLabel
 {
     public string Name { get; init; } = string.Empty;
     public string ColorCode { get; init; } = "#C100E7";

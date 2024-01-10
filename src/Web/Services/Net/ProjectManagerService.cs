@@ -94,10 +94,10 @@ public class ProjectManagerService : IProjectManagerService
             tags = tags.Add(tag);
         }
 
-        ImmutableList<Shared.Models.Net.Label> labels = ImmutableList<Shared.Models.Net.Label>.Empty;
-        foreach (Ayborg.Gateway.Net.V1.Label? LabelDto in projectMetaDto.Labels)
+        ImmutableList<ClassLabel> classes = ImmutableList<Shared.Models.Net.ClassLabel>.Empty;
+        foreach (Label? LabelDto in projectMetaDto.Labels)
         {
-            labels = labels.Add(new Shared.Models.Net.Label
+            classes = classes.Add(new Shared.Models.Net.ClassLabel
             {
                 Name = LabelDto.Name,
                 ColorCode = LabelDto.ColorCode
@@ -112,7 +112,7 @@ public class ProjectManagerService : IProjectManagerService
             Creator = projectMetaDto.CreatedBy,
             Created = projectMetaDto.CreationDate.ToDateTime(),
             Tags = tags,
-            Labels = labels
+            Classes = classes
         };
     }
 

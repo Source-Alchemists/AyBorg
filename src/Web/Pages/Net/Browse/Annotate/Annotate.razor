@@ -9,29 +9,70 @@
 </div>
 
 <MudToolBar Class="px-0">
-    
+    <MudGrid>
+        <MudItem xs="4">
+            <MudStack Spacing="5" Row>
+                <MudTooltip Text="Back">
+                    <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small" OnClick="@BackClicked" />
+                </MudTooltip>
+                <MudText Typo="Typo.h6" Class="pt-1">Annotate</MudText>
+            </MudStack>
+        </MudItem>
+    </MudGrid>
 </MudToolBar>
 
 <MudGrid class="grid-container">
-    <MudItem xs="6" md="3" class="mud-full-height">
+    <MudItem xs="12" md="4" lg="3" class="mud-full-height">
         <!-- Annotations container -->
         <MudCard class="mud-full-height">
             <MudCardHeader>
                 <MudText Typo="Typo.h6">Annotations</MudText>
             </MudCardHeader>
             <MudCardContent>
+                <div class="d-flex flex-column">
+                    <MudText Typo="Typo.caption">Tags:</MudText>
+                    <MudChipSet>
+                        @foreach (var tag in _tempValues.Tags)
+                        {
+                            <MudChip Text="@tag" Color="Color.Default" Disabled/>
+                        }
+                    </MudChipSet>
+                    <MudDivider />
+                    <MudTabs>
+                        <MudTabPanel Text="Classes">
+                            <MudTextField @ref="_addClassFieldRef" T="string" Label="Add" Placeholder="Class like 'person' or 'car' (must be unique) ..." 
+                                Adornment="Adornment.End" 
+                                AdornmentIcon="@Icons.Material.Filled.Add"
+                                OnAdornmentClick="AddClassClicked"
+                                Value="@_newClassName"
+                                TextChanged="AddClassChanged"
+                                OnKeyUp="AddClassKeyUp"
+                                Immediate
+                                Clearable/>
+                            @foreach (var classObj in _tempValues.ClassLabels.OrderBy(c => c.Index))
+                            {
+                                <ClassSelectorItem ClassLabel="@classObj" 
+                                    DeleteDisabled="@IsClassDeleteable(classObj)"
+                                    OnEditClicked="@ClassEditClicked"
+                                    OnDeleteClicked="@ClassDeleteClicked" />
+                            }
+                        </MudTabPanel>
+                        <MudTabPanel Text="Layers">
 
+                        </MudTabPanel>
+                    </MudTabs>
+                </div>
             </MudCardContent>
         </MudCard>
     </MudItem>
-    <MudItem xs="6" md="9" class="mud-full-height">
+    <MudItem xs="12" md="8" lg="9" class="mud-full-height">
         <!-- Image container -->
         <MudCard class="mud-full-height">
             <MudCardHeader>
                 <MudText Typo="Typo.h6">Image</MudText>
             </MudCardHeader>
             <MudCardContent>
-                <div class="d-flex" style="height: calc(100vh - 320px);">
+                <div style="height: calc(100vh - 320px);">
                     <AyBorg.Web.Shared.Display.Display2D 
                         Base64Image="@(_imageContainer != null ? _imageContainer.ToBase64String() : string.Empty)" 
                         ImageWidth="@(_imageContainer != null ? _imageContainer.Width : 0)"
