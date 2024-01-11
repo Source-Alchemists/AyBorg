@@ -32,9 +32,7 @@ public partial class Display2D : ComponentBase
     private string _imageTooltip => $"Width: {_imagePosition.Width} Height: {_imagePosition.Height}\nX: {_drawCrossHairX.Position1.X} Y: {_drawCrossHairY.Position1.Y}";
     private Line _drawCrossHairX = new();
     private Line _drawCrossHairY = new();
-    private bool _isDrawing = false;
     private bool _isCrossHairVisible = false;
-    private Rectangle _interactiveRectangle = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -138,7 +136,7 @@ public partial class Display2D : ComponentBase
         _isCrossHairVisible = false;
     }
 
-    private async Task SvgMouseMove(MouseEventArgs args)
+    private void SvgMouseMove(MouseEventArgs args)
     {
         int x = (int)(args.OffsetX / _svgScaleFactor);
         int y = (int)(args.OffsetY / _svgScaleFactor);
