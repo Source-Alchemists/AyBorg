@@ -54,7 +54,7 @@ public partial class ImagesGrid : ComponentBase
         _selectedImageNameBatch = _selectedImageNameBatch.AddRange(batch);
     }
 
-    private async void ThumbnailSelectChanged(ImageThumbnail.SelectChangedArgs args)
+    private async Task ThumbnailSelectChanged(ImageThumbnail.SelectChangedArgs args)
     {
         bool exists = SelectedImageNames.Exists(n => n.Equals(args.ImageName, StringComparison.InvariantCultureIgnoreCase));
         if (args.Value)

@@ -2,6 +2,7 @@ using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Shared.Utils;
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 
 namespace AyBorg.Web.Shared.Display;
@@ -15,18 +16,25 @@ public partial class Display2D : ComponentBase
     [Parameter] public int ContainerHeight { get; init; } = -1;
     [Parameter] public IEnumerable<LabelRectangle> Shapes { get; init; } = Array.Empty<LabelRectangle>();
     [Parameter] public bool ToolbarVisible { get; init; } = true;
+    [Parameter] public bool DrawCrosshairVisible { get; init; } = true;
     [Inject] public IJSRuntime JSRuntime { get; init; } = null!;
     private readonly string _maskId = $"mask_{Guid.NewGuid()}";
     private ElementReference _containerRef;
     private BoundingClientRect _boundingClientRect;
     private string _containerStyle = "height: calc(100% - 60px)";
+    private string _cursorClass = "default-cursor";
+    private string _centerClass = "force-center";
     private Rectangle _imagePosition = new();
-    private int _svgWidth;
-    private int _svgHeight;
+    private int _svgWidth = 0;
+    private int _svgHeight = 0;
     private float _svgScaleFactor = 1f;
     private float _userScaleFactor = 1f;
-
-    private string _imageTooltip => $"Width: {_imagePosition.Width} Height: {_imagePosition.Height}";
+    private string _imageTooltip => $"Width: {_imagePosition.Width} Height: {_imagePosition.Height}\nX: {_drawCrossHairX.Position1.X} Y: {_drawCrossHairY.Position1.Y}";
+    private Line _drawCrossHairX = new();
+    private Line _drawCrossHairY = new();
+    private bool _isDrawing = false;
+    private bool _isCrossHairVisible = false;
+    private Rectangle _interactiveRectangle = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -46,6 +54,7 @@ public partial class Display2D : ComponentBase
         await base.OnParametersSetAsync();
 
         _containerStyle = ToolbarVisible ? "height: calc(100% - 60px)" : string.Empty;
+        _cursorClass = DrawCrosshairVisible ? "draw-cursor" : "default-cursor";
 
         _imagePosition = new Rectangle
         {
@@ -66,6 +75,16 @@ public partial class Display2D : ComponentBase
             _svgScaleFactor = s;
             _svgWidth = w;
             _svgHeight = h;
+
+            if (_svgWidth > _boundingClientRect.Width || _svgHeight > _boundingClientRect.Height)
+            {
+                _centerClass = string.Empty;
+            }
+            else
+            {
+                _centerClass = "force-center";
+            }
+
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -96,5 +115,44 @@ public partial class Display2D : ComponentBase
         _userScaleFactor -= 0.1f;
         _userScaleFactor = MathF.Max(1f, _userScaleFactor);
         await CalculateScaleFactorAndUpdateAsync();
+    }
+
+    private void SvgMouseDown(MouseEventArgs args)
+    {
+    }
+
+    private void SvgMouseUp(MouseEventArgs args)
+    {
+    }
+
+    private void SvgMouseEnter(MouseEventArgs args)
+    {
+        if (DrawCrosshairVisible)
+        {
+            _isCrossHairVisible = true;
+        }
+    }
+
+    private void SvgMouseLeave(MouseEventArgs args)
+    {
+        _isCrossHairVisible = false;
+    }
+
+    private async Task SvgMouseMove(MouseEventArgs args)
+    {
+        int x = (int)(args.OffsetX / _svgScaleFactor);
+        int y = (int)(args.OffsetY / _svgScaleFactor);
+
+        _drawCrossHairY = new()
+        {
+            Position1 = new() { X = 0, Y = y },
+            Position2 = new() { X = ImageWidth, Y = y }
+        };
+
+        _drawCrossHairX = new()
+        {
+            Position1 = new() { X = x, Y = 0 },
+            Position2 = new() { X = x, Y = ImageHeight }
+        };
     }
 }

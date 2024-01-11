@@ -8,4 +8,5 @@ public interface IProjectManagerService
     ValueTask<IEnumerable<ProjectMeta>> GetMetasAsync();
     ValueTask<ProjectMeta> CreateAsync(CreateRequestParameters parameters);
     ValueTask DeleteAsync(DeleteRequestParameters parameters);
+    ValueTask<ClassLabel> AddOrUpdateAsync(AddOrUpdateClassLabelParameters parameters);
 }

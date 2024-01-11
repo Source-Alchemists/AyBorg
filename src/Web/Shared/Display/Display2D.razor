@@ -18,8 +18,8 @@
         <div @ref="@_containerRef" class="image-container overflow-auto">
             @if (!string.IsNullOrEmpty(Base64Image))
             {
-                <div class="force-center" title="@_imageTooltip">
-                <svg preserveAspectRatio="none" viewBox="0 0 @_svgWidth @_svgHeight" width="@_svgWidth" height="@_svgHeight">
+                <div class="@_centerClass" title="@_imageTooltip">
+                <svg class="@_cursorClass" preserveAspectRatio="none" viewBox="0 0 @_svgWidth @_svgHeight" width="@_svgWidth" height="@_svgHeight">
                     <defs>
                         <mask id="@_maskId">
                             @if (Shapes.Any())
@@ -41,7 +41,12 @@
                         </mask>
                     </defs>
                     <g
-                        transform="scale(@_svgScaleFactor.ToString(System.Globalization.CultureInfo.InvariantCulture))">
+                        transform="scale(@_svgScaleFactor.ToString(System.Globalization.CultureInfo.InvariantCulture))"
+                        @onmousedown="SvgMouseDown"
+                        @onmouseup="SvgMouseUp"
+                        @onmousemove="SvgMouseMove"
+                        @onmouseenter="SvgMouseEnter"
+                        @onmouseleave="SvgMouseLeave">
                         <image href="@Base64Image"
                             x="@_imagePosition.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                             y="@_imagePosition.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
@@ -59,6 +64,12 @@
                                 width="@rectangle.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                                 height="@rectangle.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                                 style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:2" />
+                        }
+
+                        @if (_isCrossHairVisible)
+                        {
+                            <line class="crosshair-line" x1="@_drawCrossHairX.Position1.X" y1="@_drawCrossHairX.Position1.Y" x2="@_drawCrossHairX.Position2.X" y2="@_drawCrossHairX.Position2.Y" stroke-dasharray="1" />
+                            <line class="crosshair-line" x1="@_drawCrossHairY.Position1.X" y1="@_drawCrossHairY.Position1.Y" x2="@_drawCrossHairY.Position2.X" y2="@_drawCrossHairY.Position2.Y" stroke-dasharray="1" />
                         }
                     </g>
                 </svg>

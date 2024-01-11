@@ -171,7 +171,7 @@ public partial class Annotate : ComponentBase
         );
 
         DialogResult result = await dialogReference.Result;
-        if(result.Canceled)
+        if (result.Canceled)
         {
             return;
         }
@@ -181,6 +181,42 @@ public partial class Annotate : ComponentBase
         _tempValues = _tempValues with { ClassLabels = _tempValues.ClassLabels.Replace(classLabel, newClassLabel) };
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task SaveClicked()
+    {
+        await SaveClassLabelsAsync();
+        _initialValues = _tempValues with { };
+    }
+
+    private bool IsSaveEnabled()
+    {
+        return !_initialValues.Equals(_tempValues);
+    }
+
+    private async ValueTask SaveClassLabelsAsync()
+    {
+        try
+        {
+            foreach (ClassLabel cl in _tempValues.ClassLabels)
+            {
+                if (!_initialValues.ClassLabels.Contains(cl))
+                {
+                    await ProjectManagerService.AddOrUpdateAsync(new ProjectManagerService.AddOrUpdateClassLabelParameters(ProjectId, cl));
+                    continue;
+                }
+
+                ClassLabel initialCl = _initialValues.ClassLabels.First(c => c.Index.Equals(cl.Index));
+                if (!initialCl.Equals(cl))
+                {
+                    await ProjectManagerService.AddOrUpdateAsync(new ProjectManagerService.AddOrUpdateClassLabelParameters(ProjectId, cl));
+                }
+            }
+        }
+        catch (RpcException)
+        {
+            Snackbar.Add("Failed to change classes!", Severity.Warning);
+        }
     }
 
     private sealed record ValueStore

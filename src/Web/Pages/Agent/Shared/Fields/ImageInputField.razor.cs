@@ -71,6 +71,12 @@ public partial class ImageInputField : BaseInputField
 
     private void SetImageUrl(Image image)
     {
+        if(string.IsNullOrEmpty(image.Base64))
+        {
+            _imageUrl = string.Empty;
+            return;
+        }
+
         switch (image.EncoderType)
         {
             case ImageTorque.Processing.EncoderType.Jpeg:

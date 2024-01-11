@@ -86,6 +86,37 @@ public class ProjectManagerService : IProjectManagerService
         }
     }
 
+    public async ValueTask<Shared.Models.Net.ClassLabel> AddOrUpdateAsync(AddOrUpdateClassLabelParameters parameters)
+    {
+        try
+        {
+            Ayborg.Gateway.Net.V1.ClassLabel response = await _projectManagerClient.AddOrUpdateClassLabelAsync(new AddOrUpdateClassLabelRequest
+            {
+                ProjectId = parameters.ProjectId,
+                ClassLabel = new Ayborg.Gateway.Net.V1.ClassLabel
+                {
+                    Index = parameters.ClassLabel.Index,
+                    Name = parameters.ClassLabel.Name,
+                    ColorCode = parameters.ClassLabel.ColorCode
+                }
+            });
+
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Add or update class label: {ClassLabel} to project {ProjectId}", parameters.ClassLabel, parameters.ProjectId);
+
+            return new Shared.Models.Net.ClassLabel
+            {
+                Index = response.Index,
+                Name = response.Name,
+                ColorCode = response.ColorCode
+            };
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Failed to add or update class {ClassLabel}!", parameters.ClassLabel);
+            throw;
+        }
+    }
+
     private static ProjectMeta ToModel(Ayborg.Gateway.Net.V1.ProjectMeta projectMetaDto)
     {
         ImmutableList<string> tags = ImmutableList<string>.Empty;
@@ -94,13 +125,14 @@ public class ProjectManagerService : IProjectManagerService
             tags = tags.Add(tag);
         }
 
-        ImmutableList<ClassLabel> classes = ImmutableList<Shared.Models.Net.ClassLabel>.Empty;
-        foreach (Label? LabelDto in projectMetaDto.Labels)
+        ImmutableList<Shared.Models.Net.ClassLabel> classes = ImmutableList<Shared.Models.Net.ClassLabel>.Empty;
+        foreach (Ayborg.Gateway.Net.V1.ClassLabel? classDto in projectMetaDto.ClassLabels)
         {
             classes = classes.Add(new Shared.Models.Net.ClassLabel
             {
-                Name = LabelDto.Name,
-                ColorCode = LabelDto.ColorCode
+                Index = classDto.Index,
+                Name = classDto.Name,
+                ColorCode = classDto.ColorCode
             });
         }
 
@@ -118,4 +150,5 @@ public class ProjectManagerService : IProjectManagerService
 
     public record CreateRequestParameters(string Name, ProjectType Type, string Creator, IEnumerable<string> Tags);
     public record DeleteRequestParameters(string ProjectId, string Username);
+    public record AddOrUpdateClassLabelParameters(string ProjectId, Shared.Models.Net.ClassLabel ClassLabel);
 }

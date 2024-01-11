@@ -11,7 +11,8 @@
             Shapes="@_labelRectangles" 
             ToolbarVisible="@(!OnlyThumbnail)" 
             ContainerWidth="240"
-            ContainerHeight="240"/>
+            ContainerHeight="240"
+            DrawCrosshairVisible="false" />
     </div>
 }
 else
@@ -21,5 +22,6 @@ else
         ImageWidth="@_imageWidth" 
         ImageHeight="@_imageHeight"
         Shapes="@_labelRectangles" 
-        ToolbarVisible="@(!OnlyThumbnail)" />
+        ToolbarVisible="@(!OnlyThumbnail)" 
+        DrawCrosshairVisible="true" />
 }

@@ -19,6 +19,14 @@
     background-color: var(--mud-palette-background-grey);
 }
 
+.draw-cursor {
+    cursor: crosshair;
+}
+
+.default-cursor {
+    cursor: default;
+}
+
 .corners {
     background:
         linear-gradient(to right, var(--mud-palette-primary) 4px, transparent 4px) 0 0,
@@ -32,4 +40,9 @@
 
     background-repeat: no-repeat;
     background-size: 40px 40px;
+}
+
+.crosshair-line {
+    stroke: #af4ae2;
+    stroke-width: 1px;
 }

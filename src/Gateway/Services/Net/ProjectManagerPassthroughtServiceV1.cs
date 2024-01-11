@@ -50,11 +50,27 @@ public sealed class ProjectManagerPassthroughServiceV1 : ProjectManager.ProjectM
         await Parallel.ForEachAsync(channels, async (channel, token) =>
         {
             ProjectManager.ProjectManagerClient client = _channelService.CreateClient<ProjectManager.ProjectManagerClient>(channel.ServiceUniqueName);
-            var response = client.GetMetas(request, headers: headers, cancellationToken: context.CancellationToken);
+            AsyncServerStreamingCall<ProjectMeta> response = client.GetMetas(request, headers: headers, cancellationToken: context.CancellationToken);
             await foreach (ProjectMeta? changeset in response.ResponseStream.ReadAllAsync(cancellationToken: context.CancellationToken))
             {
                 await responseStream.WriteAsync(changeset, cancellationToken: context.CancellationToken);
             }
         });
+    }
+
+    public override async Task<ClassLabel> AddOrUpdateClassLabel(AddOrUpdateClassLabelRequest request, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+
+        ClassLabel response = null!;
+
+        foreach (ChannelInfo channel in channels)
+        {
+            ProjectManager.ProjectManagerClient client = _channelService.CreateClient<ProjectManager.ProjectManagerClient>(channel.ServiceUniqueName);
+            response = await client.AddOrUpdateClassLabelAsync(request, headers);
+        }
+
+        return response;
     }
 }

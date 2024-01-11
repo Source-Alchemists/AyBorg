@@ -186,13 +186,7 @@ public class FileManagerService : IFileManagerService
                 ImageName = parameters.ImageName
             });
 
-            var classes = new List<ClassMeta>();
-            foreach (Ayborg.Gateway.Net.V1.ClassMeta? c in response.Classes)
-            {
-                classes.Add(new ClassMeta(c.Name, c.Index));
-            }
-
-            return new ImageAnnotationMeta(response.Tags, classes);
+            return new ImageAnnotationMeta(response.Tags, response.Layers);
         }
         catch (RpcException ex)
         {
@@ -215,7 +209,7 @@ public class FileManagerService : IFileManagerService
     }
 
     public sealed record GetImageAnnotationMetaParameters(string ProjectId, string ImageName);
-    public sealed record ImageAnnotationMeta(IEnumerable<string> Tags, IEnumerable<ClassMeta> Classes);
+    public sealed record ImageAnnotationMeta(IEnumerable<string> Tags, IEnumerable<int> LayerIndex);
     public sealed record ClassMeta(string Name, int Index);
 
 }

@@ -39,7 +39,7 @@ public partial class ImageThumbnail : ComponentBase
         }
     }
 
-    private async void SelectedChanged(bool value)
+    private async Task SelectedChanged(bool value)
     {
         if (value != Selected)
         {

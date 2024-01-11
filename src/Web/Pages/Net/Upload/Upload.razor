@@ -17,7 +17,7 @@
             </MudText>
         </CardHeaderContent>
         <CardHeaderActions>
-            <MudBadge Content="@(_imageSources.Count())" Origin="Origin.BottomLeft" Overlap>
+            <MudBadge Content="@(_imageSources.Count)" Origin="Origin.BottomLeft" Overlap>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@OnSave"
                     Disabled="@(!_imageSources.Any())">
                     Save and Continue
@@ -100,7 +100,7 @@
                         {
                             <MudItem xs="12" Class="d-flex justify-center">
                                 <MudText Typo="Typo.subtitle1">
-                                    <strong>@_imageSources.Count() images ready to save</strong>
+                                    <strong>@_imageSources.Count images ready to save</strong>
                                 </MudText>
                             </MudItem>
                         }
