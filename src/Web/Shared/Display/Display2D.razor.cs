@@ -21,7 +21,7 @@ public partial class Display2D : ComponentBase
     private readonly string _maskId = $"mask_{Guid.NewGuid()}";
     private ElementReference _containerRef;
     private BoundingClientRect _boundingClientRect;
-    private string _containerStyle = "height: calc(100% - 60px)";
+    private string _containerStyle = "height: calc(100% - 90px)";
     private string _cursorClass = "default-cursor";
     private string _centerClass = "force-center";
     private Rectangle _imagePosition = new();
@@ -33,6 +33,7 @@ public partial class Display2D : ComponentBase
     private Line _drawCrossHairX = new();
     private Line _drawCrossHairY = new();
     private bool _isCrossHairVisible = false;
+    private bool _isCursorCaptures = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -51,7 +52,7 @@ public partial class Display2D : ComponentBase
     {
         await base.OnParametersSetAsync();
 
-        _containerStyle = ToolbarVisible ? "height: calc(100% - 60px)" : string.Empty;
+        _containerStyle = ToolbarVisible ? "height: calc(100% - 90px)" : string.Empty;
         _cursorClass = DrawCrosshairVisible ? "draw-cursor" : "default-cursor";
 
         _imagePosition = new Rectangle
@@ -129,11 +130,14 @@ public partial class Display2D : ComponentBase
         {
             _isCrossHairVisible = true;
         }
+
+        _isCursorCaptures = true;
     }
 
     private void SvgMouseLeave(MouseEventArgs args)
     {
         _isCrossHairVisible = false;
+        _isCursorCaptures = false;
     }
 
     private void SvgMouseMove(MouseEventArgs args)

@@ -18,7 +18,7 @@
         <div @ref="@_containerRef" class="image-container overflow-auto">
             @if (!string.IsNullOrEmpty(Base64Image))
             {
-                <div class="@_centerClass" title="@_imageTooltip">
+                <div class="@_centerClass">
                 <svg class="@_cursorClass" preserveAspectRatio="none" viewBox="0 0 @_svgWidth @_svgHeight" width="@_svgWidth" height="@_svgHeight">
                     <defs>
                         <mask id="@_maskId">
@@ -81,4 +81,19 @@
             }
         </div>
     </div>
+</div>
+<div class="status-bar d-flex px-2">
+    <MudText>Size: @ImageWidth x @ImageHeight</MudText>
+    @if (ToolbarVisible)
+    {
+        <MudSpacer />
+        @if (@_isCursorCaptures)
+        {
+            <MudText>X: @_drawCrossHairX.Position1.X Y: @_drawCrossHairY.Position1.Y</MudText>
+        }
+        else 
+        {
+            <MudText>X: - Y: -</MudText>
+        }
+    }
 </div>
