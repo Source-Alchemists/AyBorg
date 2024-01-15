@@ -1,6 +1,8 @@
 using System.Collections.Immutable;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
+using AyBorg.Web.Shared;
+using AyBorg.Web.Shared.Display;
 using AyBorg.Web.Shared.Models.Net;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
@@ -31,6 +33,10 @@ public partial class Annotate : ComponentBase
     private string _newClassName = string.Empty;
     private ValueStore _initialValues = new();
     private ValueStore _tempValues = new();
+    private DrawMode _drawMode = DrawMode.None;
+    private string _drawStatusBarText = string.Empty;
+    private ClassLabel _drawingClassLabel = null!;
+    private IEnumerable<LabelRectangle> _shapes => _tempValues.Layers.Select(l => l.Shape);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -153,7 +159,13 @@ public partial class Annotate : ComponentBase
 
     private async Task ClassDeleteClicked(ClassLabel classLabel)
     {
-        _tempValues = _tempValues with { ClassLabels = _tempValues.ClassLabels.Remove(classLabel) };
+        ImmutableList<RectangleLayer> updatedLayers = ImmutableList<RectangleLayer>.Empty;
+        updatedLayers = updatedLayers.AddRange(_tempValues.Layers.Where(l => l.ClassIndex != classLabel.Index));
+        _tempValues = _tempValues with
+        {
+            ClassLabels = _tempValues.ClassLabels.Remove(classLabel),
+            Layers = updatedLayers
+        };
         await InvokeAsync(StateHasChanged);
     }
 
@@ -178,9 +190,58 @@ public partial class Annotate : ComponentBase
 
         string colorValue = (string)result.Data;
         ClassLabel newClassLabel = classLabel with { ColorCode = colorValue };
-        _tempValues = _tempValues with { ClassLabels = _tempValues.ClassLabels.Replace(classLabel, newClassLabel) };
+        ImmutableList<RectangleLayer> updatedLayers = ImmutableList<RectangleLayer>.Empty;
+        foreach (RectangleLayer layer in _tempValues.Layers)
+        {
+            if (layer.ClassIndex.Equals(classLabel.Index))
+            {
+                updatedLayers = updatedLayers.Add(layer with
+                {
+                    Shape = layer.Shape with { Color = colorValue }
+                });
+            }
+            else
+            {
+                updatedLayers = updatedLayers.Add(layer);
+            }
+        }
+        _tempValues = _tempValues with
+        {
+            ClassLabels = _tempValues.ClassLabels.Replace(classLabel, newClassLabel),
+            Layers = updatedLayers
+        };
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    private void ClassDrawClicked(ClassLabel classLabel)
+    {
+        _drawingClassLabel = classLabel;
+        _drawMode = DrawMode.Rectangle;
+        _drawStatusBarText = $"Draw: {classLabel.Name}";
+    }
+
+    private void ShapeDrawed(SDK.Common.Models.Rectangle value)
+    {
+        _tempValues = _tempValues with
+        {
+            Layers = _tempValues.Layers.Add(new RectangleLayer
+            {
+                ClassIndex = _drawingClassLabel.Index,
+                Shape = new LabelRectangle(value.X, value.Y, value.Width, value.Height)
+                {
+                    Color = _drawingClassLabel.ColorCode
+                }
+            })
+        };
+    }
+
+    private void LayerDeleteClicked(RectangleLayer value)
+    {
+        _tempValues = _tempValues with
+        {
+            Layers = _tempValues.Layers.Remove(value)
+        };
     }
 
     private async Task SaveClicked()
@@ -223,5 +284,6 @@ public partial class Annotate : ComponentBase
     {
         public ImmutableList<ClassLabel> ClassLabels { get; init; } = ImmutableList<ClassLabel>.Empty;
         public ImmutableList<string> Tags { get; init; } = ImmutableList<string>.Empty;
+        public ImmutableList<RectangleLayer> Layers { get; init; } = ImmutableList<RectangleLayer>.Empty;
     }
 }

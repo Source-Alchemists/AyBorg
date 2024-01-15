@@ -37,8 +37,8 @@
             <MudCardHeader>
                 <MudText Typo="Typo.h6">Annotations</MudText>
             </MudCardHeader>
-            <MudCardContent>
-                <div class="d-flex flex-column">
+            <MudCardContent style="height: calc(100% - 75px);">
+                <div class="d-flex flex-column mud-full-height">
                     <MudText Typo="Typo.caption">Tags:</MudText>
                     <MudChipSet>
                         @foreach (var tag in _tempValues.Tags)
@@ -47,27 +47,38 @@
                         }
                     </MudChipSet>
                     <MudDivider />
-                    <MudTabs>
+                    <MudTabs Class="mud-full-height overflow-hidden">
                         <MudTabPanel Text="Classes">
-                            <MudTextField @ref="_addClassFieldRef" T="string" Label="Add" Placeholder="Class like 'person' or 'car' (must be unique) ..." 
-                                Adornment="Adornment.End" 
-                                AdornmentIcon="@Icons.Material.Filled.Add"
-                                OnAdornmentClick="AddClassClicked"
-                                Value="@_newClassName"
-                                TextChanged="AddClassChanged"
-                                OnKeyUp="AddClassKeyUp"
-                                Immediate
-                                Clearable/>
-                            @foreach (var classObj in _tempValues.ClassLabels.OrderBy(c => c.Index))
-                            {
-                                <ClassSelectorItem ClassLabel="@classObj" 
-                                    DeleteDisabled="@IsClassDeleteable(classObj)"
-                                    OnEditClicked="@ClassEditClicked"
-                                    OnDeleteClicked="@ClassDeleteClicked" />
-                            }
+                            <div class="tab-content">
+                                <MudTextField @ref="_addClassFieldRef" T="string" Label="Add" Placeholder="Class like 'person' or 'car' (must be unique) ..." 
+                                    Adornment="Adornment.End" 
+                                    AdornmentIcon="@Icons.Material.Filled.Add"
+                                    OnAdornmentClick="AddClassClicked"
+                                    Value="@_newClassName"
+                                    TextChanged="AddClassChanged"
+                                    OnKeyUp="AddClassKeyUp"
+                                    Immediate
+                                    Clearable/>
+                                @foreach (var classObj in _tempValues.ClassLabels.OrderBy(c => c.Index))
+                                {
+                                    <ClassSelectorItem ClassLabel="@classObj" 
+                                        DeleteDisabled="@IsClassDeleteable(classObj)"
+                                        OnEditClicked="@ClassEditClicked"
+                                        OnDeleteClicked="@ClassDeleteClicked"
+                                        OnDrawClicked="@ClassDrawClicked"
+                                        Count="@_tempValues.Layers.Count(l => l.ClassIndex == classObj.Index)" />
+                                }
+                            </div>
                         </MudTabPanel>
                         <MudTabPanel Text="Layers">
-
+                            <div class="tab-content">
+                                @foreach (var layerObj in _tempValues.Layers.Reverse())
+                                {
+                                    <LayerSelectorItem Layer="@layerObj" 
+                                        Name="@_tempValues.ClassLabels.First(c => c.Index.Equals(layerObj.ClassIndex)).Name"
+                                        OnDeleteClicked="@LayerDeleteClicked" />
+                                }
+                            </div>
                         </MudTabPanel>
                     </MudTabs>
                 </div>
@@ -85,7 +96,11 @@
                     <AyBorg.Web.Shared.Display.Display2D 
                         Base64Image="@(_imageContainer != null ? _imageContainer.ToBase64String() : string.Empty)" 
                         ImageWidth="@(_imageContainer != null ? _imageContainer.Width : 0)"
-                        ImageHeight="@(_imageContainer != null ? _imageContainer.Height : 0)" />
+                        ImageHeight="@(_imageContainer != null ? _imageContainer.Height : 0)"
+                        Shapes="@_shapes"
+                        @bind-DrawMode="@_drawMode"
+                        @bind-StatusBarText="@_drawStatusBarText"
+                        OnShapeDrawed="@ShapeDrawed" />
                 </div>
             </MudCardContent>
             <MudCardActions>

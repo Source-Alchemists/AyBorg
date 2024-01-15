@@ -35,7 +35,7 @@ legend {
     background-color: var(--mud-palette-background);
 }
 .mud-tabs-panels {
-    height: 100%;
+    height: calc(100%);
 }
 .overflow-scroll {
     overflow: auto;

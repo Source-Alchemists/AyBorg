@@ -66,6 +66,15 @@
                                 style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:2" />
                         }
 
+                        @if (_drawObject.IsDrawing)
+                        {
+                            <rect x="@_drawObject.Rect.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                y="@_drawObject.Rect.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                width="@_drawObject.Rect.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                height="@_drawObject.Rect.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                style="fill:transparent;stroke:red;stroke-width:2" />
+                        }
+
                         @if (_isCrossHairVisible)
                         {
                             <line class="crosshair-line" x1="@_drawCrossHairX.Position1.X" y1="@_drawCrossHairX.Position1.Y" x2="@_drawCrossHairX.Position2.X" y2="@_drawCrossHairX.Position2.Y" stroke-dasharray="1" />
@@ -87,7 +96,10 @@
     @if (ToolbarVisible)
     {
         <MudSpacer />
-        @if (@_isCursorCaptures)
+        <MudText><strong>@StatusBarText</strong></MudText>
+        <MudSpacer />
+        <div class="position-text">
+        @if (@_isCursorCaptured)
         {
             <MudText>X: @_drawCrossHairX.Position1.X Y: @_drawCrossHairY.Position1.Y</MudText>
         }
@@ -95,5 +107,6 @@
         {
             <MudText>X: - Y: -</MudText>
         }
+        </div>
     }
 </div>

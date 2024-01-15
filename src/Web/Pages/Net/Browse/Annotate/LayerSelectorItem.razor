@@ -1,0 +1,20 @@
+<div class="layer-container mud-full-width d-flex flex-row mt-2">
+    <div class="layer-color" style="border: 2px solid @Layer.Shape.Color">
+        <MudText>@Layer.ClassIndex</MudText>
+    </div>
+    <div class="mud-full-width d-flex flex-row-reverse">
+        <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" Class="mt-2" OnClick="DeleteClicked" />
+        <MudText Class="mud-full-width mt-2 ml-2">@Name</MudText>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public Shared.Models.Net.RectangleLayer Layer { get; init; } = null!;
+    [Parameter, EditorRequired] public string Name { get; init; } = string.Empty;
+    [Parameter] public EventCallback<Shared.Models.Net.RectangleLayer> OnDeleteClicked { get; init; }
+
+    private async Task DeleteClicked()
+    {
+        await OnDeleteClicked.InvokeAsync(Layer);
+    }
+}

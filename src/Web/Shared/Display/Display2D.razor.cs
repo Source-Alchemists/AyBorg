@@ -17,6 +17,11 @@ public partial class Display2D : ComponentBase
     [Parameter] public IEnumerable<LabelRectangle> Shapes { get; init; } = Array.Empty<LabelRectangle>();
     [Parameter] public bool ToolbarVisible { get; init; } = true;
     [Parameter] public bool DrawCrosshairVisible { get; init; } = true;
+    [Parameter] public DrawMode DrawMode { get; set; } = DrawMode.None;
+    [Parameter] public EventCallback<DrawMode> DrawModeChanged { get; init; }
+    [Parameter] public string StatusBarText { get; init; } = string.Empty;
+    [Parameter] public EventCallback<string> StatusBarTextChanged { get; init; }
+    [Parameter] public EventCallback<Rectangle> OnShapeDrawed { get; init; }
     [Inject] public IJSRuntime JSRuntime { get; init; } = null!;
     private readonly string _maskId = $"mask_{Guid.NewGuid()}";
     private ElementReference _containerRef;
@@ -33,7 +38,8 @@ public partial class Display2D : ComponentBase
     private Line _drawCrossHairX = new();
     private Line _drawCrossHairY = new();
     private bool _isCrossHairVisible = false;
-    private bool _isCursorCaptures = false;
+    private bool _isCursorCaptured = false;
+    private DrawObject _drawObject = new();
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -118,10 +124,59 @@ public partial class Display2D : ComponentBase
 
     private void SvgMouseDown(MouseEventArgs args)
     {
+        if (DrawMode == DrawMode.None)
+        {
+            return;
+        }
+
+        int x = (int)(args.OffsetX / _svgScaleFactor);
+        int y = (int)(args.OffsetY / _svgScaleFactor);
+        _drawObject = new DrawObject
+        {
+            IsDrawing = true,
+            StartPosition = new Point
+            {
+                X = x,
+                Y = y
+            },
+            EndPosition = new Point
+            {
+                X = x,
+                Y = y
+            }
+        };
+
+        _drawObject = _drawObject with
+        {
+            Rect = CalculateDrawingRectangle(_drawObject)
+        };
     }
 
-    private void SvgMouseUp(MouseEventArgs args)
+    private async Task SvgMouseUp(MouseEventArgs args)
     {
+        if (DrawMode == DrawMode.None)
+        {
+            return;
+        }
+
+        _drawObject = _drawObject with
+        {
+            IsDrawing = false,
+            EndPosition = new Point
+            {
+                X = (int)(args.OffsetX / _svgScaleFactor),
+                Y = (int)(args.OffsetY / _svgScaleFactor)
+            }
+        };
+
+        _drawObject = _drawObject with
+        {
+            Rect = CalculateDrawingRectangle(_drawObject)
+        };
+
+        await DrawModeChanged.InvokeAsync(DrawMode.None);
+        await StatusBarTextChanged.InvokeAsync(string.Empty);
+        await OnShapeDrawed.InvokeAsync(_drawObject.Rect);
     }
 
     private void SvgMouseEnter(MouseEventArgs args)
@@ -131,19 +186,25 @@ public partial class Display2D : ComponentBase
             _isCrossHairVisible = true;
         }
 
-        _isCursorCaptures = true;
+        _isCursorCaptured = true;
     }
 
     private void SvgMouseLeave(MouseEventArgs args)
     {
         _isCrossHairVisible = false;
-        _isCursorCaptures = false;
+        _isCursorCaptured = false;
     }
 
     private void SvgMouseMove(MouseEventArgs args)
     {
-        int x = (int)(args.OffsetX / _svgScaleFactor);
-        int y = (int)(args.OffsetY / _svgScaleFactor);
+        
+        SvgMove(args.OffsetX, args.OffsetY);
+    }
+
+    private void SvgMove(double xOffset, double yOffset)
+    {
+        int x = (int)(xOffset / _svgScaleFactor);
+        int y = (int)(yOffset / _svgScaleFactor);
 
         _drawCrossHairY = new()
         {
@@ -156,5 +217,43 @@ public partial class Display2D : ComponentBase
             Position1 = new() { X = x, Y = 0 },
             Position2 = new() { X = x, Y = ImageHeight }
         };
+
+        _drawObject = _drawObject with
+        {
+            EndPosition = new Point
+            {
+                X = x,
+                Y = y
+            }
+        };
+
+        _drawObject = _drawObject with
+        {
+            Rect = CalculateDrawingRectangle(_drawObject)
+        };
+    }
+
+    private static Rectangle CalculateDrawingRectangle(DrawObject drawObject)
+    {
+        int minX = Math.Min(drawObject.StartPosition.X, drawObject.EndPosition.X);
+        int minY = Math.Min(drawObject.StartPosition.Y, drawObject.EndPosition.Y);
+        int maxX = Math.Max(drawObject.StartPosition.X, drawObject.EndPosition.X);
+        int maxY = Math.Max(drawObject.StartPosition.Y, drawObject.EndPosition.Y);
+
+        return new Rectangle
+        {
+            X = minX,
+            Y = minY,
+            Width = maxX - minX,
+            Height = maxY - minY
+        };
+    }
+
+    private readonly record struct DrawObject
+    {
+        public bool IsDrawing { get; init; }
+        public Point StartPosition { get; init; }
+        public Point EndPosition { get; init; }
+        public Rectangle Rect { get; init; }
     }
 }

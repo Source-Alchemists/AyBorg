@@ -1,9 +1,11 @@
-<div class="class-container mud-full-width d-flex flex-row mt-2">
-    <div class="class-color" style="border: 2px solid @ClassLabel.ColorCode">
-        <MudText>@ClassLabel.Index</MudText>
-    </div>
+<div class="class-container mud-full-width d-flex flex-row mt-3">
+    <MudBadge Origin="Origin.TopRight" Content="@Count" Overlap Bordered>
+        <div class="class-color" style="border: 2px solid @ClassLabel.ColorCode">
+            <MudText>@ClassLabel.Index</MudText>
+        </div>
+    </MudBadge>
     <div class="mud-full-width d-flex flex-row-reverse">
-        <MudIconButton Icon="@Icons.Material.Filled.Draw" Class="mt-2" />
+        <MudIconButton Icon="@Icons.Material.Filled.Draw" OnClick="DrawClicked" Class="mt-2" />
         <MudIconButton Icon="@Icons.Material.Filled.Settings" Class="mt-2" OnClick="EditClicked" />
         <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" Class="mt-2" Disabled="@DeleteDisabled" OnClick="DeleteClicked" />
         <MudText Class="mud-full-width mt-2 ml-2">@ClassLabel.Name</MudText>
@@ -13,8 +15,10 @@
 @code {
     [Parameter, EditorRequired] public Shared.Models.Net.ClassLabel ClassLabel { get; init; } = null!;
     [Parameter] public bool DeleteDisabled { get; init; }
+    [Parameter] public int Count { get; init; }
     [Parameter] public EventCallback<Shared.Models.Net.ClassLabel> OnDeleteClicked { get; init; }
     [Parameter] public EventCallback<Shared.Models.Net.ClassLabel> OnEditClicked { get; init; }
+    [Parameter] public EventCallback<Shared.Models.Net.ClassLabel> OnDrawClicked { get; init; }
 
     private async Task DeleteClicked()
     {
@@ -24,5 +28,10 @@
     private async Task EditClicked()
     {
         await OnEditClicked.InvokeAsync(ClassLabel);
+    }
+
+    private async Task DrawClicked()
+    {
+        await OnDrawClicked.InvokeAsync(ClassLabel);
     }
 }

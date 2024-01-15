@@ -28,6 +28,10 @@
     padding-top: 6px;
 }
 
+.position-text {
+    min-width: 100px;
+}
+
 .draw-cursor {
     cursor: crosshair;
 }
