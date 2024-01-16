@@ -49,7 +49,8 @@ public partial class Annotate : ComponentBase
             if (StateService.NetState != null)
             {
                 _selectedImageNames = StateService.NetState.Annotation.SelectedImageNames;
-                _selectedImageNumber = StateService.NetState.Annotation.SelectedImageIndex + 1;
+                _selectedImageNumber = _selectedImageNames.ToList().IndexOf(ImageName) + 1;
+
                 _projectName = StateService.NetState.ProjectName;
             }
 
@@ -66,6 +67,8 @@ public partial class Annotate : ComponentBase
         {
             return;
         }
+
+        _isLoading = true;
 
         try
         {
@@ -104,6 +107,7 @@ public partial class Annotate : ComponentBase
             Snackbar.Add("Failed to get meta information!", Severity.Warning);
         }
 
+        _isLoading = false;
         await InvokeAsync(StateHasChanged);
     }
 
