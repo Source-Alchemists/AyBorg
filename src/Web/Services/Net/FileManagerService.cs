@@ -176,25 +176,6 @@ public class FileManagerService : IFileManagerService
         }
     }
 
-    public async ValueTask<ImageAnnotationMeta> GetImageAnnotationMetaAsync(GetImageAnnotationMetaParameters parameters)
-    {
-        try
-        {
-            Ayborg.Gateway.Net.V1.ImageAnnotationMeta response = await _fileManagerClient.GetImageAnnotationMetaAsync(new GetImageAnnotationMetaRequest
-            {
-                ProjectId = parameters.ProjectId,
-                ImageName = parameters.ImageName
-            });
-
-            return new ImageAnnotationMeta(response.Tags, response.Layers);
-        }
-        catch (RpcException ex)
-        {
-            _logger.LogWarning((int)EventLogType.Download, ex, "Failed to receive image annotation meta informations!");
-            throw;
-        }
-    }
-
     public sealed record UploadImageParameters(string ProjectId, byte[] Data, string ContentType, string CollectionId, int CollectionIndex = 0, int CollectionSize = 1);
     public sealed record ConfirmUploadParameters(string ProjectId, string CollectionId, string BatchName, IEnumerable<string> Tags, IEnumerable<int> Distribution);
     public sealed record DownloadImageParameters(string ProjectId, string ImageName, bool AsThumbnail);
@@ -207,9 +188,5 @@ public class FileManagerService : IFileManagerService
             return $"data:{ContentType};base64,{Base64Image}";
         }
     }
-
-    public sealed record GetImageAnnotationMetaParameters(string ProjectId, string ImageName);
-    public sealed record ImageAnnotationMeta(IEnumerable<string> Tags, IEnumerable<int> LayerIndex);
     public sealed record ClassMeta(string Name, int Index);
-
 }

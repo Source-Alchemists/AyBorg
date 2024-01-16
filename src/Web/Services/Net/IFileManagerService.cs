@@ -8,5 +8,4 @@ public interface IFileManagerService
     ValueTask ConfirmUploadAsync(ConfirmUploadParameters parameters);
     ValueTask<ImageContainer> DownloadImageAsync(DownloadImageParameters parameters);
     ValueTask<ImageCollectionMeta> GetImageCollectionMetaAsync(GetImageCollectionMetaParameters parameters);
-    ValueTask<ImageAnnotationMeta> GetImageAnnotationMetaAsync(GetImageAnnotationMetaParameters parameters);
 }

@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
 using AyBorg.Web.Shared;
@@ -18,6 +19,7 @@ public partial class Annotate : ComponentBase
 
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
+    [Inject] IAnnotationManagerService AnnotationManagerService { get; init; } = null!;
     [Inject] IStateService StateService { get; init; } = null!;
     [Inject] NavigationManager NavigationManager { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
@@ -78,8 +80,22 @@ public partial class Annotate : ComponentBase
 
             _imageContainer = await FileManagerService.DownloadImageAsync(new FileManagerService.DownloadImageParameters(ProjectId, ImageName, false));
 
-            FileManagerService.ImageAnnotationMeta imageAnnotationMeta = await FileManagerService.GetImageAnnotationMetaAsync(new FileManagerService.GetImageAnnotationMetaParameters(ProjectId, ImageName));
-            _initialValues = _initialValues with { Tags = _initialValues.Tags.AddRange(imageAnnotationMeta.Tags) };
+            AnnotationManagerService.Meta imageAnnotationMeta = await AnnotationManagerService.GetMetaAsync(new AnnotationManagerService.GetMetaParameters(ProjectId, ImageName));
+
+            ImmutableList<RectangleLayer> layers = ImmutableList<RectangleLayer>.Empty;
+            foreach (string id in imageAnnotationMeta.LayerIds)
+            {
+                RectangleLayer layer = await AnnotationManagerService.GetRectangleLayer(new Services.Net.AnnotationManagerService.GetRectangleLayerParameters(ProjectId, ImageName, ProjectType.ObjectDetection, id));
+                ClassLabel classObj = targetProjectMeta!.Classes.First(c => c.Index == layer.ClassIndex);
+                layer = layer with { Shape = layer.Shape with { Color = classObj.ColorCode } };
+                layers = layers.Add(layer);
+            }
+
+            _initialValues = _initialValues with
+            {
+                Tags = _initialValues.Tags.AddRange(imageAnnotationMeta.Tags),
+                Layers = layers
+            };
             _tempValues = _initialValues with { };
 
         }
@@ -122,6 +138,11 @@ public partial class Annotate : ComponentBase
 
     private async Task AddClassClicked()
     {
+        if (string.IsNullOrEmpty(_newClassName) || string.IsNullOrWhiteSpace(_newClassName))
+        {
+            return;
+        }
+
         TempAddClass(_newClassName);
         _newClassName = string.Empty;
         await _addClassFieldRef.BlurAsync();
@@ -246,8 +267,16 @@ public partial class Annotate : ComponentBase
 
     private async Task SaveClicked()
     {
-        await SaveClassLabelsAsync();
-        _initialValues = _tempValues with { };
+        try
+        {
+            await SaveClassLabelsAsync();
+            await SaveAnnotationsAsync();
+            _initialValues = _tempValues with { };
+        }
+        catch (RpcException)
+        {
+            Snackbar.Add("Failed to save annotation!", Severity.Warning);
+        }
     }
 
     private bool IsSaveEnabled()
@@ -257,26 +286,47 @@ public partial class Annotate : ComponentBase
 
     private async ValueTask SaveClassLabelsAsync()
     {
-        try
+        foreach (ClassLabel cl in _tempValues.ClassLabels)
         {
-            foreach (ClassLabel cl in _tempValues.ClassLabels)
+            if (!_initialValues.ClassLabels.Contains(cl))
             {
-                if (!_initialValues.ClassLabels.Contains(cl))
-                {
-                    await ProjectManagerService.AddOrUpdateAsync(new ProjectManagerService.AddOrUpdateClassLabelParameters(ProjectId, cl));
-                    continue;
-                }
+                await ProjectManagerService.AddOrUpdateAsync(new ProjectManagerService.AddOrUpdateClassLabelParameters(ProjectId, cl));
+                continue;
+            }
 
-                ClassLabel initialCl = _initialValues.ClassLabels.First(c => c.Index.Equals(cl.Index));
-                if (!initialCl.Equals(cl))
-                {
-                    await ProjectManagerService.AddOrUpdateAsync(new ProjectManagerService.AddOrUpdateClassLabelParameters(ProjectId, cl));
-                }
+            ClassLabel initialCl = _initialValues.ClassLabels.First(c => c.Index.Equals(cl.Index));
+            if (!initialCl.Equals(cl))
+            {
+                await ProjectManagerService.AddOrUpdateAsync(new ProjectManagerService.AddOrUpdateClassLabelParameters(ProjectId, cl));
             }
         }
-        catch (RpcException)
+    }
+
+    private async ValueTask SaveAnnotationsAsync()
+    {
+        // Remove layer
+        foreach (RectangleLayer layer in _initialValues.Layers.Where(l => !_tempValues.Layers.Contains(l)))
         {
-            Snackbar.Add("Failed to change classes!", Severity.Warning);
+            await AnnotationManagerService.RemoveAsync(new Services.Net.AnnotationManagerService.RemoveParameters(
+                ProjectId,
+                ImageName,
+                layer.Id
+            ));
+        }
+
+        // Add layer
+        foreach (RectangleLayer layer in _tempValues.Layers.Where(l => !_initialValues.Layers.Contains(l)))
+        {
+            await AnnotationManagerService.AddAsync(new AnnotationManagerService.AddParameters(
+                    ProjectId,
+                    ImageName,
+                    ProjectType.ObjectDetection,
+                    layer.Id,
+                    layer.ClassIndex,
+                    new Point[] {
+                            new() { X = (int)layer.Shape.X, Y = (int)layer.Shape.Y  },
+                            new() { X = (int)layer.Shape.Width, Y = (int)layer.Shape.Height }
+                    }));
         }
     }
 

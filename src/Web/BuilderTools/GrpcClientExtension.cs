@@ -33,6 +33,7 @@ internal static class GrpcClientExtension
         // AyBorg.Net
         CreateClientFactory<ProjectManager.ProjectManagerClient>(builder, gatewayUrl);
         CreateClientFactory<FileManager.FileManagerClient>(builder, gatewayUrl);
+        CreateClientFactory<AnnotationManager.AnnotationManagerClient>(builder, gatewayUrl);
         return builder;
     }
 

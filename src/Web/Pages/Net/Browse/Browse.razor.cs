@@ -159,12 +159,19 @@ public partial class Browse : ComponentBase
     private void SelectAllClicked()
     {
         _selectedImageNames.Clear();
-        _selectedImageNames.AddRange(_allImageNames);
+        if (_activePanelIndex == 0)
+        {
+            _selectedImageNames.AddRange(_imageCollectionMeta.UnannotatedFileNames);
+        }
+        else
+        {
+            _selectedImageNames.AddRange(_imageCollectionMeta.AnnotatedFileNames);
+        }
     }
 
     private async Task AnnotateClicked()
     {
-        if(!_selectedImageNames.Any())
+        if (!_selectedImageNames.Any())
         {
             return;
         }

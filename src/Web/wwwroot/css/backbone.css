@@ -40,6 +40,9 @@ legend {
 .overflow-scroll {
     overflow: auto;
 }
+.mud-badge-default {
+    color: rgba(66,66,66,1) !important;
+}
 
 /*Blazor error message*/
 #blazor-error-ui {
