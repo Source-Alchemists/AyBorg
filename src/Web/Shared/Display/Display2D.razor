@@ -63,7 +63,7 @@
                                 y="@rectangle.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                                 width="@rectangle.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                                 height="@rectangle.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
-                                style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:2" />
+                                style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:@_shapeStrokeWidth" />
                         }
 
                         @if (_drawObject.IsDrawing)
@@ -72,13 +72,13 @@
                                 y="@_drawObject.Rect.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                                 width="@_drawObject.Rect.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                                 height="@_drawObject.Rect.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
-                                style="fill:transparent;stroke:red;stroke-width:2" />
+                                style="fill:transparent;stroke:red;stroke-width:@_shapeStrokeWidth" />
                         }
 
                         @if (_isCrossHairVisible)
                         {
-                            <line class="crosshair-line" x1="@_drawCrossHairX.Position1.X" y1="@_drawCrossHairX.Position1.Y" x2="@_drawCrossHairX.Position2.X" y2="@_drawCrossHairX.Position2.Y" stroke-dasharray="1" />
-                            <line class="crosshair-line" x1="@_drawCrossHairY.Position1.X" y1="@_drawCrossHairY.Position1.Y" x2="@_drawCrossHairY.Position2.X" y2="@_drawCrossHairY.Position2.Y" stroke-dasharray="1" />
+                            <line class="crosshair-line" x1="@_drawCrossHairX.Position1.X" y1="@_drawCrossHairX.Position1.Y" x2="@_drawCrossHairX.Position2.X" y2="@_drawCrossHairX.Position2.Y" stroke-dasharray="@_crossHairDash" style="stroke-width: @_crossHairStrokeWidth;" />
+                            <line class="crosshair-line" x1="@_drawCrossHairY.Position1.X" y1="@_drawCrossHairY.Position1.Y" x2="@_drawCrossHairY.Position2.X" y2="@_drawCrossHairY.Position2.Y" stroke-dasharray="@_crossHairDash" style="stroke-width: @_crossHairStrokeWidth;" />
                         }
                     </g>
                 </svg>
@@ -103,7 +103,7 @@
         {
             <MudText>X: @_drawCrossHairX.Position1.X Y: @_drawCrossHairY.Position1.Y</MudText>
         }
-        else 
+        else
         {
             <MudText>X: - Y: -</MudText>
         }
