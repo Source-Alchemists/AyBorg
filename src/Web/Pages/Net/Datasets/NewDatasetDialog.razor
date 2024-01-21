@@ -1,0 +1,30 @@
+<MudDialog>
+    <DialogContent>
+        <MudCheckBox T="bool" Label="Withdraw dataset images" @bind-Value="_withdraw" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelClicked">
+            Cancel
+        </MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateClicked">
+            Create Project
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    private bool _withdraw = false;
+
+    private void CancelClicked()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void CreateClicked()
+    {
+        MudDialog.Close(DialogResult.Ok(new Result(_withdraw)));
+    }
+
+    public record struct Result(bool Withdraw);
+}

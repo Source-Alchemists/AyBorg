@@ -69,12 +69,6 @@ builder.Services.AddScoped<IJwtConsumer, JwtConsumer>();
 
 WebApplication app = builder.Build();
 
-Console.WriteLine("Running with following settings:");
-foreach (KeyValuePair<string, string?> config in builder.Configuration.AsEnumerable())
-{
-    Console.WriteLine($"{config.Key} = {config.Value}");
-}
-
 app.UseAuthorization();
 app.UseJwtMiddleware();
 
@@ -103,6 +97,7 @@ app.MapGrpcService<AyBorg.Gateway.Services.Result.StoragePassthroughServiceV1>()
 app.MapGrpcService<AyBorg.Gateway.Services.Net.FileManagerPassthroughServiceV1>();
 app.MapGrpcService<AyBorg.Gateway.Services.Net.ProjectManagerPassthroughServiceV1>();
 app.MapGrpcService<AyBorg.Gateway.Services.Net.AnnotationManagerPassthroughServiceV1>();
+app.MapGrpcService<AyBorg.Gateway.Services.Net.DatasetManagerPassthroughServiceV1>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists

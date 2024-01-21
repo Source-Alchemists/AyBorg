@@ -12,6 +12,7 @@ public partial class Browse : ComponentBase
     [Inject] IStateService StateService { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
+    [Inject] IDatasetManagerService DatasetManagerService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
     [Inject] NavigationManager NavigationManager { get; init; } = null!;
 
@@ -177,6 +178,22 @@ public partial class Browse : ComponentBase
         }
 
         await ShowAnnotateAsync(_selectedImageNames[0]);
+    }
+
+    private async Task AddToDatasetClicked()
+    {
+        Console.WriteLine(_selectedImageNames.Count);
+        try
+        {
+            foreach (string imageName in _selectedImageNames)
+            {
+                await DatasetManagerService.AddImageAsync(new DatasetManagerService.AddImageParameters(ProjectId, string.Empty, imageName));
+            }
+        }
+        catch (RpcException)
+        {
+            Snackbar.Add("Failed to add images to dataset!", Severity.Warning);
+        }
     }
 
     private async Task ThumbnailAnnotateClicked(string value)

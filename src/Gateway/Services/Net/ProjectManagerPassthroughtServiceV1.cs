@@ -51,9 +51,9 @@ public sealed class ProjectManagerPassthroughServiceV1 : ProjectManager.ProjectM
         {
             ProjectManager.ProjectManagerClient client = _channelService.CreateClient<ProjectManager.ProjectManagerClient>(channel.ServiceUniqueName);
             AsyncServerStreamingCall<ProjectMeta> response = client.GetMetas(request, headers: headers, cancellationToken: context.CancellationToken);
-            await foreach (ProjectMeta? changeset in response.ResponseStream.ReadAllAsync(cancellationToken: context.CancellationToken))
+            await foreach (ProjectMeta? projectMeta in response.ResponseStream.ReadAllAsync(cancellationToken: context.CancellationToken))
             {
-                await responseStream.WriteAsync(changeset, cancellationToken: context.CancellationToken);
+                await responseStream.WriteAsync(projectMeta, cancellationToken: context.CancellationToken);
             }
         });
     }

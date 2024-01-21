@@ -24,11 +24,12 @@
                 <MudIconButton Variant="Variant.Text" Color="Color.Secondary" Icon="@Icons.Material.Filled.Deselect" OnClick="@DeselectAllClicked" />
                 <MudIconButton Variant="Variant.Text" Color="Color.Secondary" Icon="@Icons.Material.Filled.SelectAll" OnClick="@SelectAllClicked" />
             </MudHidden>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Draw" 
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.Draw"
                 Disabled="@(!_isEditButtonEnabled)" hidden="@(!_isAnnotateVisible)"
                 OnClick="@AnnotateClicked">Annotate</MudButton>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddBox" 
-                Disabled="@(!_isEditButtonEnabled)" hidden="@(!_isAddToDatasetVisible)">Add to
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" StartIcon="@Icons.Material.Filled.AddBox"
+                Disabled="@(!_isEditButtonEnabled)" hidden="@(!_isAddToDatasetVisible)"
+                OnClick="@AddToDatasetClicked">Add to
                 Dataset</MudButton>
         </CardHeaderActions>
     </MudCardHeader>
@@ -88,7 +89,7 @@
                             </MudStack>
                         </TabContent>
                         <ChildContent>
-                            <ImagesGrid ProjectId="@ProjectId" 
+                            <ImagesGrid ProjectId="@ProjectId"
                                 ImageNames="@_imageCollectionMeta.AnnotatedFileNames"
                                 SelectedImageNames="@_selectedImageNames"
                                 OnThumbnailSelectionChanged="@ThumbnailSelectionChanged"

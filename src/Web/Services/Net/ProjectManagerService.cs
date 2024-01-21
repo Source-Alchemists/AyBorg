@@ -34,7 +34,7 @@ public class ProjectManagerService : IProjectManagerService
         }
         catch (RpcException ex)
         {
-            _logger.LogWarning(new EventId((int)EventLogType.Connect), ex, "Failed to connect");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Failed to get project metas!");
             throw;
         }
     }
@@ -62,7 +62,7 @@ public class ProjectManagerService : IProjectManagerService
         }
         catch (Exception ex)
         {
-            _logger.LogWarning(new EventId((int)EventLogType.ProjectSaved), ex, "Failed to create project");
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectSaved), ex, "Failed to create project!");
             throw;
         }
     }
