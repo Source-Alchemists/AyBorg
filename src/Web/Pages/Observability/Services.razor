@@ -6,62 +6,72 @@
 
 <PageTitle>Observability/Services | AyBorg</PageTitle>
 
-@if (serviceEntries == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <MudGrid class="pt-6">
-        <MudItem xs="12">
-            <MudCard Class="rounded-lg">
-                <MudCardHeader>
-                    <CardHeaderAvatar>
-                        <MudIcon Icon="@Icons.Material.Filled.Storage" Size="Size.Large" />
-                    </CardHeaderAvatar>
-                    <CardHeaderContent>
-				        <MudText Typo="Typo.h6">Services</MudText>
-                    </CardHeaderContent>
-                    <CardHeaderActions>
-                        <MudIconButton Icon="@Icons.Material.Filled.Sync" Color="Color.Primary" OnClick="@OnRefreshAsync" Loading="@isRefreshing" />
-                    </CardHeaderActions>
-			    </MudCardHeader>
-                <MudCardContent>
-                    <MudTable Items="@serviceEntries" Hover="true" Elevation="0">
-                        <HeaderContent>
-                            <MudTh>Name</MudTh>
-                            <MudTh>Unique name</MudTh>
-                            <MudTh>Url</MudTh>
-                            <MudTh>Version</MudTh>
-                            <MudTh>Type</MudTh>
-                        </HeaderContent>
-                        <RowTemplate>
-                            <MudTd DataLabel="Name">@context.Name</MudTd>
-                            <MudTd DataLabel="Unique name">@context.UniqueName</MudTd>
-                            <MudTd DataLabel="Url">@context.Url</MudTd>
-                            <MudTd DataLabel="Version">@context.Version</MudTd>
-                            <MudTd DataLabel="Type">@context.Type</MudTd>
-                        </RowTemplate>
-                    </MudTable>
-                </MudCardContent>
-            </MudCard>
-        </MudItem>
-    </MudGrid>
-}
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
 
-@code  {
-        private IEnumerable<ServiceInfoEntry>? serviceEntries;
-        private bool isRefreshing = false;
+<MudCard Class="rounded-lg">
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudIcon Icon="@Icons.Material.Filled.Storage" Size="Size.Large" />
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Services</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudIconButton Icon="@Icons.Material.Filled.Sync" Color="Color.Primary" OnClick="@UpdateAsync"
+                Loading="@_isLoading" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTable Items="@serviceEntries" Hover="true" Elevation="0">
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Unique name</MudTh>
+                <MudTh>Url</MudTh>
+                <MudTh>Version</MudTh>
+                <MudTh>Type</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">@context.Name</MudTd>
+                <MudTd DataLabel="Unique name">@context.UniqueName</MudTd>
+                <MudTd DataLabel="Url">@context.Url</MudTd>
+                <MudTd DataLabel="Version">@context.Version</MudTd>
+                <MudTd DataLabel="Type">@context.Type</MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>
 
-        protected override async Task OnInitializedAsync()
+@code {
+    [Inject] ISnackbar Snackbar { get; init; } = null!;
+    private IEnumerable<ServiceInfoEntry>? serviceEntries;
+    private bool _isLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await base.OnAfterRenderAsync(firstRender);
+
+        if (firstRender)
+        {
+            await UpdateAsync();
+        }
+    }
+
+    private async Task UpdateAsync()
+    {
+        _isLoading = true;
+
+        try
         {
             serviceEntries = await registryService.ReceiveServicesAsync();
         }
-
-        private async Task OnRefreshAsync()
+        catch (Grpc.Core.RpcException)
         {
-            isRefreshing = true;
-            serviceEntries = await registryService.ReceiveServicesAsync();
-            isRefreshing = false;
+            Snackbar.Add("Failed to receive service informations!", Severity.Warning);
         }
+
+        _isLoading = false;
+        await InvokeAsync(StateHasChanged);
+    }
 }
