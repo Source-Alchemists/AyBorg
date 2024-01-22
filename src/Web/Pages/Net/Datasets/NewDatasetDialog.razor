@@ -13,7 +13,7 @@
 </MudDialog>
 
 @code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
+    [CascadingParameter] MudDialogInstance MudDialog { get; init; } = null!;
     private bool _withdraw = false;
 
     private void CancelClicked()

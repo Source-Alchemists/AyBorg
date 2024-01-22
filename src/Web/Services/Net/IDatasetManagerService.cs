@@ -8,4 +8,5 @@ public interface IDatasetManagerService
     ValueTask<Shared.Models.Net.DatasetMeta> CreateAsync(CreateParameters parameters);
     ValueTask AddImageAsync(AddImageParameters parameters);
     ValueTask EditAsync(EditParameters parameters);
+    ValueTask GenerateAsync(GenerateParameters parameters);
 }

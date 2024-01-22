@@ -52,22 +52,27 @@ public partial class Datasets : ComponentBase
                 }
             }
 
-            try
-            {
-                IEnumerable<DatasetMeta> datasetMetas = await DatasetManagerService.GetMetasAsync(new DatasetManagerService.GetMetasParameters(ProjectId));
-                _activeDataset = datasetMetas.First(d => d.IsActive);
-                _completedDatasets = datasetMetas.Where(d => !d.IsActive);
-                _tempDataset = _activeDataset with { };
-                CalcDistribution();
-                UpdateGenerateButton();
-            }
-            catch (RpcException)
-            {
-                Snackbar.Add("Failed to get dataset informantions!", Severity.Warning);
-            }
+            await UpdateMetaCollectionAsync();
 
             _isLoading = false;
             await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task UpdateMetaCollectionAsync()
+    {
+        try
+        {
+            IEnumerable<DatasetMeta> datasetMetas = await DatasetManagerService.GetMetasAsync(new DatasetManagerService.GetMetasParameters(ProjectId));
+            _activeDataset = datasetMetas.First(d => d.IsActive);
+            _completedDatasets = datasetMetas.Where(d => !d.IsActive);
+            _tempDataset = _activeDataset with { };
+            CalcDistribution();
+            UpdateGenerateButton();
+        }
+        catch (RpcException)
+        {
+            Snackbar.Add("Failed to get dataset informantions!", Severity.Warning);
         }
     }
 
@@ -131,7 +136,8 @@ public partial class Datasets : ComponentBase
 
     private async Task NewDraftClicked()
     {
-        IDialogReference dialogReference = DialogService.Show<NewDatasetDialog>("New Dataset Draft", new DialogOptions {
+        IDialogReference dialogReference = DialogService.Show<NewDatasetDialog>("New Dataset Draft", new DialogOptions
+        {
             MaxWidth = MaxWidth.Medium,
             FullWidth = true,
             CloseButton = true
@@ -144,6 +150,28 @@ public partial class Datasets : ComponentBase
             DatasetMeta newDatasetMeta = await DatasetManagerService.CreateAsync(new DatasetManagerService.CreateParameters(ProjectId, res.Withdraw));
             _activeDataset = newDatasetMeta;
             _tempDataset = _activeDataset with { };
+            await InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private async Task GenerateClicked()
+    {
+        IDialogReference dialogReference = DialogService.Show<GenerateDatasetDialog>("Generate Dataset", new DialogParameters {
+            { "ProjectId", ProjectId },
+            { "DatasetId", _tempDataset.Id }
+        }, new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true,
+            CloseButton = false
+        });
+
+        DialogResult result = await dialogReference.Result;
+        if (!result.Canceled)
+        {
+            _isLoading = true;
+            await UpdateMetaCollectionAsync();
+            _isLoading = false;
             await InvokeAsync(StateHasChanged);
         }
     }

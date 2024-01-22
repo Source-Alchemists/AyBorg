@@ -101,6 +101,25 @@ public class DatasetManagerService : IDatasetManagerService
         }
     }
 
+    public async ValueTask GenerateAsync(GenerateParameters parameters)
+    {
+        try
+        {
+            await _datasetManagerClient.GenerateAsync(new GenerateRequest
+            {
+                ProjectId = parameters.ProjectId,
+                Id = parameters.DatasetId
+            });
+
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Generated new dataset for project [{ProjectId}], draft [{DatasetId}]", parameters.ProjectId, parameters.DatasetId);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Failed to generate dataset!");
+            throw;
+        }
+    }
+
     private static Shared.Models.Net.DatasetMeta ToModel(DatasetMeta datasetMetaDto)
     {
         DateTime archieved_date = DateTime.MinValue;
@@ -127,4 +146,5 @@ public class DatasetManagerService : IDatasetManagerService
     public sealed record CreateParameters(string ProjectId, bool Withdraw);
     public sealed record AddImageParameters(string ProjectId, string DatasetId, string ImageName);
     public sealed record EditParameters(string ProjectId, Shared.Models.Net.DatasetMeta Meta);
+    public sealed record GenerateParameters(string ProjectId, string DatasetId);
 }
