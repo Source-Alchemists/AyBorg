@@ -9,6 +9,7 @@ public partial class ImagesGrid : ComponentBase
     [Parameter, EditorRequired] public string ProjectId { get; init; } = string.Empty;
     [Parameter, EditorRequired] public IEnumerable<string> ImageNames { get; init; } = null!;
     [Parameter, EditorRequired] public List<string> SelectedImageNames { get; init; } = null!;
+    [Parameter, EditorRequired] public IEnumerable<string> DatasetImageNames { get; init; } = null!;
     [Parameter] public EventCallback OnThumbnailSelectionChanged { get; set; }
     [Parameter] public EventCallback<string> OnThumbnailAnnotateClicked { get; set; }
 
@@ -83,5 +84,10 @@ public partial class ImagesGrid : ComponentBase
     private bool IsSelectedImageName(string imageName)
     {
         return SelectedImageNames.Exists(x => x.Equals(imageName, StringComparison.InvariantCultureIgnoreCase));
+    }
+
+    private bool IsImageUsedInDataset(string imageName)
+    {
+        return DatasetImageNames.Any(x => x.Equals(imageName, StringComparison.InvariantCultureIgnoreCase));
     }
 }

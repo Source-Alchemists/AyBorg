@@ -39,6 +39,31 @@ public class DatasetManagerService : IDatasetManagerService
         }
     }
 
+    public async ValueTask<IEnumerable<string>> GetImageNamesAsync(GetImageNamesParameters parameters)
+    {
+        try
+        {
+            AsyncServerStreamingCall<ImageInfo> response = _datasetManagerClient.GetImageNames(new GetImagesRequest
+            {
+                ProjectId = parameters.ProjectId,
+                Id = parameters.DatasetId
+            });
+
+            var imageNames = new List<string>();
+            await foreach (ImageInfo imageInfoDto in response.ResponseStream.ReadAllAsync())
+            {
+                imageNames.Add(imageInfoDto.Name);
+            }
+
+            return imageNames;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Failed to get dataset image names!");
+            throw;
+        }
+    }
+
     public async ValueTask<Shared.Models.Net.DatasetMeta> CreateAsync(CreateParameters parameters)
     {
         try
@@ -176,6 +201,7 @@ public class DatasetManagerService : IDatasetManagerService
     }
 
     public sealed record GetMetasParameters(string ProjectId);
+    public sealed record GetImageNamesParameters(string ProjectId, string DatasetId);
     public sealed record CreateParameters(string ProjectId, bool Withdraw);
     public sealed record DeleteParameters(string ProjectId, string DatasetId);
     public sealed record AddImageParameters(string ProjectId, string DatasetId, string ImageName);

@@ -22,6 +22,7 @@ public partial class Browse : ComponentBase
     private bool _isLoading = true;
     private FileManagerService.ImageCollectionMeta _imageCollectionMeta = new(Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>(), Array.Empty<string>());
     private List<string> _allImageNames = new();
+    private IEnumerable<string> _datasetUsedImageNames = Array.Empty<string>();
     private IEnumerable<string> _allBatchNames = Array.Empty<string>();
     private SplitGroup _selectedGroup = SplitGroup.All;
     private string _selectedGroupName = "ALL";
@@ -85,6 +86,8 @@ public partial class Browse : ComponentBase
                             batchName,
                             splitGroup,
                             tags));
+
+        _datasetUsedImageNames = await DatasetManagerService.GetImageNamesAsync(new DatasetManagerService.GetImageNamesParameters(ProjectId, string.Empty));
         _selectedImageNames.Clear();
         _allImageNames.Clear();
         _allImageNames.AddRange(_imageCollectionMeta.UnannotatedFileNames);

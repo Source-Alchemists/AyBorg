@@ -9,6 +9,7 @@ public partial class ImageThumbnail : ComponentBase
     [Parameter, EditorRequired] public string ProjectId { get; init; } = string.Empty;
     [Parameter, EditorRequired] public string ImageName { get; init; } = string.Empty;
     [Parameter, EditorRequired] public bool Selected { get; set; } = false;
+    [Parameter] public bool DatasetUsed { get; init; } = false;
     [Parameter] public EventCallback<SelectChangedArgs> OnSelectChanged { get; set; }
     [Parameter] public EventCallback<string> OnAnnotateClicked { get; set; }
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;

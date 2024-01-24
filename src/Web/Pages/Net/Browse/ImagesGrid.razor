@@ -5,7 +5,12 @@
     @foreach (var imageName in _selectedImageNameBatch)
     {
         <MudItem xs="12" md="3">
-            <ImageThumbnail ProjectId="@ProjectId" ImageName="@imageName" Selected=@(IsSelectedImageName(imageName)) OnSelectChanged="@ThumbnailSelectChanged" OnAnnotateClicked="@ThumbnailAnnotateClicked" />
+            <ImageThumbnail ProjectId="@ProjectId"
+                            ImageName="@imageName"
+                            Selected=@(IsSelectedImageName(imageName))
+                            DatasetUsed="@(IsImageUsedInDataset(imageName))"
+                            OnSelectChanged="@ThumbnailSelectChanged"
+                            OnAnnotateClicked="@ThumbnailAnnotateClicked" />
         </MudItem>
     }
     <MudItem xs="12" class="d-flex flex-column">

@@ -102,4 +102,20 @@ public sealed class DatasetManagerPassthroughServiceV1 : DatasetManager.DatasetM
             }
         });
     }
+
+    public override async Task GetImageNames(GetImagesRequest request, IServerStreamWriter<ImageInfo> responseStream, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Auditor, Roles.Reviewer });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+
+        await Parallel.ForEachAsync(channels, async (channel, token) =>
+        {
+            DatasetManager.DatasetManagerClient client = _channelService.CreateClient<DatasetManager.DatasetManagerClient>(channel.ServiceUniqueName);
+            AsyncServerStreamingCall<ImageInfo> response = client.GetImageNames(request, headers: headers, cancellationToken: context.CancellationToken);
+            await foreach (ImageInfo datasetMeta in response.ResponseStream.ReadAllAsync(cancellationToken: context.CancellationToken))
+            {
+                await responseStream.WriteAsync(datasetMeta, cancellationToken: context.CancellationToken);
+            }
+        });
+    }
 }

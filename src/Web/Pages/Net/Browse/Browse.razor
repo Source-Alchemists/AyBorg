@@ -74,6 +74,7 @@
                             <ImagesGrid ProjectId="@ProjectId"
                                 ImageNames="@_imageCollectionMeta.UnannotatedFileNames"
                                 SelectedImageNames="@_selectedImageNames"
+                                DatasetImageNames="@_datasetUsedImageNames"
                                 OnThumbnailSelectionChanged="@ThumbnailSelectionChanged"
                                 OnThumbnailAnnotateClicked="@ThumbnailAnnotateClicked" />
                         </ChildContent>
@@ -92,6 +93,7 @@
                             <ImagesGrid ProjectId="@ProjectId"
                                 ImageNames="@_imageCollectionMeta.AnnotatedFileNames"
                                 SelectedImageNames="@_selectedImageNames"
+                                DatasetImageNames="@_datasetUsedImageNames"
                                 OnThumbnailSelectionChanged="@ThumbnailSelectionChanged"
                                 OnThumbnailAnnotateClicked="@ThumbnailAnnotateClicked" />
                         </ChildContent>
