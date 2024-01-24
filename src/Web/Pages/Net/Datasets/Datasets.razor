@@ -77,5 +77,37 @@
         </CardHeaderContent>
     </MudCardHeader>
     <MudCardContent>
+        <MudTable Items="@_generatedDatasets" Elevation="0" Hover>
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Created</MudTh>
+                <MudTh>Generated</MudTh>
+                <MudTh>Distribution (T|V|T)</MudTh>
+                <MudTh>Comment</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">
+                    @context.Name
+                </MudTd>
+                <MudTd DataLabel="Created">
+                    @context.CreationDate
+                </MudTd>
+                <MudTd DataLabel="Generated">
+                    @context.GeneratedDate
+                </MudTd>
+                <MudTd DataLabel="Distribution">
+                    <MudStack Row>
+                    <MudText Color="Color.Primary">@context.Distribution.ElementAt(0)</MudText> | <MudText Color="Color.Secondary">@context.Distribution.ElementAt(1)</MudText> | <MudText Color="Color.Tertiary">@context.Distribution.ElementAt(2)</MudText>
+                    </MudStack>
+                </MudTd>
+                <MudTd DataLabel="Comment">
+                    @context.Comment
+                </MudTd>
+                <MudTd>
+                    <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="@(() => DeleteDatasetClicked(context))" />
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
     </MudCardContent>
 </MudCard>

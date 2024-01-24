@@ -71,7 +71,7 @@ public partial class Projects : ComponentBase
         var options = new DialogOptions();
         var parameters = new DialogParameters
         {
-            {"NeedPassword", true},
+            { "NeedPassword", true },
             { "ContentText", $"Are you sure you want to delete project '{project.Name}'? This action cannot be undone." }
         };
         IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete Project", parameters, options);

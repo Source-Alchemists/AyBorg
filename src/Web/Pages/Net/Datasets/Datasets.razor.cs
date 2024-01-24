@@ -1,5 +1,7 @@
+using System.Collections.Immutable;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
+using AyBorg.Web.Shared.Modals;
 using AyBorg.Web.Shared.Models.Net;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
@@ -19,7 +21,7 @@ public partial class Datasets : ComponentBase
     private bool _isLoading = true;
     private DatasetMeta _tempDataset = new();
     private DatasetMeta _activeDataset = new();
-    private IEnumerable<DatasetMeta> _completedDatasets = Array.Empty<DatasetMeta>();
+    private ImmutableList<DatasetMeta> _generatedDatasets = ImmutableList<DatasetMeta>.Empty;
     private float _trainDistribution = float.NaN;
     private float _valDistribution = float.NaN;
     private float _testDistribution = float.NaN;
@@ -65,7 +67,8 @@ public partial class Datasets : ComponentBase
         {
             IEnumerable<DatasetMeta> datasetMetas = await DatasetManagerService.GetMetasAsync(new DatasetManagerService.GetMetasParameters(ProjectId));
             _activeDataset = datasetMetas.First(d => d.IsActive);
-            _completedDatasets = datasetMetas.Where(d => !d.IsActive);
+            _generatedDatasets = _generatedDatasets.Clear();
+            _generatedDatasets = _generatedDatasets.AddRange(datasetMetas.Where(d => !d.IsActive).OrderByDescending(d => d.GeneratedDate));
             _tempDataset = _activeDataset with { };
             CalcDistribution();
             UpdateGenerateButton();
@@ -127,6 +130,7 @@ public partial class Datasets : ComponentBase
             ));
 
             _activeDataset = _tempDataset with { };
+            UpdateSaveButton();
         }
         catch (RpcException)
         {
@@ -174,5 +178,32 @@ public partial class Datasets : ComponentBase
             _isLoading = false;
             await InvokeAsync(StateHasChanged);
         }
+    }
+
+    private async Task DeleteDatasetClicked(DatasetMeta value)
+    {
+        try
+        {
+            IDialogReference dialogReference = DialogService.Show<ConfirmDialog>("Delete Dataset", new DialogParameters {
+                { "NeedPassword", true },
+                { "ContentText", "Are you sure you want to delete the dataset? This action cannot be undone!"}
+            });
+
+            DialogResult result = await dialogReference.Result;
+            if (!result.Canceled)
+            {
+                _isLoading = true;
+                await DatasetManagerService.DeleteAsync(new DatasetManagerService.DeleteParameters(ProjectId, value.Id));
+                _generatedDatasets = _generatedDatasets.Remove(value);
+                Snackbar.Add("Dataset deleted", Severity.Success);
+            }
+        }
+        catch (RpcException)
+        {
+            Snackbar.Add("Failed to delete dataset", Severity.Warning);
+        }
+
+        _isLoading = false;
+        await InvokeAsync(StateHasChanged);
     }
 }

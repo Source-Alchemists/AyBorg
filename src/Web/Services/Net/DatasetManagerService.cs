@@ -50,12 +50,31 @@ public class DatasetManagerService : IDatasetManagerService
             });
 
             Shared.Models.Net.DatasetMeta model = ToModel(response);
-            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Created new dataset draft for porject {ProjectId}", parameters.ProjectId);
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Created new dataset draft for project {ProjectId}", parameters.ProjectId);
             return model;
         }
         catch (RpcException ex)
         {
             _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Failed to create new dataset!");
+            throw;
+        }
+    }
+
+    public async ValueTask DeleteAsync(DeleteParameters parameters)
+    {
+        try
+        {
+            await _datasetManagerClient.DeleteAsync(new DeleteRequest
+            {
+                ProjectId = parameters.ProjectId,
+                Id = parameters.DatasetId
+            });
+
+            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Deleted dataset from project {ProjectId} with id {DatasetId}", parameters.ProjectId, parameters.DatasetId);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Failed to delete dataset!");
             throw;
         }
     }
@@ -108,7 +127,21 @@ public class DatasetManagerService : IDatasetManagerService
             await _datasetManagerClient.GenerateAsync(new GenerateRequest
             {
                 ProjectId = parameters.ProjectId,
-                Id = parameters.DatasetId
+                Id = parameters.DatasetId,
+                Options = new Ayborg.Gateway.Net.V1.GenerateOptions
+                {
+                    SampleRate = parameters.Options.SampleRate,
+                    MaxSize = parameters.Options.MaxSize,
+                    FlipHorizontalProbability = parameters.Options.FlipHorizontalProbability,
+                    FlipVerticalProbability = parameters.Options.FlipVerticalProbability,
+                    Rotate90Probability = parameters.Options.Rotate90Probability,
+                    ScaleProbability = parameters.Options.ScaleProbability,
+                    PixelDropoutProbability = parameters.Options.PixelDropoutProbability,
+                    ChannelShuffelProbability = parameters.Options.ChannelShuffleProbability,
+                    IsoNoiseProbability = parameters.Options.IsoNoiseProbability,
+                    GaussNoiseProbability = parameters.Options.GaussNoiseProbability,
+                    BrightnessAndContrastProbability = parameters.Options.BrightnessAndContrastProbability
+                }
             });
 
             _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Generated new dataset for project [{ProjectId}], draft [{DatasetId}]", parameters.ProjectId, parameters.DatasetId);
@@ -144,7 +177,22 @@ public class DatasetManagerService : IDatasetManagerService
 
     public sealed record GetMetasParameters(string ProjectId);
     public sealed record CreateParameters(string ProjectId, bool Withdraw);
+    public sealed record DeleteParameters(string ProjectId, string DatasetId);
     public sealed record AddImageParameters(string ProjectId, string DatasetId, string ImageName);
     public sealed record EditParameters(string ProjectId, Shared.Models.Net.DatasetMeta Meta);
-    public sealed record GenerateParameters(string ProjectId, string DatasetId);
+    public sealed record GenerateParameters(string ProjectId, string DatasetId, GenerateOptions Options);
+    public sealed record GenerateOptions
+    {
+        public int MaxSize { get; init; } = 1024;
+        public float FlipHorizontalProbability { get; init; } = 0f;
+        public float FlipVerticalProbability { get; init; } = 0f;
+        public float Rotate90Probability { get; init; } = 0f;
+        public float ScaleProbability { get; init; } = 0f;
+        public float PixelDropoutProbability { get; init; } = 0f;
+        public float ChannelShuffleProbability { get; init; } = 0f;
+        public float IsoNoiseProbability { get; init; } = 0f;
+        public float GaussNoiseProbability { get; init; } = 0f;
+        public float BrightnessAndContrastProbability { get; init; } = 0f;
+        public int SampleRate { get; init; } = 10;
+    }
 }

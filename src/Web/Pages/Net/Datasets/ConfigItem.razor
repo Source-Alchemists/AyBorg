@@ -1,0 +1,38 @@
+<div class="mud-paper mud-card mud-elevation-1">
+    <MudText Typo="Typo.subtitle1" Class="pt-2 pl-2">@Label</MudText>
+    <div class="d-flex flex-row px-6 pb-3">
+        @if (DisplayActivation)
+        {
+            <MudSwitch T="bool" Color="Color.Primary" Value="@Probability.IsActive" ValueChanged="@OnActiveChanged" />
+        }
+        @if (DisplayProbability)
+        {
+            <MudSlider Min="0.2f" Max="1.0f" Step="0.01f" @bind-Value="Probability.Value" Disabled="@(!Probability.IsActive)">
+                Probability: @_probabilityText
+            </MudSlider>
+        }
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public string Label { get; init; } = string.Empty;
+    [Parameter, EditorRequired] public ProbabilityObject Probability { get; init; } = null!;
+    [Parameter] public EventCallback<bool> ActiveChanged { get; set; }
+    [Parameter] public bool DisplayActivation { get; set; } = true;
+    [Parameter] public bool DisplayProbability { get; init; } = true;
+    [Parameter] public RenderFragment ChildContent { get; init; } = null!;
+
+    private string _probabilityText => Probability.IsActive ? $"{Math.Round(Probability.Value * 100f, 0)}%" : "Off";
+
+    private async Task OnActiveChanged(bool value)
+    {
+        Probability.IsActive = value;
+        await ActiveChanged.InvokeAsync(value);
+    }
+
+    public record ProbabilityObject {
+        public bool IsActive { get; set; } = false;
+        public float Value { get; set; } = 0.5f;
+    }
+}
