@@ -315,7 +315,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
       - Kestrel:Endpoints:gRPC:Url=http://ayborg_gateway:6000
-      - AyBorg:Service:Url=http://ayborg_gateway:6000
       - ElasticApm:Enabled=true
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
       - ElasticApm:SecretToken=${ELASTIC_APM_SECRET_TOKEN}
@@ -336,7 +335,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
       - Kestrel:Endpoints:gRPC:Url=http://ayborg_log:6001
-      - AyBorg:Service:Url=http://ayborg_log:6001
       - AyBorg:Gateway:Url=http://ayborg_gateway:6000
       - ElasticApm:Enabled=true
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
@@ -364,7 +362,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
       - ASPNETCORE_Kestrel__Certificates__Default__Password=1234
       - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/demo-cert.pfx
-      - AyBorg:Service:Url=https://ayborg_web:6011
+      - Kestrel:Endpoints:Https:Url=https://ayborg_web:6011
       - AyBorg:Gateway:Url=http://ayborg_gateway:6000
       - ElasticApm:Enabled=true
       - ElasticApm:ServerUrl=http://host.docker.internal:8200
@@ -392,7 +390,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
       - Kestrel:Endpoints:gRPC:Url=http://ayborg_agent-internal-1:6020
-      - AyBorg:Service:Url=http://ayborg_agent-internal-1:6020
       - AyBorg:Service:DisplayName=Agent.Internal-1
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-1
       - AyBorg:Gateway:Url=http://ayborg_gateway:6000
@@ -420,8 +417,7 @@ services:
       - ./misc/demo/img:/ayborg/img:rw
     environment:
       - ASPNETCORE_ENVIRONMENT=${ENVIRONMENT}
-      - Kestrel:Endpoints:gRPC:Url=http://ayborg_agent-internal-3:6020
-      - AyBorg:Service:Url=http://ayborg_agent-internal-3:6020
+      - Kestrel:Endpoints:gRPC:Url=http://ayborg_agent-internal-2:6020
       - AyBorg:Service:DisplayName=Agent.Internal-2
       - AyBorg:Service:UniqueName=AyBorg.Agent.Internal-2
       - AyBorg:Gateway:Url=http://ayborg_gateway:6000
