@@ -55,7 +55,7 @@ builder.Services.AddGrpc();
 builder.Services.AddGrpcClient<EventLog.EventLogClient>(options =>
 {
     options.ChannelOptionsActions.Add(o => o.UnsafeUseInsecureChannelCallCredentials = true);
-    options.Address = new Uri(builder.Configuration.GetValue("AyBorg:Service:Url", "http://localhost:5000")!);
+    options.Address = new Uri(builder.Configuration.GetValue("Kestrel:Endpoints:gRPC:Url", "http://localhost:6000")!);
 });
 
 builder.AddAyBorgAnalyticsLogger();

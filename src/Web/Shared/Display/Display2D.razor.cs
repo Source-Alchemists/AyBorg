@@ -34,7 +34,6 @@ public partial class Display2D : ComponentBase
     private int _svgHeight = 0;
     private float _svgScaleFactor = 1f;
     private float _userScaleFactor = 1f;
-    private string _imageTooltip => $"Width: {_imagePosition.Width} Height: {_imagePosition.Height}\nX: {_drawCrossHairX.Position1.X} Y: {_drawCrossHairY.Position1.Y}";
     private string _crossHairStrokeWidth => $"{_shapeStrokeWidth}px";
     private int _crossHairDash => (int)(2f/_svgScaleFactor);
     private int _shapeStrokeWidth => (int)(2f/_svgScaleFactor);

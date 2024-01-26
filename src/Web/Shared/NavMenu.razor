@@ -85,15 +85,12 @@
 {
     <AuthorizeView Roles="Administrator, Auditor">
     <Authorized>
-        <MudNavGroup Title="@(_auditTitle)" Icon="@Icons.Material.Filled.Assignment" Expanded="@(_isAuditAvailable)"
-            Disabled="@(!_isAuditAvailable)" HideExpandIcon>
-            <MudNavLink Href="audit/reports/create" Match="NavLinkMatch.All">
-                Create Report
-            </MudNavLink>
-            <MudNavLink Href="audit/reports" Match="NavLinkMatch.All">
-                Saved Reports
-            </MudNavLink>
-        </MudNavGroup>
+        <MudNavLink Href="audit/reports/create" Match="NavLinkMatch.All">
+            Create Report
+        </MudNavLink>
+        <MudNavLink Href="audit/reports" Match="NavLinkMatch.All">
+            Saved Reports
+        </MudNavLink>
     </Authorized>
 </AuthorizeView>
 }
