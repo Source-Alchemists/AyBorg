@@ -130,6 +130,7 @@ builder.Services.AddScoped<AyBorg.Web.Services.Net.IProjectManagerService, AyBor
 builder.Services.AddScoped<AyBorg.Web.Services.Net.IFileManagerService, AyBorg.Web.Services.Net.FileManagerService>();
 builder.Services.AddScoped<AyBorg.Web.Services.Net.IAnnotationManagerService, AyBorg.Web.Services.Net.AnnotationManagerService>();
 builder.Services.AddScoped<AyBorg.Web.Services.Net.IDatasetManagerService, AyBorg.Web.Services.Net.DatasetManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Net.IJobManagerService, AyBorg.Web.Services.Net.JobManagerService>();
 
 builder.Services.AddTransient<ITokenProvider, TokenProvider>();
 builder.Services.AddTransient<IStorageService, StorageService>();

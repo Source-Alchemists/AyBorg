@@ -116,7 +116,7 @@ public partial class NewProjectDialog : ComponentBase
             Snackbar.Add($"Project '{_projectName}' created", Severity.Info);
             if (StateService.NetState == null || string.IsNullOrEmpty(StateService.NetState.ProjectId))
             {
-                await StateService.SetNetStateAsync(new Shared.Models.UiNetState(projectMeta));
+                await StateService.SetNetStateAsync(new Web.Shared.Models.UiNetState(projectMeta));
                 NavigationManager.NavigateTo($"net/upload/{projectMeta.Id}");
             }
             MudDialog.Close();

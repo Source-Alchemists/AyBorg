@@ -105,7 +105,12 @@
                     @context.Comment
                 </MudTd>
                 <MudTd>
-                    <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="@(() => DeleteDatasetClicked(context))" />
+                    <MudTooltip Text="Start Model Training">
+                        <MudIconButton Icon="@Icons.Material.Filled.ModelTraining" Color="Color.Primary" OnClick="@(() => StartModelTrainingClicked(context))" />
+                    </MudTooltip>
+                    <MudTooltip Text="Delete Dataset">
+                        <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="@(() => DeleteDatasetClicked(context))" />
+                    </MudTooltip>
                 </MudTd>
             </RowTemplate>
         </MudTable>

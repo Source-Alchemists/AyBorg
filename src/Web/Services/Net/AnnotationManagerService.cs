@@ -20,7 +20,7 @@ public class AnnotationManagerService : IAnnotationManagerService
     {
         try
         {
-            Ayborg.Gateway.Net.V1.Meta response = await _annotationManagerClient.GetMetaAsync(new GetMetaRequest
+            AnnotationMeta response = await _annotationManagerClient.GetMetaAsync(new GetAnnotationMetaRequest
             {
                 ProjectId = parameters.ProjectId,
                 ImageName = parameters.ImageName
@@ -39,7 +39,7 @@ public class AnnotationManagerService : IAnnotationManagerService
     {
         try
         {
-            Layer response = await _annotationManagerClient.GetAsync(new GetRequest
+            AnnotationLayer response = await _annotationManagerClient.GetAsync(new GetAnnotationRequest
             {
                 ProjectId = parameters.ProjectId,
                 ImageName = parameters.ImageName,
@@ -68,7 +68,7 @@ public class AnnotationManagerService : IAnnotationManagerService
     {
         try
         {
-            Layer layer = new()
+            AnnotationLayer layer = new()
             {
                 Id = parameters.LayerId.ToString(),
                 ClassIndex = parameters.ClassIndex
@@ -83,7 +83,7 @@ public class AnnotationManagerService : IAnnotationManagerService
                 });
             }
 
-            await _annotationManagerClient.AddAsync(new AddRequest
+            await _annotationManagerClient.AddAsync(new AddAnnotationRequest
             {
                 ProjectId = parameters.ProjectId,
                 ImageName = parameters.ImageName,
@@ -104,7 +104,7 @@ public class AnnotationManagerService : IAnnotationManagerService
     {
         try
         {
-            await _annotationManagerClient.RemoveAsync(new RemoveRequest
+            await _annotationManagerClient.RemoveAsync(new RemoveAnnotationRequest
             {
                 ProjectId = parameters.ProjectId,
                 ImageName = parameters.ImageName,

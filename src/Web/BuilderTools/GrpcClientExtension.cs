@@ -35,6 +35,7 @@ internal static class GrpcClientExtension
         CreateClientFactory<FileManager.FileManagerClient>(builder, gatewayUrl);
         CreateClientFactory<AnnotationManager.AnnotationManagerClient>(builder, gatewayUrl);
         CreateClientFactory<DatasetManager.DatasetManagerClient>(builder, gatewayUrl);
+        CreateClientFactory<JobManager.JobManagerClient>(builder, gatewayUrl);
         return builder;
     }
 

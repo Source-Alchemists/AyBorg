@@ -9,9 +9,9 @@
 </div>
 
 @code {
-    [Parameter, EditorRequired] public Shared.Models.Net.RectangleLayer Layer { get; init; } = null!;
+    [Parameter, EditorRequired] public AyBorg.Web.Shared.Models.Net.RectangleLayer Layer { get; init; } = null!;
     [Parameter, EditorRequired] public string Name { get; init; } = string.Empty;
-    [Parameter] public EventCallback<Shared.Models.Net.RectangleLayer> OnDeleteClicked { get; init; }
+    [Parameter] public EventCallback<AyBorg.Web.Shared.Models.Net.RectangleLayer> OnDeleteClicked { get; init; }
 
     private async Task DeleteClicked()
     {

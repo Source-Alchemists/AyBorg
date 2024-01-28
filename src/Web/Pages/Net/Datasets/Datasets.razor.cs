@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using AyBorg.Web.Pages.Net.Shared;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
 using AyBorg.Web.Shared.Modals;
@@ -15,8 +16,10 @@ public partial class Datasets : ComponentBase
     [Inject] IStateService StateService { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IDatasetManagerService DatasetManagerService { get; init; } = null!;
+    [Inject] IJobManagerService JobManagerService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
     [Inject] IDialogService DialogService { get; init; } = null!;
+    [Inject] NavigationManager NavigationManager { get; init; } = null!;
     private string _projectName = string.Empty;
     private bool _isLoading = true;
     private DatasetMeta _tempDataset = new();
@@ -205,5 +208,29 @@ public partial class Datasets : ComponentBase
 
         _isLoading = false;
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task StartModelTrainingClicked(DatasetMeta value)
+    {
+        IDialogReference dialogReference = DialogService.Show<StartModelTrainingDialog>("Model Training", new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        });
+
+        DialogResult result = await dialogReference.Result;
+        if (!result.Canceled)
+        {
+            try
+            {
+                await JobManagerService.CreateAsync(new JobManagerService.CreateJobParameters(ProjectId, value.Id));
+                Snackbar.Add("Model Training started", Severity.Info);
+                NavigationManager.NavigateTo("net/jobs");
+            }
+            catch (RpcException)
+            {
+                Snackbar.Add("Failed to start Model Training!", Severity.Warning);
+            }
+        }
     }
 }

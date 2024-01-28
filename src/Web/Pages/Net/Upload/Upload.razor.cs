@@ -52,8 +52,8 @@ public partial class Upload : ComponentBase, IAsyncDisposable
             _fileDropFunctionReference = await _fileDropModule.InvokeAsync<IJSObjectReference>("initializeFileDropZone", _fileDropContainerRef, _inputFileRef.Element);
 
             await StateService.UpdateStateFromSessionStorageAsync();
-            IEnumerable<Shared.Models.Net.ProjectMeta> metas = await ProjectManagerService.GetMetasAsync();
-            Shared.Models.Net.ProjectMeta? targetMeta = metas.FirstOrDefault(m => m.Id.Equals(ProjectId, StringComparison.InvariantCultureIgnoreCase));
+            IEnumerable<Web.Shared.Models.Net.ProjectMeta> metas = await ProjectManagerService.GetMetasAsync();
+            Web.Shared.Models.Net.ProjectMeta? targetMeta = metas.FirstOrDefault(m => m.Id.Equals(ProjectId, StringComparison.InvariantCultureIgnoreCase));
             if (StateService.NetState != null)
             {
                 _projectName = StateService.NetState.ProjectName;
@@ -63,7 +63,7 @@ public partial class Upload : ComponentBase, IAsyncDisposable
                 if (targetMeta != null)
                 {
                     _projectName = targetMeta.Name;
-                    await StateService.SetNetStateAsync(new Shared.Models.UiNetState(targetMeta));
+                    await StateService.SetNetStateAsync(new Web.Shared.Models.UiNetState(targetMeta));
                 }
             }
 

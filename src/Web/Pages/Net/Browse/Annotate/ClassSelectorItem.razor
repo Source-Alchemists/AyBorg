@@ -13,12 +13,12 @@
 </div>
 
 @code {
-    [Parameter, EditorRequired] public Shared.Models.Net.ClassLabel ClassLabel { get; init; } = null!;
+    [Parameter, EditorRequired] public AyBorg.Web.Shared.Models.Net.ClassLabel ClassLabel { get; init; } = null!;
     [Parameter] public bool DeleteDisabled { get; init; }
     [Parameter] public int Count { get; init; }
-    [Parameter] public EventCallback<Shared.Models.Net.ClassLabel> OnDeleteClicked { get; init; }
-    [Parameter] public EventCallback<Shared.Models.Net.ClassLabel> OnEditClicked { get; init; }
-    [Parameter] public EventCallback<Shared.Models.Net.ClassLabel> OnDrawClicked { get; init; }
+    [Parameter] public EventCallback<AyBorg.Web.Shared.Models.Net.ClassLabel> OnDeleteClicked { get; init; }
+    [Parameter] public EventCallback<AyBorg.Web.Shared.Models.Net.ClassLabel> OnEditClicked { get; init; }
+    [Parameter] public EventCallback<AyBorg.Web.Shared.Models.Net.ClassLabel> OnDrawClicked { get; init; }
 
     private async Task DeleteClicked()
     {

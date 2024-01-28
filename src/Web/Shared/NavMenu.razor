@@ -43,12 +43,17 @@
 {
     <AuthorizeView Roles="Administrator, Engineer, Reviewer">
     <Authorized>
-        <MudNavLink Href="net/projects" Class="mb-2">
+        <MudNavLink Href="net/projects">
             <MudText Typo="Typo.subtitle1">
                 Projects
             </MudText>
         </MudNavLink>
-        <MudText Typo="Typo.subtitle1" Class="ml-3">
+        <MudNavLink Href="net/jobs">
+            <MudText Typo="Typo.subtitle1">
+                Jobs
+            </MudText>
+        </MudNavLink>
+        <MudText Typo="Typo.subtitle1" Class="ml-3 mt-2">
             <strong>@_netProjectName</strong>
         </MudText>
         <MudNavLink Href="@_netUploadLink" Disabled="@(!_isNetProjectSelected)">

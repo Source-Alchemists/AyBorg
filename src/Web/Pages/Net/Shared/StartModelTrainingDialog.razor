@@ -1,0 +1,27 @@
+<MudDialog>
+    <DialogContent>
+
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelClicked">
+            Cancel
+        </MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="StartClicked">
+            Start
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; init; } = null!;
+
+    private void CancelClicked()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void StartClicked()
+    {
+        MudDialog.Close(DialogResult.Ok(true));
+    }
+}

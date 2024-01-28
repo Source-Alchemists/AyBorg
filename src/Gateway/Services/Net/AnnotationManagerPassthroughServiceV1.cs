@@ -16,12 +16,12 @@ public sealed class AnnotationManagerPassthroughServiceV1 : AnnotationManager.An
         _channelService = grpcChannelService;
     }
 
-    public override async Task<Meta> GetMeta(GetMetaRequest request, ServerCallContext context)
+    public override async Task<AnnotationMeta> GetMeta(GetAnnotationMetaRequest request, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Auditor, Roles.Reviewer });
         IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
 
-        Meta result = new();
+        AnnotationMeta result = new();
 
         foreach (ChannelInfo channel in channels)
         {
@@ -32,12 +32,12 @@ public sealed class AnnotationManagerPassthroughServiceV1 : AnnotationManager.An
         return result;
     }
 
-    public override async Task<Layer> Get(GetRequest request, ServerCallContext context)
+    public override async Task<AnnotationLayer> Get(GetAnnotationRequest request, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Auditor, Roles.Reviewer });
         IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
 
-        Layer result = new();
+        AnnotationLayer result = new();
         foreach (ChannelInfo channel in channels)
         {
             AnnotationManager.AnnotationManagerClient client = _channelService.CreateClient<AnnotationManager.AnnotationManagerClient>(channel.ServiceUniqueName);
@@ -47,7 +47,7 @@ public sealed class AnnotationManagerPassthroughServiceV1 : AnnotationManager.An
         return result;
     }
 
-    public override async Task<Empty> Add(AddRequest request, ServerCallContext context)
+    public override async Task<Empty> Add(AddAnnotationRequest request, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
@@ -60,7 +60,7 @@ public sealed class AnnotationManagerPassthroughServiceV1 : AnnotationManager.An
 
         return new Empty();
     }
-    public override async Task<Empty> Remove(RemoveRequest request, ServerCallContext context)
+    public override async Task<Empty> Remove(RemoveAnnotationRequest request, ServerCallContext context)
     {
         Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
         IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);

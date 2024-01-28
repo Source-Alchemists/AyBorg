@@ -1,0 +1,42 @@
+@page "/net/jobs"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}, {Roles.Auditor}")]
+
+<PageTitle>Jobs/NET | AyBorg</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudCard Class="rounded-lg">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Jobs</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTable Items="@_jobMetas" Elevation="0" Hover>
+            <HeaderContent>
+                <MudTh>Project</MudTh>
+                <MudTh>Dataset</MudTh>
+                <MudTh>Status</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="ProjectName">
+                    @context.ProjectName
+                </MudTd>
+                <MudTd DataLabel="DatasetName">
+                    @context.DatasetName
+                </MudTd>
+                <MudTd DataLabel="Status">
+                    <MudStack>
+                        <MudStack Row>
+                            <MudIcon Icon="@Icons.Material.Filled.CalendarToday" Size="Size.Small" /><MudText></MudText>
+                            <MudIcon Icon="@Icons.Material.Filled.HourglassTop" Size="Size.Small" /><MudText></MudText>
+                        </MudStack>
+                    </MudStack>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>

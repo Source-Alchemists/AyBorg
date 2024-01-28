@@ -42,8 +42,8 @@ public partial class Browse : ComponentBase
             try
             {
                 await StateService.UpdateStateFromSessionStorageAsync();
-                IEnumerable<Shared.Models.Net.ProjectMeta> metas = await ProjectManagerService.GetMetasAsync();
-                Shared.Models.Net.ProjectMeta? targetMeta = metas.FirstOrDefault(m => m.Id.Equals(ProjectId, StringComparison.InvariantCultureIgnoreCase));
+                IEnumerable<Web.Shared.Models.Net.ProjectMeta> metas = await ProjectManagerService.GetMetasAsync();
+                Web.Shared.Models.Net.ProjectMeta? targetMeta = metas.FirstOrDefault(m => m.Id.Equals(ProjectId, StringComparison.InvariantCultureIgnoreCase));
 
                 if (StateService.NetState != null)
                 {
@@ -54,7 +54,7 @@ public partial class Browse : ComponentBase
                     if (targetMeta != null)
                     {
                         _projectName = targetMeta.Name;
-                        await StateService.SetNetStateAsync(new Shared.Models.UiNetState(targetMeta));
+                        await StateService.SetNetStateAsync(new Web.Shared.Models.UiNetState(targetMeta));
                     }
                 }
 
@@ -206,7 +206,7 @@ public partial class Browse : ComponentBase
 
     private async ValueTask ShowAnnotateAsync(string selectedImageName)
     {
-        await StateService.SetNetStateAsync(StateService.NetState with { Annotation = new Shared.Models.UiNetState.AnnotationState(_selectedImageNames.OrderBy(n => n), 0) });
+        await StateService.SetNetStateAsync(StateService.NetState with { Annotation = new Web.Shared.Models.UiNetState.AnnotationState(_selectedImageNames.OrderBy(n => n), 0) });
 
         NavigationManager.NavigateTo($"net/browse/{ProjectId}/annotate/{selectedImageName}");
     }

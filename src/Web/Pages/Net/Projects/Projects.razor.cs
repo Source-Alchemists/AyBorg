@@ -92,7 +92,7 @@ public partial class Projects : ComponentBase
 
             if(projectMeta.Id.Equals(StateService.NetState.ProjectId, StringComparison.InvariantCultureIgnoreCase))
             {
-                await StateService.SetNetStateAsync(new Shared.Models.UiNetState(new ProjectMeta()));
+                await StateService.SetNetStateAsync(new Web.Shared.Models.UiNetState(new ProjectMeta()));
             }
 
             await UpdateProjectList();
@@ -102,7 +102,7 @@ public partial class Projects : ComponentBase
 
     private async void OnOpenClicked(ProjectMeta projectMeta)
     {
-        await StateService.SetNetStateAsync(new Shared.Models.UiNetState(projectMeta));
+        await StateService.SetNetStateAsync(new Web.Shared.Models.UiNetState(projectMeta));
         NavigationManager.NavigateTo($"net/upload/{projectMeta.Id}");
     }
 }
