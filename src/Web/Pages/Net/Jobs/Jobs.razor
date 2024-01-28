@@ -1,5 +1,6 @@
 @page "/net/jobs"
 @using SDK.Authorization
+@using SDK.Common
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}, {Roles.Auditor}")]
 
 <PageTitle>Jobs/NET | AyBorg</PageTitle>
@@ -19,20 +20,27 @@
             <HeaderContent>
                 <MudTh>Project</MudTh>
                 <MudTh>Dataset</MudTh>
-                <MudTh>Status</MudTh>
+                <MudTh Style="width: 160px">Status</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="ProjectName">
+                <MudTd DataLabel="Project">
                     @context.ProjectName
                 </MudTd>
-                <MudTd DataLabel="DatasetName">
+                <MudTd DataLabel="Dataset">
                     @context.DatasetName
                 </MudTd>
                 <MudTd DataLabel="Status">
                     <MudStack>
-                        <MudStack Row>
-                            <MudIcon Icon="@Icons.Material.Filled.CalendarToday" Size="Size.Small" /><MudText></MudText>
-                            <MudIcon Icon="@Icons.Material.Filled.HourglassTop" Size="Size.Small" /><MudText></MudText>
+                        <MudChip Disabled>@context.Status.GetDescription()</MudChip>
+                        <MudTooltip Text="@context.QueueDate.ToString()">
+                            <MudStack Row>
+                                <MudIcon Icon="@Icons.Material.Filled.CalendarToday" Size="Size.Small" />
+                                <MudText Typo="Typo.body2">@CreateQueueStartString(context)</MudText>
+                            </MudStack>
+                        </MudTooltip>
+                        <MudStack hidden="@(!IsDurationVisible(context))" Row>
+                            <MudIcon Icon="@Icons.Material.Filled.HourglassTop" Size="Size.Small" />
+                            <MudText Typo="Typo.body2">@CreateDurationString(context)</MudText>
                         </MudStack>
                     </MudStack>
                 </MudTd>

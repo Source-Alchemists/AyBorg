@@ -90,6 +90,12 @@ public sealed class JobManagerService : IJobManagerService
 
     private static JobMeta ToModel(Ayborg.Gateway.Net.V1.JobMeta metaDto)
     {
+        DateTime finishedDate = DateTime.MinValue;
+        if (metaDto.FinishedDate != null)
+        {
+            finishedDate = metaDto.FinishedDate.ToDateTime();
+        }
+
         return new JobMeta(Id: metaDto.Id,
             ProjectId: metaDto.ProjectId,
             ProjectName: metaDto.ProjectName,
@@ -99,7 +105,7 @@ public sealed class JobManagerService : IJobManagerService
             RunnerName: metaDto.RunnerName,
             RunnerUniqueName: metaDto.RunnerUniqueName,
             QueueDate: metaDto.QueueDate.ToDateTime(),
-            FinishedDate: metaDto.FinishedDate.ToDateTime(),
+            FinishedDate: finishedDate,
             Status: (JobStatus)metaDto.Status);
     }
 
