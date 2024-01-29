@@ -7,12 +7,13 @@ using static AyBorg.Web.Services.Net.JobManagerService;
 
 namespace AyBorg.Web.Pages.Net.Jobs;
 
-public partial class Jobs : ComponentBase
+public partial class Jobs : ComponentBase, IAsyncDisposable
 {
     [Inject] IJobManagerService JobManagerService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
     private ImmutableList<JobMeta> _jobMetas = ImmutableList<JobMeta>.Empty;
     private bool _isLoading = true;
+    private Timer _updateTimer = null!;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -23,6 +24,10 @@ public partial class Jobs : ComponentBase
             try
             {
                 _jobMetas = _jobMetas.AddRange((await JobManagerService.GetMetasAsync()).OrderByDescending(x => x.QueueDate));
+
+                _updateTimer = new Timer(e => {
+                    InvokeAsync(StateHasChanged);
+                }, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
             }
             catch (RpcException)
             {
@@ -94,5 +99,11 @@ public partial class Jobs : ComponentBase
         }
 
         return $"{time} {unit} ago";
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _updateTimer?.Dispose();
+        return ValueTask.CompletedTask;
     }
 }
