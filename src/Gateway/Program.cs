@@ -99,6 +99,9 @@ app.MapGrpcService<AyBorg.Gateway.Services.Net.ProjectManagerPassthroughServiceV
 app.MapGrpcService<AyBorg.Gateway.Services.Net.AnnotationManagerPassthroughServiceV1>();
 app.MapGrpcService<AyBorg.Gateway.Services.Net.DatasetManagerPassthroughServiceV1>();
 app.MapGrpcService<AyBorg.Gateway.Services.Net.JobManagerPassthroughServiceV1>();
+// Net.Runner
+app.MapGrpcService<AyBorg.Gateway.Services.Net.Runner.StatusManagerPassthroughServiceV1>();
+app.MapGrpcService<AyBorg.Gateway.Services.Net.Runner.JobManagerPassthroughServiceV1>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists

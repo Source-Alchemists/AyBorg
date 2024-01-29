@@ -25,8 +25,20 @@ public partial class Jobs : ComponentBase, IAsyncDisposable
             {
                 _jobMetas = _jobMetas.AddRange((await JobManagerService.GetMetasAsync()).OrderByDescending(x => x.QueueDate));
 
-                _updateTimer = new Timer(e => {
-                    InvokeAsync(StateHasChanged);
+                _updateTimer = new Timer(async e =>
+                {
+                    try
+                    {
+                        IEnumerable<JobMeta> response = await JobManagerService.GetMetasAsync();
+                        _jobMetas = _jobMetas.Clear();
+                        _jobMetas = _jobMetas.AddRange(response.OrderByDescending(x => x.QueueDate));
+                    }
+                    catch (RpcException)
+                    {
+                        Snackbar.Add("Failed to get jobs!", Severity.Warning);
+                    }
+
+                    await InvokeAsync(StateHasChanged);
                 }, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
             }
             catch (RpcException)
@@ -55,7 +67,7 @@ public partial class Jobs : ComponentBase, IAsyncDisposable
         TimeSpan duration = finishedDate - jobMeta.QueueDate;
         if (duration.TotalSeconds < 60)
         {
-            return $"{duration.TotalSeconds}s";
+            return $"{Math.Round(duration.TotalSeconds, 0)}s";
         }
         else if (duration.TotalMinutes < 60)
         {
