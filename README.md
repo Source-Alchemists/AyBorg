@@ -16,8 +16,6 @@ We offer seamless integration with third-party plug-ins, so you can add custom f
 
 With our built-in auditing functionality, you'll have more control over your processes and data, leading to improved efficiency.
 
-**:bangbang: AyBorg is still in its early stages of development and our API is still fluid and may change. If you happen to come across any bugs, please don't hesitate to report them - we'd be grateful for your help!**
-
 ## Agents
 
 AyBorg's **Agents** are specially designed services for automating processes. Using the **AyBorg.Gateway**, they can communicate with other areas of the application. These powerful tools are ideal for optimizing your workflow and can help increase your efficiency.
@@ -65,10 +63,20 @@ The default appsettings give you a good starting point and will also work locall
 | Service          | HTTP | HTTPS | gRPC |
 | ---------------- | ---- | ----- | ---- |
 | AyBorg.Gateway   |      |       | 6000 |
-| AyBorg.Log |      |       | 6001 |
+| AyBorg.Log       |      |       | 6001 |
 | AyBorg.Web       | 6010 | 6011  |      |
 | AyBorg.Agent     |      |       | 6020 |
 
 ## Want to contribute?
 
 We are happy to accept contributions from the community. Please read our [contributing guidelines](CONTRIBUTING.md) for more information.
+
+## License
+
+AyBorg offers two licensing options to cover different use cases:
+
+AGPL-3.0 License: This [OSI-approved](https://opensource.org/licenses/) open source license is ideal for students and enthusiasts, and encourages open collaboration and knowledge sharing. See the LICENSE file for more details.
+
+Enterprise License: Designed for commercial use, this license allows seamless integration of AyBorg into commercial goods and services, bypassing the open source requirements of AGPL-3.0. If your scenario involves embedding our solutions into a commercial offering, please contact AyBorg Licensing.
+
+**Note:** AyBorg.SDK operates under the MIT license, which allows plugin developers to create proprietary plugins. This gives developers the flexibility to build without open source restrictions. See the docs/license/MIT-license.txt for detailed information.
