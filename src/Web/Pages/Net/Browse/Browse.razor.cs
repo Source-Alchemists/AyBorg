@@ -61,11 +61,11 @@ public partial class Browse : ComponentBase
                 if (targetMeta != null)
                 {
                     _projectTags.Clear();
-                    _projectTags.AddRange(targetMeta.Tags);
+                    _projectTags.AddRange(targetMeta.Tags.OrderBy(t => t));
                 }
 
                 await UpdateImageCollectionMeta(string.Empty, string.Empty, Array.Empty<string>());
-                _allBatchNames = _imageCollectionMeta.BatchNames;
+                _allBatchNames = _imageCollectionMeta.BatchNames.OrderBy(b => b);
             }
             catch (RpcException)
             {

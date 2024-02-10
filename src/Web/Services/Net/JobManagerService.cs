@@ -62,7 +62,11 @@ public sealed class JobManagerService : IJobManagerService
             await _jobManagerClient.CreateAsync(new CreateJobRequest
             {
                 ProjectId = parameters.ProjectId,
-                DatasetId = parameters.DatasetId
+                DatasetId = parameters.DatasetId,
+                TrainingParameters = new TrainParameters
+                {
+                    Iterations = parameters.Iterations
+                }
             });
         }
         catch (RpcException ex)
@@ -115,7 +119,7 @@ public sealed class JobManagerService : IJobManagerService
     }
 
     public sealed record GetJobParameters(string Id);
-    public sealed record CreateJobParameters(string ProjectId, string DatasetId);
+    public sealed record CreateJobParameters(string ProjectId, string DatasetId, int Iterations);
     public sealed record CancelJobParameters(string Id);
     public sealed record JobMeta(string Id, string ProjectId, string ProjectName, string DatasetId, string DatasetName, string ModelId, string RunnerName, string RunnerUniqueName, DateTime QueueDate, DateTime FinishedDate, JobStatus Status);
     public sealed record Job(JobMeta meta);

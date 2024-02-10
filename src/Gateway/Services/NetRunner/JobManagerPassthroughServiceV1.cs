@@ -59,4 +59,11 @@ public sealed class JobManagerPassthroughServiceV1 : JobManager.JobManagerBase
             await responseStream.WriteAsync(chunk);
         }
     }
+
+    public override async Task<Empty> ConfirmDownload(DownloadJobRequest request, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), null!);
+        JobManager.JobManagerClient client = _channelService.CreateClient<JobManager.JobManagerClient>(request.ServiceUniqueName);
+        return await client.ConfirmDownloadAsync(request, headers);
+    }
 }

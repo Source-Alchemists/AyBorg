@@ -1,6 +1,8 @@
 <MudDialog>
     <DialogContent>
-
+        <MudSlider Min="1" Max="1000" @bind-Value="_iterations">
+            Iterations: @_iterations
+        </MudSlider>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="CancelClicked">
@@ -14,6 +16,7 @@
 
 @code {
     [CascadingParameter] MudDialogInstance MudDialog { get; init; } = null!;
+    private int _iterations = 10;
 
     private void CancelClicked()
     {
@@ -22,6 +25,10 @@
 
     private void StartClicked()
     {
-        MudDialog.Close(DialogResult.Ok(true));
+        MudDialog.Close(DialogResult.Ok(new TrainParameters(
+            Iterations: _iterations
+        )));
     }
+
+    public sealed record TrainParameters(int Iterations);
 }

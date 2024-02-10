@@ -221,9 +221,14 @@ public partial class Datasets : ComponentBase
         DialogResult result = await dialogReference.Result;
         if (!result.Canceled)
         {
+            var trainingParameters = (StartModelTrainingDialog.TrainParameters)result.Data;
             try
             {
-                await JobManagerService.CreateAsync(new JobManagerService.CreateJobParameters(ProjectId, value.Id));
+                await JobManagerService.CreateAsync(new JobManagerService.CreateJobParameters(
+                    ProjectId: ProjectId,
+                    DatasetId: value.Id,
+                    Iterations: trainingParameters.Iterations
+                ));
                 Snackbar.Add("Model Training started", Severity.Info);
                 NavigationManager.NavigateTo("net/jobs");
             }

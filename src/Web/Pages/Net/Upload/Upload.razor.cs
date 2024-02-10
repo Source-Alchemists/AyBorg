@@ -35,7 +35,7 @@ public partial class Upload : ComponentBase, IAsyncDisposable
     private IJSObjectReference _fileDropFunctionReference = null!;
     private HashSet<ImageSource> _imageSources = new();
     private IEnumerable<string> _projectTags = new List<string>();
-    private IEnumerable<string> _availableTags => _projectTags.Where(t => !_selectedTags.Contains(t));
+    private IEnumerable<string> _availableTags => _projectTags.Where(t => !_selectedTags.Contains(t)).OrderBy(t => t);
     private ImmutableList<string> _selectedTags = ImmutableList<string>.Empty;
     private bool _isLoading = true;
     private bool _isDisposed = false;
