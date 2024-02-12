@@ -64,7 +64,7 @@ public partial class Datasets : ComponentBase
         }
     }
 
-    private async Task UpdateMetaCollectionAsync()
+    private async ValueTask UpdateMetaCollectionAsync()
     {
         try
         {

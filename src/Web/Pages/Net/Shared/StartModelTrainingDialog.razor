@@ -13,22 +13,3 @@
         </MudButton>
     </DialogActions>
 </MudDialog>
-
-@code {
-    [CascadingParameter] MudDialogInstance MudDialog { get; init; } = null!;
-    private int _iterations = 10;
-
-    private void CancelClicked()
-    {
-        MudDialog.Cancel();
-    }
-
-    private void StartClicked()
-    {
-        MudDialog.Close(DialogResult.Ok(new TrainParameters(
-            Iterations: _iterations
-        )));
-    }
-
-    public sealed record TrainParameters(int Iterations);
-}

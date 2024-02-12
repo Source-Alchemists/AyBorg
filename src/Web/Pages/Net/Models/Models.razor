@@ -1,0 +1,61 @@
+@page "/net/models/{projectId}"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+
+<PageTitle>@_projectName | Models/NET | AyBorg</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudCard Class="rounded-lg">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudBadge Content="@(_modelMetas.Count())" Color="Color.Primary" Overlap>
+                <MudText Typo="Typo.h6">Models</MudText>
+            </MudBadge>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudButton Variant="Variant.Filled"
+                        StartIcon="@Icons.Material.Filled.ModelTraining"
+                        Color="Color.Primary"
+                        OnClick="@TrainClicked">Train new Model</MudButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTable Items="@_modelMetas" Elevation="0" Hover>
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Created</MudTh>
+                <MudTh>Classes</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">
+                    @context.Name
+                </MudTd>
+                <MudTd DataLabel="Created">
+                    @context.CreationDate
+                </MudTd>
+                <MudTd DataLabel="Classes">
+                    <MudBadge Content="@(context.Classes.Count())" Color="Color.Default" Origin="Origin.TopLeft" Overlap>
+                        <MudChipSet>
+                        @foreach(var c in context.Classes)
+                        {
+                            <MudChip Disabled>@c</MudChip>
+                        }
+                        </MudChipSet>
+                    </MudBadge>
+                </MudTd>
+                <MudTd>
+                    <MudTooltip Text="Edit Model">
+                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Default" OnClick="(() => EditModel(context.Id, context.Name))" />
+                    </MudTooltip>
+                    <MudTooltip Text="Delete Model">
+                        <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="(() => DeleteModel(context.Id, context.Name))" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>

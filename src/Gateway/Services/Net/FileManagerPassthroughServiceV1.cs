@@ -80,4 +80,46 @@ public sealed class FileManagerPassthroughServiceV1 : FileManager.FileManagerBas
             }
         });
     }
+
+    public override async Task GetModelMetas(GetModelMetasRequest request, IServerStreamWriter<ModelMeta> responseStream, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), null!);
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+
+        await Parallel.ForEachAsync(channels, async (channel, token) =>
+        {
+            FileManager.FileManagerClient client = _channelService.CreateClient<FileManager.FileManagerClient>(channel.ServiceUniqueName);
+            AsyncServerStreamingCall<ModelMeta> requestCall = client.GetModelMetas(request, headers: headers, cancellationToken: context.CancellationToken);
+            await foreach (ModelMeta meta in requestCall.ResponseStream.ReadAllAsync(cancellationToken: context.CancellationToken))
+            {
+                await responseStream.WriteAsync(meta, cancellationToken: context.CancellationToken);
+            }
+        });
+    }
+
+    public override async Task<Empty> EditModel(EditModelRequest request, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+        foreach (ChannelInfo channel in channels)
+        {
+            FileManager.FileManagerClient client = _channelService.CreateClient<FileManager.FileManagerClient>(channel.ServiceUniqueName);
+            await client.EditModelAsync(request, headers);
+        }
+
+        return new Empty();
+    }
+
+    public override async Task<Empty> DeleteModel(DeleteModelRequest request, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+        foreach (ChannelInfo channel in channels)
+        {
+            FileManager.FileManagerClient client = _channelService.CreateClient<FileManager.FileManagerClient>(channel.ServiceUniqueName);
+            await client.DeleteModelAsync(request, headers);
+        }
+
+        return new Empty();
+    }
 }

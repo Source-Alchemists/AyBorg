@@ -1,6 +1,7 @@
 using System.Buffers;
 using Ayborg.Gateway.Net.V1;
 using AyBorg.SDK.Common;
+using AyBorg.Web.Shared.Models.Net;
 using Google.Protobuf;
 using Grpc.Core;
 
@@ -176,10 +177,78 @@ public class FileManagerService : IFileManagerService
         }
     }
 
+    public async ValueTask<IEnumerable<ModelMeta>> GetModelMetasAsync(GetModelMetasParameters parameters)
+    {
+        try
+        {
+            List<ModelMeta> result = new();
+            AsyncServerStreamingCall<Ayborg.Gateway.Net.V1.ModelMeta> response = _fileManagerClient.GetModelMetas(new GetModelMetasRequest
+            {
+                ProjectId = parameters.ProjectId
+            });
+
+            await foreach (Ayborg.Gateway.Net.V1.ModelMeta modelMetaDto in response.ResponseStream.ReadAllAsync())
+            {
+                result.Add(new ModelMeta(
+                    Id: modelMetaDto.Id,
+                    Name: modelMetaDto.Name,
+                    Type: (ProjectType)modelMetaDto.Type,
+                    CreationDate: modelMetaDto.CreationDate.ToDateTime(),
+                    Classes: modelMetaDto.Classes.ToArray()
+                ));
+            }
+
+            return result;
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning((int)EventLogType.Download, ex, "Failed to receive model metas!");
+            throw;
+        }
+    }
+
+    public async ValueTask EditModelAsync(EditModelParameters parameters)
+    {
+        try
+        {
+            await _fileManagerClient.EditModelAsync(new EditModelRequest
+            {
+                ProjectId = parameters.ProjectId,
+                ModelId = parameters.ModelId,
+                Name = parameters.NewName
+            });
+            _logger.LogInformation((int)EventLogType.UserInteraction, "Changed model [{ModelName} ({ModelId})] name to [{Name}].", parameters.OldName, parameters.ModelId, parameters.NewName);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning((int)EventLogType.Net, ex, "Failed to edit model!");
+            throw;
+        }
+    }
+
+    public async ValueTask DeleteModelAsync(DeleteModelParameters parameters)
+    {
+        try
+        {
+            await _fileManagerClient.DeleteModelAsync(new DeleteModelRequest{
+                ProjectId = parameters.ProjectId,
+                ModelId = parameters.ModelId
+            });
+            _logger.LogInformation((int)EventLogType.UserInteraction, "Deleted model [{ModelName} ({ModelId})].", parameters.ModelName, parameters.ModelId);
+        }catch (RpcException ex)
+        {
+            _logger.LogWarning((int)EventLogType.Net, ex, "Failed to delete model!");
+            throw;
+        }
+    }
+
     public sealed record UploadImageParameters(string ProjectId, byte[] Data, string ContentType, string CollectionId, int CollectionIndex = 0, int CollectionSize = 1);
     public sealed record ConfirmUploadParameters(string ProjectId, string CollectionId, string BatchName, IEnumerable<string> Tags, IEnumerable<int> Distribution);
     public sealed record DownloadImageParameters(string ProjectId, string ImageName, bool AsThumbnail);
     public sealed record GetImageCollectionMetaParameters(string ProjectId, string BatchName, string SplitGroup, IEnumerable<string> Tags);
+    public sealed record GetModelMetasParameters(string ProjectId);
+    public sealed record EditModelParameters(string ProjectId, string ModelId, string OldName, string NewName);
+    public sealed record DeleteModelParameters(string ProjectId, string ModelId, string ModelName);
     public sealed record ImageCollectionMeta(IEnumerable<string> UnannotatedFileNames, IEnumerable<string> AnnotatedFileNames, IEnumerable<string> BatchNames, IEnumerable<string> Tags);
     public sealed record ImageContainer(string ImageName, string Base64Image, string ContentType, int Width, int Height)
     {
@@ -189,4 +258,5 @@ public class FileManagerService : IFileManagerService
         }
     }
     public sealed record ClassMeta(string Name, int Index);
+    public sealed record ModelMeta(string Id, string Name, ProjectType Type, DateTime CreationDate, string[] Classes);
 }
