@@ -1,5 +1,6 @@
 <MudDialog>
     <DialogContent>
+        <MudTextField T="string" Label="Name" @bind-Value="@Name" Immediate/>
         <MudSlider Min="1" Max="1000" @bind-Value="_iterations">
             Iterations: @_iterations
         </MudSlider>
@@ -8,7 +9,7 @@
         <MudButton Color="Color.Default" OnClick="CancelClicked">
             Cancel
         </MudButton>
-        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="StartClicked">
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="StartClicked" Disabled="@_isStartDisabled">
             Start
         </MudButton>
     </DialogActions>

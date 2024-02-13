@@ -65,6 +65,7 @@ public sealed class JobManagerService : IJobManagerService
                 DatasetId = parameters.DatasetId,
                 TrainingParameters = new TrainParameters
                 {
+                    ModelName = parameters.ModelName,
                     Iterations = parameters.Iterations
                 }
             });
@@ -119,7 +120,7 @@ public sealed class JobManagerService : IJobManagerService
     }
 
     public sealed record GetJobParameters(string Id);
-    public sealed record CreateJobParameters(string ProjectId, string DatasetId, int Iterations);
+    public sealed record CreateJobParameters(string ProjectId, string DatasetId, string ModelName, int Iterations);
     public sealed record CancelJobParameters(string Id);
     public sealed record JobMeta(string Id, string ProjectId, string ProjectName, string DatasetId, string DatasetName, string ModelId, string RunnerName, string RunnerUniqueName, DateTime QueueDate, DateTime FinishedDate, JobStatus Status);
     public sealed record Job(JobMeta meta);

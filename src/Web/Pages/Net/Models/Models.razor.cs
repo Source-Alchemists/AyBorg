@@ -83,7 +83,9 @@ public partial class Models : ComponentBase, IAsyncDisposable
 
     private async Task TrainClicked()
     {
-        IDialogReference dialog = DialogService.Show<StartModelTrainingDialog>("Model Training", new DialogOptions
+        IDialogReference dialog = DialogService.Show<StartModelTrainingDialog>("Model Training", new DialogParameters {
+            { "Name", "AyBorg Object Detection" }
+        }, new DialogOptions
         {
             MaxWidth = MaxWidth.Medium,
             FullWidth = true
@@ -98,6 +100,7 @@ public partial class Models : ComponentBase, IAsyncDisposable
                 await JobManagerService.CreateAsync(new JobManagerService.CreateJobParameters(
                     ProjectId: ProjectId,
                     DatasetId: trainingParameters.DatasetId,
+                    ModelName: trainingParameters.ModelName,
                     Iterations: trainingParameters.Iterations
                 ));
                 Snackbar.Add("Model Training started", Severity.Info);

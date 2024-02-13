@@ -212,7 +212,9 @@ public partial class Datasets : ComponentBase
 
     private async Task StartModelTrainingClicked(DatasetMeta value)
     {
-        IDialogReference dialogReference = DialogService.Show<StartModelTrainingDialog>("Model Training", new DialogOptions
+        IDialogReference dialogReference = DialogService.Show<StartModelTrainingDialog>("Model Training", new DialogParameters {
+            { "Name", "AyBorg Object Detection" }
+        }, new DialogOptions
         {
             MaxWidth = MaxWidth.Medium,
             FullWidth = true
@@ -227,6 +229,7 @@ public partial class Datasets : ComponentBase
                 await JobManagerService.CreateAsync(new JobManagerService.CreateJobParameters(
                     ProjectId: ProjectId,
                     DatasetId: value.Id,
+                    ModelName: trainingParameters.ModelName,
                     Iterations: trainingParameters.Iterations
                 ));
                 Snackbar.Add("Model Training started", Severity.Info);
