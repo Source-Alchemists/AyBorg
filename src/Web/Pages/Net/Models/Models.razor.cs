@@ -17,6 +17,7 @@ public partial class Models : ComponentBase, IAsyncDisposable
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IJobManagerService JobManagerService { get; init; } = null!;
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
+    [Inject] IDatasetManagerService DatasetManagerService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
     [Inject] IDialogService DialogService { get; init; } = null!;
     [Inject] NavigationManager NavigationManager { get; init; } = null!;
@@ -25,6 +26,8 @@ public partial class Models : ComponentBase, IAsyncDisposable
     private Timer _updateTimer = null!;
     private string _projectName = string.Empty;
     private ImmutableList<FileManagerService.ModelMeta> _modelMetas = ImmutableList<FileManagerService.ModelMeta>.Empty;
+    private IEnumerable<DatasetMeta> _datasetMetas = Array.Empty<DatasetMeta>();
+    private bool _isTrainingDisabled => !_datasetMetas.Any(d => !d.IsActive);
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -69,6 +72,16 @@ public partial class Models : ComponentBase, IAsyncDisposable
     {
         try
         {
+            _datasetMetas = await DatasetManagerService.GetMetasAsync(new DatasetManagerService.GetMetasParameters(ProjectId));
+        }
+        catch (RpcException)
+        {
+            Snackbar.Add("Failed to get database informations!", Severity.Warning);
+            return;
+        }
+
+        try
+        {
             IEnumerable<FileManagerService.ModelMeta> modelMetas = await FileManagerService.GetModelMetasAsync(new FileManagerService.GetModelMetasParameters(
                 ProjectId: ProjectId
             ));
@@ -84,7 +97,9 @@ public partial class Models : ComponentBase, IAsyncDisposable
     private async Task TrainClicked()
     {
         IDialogReference dialog = DialogService.Show<StartModelTrainingDialog>("Model Training", new DialogParameters {
-            { "Name", "AyBorg Object Detection" }
+            { "ShowDatasetSelection", true },
+            { "Name", "AyBorg Object Detection" },
+            { "ProjectId", ProjectId }
         }, new DialogOptions
         {
             MaxWidth = MaxWidth.Medium,

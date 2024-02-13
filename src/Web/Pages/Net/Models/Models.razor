@@ -19,7 +19,8 @@
             <MudButton Variant="Variant.Filled"
                         StartIcon="@Icons.Material.Filled.ModelTraining"
                         Color="Color.Primary"
-                        OnClick="@TrainClicked">Train new Model</MudButton>
+                        OnClick="@TrainClicked"
+                        Disabled="@_isTrainingDisabled">Train new Model</MudButton>
         </CardHeaderActions>
     </MudCardHeader>
     <MudCardContent>
