@@ -31,7 +31,7 @@
 
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
                 @if (@context.State == SDK.Projects.ProjectState.Draft) {
-                    <MudMenuItem Icon="@Icons.Material.Filled.SafetyCheck" IconColor="Color.Info" @onclick="(args) => OnSaveAsReview(args, context)">
+                    <MudMenuItem Icon="@Icons.Material.Filled.SafetyCheck" IconColor="Color.Warning" @onclick="(args) => OnSaveAsReview(args, context)">
                             Create review
                     </MudMenuItem>
                 }
@@ -41,7 +41,7 @@
                     </MudMenuItem>
                     <AuthorizeView Roles="Administrator, Reviewer" Context="other">
                         <Authorized>
-                            <MudMenuItem Icon="@Icons.Material.Filled.GppGood" IconColor="Color.Tertiary" @onclick="(args) => OnSaveAsReady(args, context)">
+                            <MudMenuItem Icon="@Icons.Material.Filled.GppGood" IconColor="Color.Success" @onclick="(args) => OnSaveAsReady(args, context)">
                                     Approve
                             </MudMenuItem>
                         </Authorized>

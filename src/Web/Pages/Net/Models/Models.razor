@@ -26,12 +26,34 @@
     <MudCardContent>
         <MudTable Items="@_modelMetas" Elevation="0" Hover>
             <HeaderContent>
+                <MudTh Style="max-width: 30px">State</MudTh>
                 <MudTh>Name</MudTh>
                 <MudTh>Created</MudTh>
                 <MudTh>Classes</MudTh>
+                <MudTh>Comment</MudTh>
                 <MudTh></MudTh>
             </HeaderContent>
             <RowTemplate>
+                <MudTd DataLabel="State">
+                    @if (@context.State == Services.Net.FileManagerService.ModelState.Release)
+                    {
+                        <MudTooltip Text="Verified">
+                            <MudIcon Icon="@Icons.Material.Filled.GppGood" Color="Color.Success" />
+                        </MudTooltip>
+                    }
+                    else if (@context.State == Services.Net.FileManagerService.ModelState.Review)
+                    {
+                        <MudTooltip Text="Review">
+                            <MudIcon Icon="@Icons.Material.Filled.SafetyCheck" Color="Color.Warning" />
+                        </MudTooltip>
+                    }
+                    else if (@context.State == Services.Net.FileManagerService.ModelState.Draft)
+                    {
+                        <MudTooltip Text="Draft">
+                            <MudIcon Icon="@Icons.Material.Filled.GppBad" Color="Color.Default" />
+                        </MudTooltip>
+                    }
+                </MudTd>
                 <MudTd DataLabel="Name">
                     @context.Name
                 </MudTd>
@@ -48,13 +70,38 @@
                         </MudChipSet>
                     </MudBadge>
                 </MudTd>
+                <MudTd DataLabel="Comment">
+                    <MudTextField Value="@context.Comment" Lines="3" ReadOnly />
+                </MudTd>
                 <MudTd>
-                    <MudTooltip Text="Edit Model">
-                        <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Default" OnClick="(() => EditModel(context.Id, context.Name))" />
-                    </MudTooltip>
-                    <MudTooltip Text="Delete Model">
-                        <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="(() => DeleteModel(context.Id, context.Name))" />
-                    </MudTooltip>
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert">
+                        <MudMenuItem  Icon="@Icons.Material.Filled.Edit" IconColor="Color.Default" OnClick="(() => EditModelClicked(context))" Disabled=@(context.State != Services.Net.FileManagerService.ModelState.Draft)>
+                            Edit
+                        </MudMenuItem>
+                        @if (@context.State == Services.Net.FileManagerService.ModelState.Draft)
+                        {
+                            <MudMenuItem  Icon="@Icons.Material.Filled.SafetyCheck" IconColor="Color.Warning" OnClick="(() => CreateReviewClicked(context))">
+                                Create Review
+                            </MudMenuItem>
+                        }
+                        else if(@context.State == Services.Net.FileManagerService.ModelState.Review)
+                        {
+                            <MudMenuItem  Icon="@Icons.Material.Filled.Cancel" IconColor="Color.Error" OnClick="(() => AbandonClicked(context))">
+                                Abandon
+                            </MudMenuItem>
+                            <AuthorizeView Roles="Administrator, Reviewer" Context="other">
+                                <Authorized>
+                                    <MudMenuItem  Icon="@Icons.Material.Filled.GppGood" IconColor="Color.Success" OnClick="(() => ApproveClicked(context))">
+                                        Approve
+                                    </MudMenuItem>
+                                </Authorized>
+                            </AuthorizeView>
+                        }
+                        <MudDivider />
+                        <MudMenuItem  Icon="@Icons.Material.Filled.DeleteForever" IconColor="Color.Error" OnClick="(() => DeleteModelClicked(context))">
+                            Delete
+                        </MudMenuItem>
+                    </MudMenu>
                 </MudTd>
             </RowTemplate>
         </MudTable>

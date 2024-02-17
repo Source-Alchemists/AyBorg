@@ -194,7 +194,9 @@ public class FileManagerService : IFileManagerService
                     Name: modelMetaDto.Name,
                     Type: (ProjectType)modelMetaDto.Type,
                     CreationDate: modelMetaDto.CreationDate.ToDateTime(),
-                    Classes: modelMetaDto.Classes.ToArray()
+                    Classes: modelMetaDto.Classes.ToArray(),
+                    State: (ModelState)modelMetaDto.State,
+                    Comment: modelMetaDto.Comment
                 ));
             }
 
@@ -217,7 +219,10 @@ public class FileManagerService : IFileManagerService
                 ModelId = parameters.ModelId,
                 Name = parameters.NewName
             });
-            _logger.LogInformation((int)EventLogType.UserInteraction, "Changed model [{ModelName} ({ModelId})] name to [{Name}].", parameters.OldName, parameters.ModelId, parameters.NewName);
+            if (!parameters.OldName.Equals(parameters.NewName, StringComparison.InvariantCulture))
+            {
+                _logger.LogInformation((int)EventLogType.UserInteraction, "Changed model [{ModelName} ({ModelId})] name to [{Name}].", parameters.OldName, parameters.ModelId, parameters.NewName);
+            }
         }
         catch (RpcException ex)
         {
@@ -226,16 +231,38 @@ public class FileManagerService : IFileManagerService
         }
     }
 
+    public async ValueTask ChangeModelStateAsync(ChangeModelStateParameters parameters)
+    {
+        try
+        {
+            await _fileManagerClient.ChangeModelStateAsync(new ChangeModelStateRequest
+            {
+                ProjectId = parameters.ProjectId,
+                ModelId = parameters.ModelId,
+                State = (Ayborg.Gateway.Net.V1.ModelState)parameters.NewState,
+                Comment = parameters.Comment
+            });
+            _logger.LogInformation((int)EventLogType.UserInteraction, "Model [{ModelName} ({ModelId})] state changed from [{ModelState}] to [{ModelState}].", parameters.ModelName, parameters.ModelId, parameters.OldState, parameters.NewState);
+        }
+        catch (RpcException ex)
+        {
+            _logger.LogWarning((int)EventLogType.Net, ex, "Failed to change model state!");
+            throw;
+        }
+    }
+
     public async ValueTask DeleteModelAsync(DeleteModelParameters parameters)
     {
         try
         {
-            await _fileManagerClient.DeleteModelAsync(new DeleteModelRequest{
+            await _fileManagerClient.DeleteModelAsync(new DeleteModelRequest
+            {
                 ProjectId = parameters.ProjectId,
                 ModelId = parameters.ModelId
             });
             _logger.LogInformation((int)EventLogType.UserInteraction, "Deleted model [{ModelName} ({ModelId})].", parameters.ModelName, parameters.ModelId);
-        }catch (RpcException ex)
+        }
+        catch (RpcException ex)
         {
             _logger.LogWarning((int)EventLogType.Net, ex, "Failed to delete model!");
             throw;
@@ -249,6 +276,7 @@ public class FileManagerService : IFileManagerService
     public sealed record GetModelMetasParameters(string ProjectId);
     public sealed record EditModelParameters(string ProjectId, string ModelId, string OldName, string NewName);
     public sealed record DeleteModelParameters(string ProjectId, string ModelId, string ModelName);
+    public sealed record ChangeModelStateParameters(string ProjectId, string ModelId, string ModelName, ModelState OldState, ModelState NewState, string Comment);
     public sealed record ImageCollectionMeta(IEnumerable<string> UnannotatedFileNames, IEnumerable<string> AnnotatedFileNames, IEnumerable<string> BatchNames, IEnumerable<string> Tags);
     public sealed record ImageContainer(string ImageName, string Base64Image, string ContentType, int Width, int Height)
     {
@@ -258,5 +286,11 @@ public class FileManagerService : IFileManagerService
         }
     }
     public sealed record ClassMeta(string Name, int Index);
-    public sealed record ModelMeta(string Id, string Name, ProjectType Type, DateTime CreationDate, string[] Classes);
+    public sealed record ModelMeta(string Id, string Name, ProjectType Type, DateTime CreationDate, string[] Classes, ModelState State, string Comment);
+    public enum ModelState
+    {
+        Draft = 0,
+        Review = 1,
+        Release = 2
+    }
 }

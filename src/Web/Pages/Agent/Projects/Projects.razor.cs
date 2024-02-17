@@ -84,20 +84,27 @@ public partial class Projects : ComponentBase
 
     private async void OnSaveAsReviewClicked(ProjectMeta projectMeta)
     {
-        var parameters = new DialogParameters
-        {
-            { "Project", projectMeta }
-        };
-        IDialogReference dialog = DialogService.Show<CreateReviewProjectDialog>($"Create Review for {projectMeta.Name}", parameters, new DialogOptions
-        {
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>($"Create Review for {projectMeta.Name}",
+        new DialogParameters {
+            { "ShowComment", true },
+            { "Comment", projectMeta.Comment },
+            { "ShowVersion", true },
+            { "Version", projectMeta.VersionName },
+            { "NeedPassword", true }
+        },
+        new DialogOptions {
             MaxWidth = MaxWidth.Medium,
             FullWidth = true
         });
         DialogResult result = await dialog.Result;
         if (!result.Canceled)
         {
-            ProjectSaveInfo stateChange = (ProjectSaveInfo)result.Data;
-            if (await ProjectManagementService.TrySaveAsync(projectMeta, stateChange))
+            ConfirmDialog.ConfirmResult dialogResult = (ConfirmDialog.ConfirmResult)result.Data;
+            if (await ProjectManagementService.TrySaveAsync(projectMeta, new ProjectSaveInfo {
+                State = projectMeta.State,
+                VersionName = dialogResult.Version,
+                Comment = dialogResult.Comment
+            }))
             {
                 await ReceiveProjectsAsync();
             }
@@ -113,9 +120,10 @@ public partial class Projects : ComponentBase
         var options = new DialogOptions();
         var parameters = new DialogParameters
         {
-            { "ContentText", $"Are you sure you want to abandon review for project '{projectMeta.Name}'?" }
+            { "ContentText", $"Are you sure you want to abandon review for project '{projectMeta.Name}'?" },
+            { "NeedPassword", true }
         };
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Abandon review", parameters, options);
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Abandon Review", parameters, options);
         DialogResult result = await dialog.Result;
         if (!result.Canceled)
         {
@@ -123,7 +131,7 @@ public partial class Projects : ComponentBase
             {
                 State = SDK.Projects.ProjectState.Draft,
                 VersionName = projectMeta.VersionName,
-                Comment = "Abandoned review"
+                Comment = "Abandoned Review"
             }))
             {
                 await ReceiveProjectsAsync();
@@ -137,24 +145,26 @@ public partial class Projects : ComponentBase
 
     private async void OnSaveAsReadyClicked(ProjectMeta projectMeta)
     {
-        IDialogReference dialog = DialogService.Show<ConfirmProjectApproveDialog>($"Approve Project {projectMeta.Name}", new DialogParameters
-        {
-            { "Project", projectMeta }
-        }, new DialogOptions
-        {
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>($"Approve Project {projectMeta.Name}",
+        new DialogParameters {
+            { "ShowComment", true },
+            { "Comment", projectMeta.Comment },
+            { "NeedPassword", true }
+        },
+        new DialogOptions {
             MaxWidth = MaxWidth.Medium,
             FullWidth = true
         });
         DialogResult result = await dialog.Result;
         if (!result.Canceled)
         {
-            var resultProjectMetaDto = (ProjectMeta)result.Data;
+            var dialogResult = (ConfirmDialog.ConfirmResult)result.Data;
             if (await ProjectManagementService.TryApproveAsync(projectMeta, new ProjectSaveInfo
             {
                 State = SDK.Projects.ProjectState.Draft,
                 VersionName = projectMeta.VersionName,
-                Comment = resultProjectMetaDto.Comment,
-                UserName = resultProjectMetaDto.ApprovedBy
+                Comment = dialogResult.Comment,
+                UserName = dialogResult.UserName
             }))
             {
                 await ReceiveProjectsAsync();

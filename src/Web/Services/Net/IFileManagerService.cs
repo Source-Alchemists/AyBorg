@@ -11,4 +11,5 @@ public interface IFileManagerService
     ValueTask<IEnumerable<ModelMeta>> GetModelMetasAsync(GetModelMetasParameters parameters);
     ValueTask EditModelAsync(EditModelParameters parameters);
     ValueTask DeleteModelAsync(DeleteModelParameters parameters);
+    ValueTask ChangeModelStateAsync(ChangeModelStateParameters parameters);
 }

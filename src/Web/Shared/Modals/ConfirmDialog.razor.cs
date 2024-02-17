@@ -7,34 +7,51 @@ namespace AyBorg.Web.Shared.Modals;
 
 public partial class ConfirmDialog : ComponentBase
 {
-    [CascadingParameter] MudDialogInstance MudDialog { get; set; } = null!;
-    [Inject] UserManager<IdentityUser> UserManager { get; set; } = null!;
-    [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; } = null!;
+    [CascadingParameter] MudDialogInstance MudDialog { get; init; } = null!;
+    [Inject] UserManager<IdentityUser> UserManager { get; init; } = null!;
+    [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; init; } = null!;
 
-    [Parameter] public string ContentText { get; set; } = string.Empty;
+    [Parameter] public string ContentText { get; init; } = string.Empty;
+    [Parameter] public bool NeedPassword { get; init; } = false;
+    [Parameter] public bool ShowComment { get; init; } = false;
+    [Parameter] public string Comment { get; init; } = string.Empty;
+    [Parameter] public bool ShowVersion { get; init; } = false;
+    [Parameter] public string Version { get; init; } = string.Empty;
 
-    [Parameter] public bool NeedPassword { get; set; } = false;
-
+    private MudForm _form = null!;
     private string _password = string.Empty;
+    private string _comment = string.Empty;
+    private string _version = string.Empty;
     private string[] _errors = Array.Empty<string>();
 
-    protected override void OnAfterRender(bool firstRender)
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        base.OnAfterRender(firstRender);
+        await base.OnAfterRenderAsync(firstRender);
         if (firstRender)
         {
+            _comment = Comment;
+            _version = Version;
             _password = string.Empty;
-            _errors = Array.Empty<string>();
+            await InvokeAsync(StateHasChanged);
         }
     }
 
     private async void OnConfirmClicked()
     {
+        await _form.Validate();
+        string userName = string.Empty;
+
+        if (_errors.Any())
+        {
+            _errors = Array.Empty<string>();
+            return;
+        }
+
         if (NeedPassword)
         {
             AuthenticationState authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             System.Security.Claims.ClaimsPrincipal user = authState.User;
-            string userName = user.Identity!.Name!;
+            userName = user.Identity!.Name!;
             IdentityUser? identity = await UserManager.FindByNameAsync(userName);
 
             if (!await UserManager.CheckPasswordAsync(identity!, _password))
@@ -44,11 +61,13 @@ public partial class ConfirmDialog : ComponentBase
             }
         }
 
-        MudDialog.Close(DialogResult.Ok(true));
+        MudDialog.Close(DialogResult.Ok(new ConfirmResult(_comment, _version, userName)));
     }
 
     private void OnCancelClicked()
     {
         MudDialog.Cancel();
     }
+
+    public record ConfirmResult(string Comment, string Version, string UserName);
 }

@@ -25,13 +25,13 @@ else
                 <MudItem xs="12" md="4">
                     <MudStack Row="true" Spacing="0">
                         <MudTooltip Text="Draft" hidden="@(_projectState != ProjectState.Draft)">
-                            <MudIcon Icon="@Icons.Material.Filled.GppBad" Size="Size.Large" Color="Color.Error" />
+                            <MudIcon Icon="@Icons.Material.Filled.GppBad" Size="Size.Large" Color="Color.Default" />
                         </MudTooltip>
                         <MudTooltip Text="Review" hidden="@(_projectState != ProjectState.Review)">
                             <MudIcon Icon="@Icons.Material.Filled.SafetyCheck" Size="Size.Large" Color="Color.Warning" />
                         </MudTooltip>
                         <MudTooltip Text="Ready" hidden="@(_projectState != ProjectState.Ready)">
-                            <MudIcon Icon="@Icons.Material.Filled.GppGood" Size="Size.Large" Color="Color.Info" />
+                            <MudIcon Icon="@Icons.Material.Filled.GppGood" Size="Size.Large" Color="Color.Success" />
                         </MudTooltip>
                         <MudText Typo="Typo.h5" Class="pl-3">@_projectName</MudText>
                         <MudTooltip Text="Read only mode" hidden=@(_projectState == ProjectState.Draft)>

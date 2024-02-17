@@ -14,7 +14,7 @@
         <MudCard Class="rounded-lg">
             <MudCardHeader>
                 <CardHeaderAvatar>
-                    <MudIcon Icon="@Icons.Material.Filled.Hive" Size="Size.Large" Color="Color.Default" />
+                    <MudIcon Icon="@Icons.Material.Filled.Hive" Size="Size.Medium" Color="Color.Primary" />
                 </CardHeaderAvatar>
                 <CardHeaderContent>
                     <MudBadge Content="@(_projects.Count)" Overlap="true" Color="Color.Primary">
@@ -62,12 +62,12 @@
                         <MudTd>
                             <MudStack Row>
                                 <MudTooltip Text="Open">
-                                    <MudIconButton Icon="@Icons.Material.Filled.FolderOpen" 
+                                    <MudIconButton Icon="@Icons.Material.Filled.FolderOpen"
                                         Color="Color.Primary"
                                         OnClick="() => OnOpenClicked(context)" />
                                 </MudTooltip>
                                 <MudTooltip Text="Delete">
-                                    <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" 
+                                    <MudIconButton Icon="@Icons.Material.Filled.DeleteForever"
                                         Color="Color.Error"
                                         OnClick="() => OnDeleteProjectClicked(context)" />
                                 </MudTooltip>

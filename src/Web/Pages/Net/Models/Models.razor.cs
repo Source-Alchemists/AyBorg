@@ -128,10 +128,10 @@ public partial class Models : ComponentBase, IAsyncDisposable
         }
     }
 
-    private async Task EditModel(string modelId, string modelName)
+    private async Task EditModelClicked(FileManagerService.ModelMeta modelMeta)
     {
         IDialogReference dialog = DialogService.Show<EditModelDialog>("Edit Model", new DialogParameters {
-            { "Name", modelName }
+            { "Name", modelMeta.Name }
         }, new DialogOptions
         {
             MaxWidth = MaxWidth.Medium,
@@ -142,17 +142,17 @@ public partial class Models : ComponentBase, IAsyncDisposable
         if (!result.Canceled)
         {
             var newName = (string)result.Data;
-            if (newName.Equals(modelName))
+            if (newName.Equals(modelMeta.Name))
             {
                 return;
             }
 
             try
             {
-                await FileManagerService.EditModelAsync(new Services.Net.FileManagerService.EditModelParameters(
+                await FileManagerService.EditModelAsync(new FileManagerService.EditModelParameters(
                     ProjectId: ProjectId,
-                    ModelId: modelId,
-                    OldName: modelName,
+                    ModelId: modelMeta.Id,
+                    OldName: modelMeta.Name,
                     NewName: newName
                 ));
                 _isLoading = true;
@@ -167,11 +167,11 @@ public partial class Models : ComponentBase, IAsyncDisposable
         }
     }
 
-    private async Task DeleteModel(string modelId, string modelName)
+    private async Task DeleteModelClicked(FileManagerService.ModelMeta modelMeta)
     {
         IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete Model", new DialogParameters {
             { "NeedPassword", true },
-            { "ContentText", $"Are you sure you want to delete model '{modelName}'? This action cannot be undone."}
+            { "ContentText", $"Are you sure you want to delete model '{modelMeta.Name}'? This action cannot be undone."}
         });
 
         DialogResult result = await dialog.Result;
@@ -181,8 +181,8 @@ public partial class Models : ComponentBase, IAsyncDisposable
             {
                 await FileManagerService.DeleteModelAsync(new Services.Net.FileManagerService.DeleteModelParameters(
                     ProjectId: ProjectId,
-                    ModelId: modelId,
-                    ModelName: modelName
+                    ModelId: modelMeta.Id,
+                    ModelName: modelMeta.Name
                 ));
                 _isLoading = true;
                 await UpdateMetasAsync();
@@ -191,7 +191,84 @@ public partial class Models : ComponentBase, IAsyncDisposable
             }
             catch (RpcException)
             {
-                Snackbar.Add($"Failed to delete model [{modelName}]", Severity.Warning);
+                Snackbar.Add($"Failed to delete model [{modelMeta.Name}]", Severity.Warning);
+            }
+        }
+    }
+
+    private async Task CreateReviewClicked(FileManagerService.ModelMeta modelMeta)
+    {
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>($"Create Review for Model {modelMeta.Name}",
+        new DialogParameters {
+            { "ShowComment", true },
+            { "Comment", modelMeta.Comment },
+            { "NeedPassword", true }
+        },
+        new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        });
+
+        await ChangeModelState(modelMeta, dialog, Services.Net.FileManagerService.ModelState.Review);
+    }
+
+    private async Task ApproveClicked(FileManagerService.ModelMeta modelMeta)
+    {
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>($"Approve Model {modelMeta.Name}",
+        new DialogParameters {
+            { "ShowComment", true },
+            { "Comment", modelMeta.Comment },
+            { "NeedPassword", true }
+        },
+        new DialogOptions
+        {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        });
+        await ChangeModelState(modelMeta, dialog, Services.Net.FileManagerService.ModelState.Release);
+    }
+
+    private async Task AbandonClicked(FileManagerService.ModelMeta modelMeta)
+    {
+        IDialogReference dialog = DialogService.Show<ConfirmDialog>($"Abandon Review for Model {modelMeta.Name}",
+        new DialogParameters {
+            { "ContentText", $"Are you sure you want to abandon review for model '{modelMeta.Name}'?" },
+            { "Comment", "Abandoned Review" },
+            { "NeedPassword", true }
+        },
+        new DialogOptions {
+            MaxWidth = MaxWidth.Medium,
+            FullWidth = true
+        });
+
+        await ChangeModelState(modelMeta, dialog, Services.Net.FileManagerService.ModelState.Draft);
+    }
+
+    private async Task ChangeModelState(FileManagerService.ModelMeta modelMeta, IDialogReference dialog, FileManagerService.ModelState NewModelSate)
+    {
+        DialogResult dialogResult = await dialog.Result;
+        if (!dialogResult.Canceled)
+        {
+            var result = (ConfirmDialog.ConfirmResult)dialogResult.Data;
+            try
+            {
+                await FileManagerService.ChangeModelStateAsync(new Services.Net.FileManagerService.ChangeModelStateParameters(
+                    ProjectId: ProjectId,
+                    ModelId: modelMeta.Id,
+                    ModelName: modelMeta.Name,
+                    OldState: modelMeta.State,
+                    NewState: NewModelSate,
+                    Comment: result.Comment
+                ));
+                _isLoading = true;
+                await UpdateMetasAsync();
+                _isLoading = false;
+                await InvokeAsync(StateHasChanged);
+            }
+            catch (RpcException)
+            {
+                Snackbar.Add("Failed to change model state!", Severity.Warning);
             }
         }
     }

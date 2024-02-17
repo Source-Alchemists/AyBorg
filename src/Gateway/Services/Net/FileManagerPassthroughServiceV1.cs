@@ -122,4 +122,17 @@ public sealed class FileManagerPassthroughServiceV1 : FileManager.FileManagerBas
 
         return new Empty();
     }
+
+    public override async Task<Empty> ChangeModelState(ChangeModelStateRequest request, ServerCallContext context)
+    {
+        Metadata headers = AuthorizeUtil.Protect(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
+        IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Net);
+        foreach (ChannelInfo channel in channels)
+        {
+            FileManager.FileManagerClient client = _channelService.CreateClient<FileManager.FileManagerClient>(channel.ServiceUniqueName);
+            await client.ChangeModelStateAsync(request, headers);
+        }
+
+        return new Empty();
+    }
 }
