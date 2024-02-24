@@ -1,19 +1,15 @@
 using System.Collections.Immutable;
-using System.Security.Cryptography;
-using System.Text;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Net;
+using AyBorg.Web.Shared.Models;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
-using Microsoft.IO;
-using Microsoft.JSInterop;
 using MudBlazor;
 
 namespace AyBorg.Web.Pages.Net.Upload;
 
-public partial class Upload : ComponentBase, IAsyncDisposable
+public partial class Upload : ComponentBase
 {
     [Parameter] public string ProjectId { get; init; } = string.Empty;
     [Inject] IStateService StateService { get; init; } = null!;
@@ -22,23 +18,14 @@ public partial class Upload : ComponentBase, IAsyncDisposable
     [Inject] IDialogService DialogService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
     [Inject] NavigationManager NavigationManager { get; init; } = null!;
-    [Inject] IJSRuntime JSRuntime { get; init; } = null!;
 
-    private const int MAX_FILE_SIZE = 51200000; // 50MB
-    private static readonly RecyclableMemoryStreamManager s_memoryManager = new();
     private string _projectName = string.Empty;
-    private string _dragHoverClass = "mud-border-primary mud-elevation-1";
-    private ElementReference _fileDropContainerRef;
-    private InputFile _inputFileRef = null!;
     private MudAutocomplete<string> _tagField = null!;
-    private IJSObjectReference _fileDropModule = null!;
-    private IJSObjectReference _fileDropFunctionReference = null!;
     private HashSet<ImageSource> _imageSources = new();
     private IEnumerable<string> _projectTags = new List<string>();
     private IEnumerable<string> _availableTags => _projectTags.Where(t => !_selectedTags.Contains(t)).OrderBy(t => t);
     private ImmutableList<string> _selectedTags = ImmutableList<string>.Empty;
     private bool _isLoading = true;
-    private bool _isDisposed = false;
     private string _batchPlaceholder = string.Empty;
     private string _batchName = string.Empty;
 
@@ -48,9 +35,6 @@ public partial class Upload : ComponentBase, IAsyncDisposable
 
         if (firstRender)
         {
-            _fileDropModule = await JSRuntime.InvokeAsync<IJSObjectReference>("import", "./js/fileDropZone.js");
-            _fileDropFunctionReference = await _fileDropModule.InvokeAsync<IJSObjectReference>("initializeFileDropZone", _fileDropContainerRef, _inputFileRef.Element);
-
             await StateService.UpdateStateFromSessionStorageAsync();
             IEnumerable<Web.Shared.Models.Net.ProjectMeta> metas = await ProjectManagerService.GetMetasAsync();
             Web.Shared.Models.Net.ProjectMeta? targetMeta = metas.FirstOrDefault(m => m.Id.Equals(ProjectId, StringComparison.InvariantCultureIgnoreCase));
@@ -133,54 +117,15 @@ public partial class Upload : ComponentBase, IAsyncDisposable
         _selectedTags = _selectedTags.Add(value);
     }
 
-    private void OnDragHighlight(DragEventArgs dragEvent)
+    private async Task ImageAdded(ImageSource image)
     {
-        _dragHoverClass = "mud-border-info mud-elevation-3";
-    }
-
-    private void OnDragUnhighlight(DragEventArgs dragEvent)
-    {
-        _dragHoverClass = "mud-border-primary mud-elevation-1";
-    }
-
-    private void OnDrop(DragEventArgs dragEvent)
-    {
-        _dragHoverClass = "mud-border-primary mud-elevation-1";
-    }
-
-    private async void OnUploadFilesChanged(IReadOnlyList<IBrowserFile> files)
-    {
-        _isLoading = true;
-        try
+        if(_imageSources.Any(i => i.Hash.Equals(image.Hash)))
         {
-            foreach (IBrowserFile file in files)
-            {
-                await AddImageSourceAsync(file);
-            }
-        }
-        finally
-        {
-            _isLoading = false;
+            return;
         }
 
+        _imageSources.Add(image);
         await InvokeAsync(StateHasChanged);
-    }
-
-
-    private async Task OnInputFileChange(InputFileChangeEventArgs eventArgs)
-    {
-        _isLoading = true;
-        try
-        {
-            foreach (IBrowserFile file in eventArgs.GetMultipleFiles(maximumFileCount: int.MaxValue).Where(f => f.ContentType.StartsWith("image/")))
-            {
-                await AddImageSourceAsync(file);
-            }
-        }
-        finally
-        {
-            _isLoading = false;
-        }
     }
 
     private async Task OnSave()
@@ -247,28 +192,6 @@ public partial class Upload : ComponentBase, IAsyncDisposable
         }
     }
 
-    private async ValueTask AddImageSourceAsync(IBrowserFile file)
-    {
-        using Stream stream = file.OpenReadStream(maxAllowedSize: MAX_FILE_SIZE);
-        using MemoryStream ms = s_memoryManager.GetStream();
-        await stream.CopyToAsync(ms);
-        byte[] data = ms.ToArray();
-        byte[] hashBytes = SHA256.HashData(data);
-        var stringBuilder = new StringBuilder();
-        for (int index = 0; index < hashBytes.Length; index++)
-        {
-            stringBuilder.Append(hashBytes[index].ToString("x2"));
-        }
-
-        string hashValue = stringBuilder.ToString();
-        if (_imageSources.Any(s => s.Hash.Equals(hashValue, StringComparison.InvariantCultureIgnoreCase)))
-        {
-            return;
-        }
-
-        _imageSources.Add(new ImageSource(data, file.ContentType, hashValue));
-    }
-
     private async void OnDeleteImageClicked(string hashValue)
     {
         ImageSource? targetImage = _imageSources.FirstOrDefault(s => s.Hash.Equals(hashValue, StringComparison.InvariantCultureIgnoreCase));
@@ -278,44 +201,4 @@ public partial class Upload : ComponentBase, IAsyncDisposable
             await InvokeAsync(StateHasChanged);
         }
     }
-
-    private static string ToBase64String(ImageSource imageSource)
-    {
-        return $"data:{imageSource.ContentType};base64,{Convert.ToBase64String(imageSource.Data)}";
-    }
-
-    public async ValueTask DisposeAsync()
-    {
-
-        await DisposeAsync(true);
-        GC.SuppressFinalize(this);
-    }
-
-    private async ValueTask DisposeAsync(bool disposing)
-    {
-        if (disposing && !_isDisposed)
-        {
-            try
-            {
-                if (_fileDropFunctionReference != null)
-                {
-                    await _fileDropFunctionReference.InvokeVoidAsync("dispose");
-                    await _fileDropFunctionReference.DisposeAsync();
-                }
-
-                if (_fileDropModule != null)
-                {
-                    await _fileDropModule.DisposeAsync();
-                }
-            }
-            catch (JSDisconnectedException)
-            {
-                // No need to log, can only happen on site reload as SignalR is already disconnected.
-                // There is no memory leak in this case.
-            }
-            _isDisposed = true;
-        }
-    }
-
-    private sealed record ImageSource(byte[] Data, string ContentType, string Hash);
 }

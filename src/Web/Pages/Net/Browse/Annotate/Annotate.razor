@@ -1,4 +1,5 @@
 @page "/net/browse/{projectId}/annotate/{imageName}"
+@using AyBorg.Web.Shared.Display
 @using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
 
@@ -21,16 +22,16 @@
         <MudHidden Breakpoint="Breakpoint.MdAndUp" Invert>
             <MudItem xs="0" md="8">
                 <div class="d-flex flex-column mud-full-width">
-                    <MudPagination class="mx-auto" Count="@_selectedImageNames.Count()" 
-                        Selected="@_selectedImageNumber" 
+                    <MudPagination class="mx-auto" Count="@_selectedImageNames.Count()"
+                        Selected="@_selectedImageNumber"
                         SelectedChanged="@SelectedImageNumberChanged"
                         SelectedChanged:preventDefault="true" />
                 </div>
             </MudItem>
         </MudHidden>
         <MudItem xs="6" md="2" Class="d-flex flex-row-reverse">
-            <MudButton StartIcon="@Icons.Material.Filled.SaveAlt" 
-                    Variant="Variant.Filled" 
+            <MudButton StartIcon="@Icons.Material.Filled.SaveAlt"
+                    Variant="Variant.Filled"
                     Color="Color.Primary"
                     Disabled="@(!IsSaveEnabled())"
                     OnClick="@SaveClicked">
@@ -60,8 +61,8 @@
                     <MudTabs Class="mud-full-height overflow-hidden">
                         <MudTabPanel Text="Classes">
                             <div class="tab-content">
-                                <MudTextField @ref="_addClassFieldRef" T="string" Label="Add" Placeholder="Class like 'person' or 'car' (must be unique) ..." 
-                                    Adornment="Adornment.End" 
+                                <MudTextField @ref="_addClassFieldRef" T="string" Label="Add" Placeholder="Class like 'person' or 'car' (must be unique) ..."
+                                    Adornment="Adornment.End"
                                     AdornmentIcon="@Icons.Material.Filled.Add"
                                     OnAdornmentClick="AddClassClicked"
                                     Value="@_newClassName"
@@ -71,7 +72,7 @@
                                     Clearable/>
                                 @foreach (var classObj in _tempValues.ClassLabels.OrderBy(c => c.Index))
                                 {
-                                    <ClassSelectorItem ClassLabel="@classObj" 
+                                    <ClassSelectorItem ClassLabel="@classObj"
                                         DeleteDisabled="@IsClassDeleteable(classObj)"
                                         OnEditClicked="@ClassEditClicked"
                                         OnDeleteClicked="@ClassDeleteClicked"
@@ -84,7 +85,7 @@
                             <div class="tab-content">
                                 @foreach (var layerObj in _tempValues.Layers.Reverse())
                                 {
-                                    <LayerSelectorItem Layer="@layerObj" 
+                                    <LayerSelectorItem Layer="@layerObj"
                                         Name="@_tempValues.ClassLabels.First(c => c.Index.Equals(layerObj.ClassIndex)).Name"
                                         OnDeleteClicked="@LayerDeleteClicked" />
                                 }
@@ -103,8 +104,8 @@
             </MudCardHeader>
             <MudCardContent>
                 <div style="height: calc(100vh - 268px);">
-                    <AyBorg.Web.Shared.Display.Display2D 
-                        Base64Image="@(_imageContainer != null ? _imageContainer.ToBase64String() : string.Empty)" 
+                    <Display2D
+                        Base64Image="@(_imageContainer != null ? _imageContainer.ToBase64String() : string.Empty)"
                         ImageWidth="@(_imageContainer != null ? _imageContainer.Width : 0)"
                         ImageHeight="@(_imageContainer != null ? _imageContainer.Height : 0)"
                         Shapes="@_shapes"

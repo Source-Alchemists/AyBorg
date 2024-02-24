@@ -1,0 +1,8 @@
+<div class="image-selection-container pa-3 mud-full-width overflow-auto">
+    <MudStack Row>
+        @foreach (var imageSource in Sources)
+        {
+            <ImageThumbnail Source="imageSource" Width="@ItemSize" Height="@ItemSize" />
+        }
+    </MudStack>
+</div>

@@ -11,6 +11,7 @@
     --a-theme-compare-deletion-background-color: #ffeae9;
     --a-theme-compare-deletion-border-background-color: #ffd7d5;
     --a-theme-compare-neutral-background-color: #f4f6f8;
+    --a-theme-palette-background-grey-secondary: rgba(37,37,50,1);
 }
 
 html[data-color=dark] {
@@ -20,4 +21,5 @@ html[data-color=dark] {
     --a-theme-compare-deletion-background-color: #3a1d1e;
     --a-theme-compare-deletion-border-background-color: #602726;
     --a-theme-compare-neutral-background-color: #181d24;
+    --a-theme-palette-background-grey-secondary: rgba(245,245,245,1);
 }

@@ -245,6 +245,11 @@ public partial class Models : ComponentBase, IAsyncDisposable
         await ChangeModelState(modelMeta, dialog, Services.Net.FileManagerService.ModelState.Draft);
     }
 
+    private void InspectClicked(FileManagerService.ModelMeta modelMeta)
+    {
+        NavigationManager.NavigateTo($"net/models/{ProjectId}/inspect/{modelMeta.Id}");
+    }
+
     private async Task ChangeModelState(FileManagerService.ModelMeta modelMeta, IDialogReference dialog, FileManagerService.ModelState NewModelSate)
     {
         DialogResult dialogResult = await dialog.Result;

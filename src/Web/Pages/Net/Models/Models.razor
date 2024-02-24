@@ -1,6 +1,6 @@
 @page "/net/models/{projectId}"
 @using SDK.Authorization
-@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 
 <PageTitle>@_projectName | Models/NET | AyBorg</PageTitle>
 
@@ -78,6 +78,13 @@
                         <MudMenuItem  Icon="@Icons.Material.Filled.Edit" IconColor="Color.Default" OnClick="(() => EditModelClicked(context))" Disabled=@(context.State != Services.Net.FileManagerService.ModelState.Draft)>
                             Edit
                         </MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.Visibility" IconColor="Color.Info" OnClick="(() => InspectClicked(context))">
+                            Inspect
+                        </MudMenuItem>
+                        @if (@context.State != Services.Net.FileManagerService.ModelState.Release)
+                        {
+                            <MudDivider />
+                        }
                         @if (@context.State == Services.Net.FileManagerService.ModelState.Draft)
                         {
                             <MudMenuItem  Icon="@Icons.Material.Filled.SafetyCheck" IconColor="Color.Warning" OnClick="(() => CreateReviewClicked(context))">

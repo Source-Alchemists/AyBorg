@@ -1,4 +1,5 @@
 @page "/net/upload/{projectId}"
+@using AyBorg.Web.Shared
 @using SDK.Authorization
 @using SDK.Common
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
@@ -45,67 +46,33 @@
                     Clearable />
             </MudItem>
             <MudItem xs="12">
-                <div @ref="_fileDropContainerRef"
-                    class="mud-paper rounded-lg border-dashed border-2 pa-6 ma-8 @_dragHoverClass" dropzone="copy"
-                    @ondragenter="OnDragHighlight" @ondragenter:preventDefault="true"
-                    @ondragenter:stopPropagation="true" @ondragover="OnDragHighlight" @ondragover:preventDefault="true"
-                    @ondragover:stopPropagation="true" @ondragleave="OnDragUnhighlight"
-                    @ondragleave:preventDefault="true" @ondragleave:stopPropagation="true" @ondrop="OnDrop"
-                    @ondrop:preventDefault="true" @ondrop:stopPropagation="true">
-                    <MudGrid>
-                        <MudItem xs="12" Class="d-flex justify-center">
-                            <MudIcon Icon="@Icons.Material.Filled.Upload" Size="Size.Large" Color="Color.Primary" />
+                <FileDropArea OnImageAdded="@ImageAdded">
+                    <MudGrid Spacing="2">
+                    @foreach (var imageSource in _imageSources)
+                    {
+                        <MudItem xs="12" md="3">
+                            <div class="object-fill object-center mud-full-width">
+                                <MudImage Src="@(imageSource.ToBase64String())" Class="mud-full-width rounded-lg" />
+                                <button type="button" onclick="@(() => OnDeleteImageClicked(imageSource.Hash))"
+                                    class="mud-button-root mud-fab mud-fab-error mud-fab-size-small mud-ripple image-delete-button">
+                                    <span class="mud-fab-label">
+                                        <MudIcon Icon="@Icons.Material.Filled.Delete"
+                                            class="mud-icon-root mud-svg-icon mud-icon-size-small" />
+                                    </span>
+                                </button>
+                            </div>
                         </MudItem>
-                        <MudItem xs="12" Class="d-flex justify-center">
-                            <MudText Typo="Typo.h6" Color="Color.Primary">
-                                Drag and drop images to upload them.
-                            </MudText>
-                        </MudItem>
+                    }
+                    @if (_imageSources.Any())
+                    {
                         <MudItem xs="12" Class="d-flex justify-center">
                             <MudText Typo="Typo.subtitle1">
-                                Or
+                                <strong>@_imageSources.Count images ready to save</strong>
                             </MudText>
                         </MudItem>
-                        <MudItem xs="12" Class="d-flex justify-center">
-                            <InputFile @ref="_inputFileRef" OnChange="@OnInputFileChange" multiple hidden />
-
-                            <MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".png, .jpg"
-                                MaximumFileCount="@int.MaxValue" FilesChanged="OnUploadFilesChanged">
-                                <ButtonTemplate>
-                                    <MudButton HtmlTag="label" Variant="Variant.Filled"
-                                        StartIcon="@Icons.Material.Filled.DriveFolderUpload" for="@context.Id">Select
-                                        Files
-                                    </MudButton>
-                                </ButtonTemplate>
-                            </MudFileUpload>
-                        </MudItem>
-
-                        @foreach (var imageSource in _imageSources)
-                        {
-                            <MudItem xs="12" md="3">
-                                <div class="object-fill object-center mud-full-width">
-                                    <MudImage Src="@(ToBase64String(imageSource))" Class="mud-full-width rounded-lg" />
-                                    <button type="button" onclick="@(() => OnDeleteImageClicked(imageSource.Hash))"
-                                        class="mud-button-root mud-fab mud-fab-error mud-fab-size-small mud-ripple image-delete-button">
-                                        <span class="mud-fab-label">
-                                            <MudIcon Icon="@Icons.Material.Filled.Delete"
-                                                class="mud-icon-root mud-svg-icon mud-icon-size-small" />
-                                        </span>
-                                    </button>
-                                </div>
-                            </MudItem>
-                        }
-
-                        @if (_imageSources.Any())
-                        {
-                            <MudItem xs="12" Class="d-flex justify-center">
-                                <MudText Typo="Typo.subtitle1">
-                                    <strong>@_imageSources.Count images ready to save</strong>
-                                </MudText>
-                            </MudItem>
-                        }
+                    }
                     </MudGrid>
-                </div>
+                </FileDropArea>
             </MudItem>
         </MudGrid>
     </MudCardContent>

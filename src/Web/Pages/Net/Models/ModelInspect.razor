@@ -1,0 +1,38 @@
+@page "/net/models/{projectId}/inspect/{modelId}"
+@using AyBorg.Web.Shared
+@using AyBorg.Web.Shared.ImageSelection
+@using AyBorg.Web.Shared.Display
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
+
+<PageTitle>@_projectName/@_modelName | Inspect/NET | AyBorg</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+<MudGrid>
+    <MudItem xs="12" Class="mt-1">
+        <FileDropArea Hint="Drag and drop images to inspect them." OnImageAdded="@ImageAdded">
+            @if (_imageSources.Any())
+            {
+                <ImageSelection Sources="@_imageSources" />
+            }
+            else
+            {
+                <div style="min-height: 134px"></div>
+            }
+        </FileDropArea>
+    </MudItem>
+    <MudItem xs="12" class="mud-full-height">
+        <MudCard class="mud-full-height">
+            <MudCardHeader>
+                <MudText Typo="Typo.h6">Image</MudText>
+            </MudCardHeader>
+            <MudCardContent>
+                <div>
+                    @* <Display2D /> *@
+                </div>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>

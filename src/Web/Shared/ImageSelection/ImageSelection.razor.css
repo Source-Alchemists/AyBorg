@@ -1,0 +1,4 @@
+.image-selection-container {
+    height: calc(100%);
+    background-color: var(--a-theme-palette-background-grey-secondary);
+}
