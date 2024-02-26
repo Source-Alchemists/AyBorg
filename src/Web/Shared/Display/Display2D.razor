@@ -47,7 +47,7 @@
                         @onmousemove="SvgMouseMove"
                         @onmouseenter="SvgMouseEnter"
                         @onmouseleave="SvgMouseLeave">
-                        <image href="@Base64Image"
+                        <image class="@_pixelateClass" href="@Base64Image"
                             x="@_imagePosition.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                             y="@_imagePosition.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
                             width="@_imagePosition.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"

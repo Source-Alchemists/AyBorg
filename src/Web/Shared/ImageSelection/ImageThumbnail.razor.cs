@@ -8,16 +8,22 @@ public partial class ImageThumbnail : ComponentBase
     [Parameter] public ImageSource Source { get; init; } = null!;
     [Parameter] public int Width { get; init; } = 100;
     [Parameter] public int Height { get; init; } = 100;
+    [Parameter] public bool Select { get; init; } = false;
+    [Parameter] public EventCallback<ImageSource> OnSelectChanged { get; init; }
 
-    private string _containerStyle = "width: 100px; height: 100px;";
+    private string _selectClass => Select ? "image-thumbnail-container-selected" : string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender) {
         await base.OnAfterRenderAsync(firstRender);
 
          if (firstRender)
          {
-            _containerStyle = $"width: {Width}px; height: {Height}px;";
             await InvokeAsync(StateHasChanged);
          }
+    }
+
+    private async Task ImageClicked()
+    {
+        await OnSelectChanged.InvokeAsync(Source);
     }
 }

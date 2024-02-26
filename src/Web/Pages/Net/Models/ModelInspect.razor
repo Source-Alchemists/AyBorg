@@ -7,20 +7,13 @@
 
 <PageTitle>@_projectName/@_modelName | Inspect/NET | AyBorg</PageTitle>
 
-<div class="page-loading-bar">
+<div class="page-loading-bar mb-1">
     <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
 </div>
 <MudGrid>
-    <MudItem xs="12" Class="mt-1">
+    <MudItem xs="12">
         <FileDropArea Hint="Drag and drop images to inspect them." OnImageAdded="@ImageAdded">
-            @if (_imageSources.Any())
-            {
-                <ImageSelection Sources="@_imageSources" />
-            }
-            else
-            {
-                <div style="min-height: 134px"></div>
-            }
+            <ImageSelection Sources="@_imageSources" OnSelectionChanged="@ImageSelectionChanged" SelectedItem="@_selectedImageSource" />
         </FileDropArea>
     </MudItem>
     <MudItem xs="12" class="mud-full-height">
@@ -29,8 +22,11 @@
                 <MudText Typo="Typo.h6">Image</MudText>
             </MudCardHeader>
             <MudCardContent>
-                <div>
-                    @* <Display2D /> *@
+                <div class="model-inspect-display">
+                    <Display2D
+                        Base64Image="@(_selectedImageSource != null ? _selectedImageSource.ToBase64String() : string.Empty)"
+                        ImageWidth="@(_selectedImageSource != null ? _selectedImageSource.Width : 0)"
+                        ImageHeight="@(_selectedImageSource != null ? _selectedImageSource.Height : 0)"/>
                 </div>
             </MudCardContent>
         </MudCard>

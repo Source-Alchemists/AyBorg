@@ -29,6 +29,7 @@ public partial class Display2D : ComponentBase
     private string _containerStyle = "height: calc(100% - 90px)";
     private string _cursorClass = "default-cursor";
     private string _centerClass = "force-center";
+    private string _pixelateClass = "image-pixelated";
     private Rectangle _imagePosition = new();
     private int _svgWidth = 0;
     private int _svgHeight = 0;
@@ -92,6 +93,8 @@ public partial class Display2D : ComponentBase
                 _centerClass = "force-center";
             }
 
+            _pixelateClass = _svgScaleFactor > 1 ? "image-pixelated" : string.Empty;
+
             await InvokeAsync(StateHasChanged);
         }
     }
@@ -113,13 +116,13 @@ public partial class Display2D : ComponentBase
 
     private async Task ZoomIn()
     {
-        _userScaleFactor += 0.1f;
+        _userScaleFactor += 0.5f;
         await CalculateScaleFactorAndUpdateAsync();
     }
 
     private async Task ZoomOut()
     {
-        _userScaleFactor -= 0.1f;
+        _userScaleFactor -= 0.5f;
         _userScaleFactor = MathF.Max(1f, _userScaleFactor);
         await CalculateScaleFactorAndUpdateAsync();
     }

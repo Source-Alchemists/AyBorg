@@ -19,6 +19,10 @@
     background-color: var(--mud-palette-background-grey);
 }
 
+.image-pixelated {
+    image-rendering: pixelated;
+}
+
 .status-bar {
     position: relative;
     width: 100%;
@@ -26,6 +30,7 @@
     background-color: var(--mud-palette-background-grey);
     top: -4px;
     padding-top: 6px;
+    opacity: .7;
 }
 
 .position-text {

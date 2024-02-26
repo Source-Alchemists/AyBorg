@@ -11,33 +11,40 @@
     <MudGrid Class="mt-1">
         <MudItem xs="12" Class="d-flex justify-center py-0">
             <MudIcon Icon="@Icons.Material.Filled.Upload" Size="Size.Large" Color="Color.Primary" />
+            <InputFile @ref="_inputFileRef" OnChange="@OnInputFileChange" multiple hidden />
         </MudItem>
         <MudHidden Breakpoint="Breakpoint.Xs">
             <MudItem xs="12" Class="d-flex justify-center py-0">
-                <MudText Typo="Typo.h6" Color="Color.Primary">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Class="pt-2">
                     @Hint
                 </MudText>
-            </MudItem>
-        </MudHidden>
-        <MudHidden Breakpoint="Breakpoint.Xs">
-            <MudItem xs="12" Class="d-flex justify-center py-0">
-                <MudText Typo="Typo.subtitle1">
+                <MudText Typo="Typo.subtitle1" Class="px-2 pt-3">
                     Or
                 </MudText>
+                <MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".png, .jpg" MaximumFileCount="@int.MaxValue"
+                    FilesChanged="OnUploadFilesChanged">
+                    <ButtonTemplate>
+                        <MudButton HtmlTag="label" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DriveFolderUpload"
+                            for="@context.Id">Select
+                            Files
+                        </MudButton>
+                    </ButtonTemplate>
+                </MudFileUpload>
             </MudItem>
         </MudHidden>
-        <MudItem xs="12" Class="d-flex justify-center py-0">
-            <InputFile @ref="_inputFileRef" OnChange="@OnInputFileChange" multiple hidden />
-            <MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".png, .jpg" MaximumFileCount="@int.MaxValue"
-                FilesChanged="OnUploadFilesChanged">
-                <ButtonTemplate>
-                    <MudButton HtmlTag="label" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DriveFolderUpload"
-                        for="@context.Id">Select
-                        Files
-                    </MudButton>
-                </ButtonTemplate>
-            </MudFileUpload>
-        </MudItem>
+        <MudHidden Breakpoint="Breakpoint.Xs" Invert>
+            <MudItem xs="12" Class="d-flex justify-center py-0">
+                <MudFileUpload T="IReadOnlyList<IBrowserFile>" Accept=".png, .jpg" MaximumFileCount="@int.MaxValue"
+                    FilesChanged="OnUploadFilesChanged">
+                    <ButtonTemplate>
+                        <MudButton HtmlTag="label" Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.DriveFolderUpload"
+                            for="@context.Id">Select
+                            Files
+                        </MudButton>
+                    </ButtonTemplate>
+                </MudFileUpload>
+            </MudItem>
+        </MudHidden>
         <MudItem xs="12">
             @ChildContent
         </MudItem>
