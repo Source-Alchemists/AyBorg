@@ -12,6 +12,7 @@ namespace AyBorg.Web.Pages.Cognitive.Upload;
 public partial class Upload : ComponentBase
 {
     [Parameter] public string ProjectId { get; init; } = string.Empty;
+    [Inject] ILogger<Upload> Logger { get; init; } = null!;
     [Inject] IStateService StateService { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
@@ -181,8 +182,9 @@ public partial class Upload : ComponentBase
             Snackbar.Add("Upload finished!", Severity.Info);
             NavigationManager.NavigateTo($"cognitive/browse/{ProjectId}");
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
+            Logger.LogWarning(ex, "Failed to upload images!");
             Snackbar.Add("Failed to upload images!", Severity.Warning);
         }
         finally

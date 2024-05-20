@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using AyBorg.SDK.Common;
 using AyBorg.Web.Pages.Cognitive.Shared;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Cognitive;
@@ -13,6 +14,7 @@ namespace AyBorg.Web.Pages.Cognitive.Datasets;
 public partial class Datasets : ComponentBase
 {
     [Parameter] public string ProjectId { get; init; } = string.Empty;
+    [Inject] ILogger<Datasets> Logger { get; init; } = null!;
     [Inject] IStateService StateService { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IDatasetManagerService DatasetManagerService { get; init; } = null!;
@@ -51,8 +53,9 @@ public partial class Datasets : ComponentBase
                     ProjectMeta? targetMeta = metas.FirstOrDefault(m => m.Id.Equals(ProjectId, StringComparison.InvariantCultureIgnoreCase));
                     _projectName = targetMeta != null ? targetMeta.Name : string.Empty;
                 }
-                catch (RpcException)
+                catch (RpcException ex)
                 {
+                    Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to get project informations!");
                     Snackbar.Add("Failed to get project informations!", Severity.Warning);
                 }
             }
@@ -76,8 +79,9 @@ public partial class Datasets : ComponentBase
             CalcDistribution();
             UpdateGenerateButton();
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to get dataset informations!");
             Snackbar.Add("Failed to get dataset informantions!", Severity.Warning);
         }
     }
@@ -135,8 +139,9 @@ public partial class Datasets : ComponentBase
             _activeDataset = _tempDataset with { };
             UpdateSaveButton();
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to edit dataset!");
             Snackbar.Add("Failed to edit dataset!", Severity.Warning);
         }
     }
@@ -201,8 +206,9 @@ public partial class Datasets : ComponentBase
                 Snackbar.Add("Dataset deleted", Severity.Success);
             }
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to delete dataset!");
             Snackbar.Add("Failed to delete dataset", Severity.Warning);
         }
 
@@ -235,9 +241,10 @@ public partial class Datasets : ComponentBase
                 Snackbar.Add("Model Training started", Severity.Info);
                 NavigationManager.NavigateTo("cognitive/jobs");
             }
-            catch (RpcException)
+            catch (RpcException ex)
             {
-                Snackbar.Add("Failed to start Model Training!", Severity.Warning);
+                Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to start model training!");
+                Snackbar.Add("Failed to start model training!", Severity.Warning);
             }
         }
     }

@@ -12,6 +12,7 @@ public partial class ImageThumbnail : ComponentBase
     [Parameter] public bool DatasetUsed { get; init; } = false;
     [Parameter] public EventCallback<SelectChangedArgs> OnSelectChanged { get; set; }
     [Parameter] public EventCallback<string> OnAnnotateClicked { get; set; }
+    [Inject] ILogger<ImageThumbnail> Logger { get; init; } = null!;
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
 
     private FileManagerService.ImageContainer _imageContainer = null!;
@@ -34,9 +35,9 @@ public partial class ImageThumbnail : ComponentBase
                     AsThumbnail: true
                     ));
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
-            // Already logged.
+            Logger.LogWarning(ex, "Failed to download image!");
         }
     }
 

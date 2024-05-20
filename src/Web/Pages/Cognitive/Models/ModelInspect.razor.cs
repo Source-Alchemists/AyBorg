@@ -12,6 +12,7 @@ public partial class ModelInspect : ComponentBase
 {
     [Parameter] public string ProjectId { get; init; } = string.Empty;
     [Parameter] public string ModelId { get; init; } = string.Empty;
+    [Inject] ILogger<ModelInspect> Logger { get; init; } = null!;
     [Inject] IStateService StateService { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
@@ -44,8 +45,9 @@ public partial class ModelInspect : ComponentBase
                     ProjectMeta? targetMeta = projectMetas.FirstOrDefault(m => m.Id.Equals(ProjectId, StringComparison.InvariantCultureIgnoreCase));
                     _projectName = targetMeta != null ? targetMeta.Name : string.Empty;
                 }
-                catch (RpcException)
+                catch (RpcException ex)
                 {
+                    Logger.LogWarning(ex, "Failed to get project informations!");
                     Snackbar.Add("Failed to get project informations!", Severity.Warning);
                 }
             }
@@ -58,8 +60,9 @@ public partial class ModelInspect : ComponentBase
                 _modelMeta = modelMetas.First(m => m.Id.Equals(ModelId));
                 _modelName = _modelMeta.Name;
             }
-            catch (RpcException)
+            catch (RpcException ex)
             {
+                Logger.LogWarning(ex, "Failed to get model informations!");
                 Snackbar.Add("Failed to get model informations!", Severity.Warning);
             }
 

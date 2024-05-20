@@ -1,7 +1,6 @@
 using Ayborg.Gateway.Cognitive.V1;
 using AyBorg.SDK.Common;
 using AyBorg.Web.Shared.Models.Cognitive;
-using Grpc.Core;
 
 namespace AyBorg.Web.Services.Cognitive;
 
@@ -18,106 +17,78 @@ public class AnnotationManagerService : IAnnotationManagerService
 
     public async ValueTask<Meta> GetMetaAsync(GetMetaParameters parameters)
     {
-        try
+        AnnotationMeta response = await _annotationManagerClient.GetMetaAsync(new GetAnnotationMetaRequest
         {
-            AnnotationMeta response = await _annotationManagerClient.GetMetaAsync(new GetAnnotationMetaRequest
-            {
-                ProjectId = parameters.ProjectId,
-                ImageName = parameters.ImageName
-            });
+            ProjectId = parameters.ProjectId,
+            ImageName = parameters.ImageName
+        });
 
-            return new Meta(response.Tags, response.LayerIds);
-        }
-        catch (RpcException ex)
-        {
-            _logger.LogWarning((int)EventLogType.Download, ex, "Failed to receive image annotation meta informations!");
-            throw;
-        }
+        return new Meta(response.Tags, response.LayerIds);
     }
 
     public async ValueTask<RectangleLayer> GetRectangleLayer(GetRectangleLayerParameters parameters)
     {
-        try
-        {
-            AnnotationLayer response = await _annotationManagerClient.GetAsync(new GetAnnotationRequest
-            {
-                ProjectId = parameters.ProjectId,
-                ImageName = parameters.ImageName,
-                Type = (int)parameters.ProjectType,
-                LayerId = parameters.LayerId
-            });
 
-            Ayborg.Gateway.Cognitive.V1.Point p1 = response.Points[0];
-            Ayborg.Gateway.Cognitive.V1.Point p2 = response.Points[1];
-
-            return new RectangleLayer
-            {
-                Id = response.Id,
-                ClassIndex = response.ClassIndex,
-                Shape = new Shared.LabelRectangle(p1.X, p1.Y, p2.X, p2.Y)
-            };
-        }
-        catch (RpcException ex)
+        AnnotationLayer response = await _annotationManagerClient.GetAsync(new GetAnnotationRequest
         {
-            _logger.LogWarning((int)EventLogType.Download, ex, "Failed to receive image annotation layer!");
-            throw;
-        }
+            ProjectId = parameters.ProjectId,
+            ImageName = parameters.ImageName,
+            Type = (int)parameters.ProjectType,
+            LayerId = parameters.LayerId
+        });
+
+        Point p1 = response.Points[0];
+        Point p2 = response.Points[1];
+
+        return new RectangleLayer
+        {
+            Id = response.Id,
+            ClassIndex = response.ClassIndex,
+            Shape = new Shared.LabelRectangle(p1.X, p1.Y, p2.X, p2.Y)
+        };
     }
 
     public async ValueTask AddAsync(AddParameters parameters)
     {
-        try
+
+        AnnotationLayer layer = new()
         {
-            AnnotationLayer layer = new()
-            {
-                Id = parameters.LayerId.ToString(),
-                ClassIndex = parameters.ClassIndex
-            };
+            Id = parameters.LayerId.ToString(),
+            ClassIndex = parameters.ClassIndex
+        };
 
-            foreach (SDK.Common.Models.Point point in parameters.Points)
+        foreach (SDK.Common.Models.Point point in parameters.Points)
+        {
+            layer.Points.Add(new Point
             {
-                layer.Points.Add(new Ayborg.Gateway.Cognitive.V1.Point
-                {
-                    X = point.X,
-                    Y = point.Y
-                });
-            }
-
-            await _annotationManagerClient.AddAsync(new AddAnnotationRequest
-            {
-                ProjectId = parameters.ProjectId,
-                ImageName = parameters.ImageName,
-                Type = (int)parameters.ProjectType,
-                Layer = layer
+                X = point.X,
+                Y = point.Y
             });
+        }
 
-            _logger.LogInformation((int)EventLogType.UserInteraction, "Added annotation to project {ProjectId}, image {ImageName} for class {ClassIndex}", parameters.ProjectId, parameters.ImageName, parameters.ClassIndex);
-        }
-        catch (RpcException ex)
+        await _annotationManagerClient.AddAsync(new AddAnnotationRequest
         {
-            _logger.LogWarning((int)EventLogType.Upload, ex, "Failed to add annotation!");
-            throw;
-        }
+            ProjectId = parameters.ProjectId,
+            ImageName = parameters.ImageName,
+            Type = (int)parameters.ProjectType,
+            Layer = layer
+        });
+
+        _logger.LogInformation((int)EventLogType.UserInteraction, "Added annotation to project {ProjectId}, image {ImageName} for class {ClassIndex}", parameters.ProjectId, parameters.ImageName, parameters.ClassIndex);
     }
 
     public async ValueTask RemoveAsync(RemoveParameters parameters)
     {
-        try
-        {
-            await _annotationManagerClient.RemoveAsync(new RemoveAnnotationRequest
-            {
-                ProjectId = parameters.ProjectId,
-                ImageName = parameters.ImageName,
-                LayerId = parameters.LayerId
-            });
 
-            _logger.LogInformation((int)EventLogType.UserInteraction, "Removed annotation from project {ProjectId}, image {ImageName} for layer {LayerId}.", parameters.ProjectId, parameters.ImageName, parameters.LayerId);
-        }
-        catch (RpcException ex)
+        await _annotationManagerClient.RemoveAsync(new RemoveAnnotationRequest
         {
-            _logger.LogWarning((int)EventLogType.Upload, ex, "Failed to remove annotation!");
-            throw;
-        }
+            ProjectId = parameters.ProjectId,
+            ImageName = parameters.ImageName,
+            LayerId = parameters.LayerId
+        });
+
+        _logger.LogInformation((int)EventLogType.UserInteraction, "Removed annotation from project {ProjectId}, image {ImageName} for layer {LayerId}.", parameters.ProjectId, parameters.ImageName, parameters.LayerId);
+
     }
 
     public sealed record GetMetaParameters(string ProjectId, string ImageName);

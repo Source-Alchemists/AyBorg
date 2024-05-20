@@ -21,79 +21,63 @@ public class FileManagerService : IFileManagerService
 
     public async ValueTask UploadImageAsync(UploadImageParameters parameters)
     {
-        try
+        using AsyncClientStreamingCall<ImageUploadRequest, Google.Protobuf.WellKnownTypes.Empty> request = _fileManagerClient.UploadImage(cancellationToken: CancellationToken.None);
+
+        int bytesToSend = parameters.Data.Length;
+        int bufferSize = bytesToSend < CHUNK_SIZE ? bytesToSend : CHUNK_SIZE;
+        int offset = 0;
+
+        ReadOnlyMemory<byte> readOnlyMemory = new(parameters.Data);
+
+        while (bytesToSend > 0)
         {
-            using AsyncClientStreamingCall<ImageUploadRequest, Google.Protobuf.WellKnownTypes.Empty> request = _fileManagerClient.UploadImage(cancellationToken: CancellationToken.None);
-
-            int bytesToSend = parameters.Data.Length;
-            int bufferSize = bytesToSend < CHUNK_SIZE ? bytesToSend : CHUNK_SIZE;
-            int offset = 0;
-
-            ReadOnlyMemory<byte> readOnlyMemory = new(parameters.Data);
-
-            while (bytesToSend > 0)
+            if (bytesToSend < bufferSize)
             {
-                if (bytesToSend < bufferSize)
-                {
-                    bufferSize = bytesToSend;
-                }
-
-                ReadOnlyMemory<byte> slice = readOnlyMemory.Slice(offset, bufferSize);
-                bytesToSend -= bufferSize;
-                offset += bufferSize;
-
-                var chunkRequest = new ImageUploadRequest
-                {
-                    ProjectId = parameters.ProjectId,
-                    StreamLength = parameters.Data.Length,
-                    Data = UnsafeByteOperations.UnsafeWrap(slice),
-                    CollectionId = parameters.CollectionId,
-                    CollectionIndex = parameters.CollectionIndex,
-                    CollectionSize = parameters.CollectionSize,
-                    ContentType = parameters.ContentType
-                };
-
-                await request.RequestStream.WriteAsync(chunkRequest, cancellationToken: CancellationToken.None);
+                bufferSize = bytesToSend;
             }
 
-            await request.RequestStream.CompleteAsync();
-            await request;
+            ReadOnlyMemory<byte> slice = readOnlyMemory.Slice(offset, bufferSize);
+            bytesToSend -= bufferSize;
+            offset += bufferSize;
+
+            var chunkRequest = new ImageUploadRequest
+            {
+                ProjectId = parameters.ProjectId,
+                StreamLength = parameters.Data.Length,
+                Data = UnsafeByteOperations.UnsafeWrap(slice),
+                CollectionId = parameters.CollectionId,
+                CollectionIndex = parameters.CollectionIndex,
+                CollectionSize = parameters.CollectionSize,
+                ContentType = parameters.ContentType
+            };
+
+            await request.RequestStream.WriteAsync(chunkRequest, cancellationToken: CancellationToken.None);
         }
-        catch (RpcException ex)
-        {
-            _logger.LogWarning((int)EventLogType.Upload, ex, "Could not upload image!");
-            throw;
-        }
+
+        await request.RequestStream.CompleteAsync();
+        await request;
     }
 
     public async ValueTask ConfirmUploadAsync(ConfirmUploadParameters parameters)
     {
-        try
+        var request = new ConfirmUploadRequest
         {
-            var request = new ConfirmUploadRequest
-            {
-                ProjectId = parameters.ProjectId,
-                CollectionId = parameters.CollectionId,
-                BatchName = parameters.BatchName
-            };
+            ProjectId = parameters.ProjectId,
+            CollectionId = parameters.CollectionId,
+            BatchName = parameters.BatchName
+        };
 
-            foreach (string tag in parameters.Tags)
-            {
-                request.Tags.Add(tag);
-            }
-
-            foreach (int dis in parameters.Distribution)
-            {
-                request.Distribution.Add(dis);
-            }
-
-            await _fileManagerClient.ConfirmUploadAsync(request);
-        }
-        catch (RpcException ex)
+        foreach (string tag in parameters.Tags)
         {
-            _logger.LogWarning((int)EventLogType.Upload, ex, "Failed to confirm upload [{UploadId}]!", parameters.CollectionId);
-            throw;
+            request.Tags.Add(tag);
         }
+
+        foreach (int dis in parameters.Distribution)
+        {
+            request.Distribution.Add(dis);
+        }
+
+        await _fileManagerClient.ConfirmUploadAsync(request);
     }
 
     public async ValueTask<ImageContainer> DownloadImageAsync(DownloadImageParameters parameters)
@@ -134,11 +118,6 @@ public class FileManagerService : IFileManagerService
                                                 contentType,
                                                 width, height);
         }
-        catch (RpcException ex)
-        {
-            _logger.LogWarning((int)EventLogType.Download, ex, "Failed to download image [{ImageName}] from project [{ProjectId}]!", parameters.ImageName, parameters.ProjectId);
-            throw;
-        }
         finally
         {
             memoryOwner?.Dispose();
@@ -149,124 +128,88 @@ public class FileManagerService : IFileManagerService
 
     public async ValueTask<ImageCollectionMeta> GetImageCollectionMetaAsync(GetImageCollectionMetaParameters parameters)
     {
-        try
+        var request = new GetImageCollectionMetaRequest
         {
-            var request = new GetImageCollectionMetaRequest
-            {
-                ProjectId = parameters.ProjectId,
-                BatchName = parameters.BatchName ?? string.Empty,
-                SplitGroup = parameters.SplitGroup ?? string.Empty,
-            };
-            foreach (string tag in parameters.Tags)
-            {
-                request.Tags.Add(tag);
-            }
+            ProjectId = parameters.ProjectId,
+            BatchName = parameters.BatchName ?? string.Empty,
+            SplitGroup = parameters.SplitGroup ?? string.Empty,
+        };
+        foreach (string tag in parameters.Tags)
+        {
+            request.Tags.Add(tag);
+        }
 
-            Ayborg.Gateway.Cognitive.V1.ImageCollectionMeta response = await _fileManagerClient.GetImageCollectionMetaAsync(request);
-            return new ImageCollectionMeta(
-                UnannotatedFileNames: response.UnannotatedFileNames,
-                AnnotatedFileNames: response.AnnotatedFilesNames,
-                BatchNames: response.BatchNames,
-                Tags: response.Tags
-                );
-        }
-        catch (RpcException ex)
-        {
-            _logger.LogWarning((int)EventLogType.Download, ex, "Failed to receive image collection meta informations!");
-            throw;
-        }
+        Ayborg.Gateway.Cognitive.V1.ImageCollectionMeta response = await _fileManagerClient.GetImageCollectionMetaAsync(request);
+        return new ImageCollectionMeta(
+            UnannotatedFileNames: response.UnannotatedFileNames,
+            AnnotatedFileNames: response.AnnotatedFilesNames,
+            BatchNames: response.BatchNames,
+            Tags: response.Tags
+            );
+
     }
 
     public async ValueTask<IEnumerable<ModelMeta>> GetModelMetasAsync(GetModelMetasParameters parameters)
     {
-        try
+        List<ModelMeta> result = new();
+        AsyncServerStreamingCall<Ayborg.Gateway.Cognitive.V1.ModelMeta> response = _fileManagerClient.GetModelMetas(new GetModelMetasRequest
         {
-            List<ModelMeta> result = new();
-            AsyncServerStreamingCall<Ayborg.Gateway.Cognitive.V1.ModelMeta> response = _fileManagerClient.GetModelMetas(new GetModelMetasRequest
-            {
-                ProjectId = parameters.ProjectId
-            });
+            ProjectId = parameters.ProjectId
+        });
 
-            await foreach (Ayborg.Gateway.Cognitive.V1.ModelMeta modelMetaDto in response.ResponseStream.ReadAllAsync())
-            {
-                result.Add(new ModelMeta(
-                    Id: modelMetaDto.Id,
-                    Name: modelMetaDto.Name,
-                    Type: (ProjectType)modelMetaDto.Type,
-                    CreationDate: modelMetaDto.CreationDate.ToDateTime(),
-                    Classes: modelMetaDto.Classes.ToArray(),
-                    State: (ModelState)modelMetaDto.State,
-                    Comment: modelMetaDto.Comment
-                ));
-            }
-
-            return result;
-        }
-        catch (RpcException ex)
+        await foreach (Ayborg.Gateway.Cognitive.V1.ModelMeta modelMetaDto in response.ResponseStream.ReadAllAsync())
         {
-            _logger.LogWarning((int)EventLogType.Download, ex, "Failed to receive model metas!");
-            throw;
+            result.Add(new ModelMeta(
+                Id: modelMetaDto.Id,
+                Name: modelMetaDto.Name,
+                Type: (ProjectType)modelMetaDto.Type,
+                CreationDate: modelMetaDto.CreationDate.ToDateTime(),
+                Classes: modelMetaDto.Classes.ToArray(),
+                State: (ModelState)modelMetaDto.State,
+                Comment: modelMetaDto.Comment
+            ));
         }
+
+        return result;
+
     }
 
     public async ValueTask EditModelAsync(EditModelParameters parameters)
     {
-        try
+        await _fileManagerClient.EditModelAsync(new EditModelRequest
         {
-            await _fileManagerClient.EditModelAsync(new EditModelRequest
-            {
-                ProjectId = parameters.ProjectId,
-                ModelId = parameters.ModelId,
-                Name = parameters.NewName
-            });
-            if (!parameters.OldName.Equals(parameters.NewName, StringComparison.InvariantCulture))
-            {
-                _logger.LogInformation((int)EventLogType.UserInteraction, "Changed model [{ModelName} ({ModelId})] name to [{Name}].", parameters.OldName, parameters.ModelId, parameters.NewName);
-            }
-        }
-        catch (RpcException ex)
+            ProjectId = parameters.ProjectId,
+            ModelId = parameters.ModelId,
+            Name = parameters.NewName
+        });
+        if (!parameters.OldName.Equals(parameters.NewName, StringComparison.InvariantCulture))
         {
-            _logger.LogWarning((int)EventLogType.Cognitive, ex, "Failed to edit model!");
-            throw;
+            _logger.LogInformation((int)EventLogType.UserInteraction, "Changed model [{ModelName} ({ModelId})] name to [{Name}].", parameters.OldName, parameters.ModelId, parameters.NewName);
         }
+
     }
 
     public async ValueTask ChangeModelStateAsync(ChangeModelStateParameters parameters)
     {
-        try
+        await _fileManagerClient.ChangeModelStateAsync(new ChangeModelStateRequest
         {
-            await _fileManagerClient.ChangeModelStateAsync(new ChangeModelStateRequest
-            {
-                ProjectId = parameters.ProjectId,
-                ModelId = parameters.ModelId,
-                State = (Ayborg.Gateway.Cognitive.V1.ModelState)parameters.NewState,
-                Comment = parameters.Comment
-            });
-            _logger.LogInformation((int)EventLogType.UserInteraction, "Model [{ModelName} ({ModelId})] state changed from [{ModelState}] to [{ModelState}].", parameters.ModelName, parameters.ModelId, parameters.OldState, parameters.NewState);
-        }
-        catch (RpcException ex)
-        {
-            _logger.LogWarning((int)EventLogType.Cognitive, ex, "Failed to change model state!");
-            throw;
-        }
+            ProjectId = parameters.ProjectId,
+            ModelId = parameters.ModelId,
+            State = (Ayborg.Gateway.Cognitive.V1.ModelState)parameters.NewState,
+            Comment = parameters.Comment
+        });
+        _logger.LogInformation((int)EventLogType.UserInteraction, "Model [{ModelName} ({ModelId})] state changed from [{OldModelState}] to [{NewModelState}].", parameters.ModelName, parameters.ModelId, parameters.OldState, parameters.NewState);
     }
 
     public async ValueTask DeleteModelAsync(DeleteModelParameters parameters)
     {
-        try
+        await _fileManagerClient.DeleteModelAsync(new DeleteModelRequest
         {
-            await _fileManagerClient.DeleteModelAsync(new DeleteModelRequest
-            {
-                ProjectId = parameters.ProjectId,
-                ModelId = parameters.ModelId
-            });
-            _logger.LogInformation((int)EventLogType.UserInteraction, "Deleted model [{ModelName} ({ModelId})].", parameters.ModelName, parameters.ModelId);
-        }
-        catch (RpcException ex)
-        {
-            _logger.LogWarning((int)EventLogType.Cognitive, ex, "Failed to delete model!");
-            throw;
-        }
+            ProjectId = parameters.ProjectId,
+            ModelId = parameters.ModelId
+        });
+        _logger.LogInformation((int)EventLogType.UserInteraction, "Deleted model [{ModelName} ({ModelId})].", parameters.ModelName, parameters.ModelId);
+
     }
 
     public sealed record UploadImageParameters(string ProjectId, byte[] Data, string ContentType, string CollectionId, int CollectionIndex = 0, int CollectionSize = 1);

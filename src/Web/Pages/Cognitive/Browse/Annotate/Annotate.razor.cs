@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Cognitive;
@@ -17,6 +18,7 @@ public partial class Annotate : ComponentBase
     [Parameter] public string ProjectId { get; init; } = string.Empty;
     [Parameter] public string ImageName { get; init; } = string.Empty;
 
+    [Inject] ILogger<Annotate> Logger { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
     [Inject] IAnnotationManagerService AnnotationManagerService { get; init; } = null!;
@@ -102,8 +104,9 @@ public partial class Annotate : ComponentBase
             _tempValues = _initialValues with { };
 
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to get meta information!");
             Snackbar.Add("Failed to get meta information!", Severity.Warning);
         }
 
@@ -277,8 +280,9 @@ public partial class Annotate : ComponentBase
             await SaveAnnotationsAsync();
             _initialValues = _tempValues with { };
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to save annotation!");
             Snackbar.Add("Failed to save annotation!", Severity.Warning);
         }
     }

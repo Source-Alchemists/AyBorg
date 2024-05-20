@@ -1,3 +1,4 @@
+using AyBorg.SDK.Common;
 using AyBorg.Web.Services.Cognitive;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
@@ -9,6 +10,7 @@ public partial class GenerateDatasetDialog : ComponentBase
 {
     [CascadingParameter] MudDialogInstance MudDialog { get; init; } = null!;
     [Inject] IDatasetManagerService DatasetManagerService { get; init; } = null!;
+    [Inject] ILogger<GenerateDatasetDialog> Logger { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
     [Parameter] public string ProjectId { get; init; } = string.Empty;
     [Parameter] public string DatasetId { get; init; } = string.Empty;
@@ -55,8 +57,9 @@ public partial class GenerateDatasetDialog : ComponentBase
             Snackbar.Add("Dataset generated", Severity.Success);
             MudDialog.Close(DialogResult.Ok(true));
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to generate dataset!");
             Snackbar.Add("Failed to generate dataset!", Severity.Warning);
         }
 

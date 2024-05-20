@@ -7,12 +7,15 @@ using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Collections.Immutable;
 using AyBorg.Web.Shared.Modals;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
+using AyBorg.SDK.Common;
 
 namespace AyBorg.Web.Pages.Cognitive.Models;
 
 public partial class Models : ComponentBase, IAsyncDisposable
 {
     [Parameter] public string ProjectId { get; init; } = string.Empty;
+    [Inject] ILogger<Models> Logger { get; init; } = null!;
     [Inject] IStateService StateService { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IJobManagerService JobManagerService { get; init; } = null!;
@@ -49,8 +52,9 @@ public partial class Models : ComponentBase, IAsyncDisposable
                     ProjectMeta? targetMeta = projectMetas.FirstOrDefault(m => m.Id.Equals(ProjectId, StringComparison.InvariantCultureIgnoreCase));
                     _projectName = targetMeta != null ? targetMeta.Name : string.Empty;
                 }
-                catch (RpcException)
+                catch (RpcException ex)
                 {
+                    Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to get project informations!");
                     Snackbar.Add("Failed to get project informations!", Severity.Warning);
                 }
             }
@@ -74,8 +78,9 @@ public partial class Models : ComponentBase, IAsyncDisposable
         {
             _datasetMetas = await DatasetManagerService.GetMetasAsync(new DatasetManagerService.GetMetasParameters(ProjectId));
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to get database informations!");
             Snackbar.Add("Failed to get database informations!", Severity.Warning);
             return;
         }
@@ -121,9 +126,10 @@ public partial class Models : ComponentBase, IAsyncDisposable
                 Snackbar.Add("Model Training started", Severity.Info);
                 NavigationManager.NavigateTo("cognitive/jobs");
             }
-            catch (RpcException)
+            catch (RpcException ex)
             {
-                Snackbar.Add("Failed to start Model Training!", Severity.Warning);
+                Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to start model training!");
+                Snackbar.Add("Failed to start model training!", Severity.Warning);
             }
         }
     }
@@ -141,7 +147,7 @@ public partial class Models : ComponentBase, IAsyncDisposable
         DialogResult result = await dialog.Result;
         if (!result.Canceled)
         {
-            var newName = (string)result.Data;
+            string newName = (string)result.Data;
             if (newName.Equals(modelMeta.Name))
             {
                 return;
@@ -160,8 +166,9 @@ public partial class Models : ComponentBase, IAsyncDisposable
                 _isLoading = false;
                 await InvokeAsync(StateHasChanged);
             }
-            catch (RpcException)
+            catch (RpcException ex)
             {
+                Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to edit model!");
                 Snackbar.Add("Failed to edit model!");
             }
         }
@@ -189,8 +196,9 @@ public partial class Models : ComponentBase, IAsyncDisposable
                 _isLoading = false;
                 await InvokeAsync(StateHasChanged);
             }
-            catch (RpcException)
+            catch (RpcException ex)
             {
+                Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to delete model [{ModelName}]", modelMeta.Name);
                 Snackbar.Add($"Failed to delete model [{modelMeta.Name}]", Severity.Warning);
             }
         }
@@ -271,8 +279,9 @@ public partial class Models : ComponentBase, IAsyncDisposable
                 _isLoading = false;
                 await InvokeAsync(StateHasChanged);
             }
-            catch (RpcException)
+            catch (RpcException ex)
             {
+                Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to change model state!");
                 Snackbar.Add("Failed to change model state!", Severity.Warning);
             }
         }

@@ -1,3 +1,4 @@
+using AyBorg.SDK.Common;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Cognitive;
 using Grpc.Core;
@@ -9,6 +10,7 @@ namespace AyBorg.Web.Pages.Cognitive.Browse;
 public partial class Browse : ComponentBase
 {
     [Parameter] public string ProjectId { get; init; } = string.Empty;
+    [Inject] ILogger<Browse> Logger { get; init; } = null!;
     [Inject] IStateService StateService { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IFileManagerService FileManagerService { get; init; } = null!;
@@ -67,8 +69,9 @@ public partial class Browse : ComponentBase
                 await UpdateImageCollectionMeta(string.Empty, string.Empty, Array.Empty<string>());
                 _allBatchNames = _imageCollectionMeta.BatchNames.OrderBy(b => b);
             }
-            catch (RpcException)
+            catch (RpcException ex)
             {
+                Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to get project informations!");
                 Snackbar.Add("Failed to get project informations!", Severity.Warning);
             }
             finally
@@ -193,8 +196,9 @@ public partial class Browse : ComponentBase
                 await DatasetManagerService.AddImageAsync(new DatasetManagerService.AddImageParameters(ProjectId, string.Empty, imageName));
             }
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to add images to database!");
             Snackbar.Add("Failed to add images to dataset!", Severity.Warning);
         }
     }
@@ -218,8 +222,9 @@ public partial class Browse : ComponentBase
             await UpdateImageCollectionMeta(_selectedBatchName, _selectedGroupName, _selectedTags);
 
         }
-        catch (RpcException)
+        catch (RpcException ex)
         {
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to fetch image data!");
             Snackbar.Add("Failed to fetch image data!", Severity.Warning);
         }
         finally

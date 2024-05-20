@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using AyBorg.SDK.Common;
 using AyBorg.Web.Services.Cognitive;
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
@@ -9,6 +10,7 @@ namespace AyBorg.Web.Pages.Cognitive.Jobs;
 
 public partial class Jobs : ComponentBase, IAsyncDisposable
 {
+    [Inject] ILogger<Jobs> Logger { get; init; } = null!;
     [Inject] IJobManagerService JobManagerService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
     private ImmutableList<JobMeta> _jobMetas = ImmutableList<JobMeta>.Empty;
@@ -33,16 +35,18 @@ public partial class Jobs : ComponentBase, IAsyncDisposable
                         _jobMetas = _jobMetas.Clear();
                         _jobMetas = _jobMetas.AddRange(response.OrderByDescending(x => x.QueueDate));
                     }
-                    catch (RpcException)
+                    catch (RpcException ex)
                     {
-                        Snackbar.Add("Failed to get jobs!", Severity.Warning);
+                        Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to reload jobs!");
+                        Snackbar.Add("Failed to reload jobs!", Severity.Warning);
                     }
 
                     await InvokeAsync(StateHasChanged);
                 }, null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
             }
-            catch (RpcException)
+            catch (RpcException ex)
             {
+                Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to get jobs!");
                 Snackbar.Add("Failed to get jobs!", Severity.Warning);
             }
 
