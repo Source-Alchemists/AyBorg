@@ -1,0 +1,116 @@
+@page "/cognitive/models/{projectId}"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
+
+<PageTitle>@_projectName | Models/Cognitive | AyBorg</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudCard Class="rounded-lg">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudBadge Content="@(_modelMetas.Count())" Color="Color.Primary" Overlap>
+                <MudText Typo="Typo.h6">Models</MudText>
+            </MudBadge>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudButton Variant="Variant.Filled"
+                        StartIcon="@Icons.Material.Filled.ModelTraining"
+                        Color="Color.Primary"
+                        OnClick="@TrainClicked"
+                        Disabled="@_isTrainingDisabled">Train new Model</MudButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTable Items="@_modelMetas" Elevation="0" Hover>
+            <HeaderContent>
+                <MudTh Style="max-width: 30px">State</MudTh>
+                <MudTh>Name</MudTh>
+                <MudTh>Created</MudTh>
+                <MudTh>Classes</MudTh>
+                <MudTh>Comment</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="State">
+                    @if (@context.State == Services.Cognitive.FileManagerService.ModelState.Release)
+                    {
+                        <MudTooltip Text="Verified">
+                            <MudIcon Icon="@Icons.Material.Filled.GppGood" Color="Color.Success" />
+                        </MudTooltip>
+                    }
+                    else if (@context.State == Services.Cognitive.FileManagerService.ModelState.Review)
+                    {
+                        <MudTooltip Text="Review">
+                            <MudIcon Icon="@Icons.Material.Filled.SafetyCheck" Color="Color.Warning" />
+                        </MudTooltip>
+                    }
+                    else if (@context.State == Services.Cognitive.FileManagerService.ModelState.Draft)
+                    {
+                        <MudTooltip Text="Draft">
+                            <MudIcon Icon="@Icons.Material.Filled.GppBad" Color="Color.Default" />
+                        </MudTooltip>
+                    }
+                </MudTd>
+                <MudTd DataLabel="Name">
+                    @context.Name
+                </MudTd>
+                <MudTd DataLabel="Created">
+                    @context.CreationDate
+                </MudTd>
+                <MudTd DataLabel="Classes">
+                    <MudBadge Content="@(context.Classes.Count())" Color="Color.Default" Origin="Origin.TopLeft" Overlap>
+                        <MudChipSet>
+                        @foreach(var c in context.Classes)
+                        {
+                            <MudChip Disabled>@c</MudChip>
+                        }
+                        </MudChipSet>
+                    </MudBadge>
+                </MudTd>
+                <MudTd DataLabel="Comment">
+                    <MudTextField Value="@context.Comment" Lines="3" ReadOnly />
+                </MudTd>
+                <MudTd>
+                    <MudMenu Icon="@Icons.Material.Filled.MoreVert">
+                        <MudMenuItem  Icon="@Icons.Material.Filled.Edit" IconColor="Color.Default" OnClick="(() => EditModelClicked(context))" Disabled=@(context.State != Services.Cognitive.FileManagerService.ModelState.Draft)>
+                            Edit
+                        </MudMenuItem>
+                        <MudMenuItem Icon="@Icons.Material.Filled.Visibility" IconColor="Color.Info" OnClick="(() => InspectClicked(context))">
+                            Inspect
+                        </MudMenuItem>
+                        @if (@context.State != Services.Cognitive.FileManagerService.ModelState.Release)
+                        {
+                            <MudDivider />
+                        }
+                        @if (@context.State == Services.Cognitive.FileManagerService.ModelState.Draft)
+                        {
+                            <MudMenuItem  Icon="@Icons.Material.Filled.SafetyCheck" IconColor="Color.Warning" OnClick="(() => CreateReviewClicked(context))">
+                                Create Review
+                            </MudMenuItem>
+                        }
+                        else if(@context.State == Services.Cognitive.FileManagerService.ModelState.Review)
+                        {
+                            <MudMenuItem  Icon="@Icons.Material.Filled.Cancel" IconColor="Color.Error" OnClick="(() => AbandonClicked(context))">
+                                Abandon
+                            </MudMenuItem>
+                            <AuthorizeView Roles="Administrator, Reviewer" Context="other">
+                                <Authorized>
+                                    <MudMenuItem  Icon="@Icons.Material.Filled.GppGood" IconColor="Color.Success" OnClick="(() => ApproveClicked(context))">
+                                        Approve
+                                    </MudMenuItem>
+                                </Authorized>
+                            </AuthorizeView>
+                        }
+                        <MudDivider />
+                        <MudMenuItem  Icon="@Icons.Material.Filled.DeleteForever" IconColor="Color.Error" OnClick="(() => DeleteModelClicked(context))">
+                            Delete
+                        </MudMenuItem>
+                    </MudMenu>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>

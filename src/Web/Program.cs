@@ -126,11 +126,11 @@ builder.Services.AddScoped<IAgentOverviewService, AgentsOverviewService>();
 builder.Services.AddScoped<IDeviceManagerService, DeviceManagerService>();
 
 // AyBorg.NET
-builder.Services.AddScoped<AyBorg.Web.Services.Net.IProjectManagerService, AyBorg.Web.Services.Net.ProjectManagerService>();
-builder.Services.AddScoped<AyBorg.Web.Services.Net.IFileManagerService, AyBorg.Web.Services.Net.FileManagerService>();
-builder.Services.AddScoped<AyBorg.Web.Services.Net.IAnnotationManagerService, AyBorg.Web.Services.Net.AnnotationManagerService>();
-builder.Services.AddScoped<AyBorg.Web.Services.Net.IDatasetManagerService, AyBorg.Web.Services.Net.DatasetManagerService>();
-builder.Services.AddScoped<AyBorg.Web.Services.Net.IJobManagerService, AyBorg.Web.Services.Net.JobManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Cognitive.IProjectManagerService, AyBorg.Web.Services.Cognitive.ProjectManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Cognitive.IFileManagerService, AyBorg.Web.Services.Cognitive.FileManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Cognitive.IAnnotationManagerService, AyBorg.Web.Services.Cognitive.AnnotationManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Cognitive.IDatasetManagerService, AyBorg.Web.Services.Cognitive.DatasetManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Cognitive.IJobManagerService, AyBorg.Web.Services.Cognitive.JobManagerService>();
 
 builder.Services.AddTransient<ITokenProvider, TokenProvider>();
 builder.Services.AddTransient<IStorageService, StorageService>();

@@ -29,12 +29,12 @@ public partial class NavMenu : ComponentBase
     private string _agentEditorLink => _isAgentSelected ? StateService.AgentState.EditorLink : string.Empty;
     private string _agentDevicesLink => _isAgentSelected ? StateService.AgentState.DevicesLink : string.Empty;
 
-    private bool _isNetProjectSelected => StateService.NetState != null && !string.IsNullOrEmpty(StateService.NetState.ProjectId);
-    private string _netProjectName => _isNetProjectSelected ?  StateService.NetState.ProjectName : "-";
-    private string _netUploadLink => _isNetProjectSelected ? $"net/upload/{StateService.NetState.ProjectId}" : string.Empty;
-    private string _netAnnotateLink => _isNetProjectSelected ? $"net/browse/{StateService.NetState.ProjectId}" : string.Empty;
-    private string _netDatasetsLink => _isNetProjectSelected ? $"net/datasets/{StateService.NetState.ProjectId}" : string.Empty;
-    private string _netModelsLink => _isNetProjectSelected ? $"net/models/{StateService.NetState.ProjectId}" : string.Empty;
+    private bool _isCognitiveProjectSelected => StateService.CognitiveState != null && !string.IsNullOrEmpty(StateService.CognitiveState.ProjectId);
+    private string _cognitiveProjectName => _isCognitiveProjectSelected ?  StateService.CognitiveState.ProjectName : "-";
+    private string _cognitiveUploadLink => _isCognitiveProjectSelected ? $"cognitive/upload/{StateService.CognitiveState.ProjectId}" : string.Empty;
+    private string _cognitiveAnnotateLink => _isCognitiveProjectSelected ? $"cognitive/browse/{StateService.CognitiveState.ProjectId}" : string.Empty;
+    private string _cognitiveDatasetsLink => _isCognitiveProjectSelected ? $"cognitive/datasets/{StateService.CognitiveState.ProjectId}" : string.Empty;
+    private string _cognitiveModelsLink => _isCognitiveProjectSelected ? $"cognitive/models/{StateService.CognitiveState.ProjectId}" : string.Empty;
 
 
     protected override async Task OnInitializedAsync()
@@ -49,7 +49,7 @@ public partial class NavMenu : ComponentBase
             IEnumerable<Models.ServiceInfoEntry> services = await RegistryService.ReceiveServicesAsync();
 
             _isDashboardAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Dashboard));
-            _isNetAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Net));
+            _isNetAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Cognitive));
             _isAnalyticsAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Log));
             _isAuditAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Audit));
 
@@ -105,9 +105,9 @@ public partial class NavMenu : ComponentBase
             return;
         }
 
-        if(uri.Contains("/net/"))
+        if(uri.Contains("/cognitive/"))
         {
-            _category = Category.Net;
+            _category = Category.Cognitive;
             return;
         }
 
@@ -132,12 +132,12 @@ public partial class NavMenu : ComponentBase
         _category = Category.None;
     }
 
-    private enum Category 
+    private enum Category
     {
         None,
         Dashboard,
         Agents,
-        Net,
+        Cognitive,
         Observability,
         Audit,
         Admin

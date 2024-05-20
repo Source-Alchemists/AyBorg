@@ -11,7 +11,7 @@ public class StateService : IStateService
     public Action OnUpdate { get; set; } = null!;
 
     public UiAgentState AgentState { get; private set; } = null!;
-    public UiNetState NetState { get; private set; } = null!;
+    public UiCognitiveState CognitiveState { get; private set; } = null!;
 
     public AutomationFlowState AutomationFlowState { get; private set; }
 
@@ -24,7 +24,7 @@ public class StateService : IStateService
     public async ValueTask UpdateStateFromSessionStorageAsync()
     {
         UiAgentState agentState = await _sessionStorageService.GetItemAsync<UiAgentState>("Agent_State");
-        UiNetState netState = await _sessionStorageService.GetItemAsync<UiNetState>("Net_State");
+        UiCognitiveState netState = await _sessionStorageService.GetItemAsync<UiCognitiveState>("Cognitive_State");
         if (agentState != null)
         {
             await SetAgentStateAsync(agentState);
@@ -43,10 +43,10 @@ public class StateService : IStateService
         OnUpdate?.Invoke();
     }
 
-    public async ValueTask SetNetStateAsync(UiNetState netState)
+    public async ValueTask SetNetStateAsync(UiCognitiveState netState)
     {
-        NetState = netState;
-        await _sessionStorageService.SetItemAsync("Net_State", netState);
+        CognitiveState = netState;
+        await _sessionStorageService.SetItemAsync("Cognitive_State", netState);
         OnUpdate?.Invoke();
     }
 }

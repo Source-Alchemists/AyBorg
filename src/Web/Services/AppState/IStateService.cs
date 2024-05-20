@@ -6,9 +6,9 @@ public interface IStateService
 {
     Action OnUpdate { get; set; }
     UiAgentState AgentState { get; }
-    UiNetState NetState { get; }
+    UiCognitiveState CognitiveState { get; }
     AutomationFlowState AutomationFlowState { get; }
     ValueTask SetAgentStateAsync(UiAgentState agentState);
-    ValueTask SetNetStateAsync(UiNetState netState);
+    ValueTask SetNetStateAsync(UiCognitiveState cognitiveState);
     ValueTask UpdateStateFromSessionStorageAsync();
 }

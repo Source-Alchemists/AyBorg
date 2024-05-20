@@ -19,9 +19,9 @@
                         Agents
                     </MudMenuItem>
 
-                    <MudMenuItem Icon="@Icons.Material.Filled.Hive" Href="@NET_URI" Disabled="@(!_isNetAvailable)">
+                    <MudMenuItem Icon="@Icons.Material.Filled.Hive" Href="@COGNITIVE_URI" Disabled="@(!_isCognitiveAvailable)">
                         Net
-                        @if (!_isNetAvailable)
+                        @if (!_isCognitiveAvailable)
                         {
                             <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
                         }
@@ -83,10 +83,10 @@
 
     <AuthorizeView Roles="Administrator, Engineer, Reviewer">
         <Authorized>
-            <MudButton Href="@NET_URI" Class="@GetActiveClass(NET_BASE_URI)" StartIcon="@Icons.Material.Filled.Hive"
-                Disabled="@(!_isNetAvailable)">
-                Net
-                @if (!_isNetAvailable)
+            <MudButton Href="@COGNITIVE_URI" Class="@GetActiveClass(COGNITIVE_BASE_URI)" StartIcon="@Icons.Material.Filled.Hive"
+                Disabled="@(!_isCognitiveAvailable)">
+                Cognitive
+                @if (!_isCognitiveAvailable)
                 {
                     <MudChip Color="Color.Info" Class="ml-2">PRO</MudChip>
                 }

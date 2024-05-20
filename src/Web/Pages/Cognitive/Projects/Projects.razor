@@ -1,0 +1,81 @@
+@page "/cognitive/projects"
+@using SDK.Authorization
+@using SDK.Common
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
+
+<PageTitle>Projects/Cognitive | AyBorg</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudGrid class="pt-1">
+    <MudItem xs="12">
+        <MudCard Class="rounded-lg">
+            <MudCardHeader>
+                <CardHeaderAvatar>
+                    <MudIcon Icon="@Icons.Material.Filled.Hive" Size="Size.Medium" Color="Color.Primary" />
+                </CardHeaderAvatar>
+                <CardHeaderContent>
+                    <MudBadge Content="@(_projects.Count)" Overlap="true" Color="Color.Primary">
+                        <MudText Typo="Typo.h6">Projects</MudText>
+                    </MudBadge>
+                </CardHeaderContent>
+                <CardHeaderActions>
+                    <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.AddBox"
+                        Color="Color.Primary" OnClick="@OnNewProjectClicked">New Project</MudButton>
+                </CardHeaderActions>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudTable Items="@_projects" Elevation="0" Hover>
+                    <HeaderContent>
+                        <MudTh>Name</MudTh>
+                        <MudTh>Type</MudTh>
+                        <MudTh>Creator</MudTh>
+                        <MudTh>Created</MudTh>
+                        <MudTh>Tags</MudTh>
+                        <MudTh Style="width: 30px"></MudTh>
+                    </HeaderContent>
+                    <RowTemplate>
+                        <MudTd DataLabel="Name">
+                            <MudLink Underline="Underline.None" OnClick="() => OnOpenClicked(context)">
+                                @context.Name
+                            </MudLink>
+                        </MudTd>
+                        <MudTd DataLabel="Type">@context.Type.GetDescription()</MudTd>
+                        <MudTd DataLabel="Creator">@context.Creator</MudTd>
+                        <MudTd DataLabel="Created">@context.Created</MudTd>
+                        <MudTd DataLabel="Tags">
+                            <MudChipSet>
+                                @foreach (var tag in @context.Tags.Take(5))
+                                {
+                                    <MudChip Text="@tag" Disabled />
+                                }
+                                @if (context.Tags.Count() > 5)
+                                {
+                                    <MudBadge Content="@(context.Tags.Count() - 5)" Color="Color.Default" Overlap>
+                                        <MudChip Text="..." Disabled />
+                                    </MudBadge>
+                                }
+                            </MudChipSet>
+                        </MudTd>
+                        <MudTd>
+                            <MudStack Row>
+                                <MudTooltip Text="Open">
+                                    <MudIconButton Icon="@Icons.Material.Filled.FolderOpen"
+                                        Color="Color.Primary"
+                                        OnClick="() => OnOpenClicked(context)" />
+                                </MudTooltip>
+                                <MudTooltip Text="Delete">
+                                    <MudIconButton Icon="@Icons.Material.Filled.DeleteForever"
+                                        Color="Color.Error"
+                                        OnClick="() => OnDeleteProjectClicked(context)" />
+                                </MudTooltip>
+                            </MudStack>
+                        </MudTd>
+                    </RowTemplate>
+                </MudTable>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+</MudGrid>

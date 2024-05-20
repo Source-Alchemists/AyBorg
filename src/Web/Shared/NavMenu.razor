@@ -39,33 +39,33 @@
 </AuthorizeView>
 }
 
-@if (_category == Category.Net)
+@if (_category == Category.Cognitive)
 {
     <AuthorizeView Roles="Administrator, Engineer, Reviewer">
     <Authorized>
-        <MudNavLink Href="net/projects">
+        <MudNavLink Href="cognitive/projects">
             <MudText Typo="Typo.subtitle1">
                 Projects
             </MudText>
         </MudNavLink>
-        <MudNavLink Href="net/jobs">
+        <MudNavLink Href="cognitive/jobs">
             <MudText Typo="Typo.subtitle1">
                 Jobs
             </MudText>
         </MudNavLink>
         <MudText Typo="Typo.subtitle1" Class="ml-3 mt-2">
-            <strong>@_netProjectName</strong>
+            <strong>@_cognitiveProjectName</strong>
         </MudText>
-        <MudNavLink Href="@_netUploadLink" Disabled="@(!_isNetProjectSelected)">
+        <MudNavLink Href="@_cognitiveUploadLink" Disabled="@(!_isCognitiveProjectSelected)">
             Upload
         </MudNavLink>
-        <MudNavLink Href="@_netAnnotateLink" Disabled="@(!_isNetProjectSelected)">
+        <MudNavLink Href="@_cognitiveAnnotateLink" Disabled="@(!_isCognitiveProjectSelected)">
             Browse
         </MudNavLink>
-        <MudNavLink Href="@_netDatasetsLink" Disabled="@(!_isNetProjectSelected)">
+        <MudNavLink Href="@_cognitiveDatasetsLink" Disabled="@(!_isCognitiveProjectSelected)">
             Datasets
         </MudNavLink>
-        <MudNavLink Href="@_netModelsLink" Disabled="@(!_isNetProjectSelected)">
+        <MudNavLink Href="@_cognitiveModelsLink" Disabled="@(!_isCognitiveProjectSelected)">
             Models
         </MudNavLink>
     </Authorized>

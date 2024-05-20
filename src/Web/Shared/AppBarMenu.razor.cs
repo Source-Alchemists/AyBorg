@@ -13,15 +13,15 @@ public partial class AppBarMenu : ComponentBase
     private const string DASHBOARD_URI = "/dashboard";
     private const string AGENTS_URI = "/agents/overview";
     private const string AGENTS_BASE_URI = "/agents/";
-    private const string NET_URI = "/net/projects";
-    private const string NET_BASE_URI = "/net/";
+    private const string COGNITIVE_URI = "/cognitive/projects";
+    private const string COGNITIVE_BASE_URI = "/cognitive/";
     private const string OBSERVABILITY_URI = "/observability/services";
     private const string OBSERVABILITY_BASE_URI = "/observability/";
     private const string AUDIT_URI = "/audit/reports";
     private const string AUDIT_BASE_URI = "/audit/";
 
     private bool _isDashboardAvailable = false;
-    private bool _isNetAvailable = false;
+    private bool _isCognitiveAvailable = false;
     private bool _isAuditAvailable = false;
 
     protected override async Task OnInitializedAsync()
@@ -34,7 +34,7 @@ public partial class AppBarMenu : ComponentBase
         {
             IEnumerable<Models.ServiceInfoEntry> services = await RegistryService.ReceiveServicesAsync();
             _isDashboardAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Dashboard));
-            _isNetAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Net));
+            _isCognitiveAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Cognitive));
             _isAuditAvailable = services.Any(s => s.Type.Equals(ServiceTypes.Audit));
         }
         catch (Exception ex)

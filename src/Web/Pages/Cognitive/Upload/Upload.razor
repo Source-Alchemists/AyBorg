@@ -1,0 +1,79 @@
+@page "/cognitive/upload/{projectId}"
+@using AyBorg.Web.Shared
+@using SDK.Authorization
+@using SDK.Common
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+
+<PageTitle>@_projectName | Upload/Cognitive | AyBorg</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudCard Class="rounded-lg mud-full-width">
+    <MudCardHeader>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">
+                Upload
+            </MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudBadge Content="@(_imageSources.Count)" Origin="Origin.BottomLeft" Overlap>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@OnSave"
+                    Disabled="@(!_imageSources.Any())">
+                    Save and Continue
+                </MudButton>
+            </MudBadge>
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudGrid class="pt-1">
+            <MudItem xs="12" md="6" Class="pl-8 pr-8">
+                <MudAutocomplete @ref="_tagField" T="string" Label="Tags" Placeholder="Search or add tags for images"
+                    HelperText="Tagging images can help you to find them again later"
+                    AdornmentIcon="@Icons.Material.Filled.Search" MaxItems="null" Strict="false" CoerceText="false"
+                    SearchFunc="@SearchTags" OnKeyDown="OnTagsKeyUp" ValueChanged="OnTagsValueChanged"
+                    ResetValueOnEmptyText TextUpdateSuppression Clearable SelectValueOnTab />
+                <MudChipSet AllClosable="true" OnClose="TagRemoved">
+                    @foreach (var tag in _selectedTags)
+                    {
+                        <MudChip Text="@tag" Color="Color.Secondary" />
+                    }
+                </MudChipSet>
+            </MudItem>
+            <MudItem xs="12" md="6" Class="pl-8 pr-8">
+                <MudTextField T="string" Label="Batch Name" Placeholder="@_batchPlaceholder" @bind-Value="_batchName"
+                    Clearable />
+            </MudItem>
+            <MudItem xs="12">
+                <FileDropArea OnImageAdded="@ImageAdded">
+                    <MudGrid Spacing="2">
+                    @foreach (var imageSource in _imageSources)
+                    {
+                        <MudItem xs="12" md="3">
+                            <div class="object-fill object-center mud-full-width">
+                                <MudImage Src="@(imageSource.ToBase64String())" Class="mud-full-width rounded-lg" />
+                                <button type="button" onclick="@(() => OnDeleteImageClicked(imageSource.Hash))"
+                                    class="mud-button-root mud-fab mud-fab-error mud-fab-size-small mud-ripple image-delete-button">
+                                    <span class="mud-fab-label">
+                                        <MudIcon Icon="@Icons.Material.Filled.Delete"
+                                            class="mud-icon-root mud-svg-icon mud-icon-size-small" />
+                                    </span>
+                                </button>
+                            </div>
+                        </MudItem>
+                    }
+                    @if (_imageSources.Any())
+                    {
+                        <MudItem xs="12" Class="d-flex justify-center">
+                            <MudText Typo="Typo.subtitle1">
+                                <strong>@_imageSources.Count images ready to save</strong>
+                            </MudText>
+                        </MudItem>
+                    }
+                    </MudGrid>
+                </FileDropArea>
+            </MudItem>
+        </MudGrid>
+    </MudCardContent>
+</MudCard>

@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.002.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AyBorg.Plugins.ImageTorque", "ImageTorque\AyBorg.Plugins.ImageTorque.csproj", "{A169DF4B-FB8F-4DAC-982B-67C04DCDB1EA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AyBorg.Plugins.MQTT", "MQTT\AyBorg.Plugins.MQTT.csproj", "{B5932316-8A59-4CC4-A81C-19A537E2E984}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AyBorg.Plugins.Base", "Base\AyBorg.Plugins.Base.csproj", "{34A45453-0D45-483E-AB1B-B4AAFBEAA170}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AyBorg.Plugins.ZXing", "ZXing\AyBorg.Plugins.ZXing.csproj", "{FA9E0773-F67F-4719-9FC1-941FD5C5A7BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A169DF4B-FB8F-4DAC-982B-67C04DCDB1EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A169DF4B-FB8F-4DAC-982B-67C04DCDB1EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A169DF4B-FB8F-4DAC-982B-67C04DCDB1EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A169DF4B-FB8F-4DAC-982B-67C04DCDB1EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B5932316-8A59-4CC4-A81C-19A537E2E984}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B5932316-8A59-4CC4-A81C-19A537E2E984}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B5932316-8A59-4CC4-A81C-19A537E2E984}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B5932316-8A59-4CC4-A81C-19A537E2E984}.Release|Any CPU.Build.0 = Release|Any CPU
+		{34A45453-0D45-483E-AB1B-B4AAFBEAA170}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{34A45453-0D45-483E-AB1B-B4AAFBEAA170}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{34A45453-0D45-483E-AB1B-B4AAFBEAA170}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{34A45453-0D45-483E-AB1B-B4AAFBEAA170}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA9E0773-F67F-4719-9FC1-941FD5C5A7BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA9E0773-F67F-4719-9FC1-941FD5C5A7BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA9E0773-F67F-4719-9FC1-941FD5C5A7BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA9E0773-F67F-4719-9FC1-941FD5C5A7BC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {15F612A1-B496-4105-9560-330583720042}
+	EndGlobalSection
+EndGlobal

@@ -1,7 +1,7 @@
 using Ayborg.Gateway.Agent.V1;
 using Ayborg.Gateway.Analytics.V1;
 using Ayborg.Gateway.Audit.V1;
-using Ayborg.Gateway.Net.V1;
+using Ayborg.Gateway.Cognitive.V1;
 using Ayborg.Gateway.V1;
 using AyBorg.Web.Services;
 using Grpc.Core;
@@ -30,7 +30,7 @@ internal static class GrpcClientExtension
         CreateClientFactory<DeviceManager.DeviceManagerClient>(builder, gatewayUrl);
         // AyBorg.Audit
         CreateClientFactory<Audit.AuditClient>(builder, gatewayUrl);
-        // AyBorg.Net
+        // AyBorg.Cognitive
         CreateClientFactory<ProjectManager.ProjectManagerClient>(builder, gatewayUrl);
         CreateClientFactory<FileManager.FileManagerClient>(builder, gatewayUrl);
         CreateClientFactory<AnnotationManager.AnnotationManagerClient>(builder, gatewayUrl);
