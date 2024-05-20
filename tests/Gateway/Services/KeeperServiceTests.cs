@@ -11,7 +11,7 @@ namespace AyBorg.Gateway.Services.Tests;
 public sealed class KeeperServiceTests : IDisposable
 {
     private static readonly NullLogger<KeeperService> s_logger = new();
-    private readonly NullLogger<IGatewayConfiguration> _registryConfigurationLogger = new();
+    private readonly NullLogger<GatewayConfiguration> _registryConfigurationLogger = new();
     private readonly IConfiguration _configuration;
     private readonly IGatewayConfiguration _registryConfiguration;
     private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
