@@ -5,6 +5,7 @@ using AyBorg.Agent.Services;
 using AyBorg.Agent.Services.gRPC;
 using AyBorg.Data.Agent;
 using AyBorg.Data.Mapper;
+using AyBorg.Hub.Connect;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Result;
@@ -68,6 +69,8 @@ builder.Services.AddDbContextFactory<DeviceContext>(options =>
 
 builder.Services.AddAuthorization();
 builder.Services.AddGrpc();
+
+builder.AddAyBorgAgentClient();
 
 builder.RegisterGrpcClients();
 
