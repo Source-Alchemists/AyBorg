@@ -1,8 +1,10 @@
 using System.Collections.Immutable;
+using AyBorg.SDK.Common;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Cognitive;
 using AyBorg.Web.Shared.Modals;
 using AyBorg.Web.Shared.Models.Cognitive;
+using Grpc.Core;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using MudBlazor;
@@ -12,6 +14,7 @@ namespace AyBorg.Web.Pages.Cognitive.Projects;
 public partial class Projects : ComponentBase
 {
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; } = null!;
+    [Inject] ILogger<Projects> Logger { get; init; }
     [Inject] IDialogService DialogService { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IStateService StateService { get; set; } = null!;
@@ -48,9 +51,9 @@ public partial class Projects : ComponentBase
             _projects = _projects.Clear();
             _projects = _projects.AddRange(projects);
         }
-        catch
+        catch (RpcException ex)
         {
-            // Already catched and logged.
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to load projects!");
             Snackbar.Add("Failed to load projects", Severity.Warning);
         }
 
@@ -83,20 +86,31 @@ public partial class Projects : ComponentBase
             {"ContentText", $"Are you sure you want to delete the project '{projectMeta.Name}'? All associated data will be deleted. This action cannot be undone."}
         });
         DialogResult result = await dialogReference.Result;
-        if(!result.Canceled)
+        if (!result.Canceled)
         {
-            await ProjectManagerService.DeleteAsync(new ProjectManagerService.DeleteRequestParameters(
-                ProjectId: projectMeta.Id,
-                Username: _username
-            ));
-
-            if(projectMeta.Id.Equals(StateService.CognitiveState.ProjectId, StringComparison.InvariantCultureIgnoreCase))
+            try
             {
-                await StateService.SetNetStateAsync(new Web.Shared.Models.UiCognitiveState(new ProjectMeta()));
-            }
+                await ProjectManagerService.DeleteAsync(new ProjectManagerService.DeleteRequestParameters(
+                    ProjectId: projectMeta.Id,
+                    Username: _username
+                ));
 
-            await UpdateProjectList();
-            await InvokeAsync(StateHasChanged);
+                if (projectMeta.Id.Equals(StateService.CognitiveState.ProjectId, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    await StateService.SetNetStateAsync(new Web.Shared.Models.UiCognitiveState(new ProjectMeta()));
+                }
+
+                await UpdateProjectList();
+            }
+            catch (RpcException ex)
+            {
+                Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Failed to delete project!");
+                Snackbar.Add("Failed to delete project!", Severity.Warning);
+            }
+            finally
+            {
+                await InvokeAsync(StateHasChanged);
+            }
         }
     }
 

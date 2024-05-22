@@ -16,6 +16,7 @@ public partial class NewProjectDialog : ComponentBase
 {
     [CascadingParameter] MudDialogInstance MudDialog { get; set; }
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+    [Inject] ILogger<NewProjectDialog> Logger { get; init; }
     [Inject] IProjectManagerService ProjectManagerService { get; init; }
     [Inject] IStateService StateService { get; init; }
     [Inject] NavigationManager NavigationManager { get; init; }
@@ -121,8 +122,9 @@ public partial class NewProjectDialog : ComponentBase
             }
             MudDialog.Close();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            Logger.LogWarning((int)EventLogType.UserInteraction, ex, "Could noz create project");
             Snackbar.Add("Could not create project", Severity.Warning);
         }
     }

@@ -21,22 +21,14 @@ public class ProjectManagerService : IProjectManagerService
 
     public async ValueTask<IEnumerable<ProjectMeta>> GetMetasAsync()
     {
-        try
+        var metas = new List<ProjectMeta>();
+        AsyncServerStreamingCall<Ayborg.Gateway.Cognitive.V1.ProjectMeta> response = _projectManagerClient.GetMetas(new Empty());
+        await foreach (Ayborg.Gateway.Cognitive.V1.ProjectMeta? metaDto in response.ResponseStream.ReadAllAsync())
         {
-            var metas = new List<ProjectMeta>();
-            AsyncServerStreamingCall<Ayborg.Gateway.Cognitive.V1.ProjectMeta> response = _projectManagerClient.GetMetas(new Empty());
-            await foreach (Ayborg.Gateway.Cognitive.V1.ProjectMeta? metaDto in response.ResponseStream.ReadAllAsync())
-            {
-                metas.Add(ToModel(metaDto));
-            }
+            metas.Add(ToModel(metaDto));
+        }
 
-            return metas;
-        }
-        catch (RpcException ex)
-        {
-            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Failed to get project metas!");
-            throw;
-        }
+        return metas;
     }
 
     public async ValueTask<ProjectMeta> CreateAsync(CreateRequestParameters parameters)
@@ -53,68 +45,46 @@ public class ProjectManagerService : IProjectManagerService
             request.Tags.Add(tag);
         }
 
-        try
-        {
-            Ayborg.Gateway.Cognitive.V1.ProjectMeta response = await _projectManagerClient.CreateAsync(request);
+        Ayborg.Gateway.Cognitive.V1.ProjectMeta response = await _projectManagerClient.CreateAsync(request);
 
-            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Project created: {ProjectName}", response.Name);
-            return ToModel(response);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogWarning(new EventId((int)EventLogType.ProjectSaved), ex, "Failed to create project!");
-            throw;
-        }
+        _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Project created: {ProjectName}", response.Name);
+        return ToModel(response);
     }
 
     public async ValueTask DeleteAsync(DeleteRequestParameters parameters)
     {
-        try
-        {
-            await _projectManagerClient.DeleteAsync(new Ayborg.Gateway.Cognitive.V1.ProjectMeta
-            {
-                Id = parameters.ProjectId,
-                CreatedBy = parameters.Username
-            });
 
-            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Project deleted: {ProjectId}", parameters.ProjectId);
-        }
-        catch (RpcException ex)
+        await _projectManagerClient.DeleteAsync(new Ayborg.Gateway.Cognitive.V1.ProjectMeta
         {
-            _logger.LogWarning(new EventId((int)EventLogType.ProjectRemoved), ex, "Failed to delete project");
-            throw;
-        }
+            Id = parameters.ProjectId,
+            CreatedBy = parameters.Username
+        });
+
+        _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Project deleted: {ProjectId}", parameters.ProjectId);
+
     }
 
     public async ValueTask<Shared.Models.Cognitive.ClassLabel> AddOrUpdateAsync(AddOrUpdateClassLabelParameters parameters)
     {
-        try
+        Ayborg.Gateway.Cognitive.V1.ClassLabel response = await _projectManagerClient.AddOrUpdateClassLabelAsync(new AddOrUpdateClassLabelRequest
         {
-            Ayborg.Gateway.Cognitive.V1.ClassLabel response = await _projectManagerClient.AddOrUpdateClassLabelAsync(new AddOrUpdateClassLabelRequest
+            ProjectId = parameters.ProjectId,
+            ClassLabel = new Ayborg.Gateway.Cognitive.V1.ClassLabel
             {
-                ProjectId = parameters.ProjectId,
-                ClassLabel = new Ayborg.Gateway.Cognitive.V1.ClassLabel
-                {
-                    Index = parameters.ClassLabel.Index,
-                    Name = parameters.ClassLabel.Name,
-                    ColorCode = parameters.ClassLabel.ColorCode
-                }
-            });
+                Index = parameters.ClassLabel.Index,
+                Name = parameters.ClassLabel.Name,
+                ColorCode = parameters.ClassLabel.ColorCode
+            }
+        });
 
-            _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Add or update class label: {ClassLabel} to project {ProjectId}", parameters.ClassLabel, parameters.ProjectId);
+        _logger.LogInformation(new EventId((int)EventLogType.UserInteraction), "Add or update class label: {ClassLabel} to project {ProjectId}", parameters.ClassLabel, parameters.ProjectId);
 
-            return new Shared.Models.Cognitive.ClassLabel
-            {
-                Index = response.Index,
-                Name = response.Name,
-                ColorCode = response.ColorCode
-            };
-        }
-        catch (RpcException ex)
+        return new Shared.Models.Cognitive.ClassLabel
         {
-            _logger.LogWarning(new EventId((int)EventLogType.ProjectState), ex, "Failed to add or update class {ClassLabel}!", parameters.ClassLabel);
-            throw;
-        }
+            Index = response.Index,
+            Name = response.Name,
+            ColorCode = response.ColorCode
+        };
     }
 
     private static ProjectMeta ToModel(Ayborg.Gateway.Cognitive.V1.ProjectMeta projectMetaDto)
