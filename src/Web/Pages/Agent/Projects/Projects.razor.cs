@@ -74,7 +74,7 @@ public partial class Projects : ComponentBase
             { "NeedPassword", true },
             { "ContentText", $"Are you sure you want to delete project '{project.Name}'? This action cannot be undone." }
         };
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete Project", parameters, options);
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Project", parameters, options);
         DialogResult result = await dialog.Result;
         if (!result.Canceled && await ProjectManagementService.TryDeleteAsync(project))
         {
@@ -84,7 +84,7 @@ public partial class Projects : ComponentBase
 
     private async void OnSaveAsReviewClicked(ProjectMeta projectMeta)
     {
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>($"Create Review for {projectMeta.Name}",
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>($"Create Review for {projectMeta.Name}",
         new DialogParameters {
             { "ShowComment", true },
             { "Comment", projectMeta.Comment },
@@ -123,7 +123,7 @@ public partial class Projects : ComponentBase
             { "ContentText", $"Are you sure you want to abandon review for project '{projectMeta.Name}'?" },
             { "NeedPassword", true }
         };
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Abandon Review", parameters, options);
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>("Abandon Review", parameters, options);
         DialogResult result = await dialog.Result;
         if (!result.Canceled)
         {
@@ -145,7 +145,7 @@ public partial class Projects : ComponentBase
 
     private async void OnSaveAsReadyClicked(ProjectMeta projectMeta)
     {
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>($"Approve Project {projectMeta.Name}",
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>($"Approve Project {projectMeta.Name}",
         new DialogParameters {
             { "ShowComment", true },
             { "Comment", projectMeta.Comment },
@@ -174,7 +174,7 @@ public partial class Projects : ComponentBase
 
     private async Task OnNewProjectClicked()
     {
-        IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New Project", new DialogOptions
+        IDialogReference dialog = await DialogService.ShowAsync<CreateNewProjectDialog>("New Project", new DialogOptions
         {
             MaxWidth = MaxWidth.Small,
             FullWidth = true

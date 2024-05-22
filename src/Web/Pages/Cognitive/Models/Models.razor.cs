@@ -101,7 +101,7 @@ public partial class Models : ComponentBase, IAsyncDisposable
 
     private async Task TrainClicked()
     {
-        IDialogReference dialog = DialogService.Show<StartModelTrainingDialog>("Model Training", new DialogParameters {
+        IDialogReference dialog = await DialogService.ShowAsync<StartModelTrainingDialog>("Model Training", new DialogParameters {
             { "ShowDatasetSelection", true },
             { "Name", "AyBorg Object Detection" },
             { "ProjectId", ProjectId }
@@ -136,7 +136,7 @@ public partial class Models : ComponentBase, IAsyncDisposable
 
     private async Task EditModelClicked(FileManagerService.ModelMeta modelMeta)
     {
-        IDialogReference dialog = DialogService.Show<EditModelDialog>("Edit Model", new DialogParameters {
+        IDialogReference dialog = await DialogService.ShowAsync<EditModelDialog>("Edit Model", new DialogParameters {
             { "Name", modelMeta.Name }
         }, new DialogOptions
         {
@@ -176,7 +176,7 @@ public partial class Models : ComponentBase, IAsyncDisposable
 
     private async Task DeleteModelClicked(FileManagerService.ModelMeta modelMeta)
     {
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete Model", new DialogParameters {
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete Model", new DialogParameters {
             { "NeedPassword", true },
             { "ContentText", $"Are you sure you want to delete model '{modelMeta.Name}'? This action cannot be undone."}
         });
@@ -206,7 +206,7 @@ public partial class Models : ComponentBase, IAsyncDisposable
 
     private async Task CreateReviewClicked(FileManagerService.ModelMeta modelMeta)
     {
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>($"Create Review for Model {modelMeta.Name}",
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>($"Create Review for Model {modelMeta.Name}",
         new DialogParameters {
             { "ShowComment", true },
             { "Comment", modelMeta.Comment },
@@ -223,7 +223,7 @@ public partial class Models : ComponentBase, IAsyncDisposable
 
     private async Task ApproveClicked(FileManagerService.ModelMeta modelMeta)
     {
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>($"Approve Model {modelMeta.Name}",
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>($"Approve Model {modelMeta.Name}",
         new DialogParameters {
             { "ShowComment", true },
             { "Comment", modelMeta.Comment },
@@ -239,7 +239,7 @@ public partial class Models : ComponentBase, IAsyncDisposable
 
     private async Task AbandonClicked(FileManagerService.ModelMeta modelMeta)
     {
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>($"Abandon Review for Model {modelMeta.Name}",
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>($"Abandon Review for Model {modelMeta.Name}",
         new DialogParameters {
             { "ContentText", $"Are you sure you want to abandon review for model '{modelMeta.Name}'?" },
             { "Comment", "Abandoned Review" },

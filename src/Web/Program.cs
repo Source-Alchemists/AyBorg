@@ -169,10 +169,10 @@ app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 // Create database if not exists
-app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbContext().Database.Migrate();
+await (await app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbContextAsync()).Database.MigrateAsync();
 
 // Initialize identity
 IServiceProvider scopedServiceProvider = app.Services.CreateScope().ServiceProvider;
 await IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).AsTask();
 
-app.Run();
+await app.RunAsync();

@@ -63,7 +63,7 @@ public partial class Devices : ComponentBase
 
     private async Task OnAddDeviceClicked()
     {
-        IDialogReference dialogReference = DialogService.Show<AddDeviceDialog>("Add Device", new DialogParameters
+        IDialogReference dialogReference = await DialogService.ShowAsync<AddDeviceDialog>("Add Device", new DialogParameters
         {
             { "DeviceProviders", _deviceProviders },
             { "ServiceUniqueName", _serviceUniqueName }
@@ -82,7 +82,7 @@ public partial class Devices : ComponentBase
 
     private async Task OnRemoveDeviceClicked(DeviceMeta deviceMeta)
     {
-        IDialogReference dialogReference = DialogService.Show<ConfirmDialog>("Remove Device", new DialogParameters {
+        IDialogReference dialogReference = await DialogService.ShowAsync<ConfirmDialog>("Remove Device", new DialogParameters {
             { "ContentText", $"Are you sure you want to remove device '{deviceMeta.Name}'?"  }
         });
         DialogResult result = await dialogReference.Result;
@@ -107,7 +107,7 @@ public partial class Devices : ComponentBase
 
     private async Task OnActivateDeviceClicked(DeviceMeta deviceMeta)
     {
-        IDialogReference dialogReference = DialogService.Show<ConfirmDialog>("Activate Device", new DialogParameters {
+        IDialogReference dialogReference = await DialogService.ShowAsync<ConfirmDialog>("Activate Device", new DialogParameters {
             { "ContentText", $"Are you sure you want to activate device '{deviceMeta.Name}'?"  }
         });
         DialogResult result = await dialogReference.Result;
@@ -131,7 +131,7 @@ public partial class Devices : ComponentBase
 
     private async Task OnDeviceSettingsClicked(DeviceMeta deviceMeta)
     {
-        IDialogReference dialogReference = DialogService.Show<DeviceSettingsDialog>($"{deviceMeta.Name} Settings", new DialogParameters {
+        IDialogReference dialogReference = await DialogService.ShowAsync<DeviceSettingsDialog>($"{deviceMeta.Name} Settings", new DialogParameters {
             { "Device", deviceMeta }
         },
         new DialogOptions

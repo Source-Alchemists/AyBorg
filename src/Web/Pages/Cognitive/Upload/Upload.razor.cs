@@ -132,7 +132,7 @@ public partial class Upload : ComponentBase
     private async Task OnSave()
     {
 
-        IDialogReference dialogReference = DialogService.Show<ImagesDistributionDialog>("How should the images be organised?", new DialogOptions
+        IDialogReference dialogReference = await DialogService.ShowAsync<ImagesDistributionDialog>("How should the images be organised?", new DialogOptions
         {
             MaxWidth = MaxWidth.Medium,
             FullWidth = true

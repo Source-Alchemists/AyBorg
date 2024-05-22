@@ -450,7 +450,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         {
             { "ContentText", $"Are you sure you want to delete '{targetName}'?" }
         };
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Confirm deletion", dialogParameters, new DialogOptions());
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirm deletion", dialogParameters, new DialogOptions());
         DialogResult result = await dialog.Result;
         return !result.Canceled;
     }

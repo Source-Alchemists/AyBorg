@@ -199,7 +199,7 @@ public partial class Annotate : ComponentBase
 
     private async Task ClassEditClicked(ClassLabel classLabel)
     {
-        IDialogReference dialogReference = DialogService.Show<ClassEditDialog>($"Edit {classLabel.Name}",
+        IDialogReference dialogReference = await DialogService.ShowAsync<ClassEditDialog>($"Edit {classLabel.Name}",
             new DialogParameters
             {
                 { "ColorValue", classLabel.ColorCode }

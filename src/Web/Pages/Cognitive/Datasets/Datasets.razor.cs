@@ -148,7 +148,7 @@ public partial class Datasets : ComponentBase
 
     private async Task NewDraftClicked()
     {
-        IDialogReference dialogReference = DialogService.Show<NewDatasetDialog>("New Dataset Draft", new DialogOptions
+        IDialogReference dialogReference = await DialogService.ShowAsync<NewDatasetDialog>("New Dataset Draft", new DialogOptions
         {
             MaxWidth = MaxWidth.Medium,
             FullWidth = true,
@@ -168,7 +168,7 @@ public partial class Datasets : ComponentBase
 
     private async Task GenerateClicked()
     {
-        IDialogReference dialogReference = DialogService.Show<GenerateDatasetDialog>("Generate Dataset", new DialogParameters {
+        IDialogReference dialogReference = await DialogService.ShowAsync<GenerateDatasetDialog>("Generate Dataset", new DialogParameters {
             { "ProjectId", ProjectId },
             { "DatasetId", _tempDataset.Id }
         }, new DialogOptions
@@ -192,7 +192,7 @@ public partial class Datasets : ComponentBase
     {
         try
         {
-            IDialogReference dialogReference = DialogService.Show<ConfirmDialog>("Delete Dataset", new DialogParameters {
+            IDialogReference dialogReference = await DialogService.ShowAsync<ConfirmDialog>("Delete Dataset", new DialogParameters {
                 { "NeedPassword", true },
                 { "ContentText", "Are you sure you want to delete the dataset? This action cannot be undone!"}
             });
@@ -218,7 +218,7 @@ public partial class Datasets : ComponentBase
 
     private async Task StartModelTrainingClicked(DatasetMeta value)
     {
-        IDialogReference dialogReference = DialogService.Show<StartModelTrainingDialog>("Model Training", new DialogParameters {
+        IDialogReference dialogReference = await DialogService.ShowAsync<StartModelTrainingDialog>("Model Training", new DialogParameters {
             { "Name", "AyBorg Object Detection" }
         }, new DialogOptions
         {

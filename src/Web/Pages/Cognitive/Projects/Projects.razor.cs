@@ -14,7 +14,7 @@ namespace AyBorg.Web.Pages.Cognitive.Projects;
 public partial class Projects : ComponentBase
 {
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; } = null!;
-    [Inject] ILogger<Projects> Logger { get; init; }
+    [Inject] ILogger<Projects> Logger { get; init; } = null!;
     [Inject] IDialogService DialogService { get; init; } = null!;
     [Inject] IProjectManagerService ProjectManagerService { get; init; } = null!;
     [Inject] IStateService StateService { get; set; } = null!;
@@ -63,7 +63,7 @@ public partial class Projects : ComponentBase
 
     private async void OnNewProjectClicked()
     {
-        IDialogReference dialogReference = DialogService.Show<NewProjectDialog>("Create Project", new DialogOptions
+        IDialogReference dialogReference = await DialogService.ShowAsync<NewProjectDialog>("Create Project", new DialogOptions
         {
             MaxWidth = MaxWidth.Medium,
             FullWidth = true
@@ -79,7 +79,7 @@ public partial class Projects : ComponentBase
 
     private async void OnDeleteProjectClicked(ProjectMeta projectMeta)
     {
-        IDialogReference dialogReference = DialogService.Show<ConfirmDialog>("Delete Project",
+        IDialogReference dialogReference = await DialogService.ShowAsync<ConfirmDialog>("Delete Project",
         new DialogParameters
         {
             {"NeedPassword", true},
