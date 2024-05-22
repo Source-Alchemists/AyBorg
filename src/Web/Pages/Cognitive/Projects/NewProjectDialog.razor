@@ -1,0 +1,48 @@
+@using AyBorg.Web.Shared.Models.Cognitive
+
+<MudDialog>
+    <DialogContent>
+        <MudSelect T="string" Label="Project Type" @bind-Value="_selectedProjectType">
+            @foreach (var type in _projectTypes)
+            {
+                <MudSelectItem T="string" value="@type">@type</MudSelectItem>
+            }
+        </MudSelect>
+        <MudTextField @ref="_tagField"
+                T="string"
+                @bind-Value="_tmpTag"
+                Label="What are you detection?"
+                Placeholder="e.g. 'persons' or 'cats' or 'cars'"
+                Variant="Variant.Text"
+                Adornment="Adornment.End"
+                AdornmentIcon="@Icons.Material.Filled.Add"
+                AdornmentAriaLabel="Add Tag"
+                AdornmentColor="Color.Secondary"
+                OnAdornmentClick="TagAdornmentClicked"
+                OnKeyDown="TagsKeyUp"
+                TextUpdateSuppression
+                Immediate
+                Class="mt-2" />
+        <MudChipSet AllClosable="true" OnClose="TagRemoved">
+            @foreach(var tag in _addedTags)
+            {
+                <MudChip Text="@tag" Color="Color.Secondary" />
+            }
+        </MudChipSet>
+        <MudTextField T="string"
+                @bind-Value="_projectName"
+                Label="Project Name"
+                Placeholder="e.g. 'Person Detection' or 'Animals' or 'Car Models'"
+                Variant="Variant.Text"
+                Error="@(!string.IsNullOrEmpty(_projectNameError))" ErrorText="@_projectNameError" Required
+                Class="mt-2"/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CloseClicked">
+            Cancel
+        </MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="CreateClicked">
+            Create Project
+        </MudButton>
+    </DialogActions>
+</MudDialog>

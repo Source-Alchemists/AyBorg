@@ -1,0 +1,112 @@
+<MudToolBar hidden="@(!ToolbarVisible)">
+    <MudSpacer />
+    <MudButtonGroup Variant="Variant.Filled" Color="Color.Default" DisableElevation>
+        <MudTooltip Text="Zoom in">
+            <MudIconButton Icon="@Icons.Material.Filled.ZoomIn" OnClick="@ZoomIn" />
+        </MudTooltip>
+        <MudTooltip Text="Fit to screen">
+            <MudIconButton Icon="@Icons.Material.Filled.FitScreen" OnClick="@FitToScreen" />
+        </MudTooltip>
+        <MudTooltip Text="Zoom out">
+            <MudIconButton Icon="@Icons.Material.Filled.ZoomOut" OnClick="@ZoomOut" />
+        </MudTooltip>
+    </MudButtonGroup>
+    <MudSpacer />
+</MudToolBar>
+<div class="mud-full-height" style="@_containerStyle">
+    <div class="mud-full-width mud-full-height corners">
+        <div @ref="@_containerRef" class="image-container overflow-auto">
+            @if (!string.IsNullOrEmpty(Base64Image))
+            {
+                <div class="@_centerClass">
+                <svg class="@_cursorClass" preserveAspectRatio="none" viewBox="0 0 @_svgWidth @_svgHeight" width="@_svgWidth" height="@_svgHeight">
+                    <defs>
+                        <mask id="@_maskId">
+                            @if (Shapes.Any())
+                            {
+                                <rect x="@_imagePosition.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    y="@_imagePosition.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    width="@_imagePosition.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    height="@_imagePosition.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    fill="white" />
+                            }
+                            @foreach (var rectangle in Shapes)
+                            {
+                                <rect x="@rectangle.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    y="@rectangle.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    width="@rectangle.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    height="@rectangle.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    fill="black" />
+                            }
+                        </mask>
+                    </defs>
+                    <g
+                        transform="scale(@_svgScaleFactor.ToString(System.Globalization.CultureInfo.InvariantCulture))"
+                        @onmousedown="SvgMouseDown"
+                        @onmouseup="SvgMouseUp"
+                        @onmousemove="SvgMouseMove"
+                        @onmouseenter="SvgMouseEnter"
+                        @onmouseleave="SvgMouseLeave">
+                        <image class="@_pixelateClass" href="@Base64Image"
+                            x="@_imagePosition.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                            y="@_imagePosition.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                            width="@_imagePosition.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                            height="@_imagePosition.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)" />
+                        <rect x="@_imagePosition.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                            y="@_imagePosition.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                            width="@_imagePosition.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                            height="@_imagePosition.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                            fill="#00000091" mask="url(#@_maskId)" />
+                        @foreach (var rectangle in Shapes)
+                        {
+                            <rect x="@rectangle.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                y="@rectangle.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                width="@rectangle.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                height="@rectangle.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                style="fill:@rectangle.FillColor;stroke:@rectangle.Color;stroke-width:@_shapeStrokeWidth" />
+                        }
+
+                        @if (_drawObject.IsDrawing)
+                        {
+                            <rect x="@_drawObject.Rect.X.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                y="@_drawObject.Rect.Y.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                width="@_drawObject.Rect.Width.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                height="@_drawObject.Rect.Height.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                style="fill:transparent;stroke:red;stroke-width:@_shapeStrokeWidth" />
+                        }
+
+                        @if (_isCrossHairVisible)
+                        {
+                            <line class="crosshair-line" x1="@_drawCrossHairX.Position1.X" y1="@_drawCrossHairX.Position1.Y" x2="@_drawCrossHairX.Position2.X" y2="@_drawCrossHairX.Position2.Y" stroke-dasharray="@_crossHairDash" style="stroke-width: @_crossHairStrokeWidth;" />
+                            <line class="crosshair-line" x1="@_drawCrossHairY.Position1.X" y1="@_drawCrossHairY.Position1.Y" x2="@_drawCrossHairY.Position2.X" y2="@_drawCrossHairY.Position2.Y" stroke-dasharray="@_crossHairDash" style="stroke-width: @_crossHairStrokeWidth;" />
+                        }
+                    </g>
+                </svg>
+                </div>
+            }
+            else
+            {
+                <LogoPlaceholder Watermark />
+            }
+        </div>
+    </div>
+</div>
+<div class="status-bar d-flex px-2">
+    <MudText>Size: @ImageWidth x @ImageHeight</MudText>
+    @if (ToolbarVisible)
+    {
+        <MudSpacer />
+        <MudText><strong>@StatusBarText</strong></MudText>
+        <MudSpacer />
+        <div class="position-text">
+        @if (@_isCursorCaptured)
+        {
+            <MudText>X: @_drawCrossHairX.Position1.X Y: @_drawCrossHairY.Position1.Y</MudText>
+        }
+        else
+        {
+            <MudText>X: - Y: -</MudText>
+        }
+        </div>
+    }
+</div>

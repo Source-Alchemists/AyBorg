@@ -7,6 +7,7 @@ public partial class AgentsOverview : ComponentBase, IAsyncDisposable
 {
     [Inject] IAgentOverviewService AgentOverviewService { get; set; } = null!;
 
+    private bool _isLoading = true;
     private Task _updateTask = null!;
     private bool _terminated = false;
     private bool _isDisposed = false;
@@ -21,6 +22,7 @@ public partial class AgentsOverview : ComponentBase, IAsyncDisposable
                 while (!_terminated)
                 {
                     await AgentOverviewService.UpdateAsync();
+                    _isLoading = false;
                     await InvokeAsync(StateHasChanged);
                     await Task.Delay(TimeSpan.FromSeconds(5));
                 }

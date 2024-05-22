@@ -1,0 +1,9 @@
+.model-inspect-display {
+    height: calc(100vh - 500px);
+}
+
+@media screen and (max-width: 576px) {
+    .model-inspect-display {
+        height: calc(100vh - 490px);
+    }
+}

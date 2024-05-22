@@ -1,0 +1,15 @@
+.class-container {
+    height: 41px;
+}
+
+.class-color {
+    width: 41px;
+    min-width: 41px;
+    height: 41px;
+    display: flex;
+    -webkit-box-pack: center;
+    justify-content: center;
+    -webkit-box-align: center;
+    align-items: center;
+    border-radius: 50%;
+}

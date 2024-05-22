@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MudBlazor;
 using MudBlazor.Services;
+using MudExtensions.Services;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -26,6 +27,7 @@ using Toolbelt.Blazor.Extensions.DependencyInjection;
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 string serviceUniqueName = builder.Configuration.GetValue("AyBorg:Service:UniqueName", "AyBorg.Web")!;
+int maximumReceiveMessageSize = builder.Configuration.GetValue("MaximumReceiveMessageSize", 256);
 bool isOpenTelemetryEnabled = builder.Configuration.GetValue("OpenTelemetry:Enabled", false)!;
 bool isElasticApmEnabled = builder.Configuration.GetValue("ElasticApm:Enabled", false)!;
 
@@ -42,7 +44,7 @@ if (isOpenTelemetryEnabled)
             .AddAspNetCoreInstrumentation());
 }
 
-if(isElasticApmEnabled)
+if (isElasticApmEnabled)
 {
     builder.Logging.AddElasticsearch();
 }
@@ -83,12 +85,17 @@ builder.Services.AddAuthorization(options =>
 });
 
 builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
+builder.Services.AddServerSideBlazor()
+                .AddHubOptions(options =>
+{
+    options.MaximumReceiveMessageSize = maximumReceiveMessageSize * 1024;
+});
 builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
 });
+builder.Services.AddMudExtensions();
 builder.Services.AddBlazoredLocalStorage();
 builder.Services.AddBlazoredSessionStorage();
 builder.Services.AddHotKeys2();
@@ -106,15 +113,24 @@ builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IRpcMapper, RpcMapper>();
 
 builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
+builder.Services.AddScoped<IStateService, StateService>();
+builder.Services.AddScoped<IEventLogService, EventLogService>();
+
+// AyBorg.Agent
 builder.Services.AddScoped<IProjectManagementService, ProjectManagementService>();
 builder.Services.AddScoped<IProjectSettingsService, ProjectSettingsService>();
 builder.Services.AddScoped<PluginsService>();
 builder.Services.AddScoped<IFlowService, FlowService>();
 builder.Services.AddScoped<IRuntimeService, RuntimeService>();
 builder.Services.AddScoped<IAgentOverviewService, AgentsOverviewService>();
-builder.Services.AddScoped<IStateService, StateService>();
-builder.Services.AddScoped<IEventLogService, EventLogService>();
 builder.Services.AddScoped<IDeviceManagerService, DeviceManagerService>();
+
+// AyBorg.NET
+builder.Services.AddScoped<AyBorg.Web.Services.Cognitive.IProjectManagerService, AyBorg.Web.Services.Cognitive.ProjectManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Cognitive.IFileManagerService, AyBorg.Web.Services.Cognitive.FileManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Cognitive.IAnnotationManagerService, AyBorg.Web.Services.Cognitive.AnnotationManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Cognitive.IDatasetManagerService, AyBorg.Web.Services.Cognitive.DatasetManagerService>();
+builder.Services.AddScoped<AyBorg.Web.Services.Cognitive.IJobManagerService, AyBorg.Web.Services.Cognitive.JobManagerService>();
 
 builder.Services.AddTransient<ITokenProvider, TokenProvider>();
 builder.Services.AddTransient<IStorageService, StorageService>();
@@ -153,10 +169,10 @@ app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
 // Create database if not exists
-app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbContext().Database.Migrate();
+await (await app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbContextAsync()).Database.MigrateAsync();
 
 // Initialize identity
 IServiceProvider scopedServiceProvider = app.Services.CreateScope().ServiceProvider;
 await IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).AsTask();
 
-app.Run();
+await app.RunAsync();

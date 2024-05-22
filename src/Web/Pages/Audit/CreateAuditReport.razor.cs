@@ -136,9 +136,9 @@ public partial class CreateAuditReport : ComponentBase
 
     private async Task SaveClicked()
     {
-        IDialogReference dialog = DialogService.Show<SaveAuditReportDialog>("Save audit report");
+        IDialogReference dialog = await DialogService.ShowAsync<SaveAuditReportDialog>("Save audit report");
         DialogResult result = await dialog.Result;
-        if (result.Cancelled)
+        if (result.Canceled)
         {
             return;
         }

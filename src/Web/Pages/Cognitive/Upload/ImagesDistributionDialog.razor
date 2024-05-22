@@ -1,0 +1,39 @@
+<MudDialog>
+    <DialogContent>
+        <MudSelect T="DistributionMethod" Label="Distribution" SelectedValues="@_selectedDistributionMethod"
+            ValueChanged="@DistributionMethodChanged">
+            <MudSelectItem T="DistributionMethod" Value="DistributionMethod.TrainValidTest">
+                Split images between Train/Valid/Test
+            </MudSelectItem>
+            <MudSelectItem T="DistributionMethod" Value="DistributionMethod.TrainValid">
+                Split images between Train/Valid
+            </MudSelectItem>
+        </MudSelect>
+        <MudStack Class="d-flex justify-center mt-5" Row>
+            <MudStack Class="d-flex justify-center mr-6">
+                <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">Train</MudText>
+                <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">@_trainFactor%</MudText>
+            </MudStack>
+            <MudStack Class="d-flex justify-center mr-6">
+                <MudText Typo="Typo.h6" Color="Color.Secondary" Align="Align.Center">Valid</MudText>
+                <MudText Typo="Typo.h6" Color="Color.Secondary" Align="Align.Center">@_validFactor%</MudText>
+            </MudStack>
+            @if (_selectedDistributionMethod.First() == DistributionMethod.TrainValidTest)
+            {
+                <MudStack Class="d-flex justify-center">
+                    <MudText Typo="Typo.h6" Color="Color.Tertiary" Align="Align.Center">Test</MudText>
+                    <MudText Typo="Typo.h6" Color="Color.Tertiary" Align="Align.Center">@_testFactor%</MudText>
+                </MudStack>
+            }
+        </MudStack>
+        <MudRangeSlider T="int" Range="@_isRange" Size="Size.Large" Min="0" Max="100" MinDistance="1" Step="1" @bind-Value="_trainSliderValue" @bind-UpperValue="_validSliderValue" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="@OnCancelClicked">
+            Cancel
+        </MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="@OnContinueClicked">
+            Continue
+        </MudButton>
+    </DialogActions>
+</MudDialog>

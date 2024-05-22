@@ -1,18 +1,24 @@
 ﻿<MudDialog>
     <DialogContent>
         <MudText>@ContentText</MudText>
-        @if (NeedPassword)
-        {
-            <MudAlert Severity="Severity.Info">
-                Please confirm with your password.
-            </MudAlert>
-            <MudTextField T="string" Label="Password" InputType="InputType.Password" Required="true"
-            @bind-value="_password" />
-            @foreach (var error in _errors)
+        <MudForm @ref="_form" @bind-Errors="@_errors">
+            @if (ShowVersion)
             {
-                <MudText Color="Color.Error">@error</MudText>
+                <MudTextField Label="Version" @bind-Value="_version" Required="true" />
             }
-        }
+            @if (ShowComment)
+            {
+                <MudTextField Label="Comment" @bind-Value="_comment" Required="false" Lines="3" Counter="200"
+                    Immediate="true" Variant="Variant.Outlined" class="pt-2" />
+            }
+            @if (NeedPassword)
+            {
+                <MudAlert Severity="Severity.Info">
+                    Please confirm with your password.
+                </MudAlert>
+                <MudTextField T="string" Label="Password" InputType="InputType.Password" @bind-value="_password" Required="true" />
+            }
+        </MudForm>
     </DialogContent>
     <DialogActions>
         <MudButton Color="Color.Default" OnClick="OnCancelClicked">Cancel</MudButton>

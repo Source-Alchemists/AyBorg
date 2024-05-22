@@ -135,7 +135,7 @@ public partial class StepView : ComponentBase, IDisposable
         await UpdateNode(iterationId);
     }
 
-    private void OnBackClicked()
+    private void BackClicked()
     {
         NavigationManager.NavigateTo($"/agents/editor/{ServiceId}");
     }

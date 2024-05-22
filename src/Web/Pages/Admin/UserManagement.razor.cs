@@ -26,9 +26,9 @@ public partial class UserManagement : ComponentBase
     {
         var dialogOptions = new DialogOptions();
         var dialogParameters = new DialogParameters();
-        IDialogReference dialog = DialogService.Show<CreateAccountDialog>("Add Account", dialogParameters, dialogOptions);
+        IDialogReference dialog = await DialogService.ShowAsync<CreateAccountDialog>("Add Account", dialogParameters, dialogOptions);
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             _users = UserManager.Users.ToList();
             await InvokeAsync(StateHasChanged);
@@ -42,9 +42,9 @@ public partial class UserManagement : ComponentBase
         {
             { "User", listUser }
         };
-        IDialogReference dialog = DialogService.Show<EditAccountDialog>("Edit Account", dialogParameters, dialogOptions);
+        IDialogReference dialog = await DialogService.ShowAsync<EditAccountDialog>("Edit Account", dialogParameters, dialogOptions);
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             _users = UserManager.Users.ToList();
             await InvokeAsync(StateHasChanged);
@@ -54,9 +54,9 @@ public partial class UserManagement : ComponentBase
     private async void OnLockAccountClicked(IdentityUser listUser)
     {
         IdentityUser user = await FindActualUserAsync(listUser);
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Lock Account", new DialogParameters { { "ContentText", $"Are you sure you want to lock '{user.UserName}'?" } });
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>("Lock Account", new DialogParameters { { "ContentText", $"Are you sure you want to lock '{user.UserName}'?" } });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             user.LockoutEnd = DateTime.Now.AddYears(1000);
             await UserManager.UpdateAsync(user);
@@ -68,9 +68,9 @@ public partial class UserManagement : ComponentBase
     private async void OnUnlockAccountClicked(IdentityUser listUser)
     {
         IdentityUser user = await FindActualUserAsync(listUser);
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Unlock Account", new DialogParameters { { "ContentText", $"Are you sure you want to unlock '{user.UserName}'?" } });
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>("Unlock Account", new DialogParameters { { "ContentText", $"Are you sure you want to unlock '{user.UserName}'?" } });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             user.LockoutEnd = null;
             user.AccessFailedCount = 0;
@@ -83,9 +83,9 @@ public partial class UserManagement : ComponentBase
     private async void OnResetPasswordClicked(IdentityUser listUser)
     {
         IdentityUser user = await FindActualUserAsync(listUser);
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Reset Password", new DialogParameters { { "ContentText", $"Are you sure you want to reset the password for '{user.UserName}'?" } });
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>("Reset Password", new DialogParameters { { "ContentText", $"Are you sure you want to reset the password for '{user.UserName}'?" } });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             string newPassword = RandomPasswordGenerator.Generate();
             IdentityResult pwResult = await UserManager.RemovePasswordAsync(user);
@@ -101,7 +101,7 @@ public partial class UserManagement : ComponentBase
                 return;
             }
 
-            dialog = DialogService.Show<DisplayGeneratedPasswordDialog>("New Password", new DialogParameters { { "Password", newPassword } },
+            dialog = await DialogService.ShowAsync<DisplayGeneratedPasswordDialog>("New Password", new DialogParameters { { "Password", newPassword } },
                                         new DialogOptions { CloseButton = true, CloseOnEscapeKey = false, DisableBackdropClick = true });
             await dialog.Result;
 

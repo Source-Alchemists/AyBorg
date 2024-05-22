@@ -1,0 +1,26 @@
+.output-port-container {
+    height: 40px;
+}
+
+.output-port-name-container {
+    float: right;
+}
+
+.outut-port-renderer-container {
+    position: relative; 
+    float: right;
+}
+
+.input-port-renderer-container {
+    position: absolute; 
+    float: left; 
+    left: -6px;
+}
+
+.flow-action-container {
+    height: 42px;
+}
+
+.flow-time {
+    float: right;
+}

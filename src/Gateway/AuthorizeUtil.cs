@@ -10,7 +10,11 @@ public static class AuthorizeUtil
     public static Metadata Protect(HttpContext httpContext, IEnumerable<string> roles)
     {
         AuthorizeGuard.ThrowIfNotAuthorized(httpContext, roles);
-        string token = httpContext.Request.Headers["Authorization"].First()!;
+        string token = httpContext.Request.Headers["Authorization"].FirstOrDefault()!;
+        if (string.IsNullOrEmpty(token))
+        {
+            return new Metadata();
+        }
 
         return new Metadata
         {

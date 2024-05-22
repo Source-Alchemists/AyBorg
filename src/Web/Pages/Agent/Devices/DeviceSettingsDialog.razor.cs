@@ -89,12 +89,12 @@ public partial class DeviceSettingsDialog : ComponentBase
 
     private async void OnConnectClicked()
     {
-        IDialogReference dialogReference = DialogService.Show<ConfirmDialog>("Confirm", new DialogParameters
+        IDialogReference dialogReference = await DialogService.ShowAsync<ConfirmDialog>("Confirm", new DialogParameters
         {
             { "ContentText", "Are you sure you want to apply settings and connect this device?" }
         });
         DialogResult result = await dialogReference.Result;
-        if (result.Cancelled)
+        if (result.Canceled)
         {
             return;
         }
@@ -129,12 +129,12 @@ public partial class DeviceSettingsDialog : ComponentBase
 
     private async void OnDisconnectClicked()
     {
-        IDialogReference dialogReference = DialogService.Show<ConfirmDialog>("Confirm", new DialogParameters
+        IDialogReference dialogReference = await DialogService.ShowAsync<ConfirmDialog>("Confirm", new DialogParameters
         {
             { "ContentText", "Are you sure you want disconnect this device?" }
         });
         DialogResult result = await dialogReference.Result;
-        if (result.Cancelled)
+        if (result.Canceled)
         {
             return;
         }

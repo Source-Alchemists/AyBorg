@@ -1,7 +1,7 @@
-<MudCard Style="height: calc(100vh - 148px)" Class="rounded-lg d-flex justify-center flex-column">
+<MudCard Style="height: calc(100vh - 158px)" Class="rounded-lg d-flex justify-center flex-column">
     <MudCardHeader Class="order-0">
         <CardHeaderAvatar>
-            <MudIcon Icon="@Icons.Filled.Apps" />
+            <MudIcon Icon="@Icons.Material.Filled.Apps" />
         </CardHeaderAvatar>
         <CardHeaderContent>
             <MudText Typo="Typo.h6">Steps</MudText>
@@ -12,7 +12,7 @@
                         Variant="Variant.Filled" Adornment="Adornment.End"
                         AdornmentIcon="@Icons.Material.Filled.Search" Clearable="true"
                         Immediate="true" Class="mt-3" />
-        <MudSelect T ="string" Label="Category" SelectedValues="_selectedCategories"
+        <MudSelect T="string" Label="Category" SelectedValues="_selectedCategories"
                     SelectedValuesChanged="@OnSelectedCategoryChanged">
             @foreach (var category in _availableCategories)
             {
@@ -31,7 +31,7 @@
             </MudListSubheader>
             @foreach (var step in @_filteredSteps)
             {
-                <MudListItem Icon="@Icons.Filled.DragIndicator" IconColor="Color.Primary" draggable="true"
+                <MudListItem Icon="@Icons.Material.Filled.DragIndicator" IconColor="Color.Primary" draggable="true"
                 @ondragstart="(args) => OnDragStart(args, step)">
                     <MudTooltip Text="@step.Name">
                         <MudText>@step.Name</MudText>

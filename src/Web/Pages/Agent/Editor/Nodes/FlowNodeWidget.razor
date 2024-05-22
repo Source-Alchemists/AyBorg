@@ -7,37 +7,39 @@
 		<MudText>@Node!.Title</MudText>
 	</MudCardHeader>
 	<MudCardContent Class="pt-10 pb-0">
+		<div class="mud-full-height">
 		@foreach (var port in _outputPorts)
 		{
-			<div Class="mud-full-width" Style="height: 40px">
-				<div Style="position: relative; float: right">
-				<MudTooltip Text="@port.Brand.ToString()">
-					<PortRenderer Port="port" class="@GetPortClass(port.Port)" />
-				</MudTooltip>
+			<div class="mud-full-width output-port-container">
+				<div class="outut-port-renderer-container">
+					<MudTooltip Text="@port.Brand.ToString()">
+						<PortRenderer Port="port" class="@GetPortClass(port.Port)" />
+					</MudTooltip>
 				</div>
-				<span Style="float: right" Class="pt-1">@port.Name</span>
+				<span class="output-port-name-container pt-1">@port.Name</span>
 			</div>
 
 		}
 		@foreach (var port in _inputPorts)
 		{
-			<div Style="position: absolute; float: left; left: -6px">
+			<div class="input-port-renderer-container">
 				<MudTooltip Text="@port.Brand.ToString()">
 					<PortRenderer Port="port" class="@GetPortClass(port.Port)" />
 				</MudTooltip>
 			</div>
-            <PortResolver Port="@port.Port" Ports="@(_inputPorts.Select(p => p.Port))" Disabled="@port.Locked" />
+            <PortResolver Port="@port.Port" Ports="@(_inputPorts.Select(p => p.Port))" Disabled="@port.Locked" OnlyThumbnail />
 		}
+		</div>
 	</MudCardContent>
 	<MudCardActions>
-		<div Class="mud-full-width" Style="height: 42px">
+		<div class="flow-action-container mud-full-width">
             <MudTooltip Text="Full Screen" hidden="@(!Node.Selected || Node.Locked)">
                 <MudIconButton Icon="@Icons.Material.Filled.Fullscreen" Color="Color.Default" OnClick="@OnStepFullScreenClicked" Style="float: left" />
             </MudTooltip>
             <MudTooltip Text="Delete" hidden="@(!Node.Selected || Node.Locked)">
-			    <MudIconButton Icon="@Icons.Filled.Delete" Color="Color.Error" OnClick="@OnRemoveNodeClicked" Style="float: left" />
+			    <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" OnClick="@OnRemoveNodeClicked" Style="float: left" />
             </MudTooltip>
-			<span Style="float: right" Class="pr-3 pt-4">@Node!.Step!.ExecutionTimeMs ms</span>
+			<span class="flow-time pr-3 pt-4">@Node!.Step!.ExecutionTimeMs ms</span>
 		</div>
 	</MudCardActions>
 </MudCard>

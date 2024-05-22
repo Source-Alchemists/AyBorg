@@ -38,7 +38,7 @@
                     <MudTd DataLabel="Timestamp">@context.Timestamp</MudTd>
                     <MudTd DataLabel="Name">@context.Name</MudTd>
                     <MudTd DataLabel="Comment">@context.Comment</MudTd>
-                    <MudTd DataLabel="ChangesetCount">@context.ChangesetCount</MudTd>
+                    <MudTd DataLabel="ChangesetCount">@(context.ChangesetCount-1)</MudTd>
                     <MudTd hidden=@(!_isAdminRole)>
                         <MudTooltip Text="Delete report">
                             <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="() => DeleteReportClicked(context)" />

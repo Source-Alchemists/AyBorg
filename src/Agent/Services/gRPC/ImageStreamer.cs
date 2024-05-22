@@ -9,7 +9,7 @@ namespace AyBorg.Agent.Services.gRPC;
 
 internal static class ImageStreamer
 {
-    private const int ChunkSize = 32768;
+    private const int CHUNK_SIZE = 32768;
     private static readonly RecyclableMemoryStreamManager s_memoryManager = new();
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -30,13 +30,7 @@ internal static class ImageStreamer
             }
 
             using MemoryStream stream = s_memoryManager.GetStream();
-            targetImage.Save(stream, ImageTorque.Processing.EncoderType.Jpeg);
-            stream.Position = 0;
-            long fullStreamLength = stream.Length;
-            long bytesToSend = fullStreamLength;
-            int bufferSize = fullStreamLength < ChunkSize ? (int)fullStreamLength : ChunkSize;
-            int offset = 0;
-            using IMemoryOwner<byte> memoryOwner = MemoryPool<byte>.Shared.Rent((int)fullStreamLength);
+            PrepareStream(targetImage, stream, out long fullStreamLength, out long bytesToSend, out int bufferSize, out int offset, out IMemoryOwner<byte> memoryOwner);
             await stream.ReadAsync(memoryOwner.Memory, cancellationToken);
 
             while (!cancellationToken.IsCancellationRequested && bytesToSend > 0)
@@ -46,10 +40,7 @@ internal static class ImageStreamer
                     bufferSize = (int)bytesToSend;
                 }
 
-                Memory<byte> slice = memoryOwner.Memory.Slice(offset, bufferSize);
-
-                bytesToSend -= bufferSize;
-                offset += bufferSize;
+                Memory<byte> slice = CreateMemorySlice(ref bytesToSend, bufferSize, ref offset, memoryOwner);
 
                 await responseStream.WriteAsync(new Ayborg.Gateway.Agent.V1.ImageChunkDto
                 {
@@ -69,7 +60,7 @@ internal static class ImageStreamer
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static async ValueTask SendImageAsync(Image originalImage, IClientStreamWriter<Ayborg.Gateway.Result.V1.ImageChunkDto> responseStream, string serviceUniqueName, string iterationId, string portId, float scaleFactor, CancellationToken cancellationToken)
+    public static async ValueTask SendImageAsync(Image originalImage, IClientStreamWriter<Ayborg.Gateway.Result.V1.ImageChunkDto> requestStream, string serviceUniqueName, string iterationId, string portId, float scaleFactor, CancellationToken cancellationToken)
     {
         IImage targetImage = null!;
         try
@@ -86,13 +77,7 @@ internal static class ImageStreamer
             }
 
             using MemoryStream stream = s_memoryManager.GetStream();
-            targetImage.Save(stream, ImageTorque.Processing.EncoderType.Jpeg);
-            stream.Position = 0;
-            long fullStreamLength = stream.Length;
-            long bytesToSend = fullStreamLength;
-            int bufferSize = fullStreamLength < ChunkSize ? (int)fullStreamLength : ChunkSize;
-            int offset = 0;
-            using IMemoryOwner<byte> memoryOwner = MemoryPool<byte>.Shared.Rent((int)fullStreamLength);
+            PrepareStream(targetImage, stream, out long fullStreamLength, out long bytesToSend, out int bufferSize, out int offset, out IMemoryOwner<byte> memoryOwner);
             await stream.ReadAsync(memoryOwner.Memory, cancellationToken);
 
             while (!cancellationToken.IsCancellationRequested && bytesToSend > 0)
@@ -102,12 +87,9 @@ internal static class ImageStreamer
                     bufferSize = (int)bytesToSend;
                 }
 
-                Memory<byte> slice = memoryOwner.Memory.Slice(offset, bufferSize);
+                Memory<byte> slice = CreateMemorySlice(ref bytesToSend, bufferSize, ref offset, memoryOwner);
 
-                bytesToSend -= bufferSize;
-                offset += bufferSize;
-
-                await responseStream.WriteAsync(new Ayborg.Gateway.Result.V1.ImageChunkDto
+                await requestStream.WriteAsync(new Ayborg.Gateway.Result.V1.ImageChunkDto
                 {
                     AgentUniqueName = serviceUniqueName,
                     IterationId = iterationId,
@@ -121,11 +103,33 @@ internal static class ImageStreamer
                 }, cancellationToken);
             }
 
-            await responseStream.CompleteAsync();
+            await requestStream.CompleteAsync();
         }
         finally
         {
             targetImage?.Dispose();
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static void PrepareStream(IImage targetImage, MemoryStream stream, out long fullStreamLength, out long bytesToSend, out int bufferSize, out int offset, out IMemoryOwner<byte> memoryOwner)
+    {
+        targetImage.Save(stream, ImageTorque.Processing.EncoderType.Jpeg);
+        stream.Position = 0;
+        fullStreamLength = stream.Length;
+        bytesToSend = fullStreamLength;
+        bufferSize = fullStreamLength < CHUNK_SIZE ? (int)fullStreamLength : CHUNK_SIZE;
+        offset = 0;
+        memoryOwner = MemoryPool<byte>.Shared.Rent((int)fullStreamLength);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static Memory<byte> CreateMemorySlice(ref long bytesToSend, int bufferSize, ref int offset, IMemoryOwner<byte> memoryOwner)
+    {
+        Memory<byte> slice = memoryOwner.Memory.Slice(offset, bufferSize);
+
+        bytesToSend -= bufferSize;
+        offset += bufferSize;
+        return slice;
     }
 }

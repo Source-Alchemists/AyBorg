@@ -38,7 +38,7 @@ public class RuntimeService : IRuntimeService
                 AgentUniqueName = serviceUniqueName
             });
 
-            return CreateEngineMeta(response.EngineMetaInfos.First());
+            return CreateEngineMeta(response.EngineMetaInfos[0]);
         }
         catch (RpcException ex)
         {
@@ -64,7 +64,7 @@ public class RuntimeService : IRuntimeService
                 EngineId = string.Empty
             });
 
-            return CreateEngineMeta(response.EngineMetaInfos.First());
+            return CreateEngineMeta(response.EngineMetaInfos[0]);
         }
         catch (RpcException ex)
         {
@@ -88,7 +88,7 @@ public class RuntimeService : IRuntimeService
                 EngineId = string.Empty
             });
 
-            return CreateEngineMeta(response.EngineMetaInfos.First());
+            return CreateEngineMeta(response.EngineMetaInfos[0]);
         }
         catch (RpcException ex)
         {
@@ -112,7 +112,7 @@ public class RuntimeService : IRuntimeService
                 EngineId = string.Empty
             });
 
-            return CreateEngineMeta(response.EngineMetaInfos.First());
+            return CreateEngineMeta(response.EngineMetaInfos[0]);
         }
         catch (RpcException ex)
         {

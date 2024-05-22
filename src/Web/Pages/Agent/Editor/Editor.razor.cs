@@ -78,7 +78,7 @@ public partial class Editor : ComponentBase
 
     private async void OnProjectSettingsClicked()
     {
-        IDialogReference dialog = DialogService.Show<ProjectSettingsDialog>("Project settings",
+        IDialogReference dialog = await DialogService.ShowAsync<ProjectSettingsDialog>("Project settings",
                                                                             new DialogParameters {
                                                                                 { "ProjectMeta", _projectMeta }
                                                                             },
@@ -89,7 +89,7 @@ public partial class Editor : ComponentBase
                                                                                 CloseButton = true
                                                                             });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             await InvokeAsync(StateHasChanged);
         }
@@ -97,12 +97,12 @@ public partial class Editor : ComponentBase
 
     private async Task OnCreateProjectClicked()
     {
-        IDialogReference dialog = DialogService.Show<CreateNewProjectDialog>("New project", new DialogOptions {
+        IDialogReference dialog = await DialogService.ShowAsync<CreateNewProjectDialog>("New project", new DialogOptions {
             MaxWidth = MaxWidth.Small,
             FullWidth = true
         });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             _isLoading = true;
             await InvokeAsync(StateHasChanged);

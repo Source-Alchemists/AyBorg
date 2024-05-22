@@ -8,18 +8,18 @@
     <PageTitle>Step</PageTitle>
 }
 else{
-    <PageTitle>Step (@_step.Name)</PageTitle>
+    <PageTitle>Step - @_step.Name</PageTitle>
 }
 
 <MudToolBar Class="px-0">
     <MudGrid>
         <MudItem xs="4">
-            <MudStack Row>
+            <MudStack Spacing="5" Row>
                 <MudTooltip Text="Back">
                     <MudFab StartIcon="@Icons.Material.Filled.ArrowBackIosNew" Color="Color.Primary" Size="Size.Small"
-                        OnClick="OnBackClicked" />
+                        OnClick="BackClicked" />
                 </MudTooltip>
-                <MudText Typo="Typo.h6" Class="pl-3">@_step.Name</MudText>
+                <MudText Typo="Typo.h6" Class="pt-1">@_step.Name</MudText>
             </MudStack>
         </MudItem>
         <MudItem xs="4">
@@ -77,7 +77,7 @@ else{
     </MudItem>
     @* Visual content *@
     <MudItem sm="12" md="6" Class="mud-full-height">
-        <MudCard Style="height: calc(100vh - 148px)" Class="mud-full-height">
+        <MudCard Class="mud-full-height">
             <MudCardHeader>
                 <CardHeaderAvatar>
                     <MudIcon Icon="@Icons.Material.Filled.Image" />
@@ -86,24 +86,27 @@ else{
                     <MudText>Visual content</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
-            <MudCardContent Style="height: calc(100% - 65px)">
-                <MudTabs Centered="true" Class="mud-full-height">
+            <MudCardContent>
+                <MudTabs Class="d-block" Centered="true" style="height: calc(100vh - 300px);">
                     @foreach (var imagePort in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Brand ==
                     SDK.Common.Ports.PortBrand.Image))
                     {
-                        <MudTabPanel Icon="@Icons.Material.Filled.Input" Text="@imagePort.Name">
-                            <PortResolver Port="@imagePort" Ports="@_ports" Disabled="@(IsDisabled(imagePort))"  AlternativeMode/>
+                        <MudTabPanel Icon="@Icons.Material.Filled.Input" Text="@imagePort.Name" Class="mud-full-height">
+                            <PortResolver Port="@imagePort" Ports="@_ports" Disabled="@(IsDisabled(imagePort))" />
                         </MudTabPanel>
                     }
                     @foreach (var imagePort in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Brand ==
                     SDK.Common.Ports.PortBrand.Image))
                     {
-                        <MudTabPanel Icon="@Icons.Material.Filled.Output" Text="@imagePort.Name">
-                            <PortResolver Port="@imagePort" Ports="@_ports" Disabled="@(IsDisabled(imagePort))"  AlternativeMode/>
+                        <MudTabPanel Icon="@Icons.Material.Filled.Output" Text="@imagePort.Name" Class="mud-full-height">
+                            <PortResolver Port="@imagePort" Ports="@_ports" Disabled="@(IsDisabled(imagePort))" />
                         </MudTabPanel>
                     }
                 </MudTabs>
             </MudCardContent>
+            <MudCardActions>
+
+            </MudCardActions>
         </MudCard>
     </MudItem>
     @* Outputs *@

@@ -4,15 +4,15 @@
     <HeaderContent>
         <MudTh Style="width:20px">Active</MudTh>
         <MudTh>Name</MudTh>
-        <MudTh Style="width:20%" Display="Display.None.TableCell.OnFullHD">Change date</MudTh>
-        <MudTh Style="width:20%" Display="Display.None.TableCell.OnFullHD">Creation date</MudTh>
+        <MudTh Style="width:20%">Change date</MudTh>
+        <MudTh Style="width:20%">Creation date</MudTh>
         <MudTh Style="width: 200px"></MudTh>
     </HeaderContent>
     <RowTemplate>
         <MudTd DataLabel="Active">
             @if (@context.IsActive)
             {
-                <MudIcon Icon="@Icons.Filled.Check" />
+                <MudIcon Icon="@Icons.Material.Filled.Check" />
             }
         </MudTd>
         <MudTd DataLabel="Name">@context.Name</MudTd>
@@ -31,24 +31,24 @@
 
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
                 @if (@context.State == SDK.Projects.ProjectState.Draft) {
-                    <MudMenuItem Icon="@Icons.Filled.SafetyCheck" IconColor="Color.Info" @onclick="(args) => OnSaveAsReview(args, context)">
+                    <MudMenuItem Icon="@Icons.Material.Filled.SafetyCheck" IconColor="Color.Warning" @onclick="(args) => OnSaveAsReview(args, context)">
                             Create review
                     </MudMenuItem>
                 }
                 @if (@context.State == SDK.Projects.ProjectState.Review) {
-                    <MudMenuItem Icon="@Icons.Filled.Cancel" IconColor="Color.Error" @onclick="(args) => OnAbandonClicked(args, context)">
+                    <MudMenuItem Icon="@Icons.Material.Filled.Cancel" IconColor="Color.Error" @onclick="(args) => OnAbandonClicked(args, context)">
                             Abandon
                     </MudMenuItem>
                     <AuthorizeView Roles="Administrator, Reviewer" Context="other">
                         <Authorized>
-                            <MudMenuItem Icon="@Icons.Filled.GppGood" IconColor="Color.Tertiary" @onclick="(args) => OnSaveAsReady(args, context)">
+                            <MudMenuItem Icon="@Icons.Material.Filled.GppGood" IconColor="Color.Success" @onclick="(args) => OnSaveAsReady(args, context)">
                                     Approve
                             </MudMenuItem>
                         </Authorized>
                     </AuthorizeView>
                 }
                 <MudDivider />
-                <MudMenuItem Icon="@Icons.Filled.DeleteForever" IconColor="Color.Error" @onclick="(args) => OnDeleteClicked(args, context)">
+                <MudMenuItem Icon="@Icons.Material.Filled.DeleteForever" IconColor="Color.Error" @onclick="(args) => OnDeleteClicked(args, context)">
                     Delete
                 </MudMenuItem>
             </MudMenu>

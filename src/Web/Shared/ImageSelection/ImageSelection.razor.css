@@ -1,0 +1,10 @@
+.image-selection-container {
+    height: 155px;
+    background-color: var(--a-theme-palette-background-grey-secondary);
+}
+
+.image-selection-container-border {
+    height: calc(100%);
+    border-top: dashed 6px var(--mud-palette-surface);
+    border-bottom: dashed 6px var(--mud-palette-surface);
+}

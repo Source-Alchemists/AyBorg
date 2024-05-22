@@ -12,7 +12,7 @@ public sealed class ProjectManagementServiceTests
 {
     private const string TestServiceUniqueName = "AyBorg.Agent";
     private static readonly NullLogger<ProjectManagementService> s_projLogger = new();
-    private static readonly NullLogger<IServiceConfiguration> s_serviceLogger = new();
+    private static readonly NullLogger<ServiceConfiguration> s_serviceLogger = new();
     private readonly IServiceConfiguration _serviceConfiguration;
     private readonly Mock<IEngineHost> _mockEngineHost = new();
     private readonly Mock<IFlowToStorageMapper> _mockRuntimeToStorageMapper = new();

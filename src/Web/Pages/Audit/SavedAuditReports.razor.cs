@@ -94,13 +94,13 @@ public partial class SavedAuditReports : ComponentBase
 
     private async Task DeleteReportClicked(AuditReport report)
     {
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Delete audit report",
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>("Delete audit report",
                                             new DialogParameters {
                                                 { "NeedPassword", true },
                                                 { "ContentText", "Are you sure you want to delete the audit report?" }
                                             });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             if (!await AuditService.TryDeleteReport(report))
             {

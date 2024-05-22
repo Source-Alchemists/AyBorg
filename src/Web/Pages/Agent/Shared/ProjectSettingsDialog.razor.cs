@@ -26,13 +26,13 @@ public sealed partial class ProjectSettingsDialog : ComponentBase
 
     private async Task ChangeResultCommunicationClicked()
     {
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Change result communication",
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>("Change result communication",
                                             new DialogParameters {
                                                 { "NeedPassword", true },
                                                 { "ContentText", "Are you sure you want to change the result communication?" }
                                             });
         DialogResult result = await dialog.Result;
-        if (!result.Cancelled)
+        if (!result.Canceled)
         {
             _projectSettings.IsForceResultCommunicationEnabled = !_projectSettings.IsForceResultCommunicationEnabled;
             await UpdateCommunicationSettings();

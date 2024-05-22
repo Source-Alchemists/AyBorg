@@ -9,12 +9,12 @@
 
     <Columns>
         <SelectColumn T="AuditChangeset" />
-        <Column T="AuditChangeset" Field="Timestamp" Title="Timestamp (UTC)" />
-        <Column T="AuditChangeset" Field="ProjectName" Title="Project Name" />
-        <Column T="AuditChangeset" Field="ProjectState" Title="Project State" />
-        <Column T="AuditChangeset" Field="VersionName" Title="Version" />
-        <Column T="AuditChangeset" Field="User" Title="Account" />
-        <Column T="AuditChangeset" Field="Approver" Title="Approver" />
-        <Column T="AuditChangeset" Field="Comment" Title="Comment" />
+        <PropertyColumn Property="x => x!.Timestamp" Title="Timestamp (UTC)" />
+        <PropertyColumn Property="x => x!.ProjectName" Title="Project Name" />
+        <PropertyColumn Property="x => x!.ProjectState" Title="Project State" />
+        <PropertyColumn Property="x => x!.VersionName" Title="Version" />
+        <PropertyColumn Property="x => x!.User" Title="Account" />
+        <PropertyColumn Property="x => x!.Approver" Title="Approver" />
+        <PropertyColumn Property="x => x!.Comment" Title="Comment" />
     </Columns>
 </MudDataGrid>

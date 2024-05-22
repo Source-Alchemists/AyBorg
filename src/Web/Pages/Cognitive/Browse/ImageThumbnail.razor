@@ -1,0 +1,21 @@
+<div class="object-fill object-center mud-full-width">
+    <img src="/img/brand/logo-white.svg" class="mud-full-width mud-full-height image-placeholder" hidden="@(_imageContainer != null)" />
+    <div class="mud-paper mud-card mud-elevation-2">
+        <MudImage Src="@(_imageContainer != null ? _imageContainer.ToBase64String() : string.Empty)" Class="mud-full-width rounded-lg" />
+        <div class="mud-card-actions">
+            <MudGrid>
+                <MudItem xs="4">
+                    <MudCheckBox T="bool" Size="Size.Medium" Color="Color.Secondary" Value="@Selected" ValueChanged="@SelectedChanged" />
+                </MudItem>
+                <MudItem xs="4" Class="d-flex flex-wrap justify-center">
+                    <MudChip Text="Dataset" hidden="@(!DatasetUsed)" Disabled />
+                </MudItem>
+                <MudItem xs="4" Class="d-flex flex-wrap justify-end">
+                    <MudTooltip Text="Annotate">
+                        <MudIconButton Icon="@Icons.Material.Filled.Draw" Color="Color.Primary" OnClick="@AnnotateClicked" />
+                    </MudTooltip>
+                </MudItem>
+            </MudGrid>
+        </div>
+    </div>
+</div>

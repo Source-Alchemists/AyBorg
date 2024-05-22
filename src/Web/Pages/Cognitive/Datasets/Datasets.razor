@@ -1,0 +1,124 @@
+@page "/cognitive/datasets/{projectId}"
+@using SDK.Authorization
+@attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
+
+<PageTitle>@_projectName | Datasets/Cognitive | AyBorg</PageTitle>
+
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudCard Class="rounded-lg">
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudIcon Icon="@Icons.Material.Filled.Dataset" Size="Size.Medium" Color="Color.Primary" />
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Draft Dataset</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <MudButton Variant="Variant.Filled"
+                        StartIcon="@Icons.Material.Filled.AddBox"
+                        Color="Color.Default"
+                        Disabled="@_isGenerateDisabled"
+                        OnClick="@NewDraftClicked">New Draft</MudButton>
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTextField T="string"
+                    Label="Name"
+                    Text="@_tempDataset.Name"
+                    TextChanged="@NameTextChanged"
+                    Immediate
+                    Required />
+        <MudDivider />
+        <div class="mud-full-width mt-5">
+            <MudText Typo="Typo.caption">Distribution</MudText>
+            <MudStack Class="d-flex justify-center" Row>
+                <MudStack Class="d-flex justify-center mr-6">
+                    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">Train</MudText>
+                    <MudText Typo="Typo.h6" Color="Color.Primary" Align="Align.Center">@(Math.Round(_trainDistribution, 2))% (@_activeDataset.Distribution.ElementAt(0))</MudText>
+                </MudStack>
+                <MudStack Class="d-flex justify-center mr-6">
+                    <MudText Typo="Typo.h6" Color="Color.Secondary" Align="Align.Center">Valid</MudText>
+                    <MudText Typo="Typo.h6" Color="Color.Secondary" Align="Align.Center">@(Math.Round(_valDistribution, 2))% (@_activeDataset.Distribution.ElementAt(1))</MudText>
+                </MudStack>
+                <MudStack Class="d-flex justify-center">
+                    <MudText Typo="Typo.h6" Color="Color.Tertiary" Align="Align.Center">Test</MudText>
+                    <MudText Typo="Typo.h6" Color="Color.Tertiary" Align="Align.Center">@(Math.Round(_testDistribution, 2))% (@_activeDataset.Distribution.ElementAt(2))</MudText>
+                </MudStack>
+            </MudStack>
+        </div>
+        <MudDivider />
+        <MudTextField T="string"
+                    Label="Comment"
+                    Variant="Variant.Filled"
+                    Text="@_tempDataset.Comment"
+                    Lines="5"
+                    TextChanged="@CommentTextChanged"
+                    Immediate/>
+    </MudCardContent>
+    <MudCardActions Class="flex-row-reverse">
+        <MudStack Row>
+            <MudButton Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        StartIcon="@Icons.Material.Filled.SaveAlt"
+                        Disabled="@_isSaveDisabled"
+                        OnClick="@SaveChangesClicked">Save Changes</MudButton>
+            <MudButton Variant="Variant.Filled"
+                        Color="Color.Primary"
+                        Disabled="@_isGenerateDisabled"
+                        OnClick="@GenerateClicked">Generate</MudButton>
+        </MudStack>
+    </MudCardActions>
+</MudCard>
+
+<MudCard Class="rounded-lg mt-5">
+    <MudCardHeader>
+        <CardHeaderAvatar>
+            <MudIcon Icon="@Icons.Material.Filled.Dataset" Size="Size.Medium" Color="Color.Default" />
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.h6">Generated Datasets</MudText>
+        </CardHeaderContent>
+    </MudCardHeader>
+    <MudCardContent>
+        <MudTable Items="@_generatedDatasets" Elevation="0" Hover>
+            <HeaderContent>
+                <MudTh>Name</MudTh>
+                <MudTh>Created</MudTh>
+                <MudTh>Generated</MudTh>
+                <MudTh>Distribution (T|V|T)</MudTh>
+                <MudTh>Comment</MudTh>
+                <MudTh></MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Name">
+                    @context.Name
+                </MudTd>
+                <MudTd DataLabel="Created">
+                    @context.CreationDate
+                </MudTd>
+                <MudTd DataLabel="Generated">
+                    @context.GeneratedDate
+                </MudTd>
+                <MudTd DataLabel="Distribution">
+                    <MudStack Row>
+                    <MudText Color="Color.Primary">@context.Distribution.ElementAt(0)</MudText> | <MudText Color="Color.Secondary">@context.Distribution.ElementAt(1)</MudText> | <MudText Color="Color.Tertiary">@context.Distribution.ElementAt(2)</MudText>
+                    </MudStack>
+                </MudTd>
+                <MudTd DataLabel="Comment">
+                    @context.Comment
+                </MudTd>
+                <MudTd>
+                    <MudTooltip Text="Start Model Training">
+                        <MudIconButton Icon="@Icons.Material.Filled.ModelTraining" Color="Color.Primary" OnClick="@(() => StartModelTrainingClicked(context))" />
+                    </MudTooltip>
+                    <MudTooltip Text="Delete Dataset">
+                        <MudIconButton Icon="@Icons.Material.Filled.DeleteForever" Color="Color.Error" OnClick="@(() => DeleteDatasetClicked(context))" />
+                    </MudTooltip>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    </MudCardContent>
+</MudCard>

@@ -41,7 +41,14 @@ internal sealed class CacheService : ICacheService
         _cache.TryAdd(new CacheKey(iterationId), new ConcurrentBag<CacheItem>());
         Parallel.ForEach(project.Steps, (step) =>
         {
-            CreateStepEntry(iterationId, step);
+            try
+            {
+                CreateStepEntry(iterationId, step);
+            }
+            catch
+            {
+                // Non critical exception, may the step is already creating new outputs. 
+            }
         });
     }
 

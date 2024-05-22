@@ -2,9 +2,13 @@
 @using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, , {Roles.Reviewer}")]
 
-<PageTitle>Agents Overview</PageTitle>
+<PageTitle>Agents Overview | AyBorg</PageTitle>
 
-<MudGrid class="pt-6">
+<div class="page-loading-bar">
+    <MudProgressLinear Color="Color.Primary" Indeterminate="true" Class="my-0" hidden="@(!_isLoading)" />
+</div>
+
+<MudGrid class="pt-1">
     <MudItem xs="4">
         <MudCard Class="rounded-lg">
             <MudCardHeader>

@@ -1,0 +1,30 @@
+<MudDialog>
+    <DialogContent>
+        <MudTextField T="string" Label="Name" @bind-Value="@Name" Immediate/>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelClicked">
+            Cancel
+        </MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="ApplyClicked" Disabled="@_isApplyDisabled">
+            Apply
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; init; } = null!;
+    [Parameter] public string Name { get; set; } = string.Empty;
+
+    private bool _isApplyDisabled => string.IsNullOrEmpty(Name) || string.IsNullOrWhiteSpace(Name);
+
+    private void CancelClicked()
+    {
+        MudDialog.Cancel();
+    }
+
+    private void ApplyClicked()
+    {
+        MudDialog.Close(DialogResult.Ok(Name));
+    }
+}

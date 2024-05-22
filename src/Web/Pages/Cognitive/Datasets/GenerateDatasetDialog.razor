@@ -1,0 +1,75 @@
+@using MudExtensions.Enums
+
+<MudDialog ClassContent="dialog-alternative">
+    <DialogContent>
+        <div Style="min-height: 300px" >
+        <MudLoading Loading="@_isGenerating" LoaderType="LoaderType.Circular"
+            Text="Dataset is being generated. This process can take several minutes ...">
+            <MudGrid Spacing="1">
+                <MudItem xs="12">
+                    <ConfigItem Label="Max Size" Probability="@_maxSizeValue" DisplayProbability="false">
+                        <MudSlider TickMarks="true" TickMarkLabels="@_maxSizeValue.TickLabels" Step="512"
+                            Min="@_maxSizeValue.Min" Max="@_maxSizeValue.Max" @bind-Value="_maxSizeValue.Value"
+                            Disabled="@(!_maxSizeValue.IsActive)" />
+                    </ConfigItem>
+                </MudItem>
+                <MudItem xs="12">
+                    <MudText Typo="Typo.h6">Data Augmentation</MudText>
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <ConfigItem Label="Flip Horizontal" Probability="@_flipHorizontalValue"
+                        ActiveChanged="@ConfigItemActiveChanged" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <ConfigItem Label="Flip Vertical" Probability="@_flipVerticalValue"
+                        ActiveChanged="@ConfigItemActiveChanged" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <ConfigItem Label="Rotate 90°" Probability="@_rotate90Value"
+                        ActiveChanged="@ConfigItemActiveChanged" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <ConfigItem Label="Scale" Probability="@_scaleValue" ActiveChanged="@ConfigItemActiveChanged" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <ConfigItem Label="Pixel Dropout" Probability="@_pixelDropoutValue"
+                        ActiveChanged="@ConfigItemActiveChanged" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <ConfigItem Label="Channel Shuffle" Probability="@_channelShuffelValue"
+                        ActiveChanged="@ConfigItemActiveChanged" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <ConfigItem Label="ISO Noise" Probability="@_isoNoiseValue"
+                        ActiveChanged="@ConfigItemActiveChanged" />
+                </MudItem>
+                <MudItem xs="12" md="6">
+                    <ConfigItem Label="Gauss Noise" Probability="@_gaussNoiseValue"
+                        ActiveChanged="@ConfigItemActiveChanged" />
+                </MudItem>
+                <MudItem xs="12">
+                    <ConfigItem Label="Brightness & Contrast" Probability="@_brightnessAndContrastValue"
+                        ActiveChanged="@ConfigItemActiveChanged" />
+                </MudItem>
+                <MudItem xs="12">
+                    <ConfigItem Label="Sample Rate" Probability="@_sampleRateValue" DisplayProbability="false"
+                        DisplayActivation="false">
+                        <MudSlider Min="@_sampleRateValue.Min" Max="@_sampleRateValue.Max"
+                            @bind-Value="_sampleRateValue.Value" Disabled="@(!_sampleRateValue.IsActive)">
+                            @_sampleRateValue.Value / Image
+                        </MudSlider>
+                    </ConfigItem>
+                </MudItem>
+            </MudGrid>
+        </MudLoading>
+        </div>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Color="Color.Default" OnClick="CancelClicked" Disabled="@_isGenerating">
+            Cancel
+        </MudButton>
+        <MudButton Color="Color.Primary" Variant="Variant.Filled" OnClick="GenerateClicked" Disabled="@_isGenerating">
+            Generate
+        </MudButton>
+    </DialogActions>
+</MudDialog>

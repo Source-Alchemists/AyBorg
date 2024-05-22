@@ -450,9 +450,9 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         {
             { "ContentText", $"Are you sure you want to delete '{targetName}'?" }
         };
-        IDialogReference dialog = DialogService.Show<ConfirmDialog>("Confirm deletion", dialogParameters, new DialogOptions());
+        IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>("Confirm deletion", dialogParameters, new DialogOptions());
         DialogResult result = await dialog.Result;
-        return !result.Cancelled;
+        return !result.Canceled;
     }
 
     private void OnZoomInClicked() => _diagram.SetZoom(_diagram.Zoom + 0.1);
