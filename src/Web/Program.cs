@@ -13,6 +13,7 @@ using Blazored.LocalStorage;
 using Blazored.SessionStorage;
 using Elastic.Apm.NetCoreAll;
 using Elastic.Extensions.Logging;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -159,22 +160,18 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-// app.UseRouting();
-
-// app.UseAuthentication();
-// app.UseAuthorization();
-
 if (isElasticApmEnabled)
 {
     app.UseAllElasticApm(builder.Configuration);
 }
 
-// app.MapControllers();
-// app.MapBlazorHub();
-// app.MapFallbackToPage("/_Host");
-
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 app.MapAdditionalIdentityEndpoints();
+
+app.MapGet("/Logout", async (HttpContext context, string returnUrl = "/") => {
+    await context.SignOutAsync(IdentityConstants.ApplicationScheme);
+    context.Response.Redirect(returnUrl);
+}).RequireAuthorization();
 
 // Create database if not exists
 await (await app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbContextAsync()).Database.MigrateAsync();
