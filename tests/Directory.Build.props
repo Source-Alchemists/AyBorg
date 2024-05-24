@@ -1,9 +1,5 @@
 <Project>
   <PropertyGroup>
-    <Version>0.10.0</Version>
-  </PropertyGroup>
-
-  <PropertyGroup>
     <Authors>Source Alchemists</Authors>
     <Owners>Source Alchemists</Owners>
     <Company>Source Alchemists</Company>

@@ -5,7 +5,7 @@ using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.Web;
-using AyBorg.Web.Areas.Identity;
+using AyBorg.Web.Components.Account;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.Analytics;
@@ -49,6 +49,28 @@ if (isElasticApmEnabled)
     builder.Logging.AddElasticsearch();
 }
 
+builder.Services.AddRazorComponents().AddInteractiveServerComponents().AddHubOptions(options => options.MaximumReceiveMessageSize = maximumReceiveMessageSize * 1024);
+
+builder.Services.AddCascadingAuthenticationState();
+builder.Services.AddScoped<IdentityUserAccessor>();
+builder.Services.AddScoped<IdentityRedirectManager>();
+builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultScheme = IdentityConstants.ApplicationScheme;
+        options.DefaultSignInScheme = IdentityConstants.ExternalScheme;
+    })
+    .AddIdentityCookies();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole(Roles.Administrator));
+    options.AddPolicy("RequireEngineerRole", policy => policy.RequireRole(Roles.Engineer));
+    options.AddPolicy("RequireAuditorRole", policy => policy.RequireRole(Roles.Auditor));
+    options.AddPolicy("RequireReviewerRole", policy => policy.RequireRole(Roles.Reviewer));
+});
+
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
     _ = databaseProvider switch
     {
@@ -59,7 +81,6 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
         _ => throw new Exception("Invalid database provider")
     }
 );
-
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Add authentication services.
@@ -67,30 +88,12 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 })
-    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddSignInManager()
     .AddRoleManager<RoleManager<IdentityRole>>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
-builder.Services.ConfigureApplicationCookie(options =>
-{
-    options.LoginPath = "/Identity/Account/Login";
-    options.LogoutPath = "/Identity/Account/Logout";
-    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
-});
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAdministratorRole", policy => policy.RequireRole(Roles.Administrator));
-    options.AddPolicy("RequireEngineerRole", policy => policy.RequireRole(Roles.Engineer));
-    options.AddPolicy("RequireAuditorRole", policy => policy.RequireRole(Roles.Auditor));
-    options.AddPolicy("RequireReviewerRole", policy => policy.RequireRole(Roles.Reviewer));
-});
+    .AddRoles<IdentityRole>()
+    .AddDefaultTokenProviders();
 
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor()
-                .AddHubOptions(options =>
-{
-    options.MaximumReceiveMessageSize = maximumReceiveMessageSize * 1024;
-});
-builder.Services.AddScoped<AuthenticationStateProvider, RevalidatingIdentityAuthenticationStateProvider<IdentityUser>>();
 builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
@@ -145,28 +148,31 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
-    app.UseExceptionHandler("/Error");
+    app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
+app.UseAntiforgery();
 
-app.UseRouting();
+// app.UseRouting();
 
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 
 if (isElasticApmEnabled)
 {
     app.UseAllElasticApm(builder.Configuration);
 }
 
-app.MapControllers();
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
+// app.MapControllers();
+// app.MapBlazorHub();
+// app.MapFallbackToPage("/_Host");
+
+app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
+app.MapAdditionalIdentityEndpoints();
 
 // Create database if not exists
 await (await app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!.CreateDbContextAsync()).Database.MigrateAsync();

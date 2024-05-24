@@ -1,9 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
-        <ImplicitUsings>enable</ImplicitUsings>
-        <Nullable>enable</Nullable>
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
@@ -29,6 +26,6 @@
     <ItemGroup>
         <Content Include="resources\*.*">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>  
+        </Content>
     </ItemGroup>
 </Project>
