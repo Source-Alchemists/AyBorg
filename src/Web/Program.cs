@@ -84,15 +84,17 @@ builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 // Add authentication services.
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(options =>
+builder.Services.AddIdentityCore<IdentityUser>(options =>
 {
     options.SignIn.RequireConfirmedAccount = false;
 })
+    .AddRoles<IdentityRole>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddRoleManager<RoleManager<IdentityRole>>()
-    .AddRoles<IdentityRole>()
     .AddDefaultTokenProviders();
+
+builder.Services.AddSingleton<IEmailSender<IdentityUser>, IdentityNoOpEmailSender>();
 
 builder.Services.AddMudServices(config =>
 {
