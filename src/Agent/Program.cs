@@ -13,7 +13,6 @@ using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
-using Elastic.Apm.NetCoreAll;
 using Elastic.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
@@ -41,6 +40,7 @@ if (isOpenTelemetryEnabled)
 
 if(isElasticApmEnabled)
 {
+    builder.Services.AddAllElasticApm();
     builder.Logging.AddElasticsearch();
 }
 
@@ -111,11 +111,6 @@ WebApplication app = builder.Build();
 app.UseAuthorization();
 app.UseJwtMiddleware();
 app.UseProjectStateGuardMiddleware();
-
-if (isElasticApmEnabled)
-{
-    app.UseAllElasticApm(builder.Configuration);
-}
 
 app.MapGrpcService<ProjectManagementServiceV1>();
 app.MapGrpcService<ProjectSettingsServiceV1>();

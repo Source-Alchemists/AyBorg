@@ -27,7 +27,7 @@ public class AuthorizeUtilTests
 
         if (authorized)
         {
-            context.Request.Headers.Add("Authorization", "TokenValue");
+            context.Request.Headers.Append("Authorization", "TokenValue");
             mockUser.Setup(u => u.Claims).Returns(new List<Claim> { new Claim("role", "Admin") });
         }
 

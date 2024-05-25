@@ -2,7 +2,6 @@ using AyBorg.Log.Services;
 using AyBorg.Data.Log;
 using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.System.Configuration;
-using Elastic.Apm.NetCoreAll;
 using Elastic.Extensions.Logging;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -26,6 +25,7 @@ if (isOpenTelemetryEnabled)
 
 if(isElasticApmEnabled)
 {
+    builder.Services.AddAllElasticApm();
     builder.Logging.AddElasticsearch();
 }
 
@@ -46,11 +46,6 @@ builder.Services.AddSingleton<IEventLogRepository, EventLogRepository>();
 builder.Services.AddSingleton<IEventStorage, EventStorage>();
 
 WebApplication app = builder.Build();
-
-if (isElasticApmEnabled)
-{
-    app.UseAllElasticApm(builder.Configuration);
-}
 
 // Configure the HTTP request pipeline.
 app.MapGrpcService<EventLogServiceV1>();

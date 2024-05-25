@@ -1,16 +1,6 @@
-using System.Runtime.Serialization;
-
 namespace AyBorg.Agent;
 
 [Serializable]
-public sealed class ProjectException : Exception
+public sealed class ProjectException(string message) : Exception(message)
 {
-    public ProjectException(string message) : base(message)
-    {
-    }
-
-    private ProjectException(SerializationInfo serializationInfo, StreamingContext streamingContext)
-        : base(serializationInfo, streamingContext)
-    {
-    }
 }

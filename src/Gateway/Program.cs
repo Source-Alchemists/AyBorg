@@ -7,7 +7,6 @@ using AyBorg.Gateway.Services.Audit;
 using AyBorg.SDK.Authorization;
 using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
-using Elastic.Apm.NetCoreAll;
 using Elastic.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
@@ -35,6 +34,7 @@ if (isOpenTelemetryEnabled)
 
 if(isElasticApmEnabled)
 {
+    builder.Services.AddAllElasticApm();
     builder.Logging.AddElasticsearch();
 }
 
@@ -71,11 +71,6 @@ WebApplication app = builder.Build();
 
 app.UseAuthorization();
 app.UseJwtMiddleware();
-
-if (isElasticApmEnabled)
-{
-    app.UseAllElasticApm(builder.Configuration);
-}
 
 // Gateway
 app.MapGrpcService<RegisterServiceV1>();

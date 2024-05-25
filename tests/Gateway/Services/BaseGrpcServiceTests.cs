@@ -24,7 +24,7 @@ public abstract class BaseGrpcServiceTests<TService, TClient>
     protected BaseGrpcServiceTests()
     {
         _serverCallContextCancellationTokenSource = new CancellationTokenSource();
-        _httpContext.Request.Headers.Add("Authorization", "TokenValue");
+        _httpContext.Request.Headers.Append("Authorization", "TokenValue");
         _httpContext.User = _mockContextUser.Object;
         _serverCallContext = TestServerCallContext.Create(null, _serverCallContextCancellationTokenSource.Token);
         _serverCallContext.UserState["__HttpContext"] = _httpContext;

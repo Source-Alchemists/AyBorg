@@ -54,7 +54,7 @@ public sealed class RegisterServiceV1 : Register.RegisterBase
         }
         catch (KeyNotFoundException ex)
         {
-            _logger.LogWarning(new EventId((int)EventLogType.Disconnect), "Failed to unregister", ex.Message);
+            _logger.LogWarning(new EventId((int)EventLogType.Disconnect), ex, "Failed to unregister");
             return new StatusResponse { Success = false, Id = request.Id, ErrorMessage = "Failed to unregister" };
         }
     }

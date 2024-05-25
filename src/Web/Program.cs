@@ -11,7 +11,6 @@ using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.Analytics;
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
-using Elastic.Apm.NetCoreAll;
 using Elastic.Extensions.Logging;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -47,6 +46,7 @@ if (isOpenTelemetryEnabled)
 
 if (isElasticApmEnabled)
 {
+    builder.Services.AddAllElasticApm();
     builder.Logging.AddElasticsearch();
 }
 
@@ -159,11 +159,6 @@ else
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
-
-if (isElasticApmEnabled)
-{
-    app.UseAllElasticApm(builder.Configuration);
-}
 
 app.MapRazorComponents<App>().AddInteractiveServerRenderMode();
 app.MapAdditionalIdentityEndpoints();
