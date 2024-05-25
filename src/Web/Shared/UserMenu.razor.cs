@@ -40,6 +40,6 @@ public partial class UserMenu : ComponentBase
 
     private void Logout()
     {
-        NavigationManager.NavigateTo("/Logout", true);
+        NavigationManager.NavigateTo($"/Logout?returnUrl={Uri.EscapeDataString(NavigationManager.Uri)}", true);
     }
 }

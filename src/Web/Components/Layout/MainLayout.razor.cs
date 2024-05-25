@@ -30,7 +30,7 @@ public sealed partial class MainLayout : LayoutComponentBase, IDisposable
     {
         if (firstRender)
         {
-            _isDarkMode = !(await LocalStorageService.GetItemAsync<bool>("Theme.IsDarkModeDisabled"));
+            _isDarkMode = !await LocalStorageService.GetItemAsync<bool>("Theme.IsDarkModeDisabled");
             await JsRuntime.InvokeVoidAsync("switchTheme", _isDarkMode);
             await InvokeAsync(StateHasChanged);
         }
