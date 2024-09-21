@@ -171,7 +171,7 @@ public sealed class MqttClient : ICommunicationDevice, IDisposable
             subscription.Next(new Message
             {
                 ContentType = message.ContentType,
-                Payload = message.Payload
+                Payload = message.PayloadSegment
             });
         };
 

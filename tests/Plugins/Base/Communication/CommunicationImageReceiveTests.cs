@@ -56,7 +56,7 @@ public class CommunicationImageReceiveTests : IDisposable
         ms.Position = 0;
         byte[] imageArray = ms.ToArray();
 
-        _messageMock.Setup(m => m.Payload).Returns(hasPayload ? imageArray : null!);
+        _messageMock.Setup(m => m.Payload).Returns(hasPayload ? imageArray : ArraySegment<byte>.Empty);
 
         // Act
         // Simulate lifecycle
