@@ -16,7 +16,7 @@ public sealed class KeeperServiceTests : IDisposable
     private readonly IGatewayConfiguration _registryConfiguration;
     private readonly Microsoft.Data.Sqlite.SqliteConnection _connection;
     private readonly DbContextOptions<RegistryContext> _contextOptions;
-    private readonly Mock<IGrpcChannelService> _mockGrpcChannelService = new();
+    private readonly Mock<IGrpcChannelService> _mockGrpcChannelService;
 
     private readonly KeeperService _service;
     private readonly ServiceEntry _validServiceEntry = new() { Name = "Test", UniqueName = "Test-1", Url = "https://myservice:7777" };
@@ -56,13 +56,13 @@ public sealed class KeeperServiceTests : IDisposable
     [InlineData("")]
     [InlineData("http://test.org")]
     [InlineData("https://test.org")]
-    public void Test_ConfigurationServerUrl(string url)
+    public void Test_ConfigurationServerUrl(string? url)
     {
         // Arrange
         IConfigurationRoot configuration = new ConfigurationBuilder().AddInMemoryCollection(
             initialData: new List<KeyValuePair<string, string>> {
-                new("Kestrel:Endpoints:gRPC:Url", url),
-                new("AyBorg:Service:Url", url)
+                new("Kestrel:Endpoints:gRPC:Url", url!),
+                new("AyBorg:Service:Url", url!)
             }!).Build();
         var registryConfiguration = new GatewayConfiguration(_registryConfigurationLogger, configuration);
 

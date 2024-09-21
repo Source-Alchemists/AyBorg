@@ -7,7 +7,7 @@ public class ShapeRectangleCreateTests
     private readonly ShapeRectangleCreate _plugin = new();
 
     [Fact]
-    public async ValueTask Test_TryRunAsync()
+    public async Task Test_TryRunAsync()
     {
         // Arrange
         var xPort = (NumericPort)_plugin.Ports.First(p => p.Name.Equals("X"));
