@@ -178,6 +178,15 @@
     z-index: -1;
 }
 
+.login-container {
+    position: relative;
+    top: 50%;
+    -webkit-transform: translateY(-50%);
+    -ms-transform: translateY(-50%);
+    -moz-transform: translateY(-50%);
+    transform: translateY(-50%);
+}
+
 .app-nav-bar-spacer {
     width: 80px;
 }

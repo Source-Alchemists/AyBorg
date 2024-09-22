@@ -5,63 +5,96 @@
 @using Microsoft.AspNetCore.Identity
 
 @inject SignInManager<IdentityUser> SignInManager
+@inject UserManager<IdentityUser> UserManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
 <PageTitle>Log in | AyBorg</PageTitle>
 
-<h1>Log in</h1>
-<div class="row">
-    <div class="col-md-4">
-        <section>
-            <StatusMessage Message="@errorMessage" />
-            <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
-                <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
-                <hr />
-                <ValidationSummary class="text-danger" role="alert" />
-                <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.Username" class="form-control" autocomplete="username" aria-required="true" />
-                    <label for="email" class="form-label">Username</label>
-                    <ValidationMessage For="() => Input.Username" class="text-danger" />
-                </div>
-                <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label for="password" class="form-label">Password</label>
-                    <ValidationMessage For="() => Input.Password" class="text-danger" />
-                </div>
-                <div class="checkbox mb-3">
-                    <label class="form-label">
-                        <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
-                        Remember me
-                    </label>
-                </div>
-                <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
-                    <p>
-                        <a href="Account/ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
-            </EditForm>
-        </section>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            <ExternalLoginPicker />
-        </section>
-    </div>
+<MudGrid Class="login-container">
+    <MudItem xs="0" md="4"></MudItem>
+    <MudItem xs="12" md="4">
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudGrid>
+                        <MudItem xs="4"></MudItem>
+                        <MudItem xs="4">
+                            <MudStack Spacing="0" Row>
+                                <MudImage Src="icons/logo.svg" Width="40" Height="40" />
+                                <MudText Typo="Typo.h5" Class="ml-3 mt-2 brand-text navigation" Color="Color.Primary">
+                                    AyBorg</MudText>
+                            </MudStack>
+                        </MudItem>
+                        <MudItem xs="4"></MudItem>
+                    </MudGrid>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <StatusMessage Message="@errorMessage" />
+                <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary class="text-danger" role="alert" />
+                    <div class="mud-input-control mud-input-required mud-input-input-control">
+                        <div class="mud-input-control-input-container">
+                            <div class="mud-input mud-input-filled mud-input-filled-with-label mud-input-underline mud-ltr">
+                                <InputText id="email" @bind-Value="Input.Email" class="mud-input-slot mud-input-root mud-input-root-text" autocomplete="email" aria-required="true" />
+                            </div>
+                            <label for="email" class="mud-input-label mud-input-label-animated mud-input-label-text">Email</label>
+                            <ValidationMessage For="() => Input.Email" class="text-danger" />
+                        </div>
+                    </div>
+
+                    <div class="mud-input-control mud-input-required mud-input-input-control">
+                        <div class="mud-input-control-input-container">
+                            <div class="mud-input mud-input-filled mud-input-filled-with-label mud-input-underline mud-ltr">
+                                <InputText id="password" type="password" @bind-Value="Input.Password" class="mud-input-slot mud-input-root mud-input-root-text" autocomplete="current-password" aria-required="true" />
+                            </div>
+                            <label for="password" class="mud-input-label mud-input-label-animated mud-input-label-text">Password</label>
+                            <ValidationMessage For="() => Input.Password" class="text-danger" />
+                        </div>
+                    </div>
+
+                    <div class="mud-input-control mud-input-control-boolean-input">
+                        <div class="mud-input-control-input-container">
+                            <label class="mud-checkbox">
+                                <span tabindex="0" class="mud-button-root mud-icon-button mud-default-text hover:mud-default-hover mud-ripple mud-ripple-checkbox">
+                                    <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox" />
+                                </span><p class="mud-typography mud-typography-body1">Remember me</p>
+                            </label>
+                        </div>
+                    </div>
+
+                    <MudButton ButtonType="ButtonType.Submit" Color="Color.Primary" Variant="Variant.Filled"
+                        Class="mud-full-width mt-4">Log in</MudButton>
+                </EditForm>
+            </MudCardContent>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="0" md="4"></MudItem>
+</MudGrid>
+
+@*
+<p>
+<a href="Account/ForgotPassword">Forgot your password?</a>
+</p>
+<p>
+<a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> {
+["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
+</p>
+<p>
+<a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
+</p>
 </div>
+</EditForm>
+</section>
+</div>
+<div class="col-md-6 col-md-offset-2">
+<section>
+<h3>Use another service to log in.</h3>
+<hr />
+<ExternalLoginPicker /> *@
 
 @code {
     private string? errorMessage;
@@ -86,9 +119,14 @@
 
     public async Task LoginUser()
     {
-        // This doesn't count login failures towards account lockout
-        // To enable password failures to trigger account lockout, set lockoutOnFailure: true
-        var result = await SignInManager.PasswordSignInAsync(Input.Username, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+        var user = await UserManager.FindByEmailAsync(Input.Email);
+        if (user == null)
+        {
+            errorMessage = "Error: Invalid login attempt.";
+            return;
+        }
+
+        var result = await SignInManager.PasswordSignInAsync(user.UserName!, Input.Password, Input.RememberMe, lockoutOnFailure: true);
         if (result.Succeeded)
         {
             Logger.LogInformation("User logged in.");
@@ -97,8 +135,8 @@
         else if (result.RequiresTwoFactor)
         {
             RedirectManager.RedirectTo(
-                "Account/LoginWith2fa",
-                new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
+            "Account/LoginWith2fa",
+            new() { ["returnUrl"] = ReturnUrl, ["rememberMe"] = Input.RememberMe });
         }
         else if (result.IsLockedOut)
         {
@@ -114,11 +152,11 @@
     private sealed class InputModel
     {
         [Required]
-        public string Username { get; set; } = "";
+        public string Email { get; set; } = string.Empty;
 
         [Required]
         [DataType(DataType.Password)]
-        public string Password { get; set; } = "";
+        public string Password { get; set; } = string.Empty;
 
         [Display(Name = "Remember me?")]
         public bool RememberMe { get; set; }
