@@ -1,3 +1,20 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Security.Cryptography;
 using System.Text;
 using AyBorg.Web.Shared.Models;
@@ -28,15 +45,15 @@ public static class UploadUtils
                 await using var resizedFileStream = new FileStream(tempFilePath, FileMode.Create);
                 if (file.ContentType.EndsWith("jpeg") || file.ContentType.EndsWith("jpg"))
                 {
-                    resizedImage.Save(resizedFileStream, ImageTorque.Processing.EncoderType.Jpeg);
+                    resizedImage.Save(resizedFileStream, "jpeg");
                 }
                 else
                 {
-                    resizedImage.Save(resizedFileStream, ImageTorque.Processing.EncoderType.Png);
+                    resizedImage.Save(resizedFileStream, "png");
                 }
                 byte[] data = new byte[resizedFileStream.Length];
                 resizedFileStream.Position = 0;
-                await resizedFileStream.ReadAsync(data);
+                _ = await resizedFileStream.ReadAsync(data);
                 resizedFileStream.Close();
                 string hashValue = CreateHash(data);
                 return new ImageSource(data, file.ContentType, hashValue) { Width = resizedImage.Width, Height = resizedImage.Height };
@@ -45,7 +62,7 @@ public static class UploadUtils
             {
                 byte[] data = new byte[file.Size];
                 fileStream.Position = 0;
-                await fileStream.ReadAsync(data);
+                _ = await fileStream.ReadAsync(data);
                 fileStream.Close();
                 string hashValue = CreateHash(data);
                 return new ImageSource(data, file.ContentType, hashValue) { Width = image.Width, Height = image.Height };

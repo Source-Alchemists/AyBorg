@@ -30,10 +30,8 @@ internal sealed class StorageService : IStorageService
                 _logger.LogError(ex, "Failed to create storage directory at {StorageLocation}", _environment.StorageLocation);
             }
         }
-        else
-        {
-            _logger.LogTrace("Using storage directory at {StorageLocation}", _environment.StorageLocation);
-        }
+
+        _logger.LogTrace("Storage directory: {StorageLocation}", _environment.StorageLocation);
     }
 
     /// <summary>
