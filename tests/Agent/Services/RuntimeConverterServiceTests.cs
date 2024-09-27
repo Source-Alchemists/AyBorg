@@ -34,7 +34,7 @@ public class RuntimeConverterServiceTests
     [InlineData(true, PortBrand.Image, null, null)]
     [InlineData(true, PortBrand.StringCollection, null, null)]
     [InlineData(true, PortBrand.StringCollection, "[\"Test1\",\"Test2\"]", null)]
-    public async Task Test_TryUpdatePortValueAsync(bool expectedSuccess, PortBrand portBrand, object value, object expectedValue)
+    public async Task Test_TryUpdatePortValueAsync(bool expectedSuccess, PortBrand portBrand, object? value, object? expectedValue)
     {
         // Arrange
         if (portBrand == PortBrand.Rectangle)
@@ -79,7 +79,7 @@ public class RuntimeConverterServiceTests
         }
 
         // Act
-        bool result = await _service.TryUpdatePortValueAsync(port, value);
+        bool result = await _service.TryUpdatePortValueAsync(port, value!);
 
         // Assert
         Assert.Equal(expectedSuccess, result);

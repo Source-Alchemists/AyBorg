@@ -1,0 +1,17 @@
+@inherits LayoutComponentBase
+
+<PageTitle>AyBorg</PageTitle>
+
+<MudThemeProvider IsDarkMode Theme="_theme"/>
+
+<MudLayout Class="mud-full-height">
+    <MudMainContent Class="mud-full-height">
+        <MudContainer Class="mud-full-height py-0" MaxWidth="MaxWidth.ExtraExtraLarge">
+            @Body
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private readonly MudTheme _theme = ThemeFactory.Create();
+}

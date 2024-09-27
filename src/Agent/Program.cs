@@ -1,3 +1,20 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using AyBorg.Agent;
 using AyBorg.Agent.Guards;
 using AyBorg.Agent.Result;
@@ -13,7 +30,6 @@ using AyBorg.SDK.Communication.gRPC.Registry;
 using AyBorg.SDK.Logging.Analytics;
 using AyBorg.SDK.System.Configuration;
 using AyBorg.SDK.System.Runtime;
-using Elastic.Apm.NetCoreAll;
 using Elastic.Extensions.Logging;
 using Microsoft.EntityFrameworkCore;
 using OpenTelemetry.Metrics;
@@ -39,8 +55,9 @@ if (isOpenTelemetryEnabled)
             .AddAspNetCoreInstrumentation());
 }
 
-if(isElasticApmEnabled)
+if (isElasticApmEnabled)
 {
+    builder.Services.AddAllElasticApm();
     builder.Logging.AddElasticsearch();
 }
 
@@ -87,7 +104,7 @@ builder.Services.AddTransient<IJwtConsumer, JwtConsumer>();
 builder.Services.AddTransient<IProjectRepository, ProjectRepository>();
 builder.Services.AddTransient<IDeviceRepository, DeviceRepository>();
 // Environment / Configuration
-builder.Services.AddTransient<IEnvironment, AyBorg.SDK.Common.Environment>();
+builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
 builder.Services.AddTransient<IServiceConfiguration, ServiceConfiguration>();
 // Mapper / Converter
 builder.Services.AddTransient<IRuntimeMapper, RuntimeMapper>();
@@ -112,11 +129,6 @@ app.UseAuthorization();
 app.UseJwtMiddleware();
 app.UseProjectStateGuardMiddleware();
 
-if (isElasticApmEnabled)
-{
-    app.UseAllElasticApm(builder.Configuration);
-}
-
 app.MapGrpcService<ProjectManagementServiceV1>();
 app.MapGrpcService<ProjectSettingsServiceV1>();
 app.MapGrpcService<EditorServiceV1>();
@@ -126,11 +138,11 @@ app.MapGrpcService<DeviceManagerServiceV1>();
 app.MapGet("/", () => "Communication with gRPC endpoints must be made through a gRPC client. To learn how to create a client, visit: https://go.microsoft.com/fwlink/?linkid=2086909");
 
 // Create database if not exists
-app.Services.GetService<IDbContextFactory<ProjectContext>>()!.CreateDbContext().Database.Migrate();
-app.Services.GetService<IDbContextFactory<DeviceContext>>()!.CreateDbContext().Database.Migrate();
+await app.Services.GetService<IDbContextFactory<ProjectContext>>()!.CreateDbContext().Database.MigrateAsync();
+await app.Services.GetService<IDbContextFactory<DeviceContext>>()!.CreateDbContext().Database.MigrateAsync();
 
 await app.Services.GetService<IPluginsService>()!.LoadAsync().AsTask()!;
 await app.Services.GetService<IDeviceProxyManagerService>()!.LoadAsync().AsTask()!;
 await app.Services.GetService<IProjectManagementService>()!.TryLoadActiveAsync().AsTask()!;
 
-app.Run();
+await app.RunAsync();

@@ -1,3 +1,20 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Collections.Immutable;
 using AyBorg.SDK.Common.Models;
 using AyBorg.Web.Shared;
@@ -28,7 +45,8 @@ public partial class ImageInputField : BaseInputField
             _imageWidth = image.Width;
             _imageHeight = image.Height;
 
-            _imagePosition = new Rectangle {
+            _imagePosition = new Rectangle
+            {
                 X = 0,
                 Y = 0,
                 Width = _imageWidth,
@@ -71,23 +89,18 @@ public partial class ImageInputField : BaseInputField
 
     private void SetImageUrl(Image image)
     {
-        if(string.IsNullOrEmpty(image.Base64))
+        if (string.IsNullOrEmpty(image.Base64))
         {
             _imageUrl = string.Empty;
             return;
         }
 
-        switch (image.EncoderType)
+        _imageUrl = image.EncoderType switch
         {
-            case ImageTorque.Processing.EncoderType.Jpeg:
-                _imageUrl = $"data:image/jpeg;base64,{image.Base64}";
-                break;
-            case ImageTorque.Processing.EncoderType.Png:
-                _imageUrl = $"data:image/png;base64,{image.Base64}";
-                break;
-            case ImageTorque.Processing.EncoderType.Bmp:
-                _imageUrl = $"data:image/bmp;base64,{image.Base64}";
-                break;
-        }
+            "jpeg" => $"data:image/jpeg;base64,{image.Base64}",
+            "png" => $"data:image/png;base64,{image.Base64}",
+            "bmp" => $"data:image/bmp;base64,{image.Base64}",
+            _ => throw new NotSupportedException($"The encoder type '{image.EncoderType}' is not supported."),
+        };
     }
 }

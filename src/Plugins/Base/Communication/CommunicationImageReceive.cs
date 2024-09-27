@@ -22,9 +22,9 @@ public sealed class CommunicationImageReceive : CommunicationReceiveBase
 
     protected override void OnMessageReceived(object? sender, MessageEventArgs e)
     {
-        if (e.Message.Payload == null)
+        if (e.Message.Payload == ArraySegment<byte>.Empty)
         {
-            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Received message with null payload");
+            _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Received message with empty payload");
             _valuePort.Value = null!;
         }
         else

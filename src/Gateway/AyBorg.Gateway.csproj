@@ -11,21 +11,19 @@
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'http' " />
   <PropertyGroup Condition=" '$(RunConfiguration)' == 'https' " />
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="7.0.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="7.0.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Elastic.Apm.GrpcClient" Version="1.25.0" />
-    <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.25.0" />
-    <PackageReference Include="Elastic.Extensions.Logging" Version="8.6.1" />
-    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.6.0" />
-    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.6.0-beta.2" />
+    <PackageReference Include="Elastic.Apm.GrpcClient" Version="1.29.0" />
+    <PackageReference Include="Elastic.Apm.NetCoreAll" Version="1.29.0" />
+    <PackageReference Include="Elastic.Extensions.Logging" Version="8.11.1" />
+    <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.9.0" />
+    <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
   </ItemGroup>
 
   <ItemGroup>

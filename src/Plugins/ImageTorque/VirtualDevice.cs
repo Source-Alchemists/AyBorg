@@ -1,3 +1,20 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.ImageAcquisition;
 using AyBorg.SDK.Common.Ports;
@@ -11,7 +28,7 @@ public sealed class VirtualDevice : ICameraDevice, IDisposable
     private readonly ILogger<VirtualDevice> _logger;
     private readonly IEnvironment _environment;
     private readonly FolderPort _folderPort = new("Folder", PortDirection.Input, string.Empty);
-    private static readonly string[] s_supportedFileTypes = new[] { ".jpg", ".jpeg", ".png", ".bmp" };
+    private static readonly string[] s_supportedFileTypes = [".jpg", ".jpeg", ".png", ".bmp"];
     private int _imageIndex = 0;
     private Task<ImageContainer>? _preloadTask;
     private string _lastFolderPath = string.Empty;
@@ -29,7 +46,7 @@ public sealed class VirtualDevice : ICameraDevice, IDisposable
 
     public string Name { get; }
 
-    public IReadOnlyCollection<string> Categories { get; } = new List<string> { DefaultDeviceCategories.Camera, "Virtual Device" };
+    public IReadOnlyCollection<string> Categories { get; } = [DefaultDeviceCategories.Camera, "Virtual Device"];
 
     public VirtualDevice(ILogger<VirtualDevice> logger, IEnvironment environment, string id)
     {
@@ -38,7 +55,7 @@ public sealed class VirtualDevice : ICameraDevice, IDisposable
         Id = id;
         Name = $"Virtual Device ({id})";
 
-        Ports = new List<IPort> { _folderPort };
+        Ports = [_folderPort];
     }
 
     public async ValueTask<ImageContainer> AcquisitionAsync(CancellationToken cancellationToken)
@@ -160,7 +177,7 @@ public sealed class VirtualDevice : ICameraDevice, IDisposable
 
     private void Dispose(bool isDisposing)
     {
-        if(isDisposing && !_isDisposed)
+        if (isDisposing && !_isDisposed)
         {
             _preloadTask?.Wait();
             _preloadTask?.Dispose();

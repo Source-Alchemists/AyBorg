@@ -1,4 +1,20 @@
-using System.Text;
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Communication;
 using AyBorg.SDK.Common.Ports;
@@ -52,11 +68,11 @@ public class CommunicationImageReceiveTests : IDisposable
         var testImage = Image.Load("./resources/luna.jpg");
 
         using var ms = new MemoryStream();
-        testImage.Save(ms, ImageTorque.Processing.EncoderType.Bmp);
+        testImage.Save(ms, "bmp");
         ms.Position = 0;
         byte[] imageArray = ms.ToArray();
 
-        _messageMock.Setup(m => m.Payload).Returns(hasPayload ? imageArray : null!);
+        _messageMock.Setup(m => m.Payload).Returns(hasPayload ? imageArray : ArraySegment<byte>.Empty);
 
         // Act
         // Simulate lifecycle

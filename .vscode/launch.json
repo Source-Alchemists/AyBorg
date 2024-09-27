@@ -8,9 +8,9 @@
             "name": ".NET Core Launch (Web)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
+            "preLaunchTask": "build-web",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/Web/bin/Debug/net7.0/AyBorg.Web.dll",
+            "program": "${workspaceFolder}/src/Web/bin/Debug/net8.0/AyBorg.Web.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/Web",
             "stopAtEntry": false,
@@ -32,7 +32,7 @@
             "request": "launch",
             "preLaunchTask": "build-agent",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/Agent/bin/Debug/net7.0/AyBorg.Agent.dll",
+            "program": "${workspaceFolder}/src/Agent/bin/Debug/net8.0/AyBorg.Agent.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/Agent",
             "stopAtEntry": false,
@@ -47,7 +47,7 @@
           "request": "launch",
           "preLaunchTask": "build-result",
           // If you have changed target frameworks, make sure to update the program path.
-          "program": "${workspaceFolder}/src/Result/bin/Debug/net7.0/AyBorg.Result.dll",
+          "program": "${workspaceFolder}/src/Result/bin/Debug/net8.0/AyBorg.Result.dll",
           "args": [],
           "cwd": "${workspaceFolder}/src/Result",
           "stopAtEntry": false,
@@ -62,7 +62,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/src/Gateway/bin/debug/AyBorg.Gateway/net7.0/AyBorg.Gateway.dll",
+            "program": "${workspaceFolder}/src/Gateway/bin/debug/AyBorg.Gateway/net8.0/AyBorg.Gateway.dll",
             "args": [],
             "cwd": "${workspaceFolder}/src/Gateway",
             "stopAtEntry": false,

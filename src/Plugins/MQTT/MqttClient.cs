@@ -1,9 +1,25 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using AyBorg.SDK.Common;
 using AyBorg.SDK.Common.Communication;
 using AyBorg.SDK.Common.Ports;
 using AyBorg.SDK.Communication.MQTT;
 using AyBorg.SDK.System.Runtime;
-using ImageTorque.Processing;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
 
@@ -133,11 +149,17 @@ public sealed class MqttClient : ICommunicationDevice, IDisposable
 
         try
         {
+            string encoderType = (EncoderType)_encoder.Value switch
+            {
+                EncoderType.Jpeg => "jpeg",
+                EncoderType.Png => "png",
+                _ => throw new NotImplementedException()
+            };
             await _mqttClientProvider.PublishAsync(messageId, port, new MqttPublishOptions
             {
                 QualityOfServiceLevel = (MqttQualityOfServiceLevel)_qualityOfService.Value,
                 Retain = _retain.Value,
-                EncoderType = (EncoderType)_encoder.Value
+                EncoderType = encoderType
             });
         }
         catch (Exception ex)
@@ -171,7 +193,7 @@ public sealed class MqttClient : ICommunicationDevice, IDisposable
             subscription.Next(new Message
             {
                 ContentType = message.ContentType,
-                Payload = message.Payload
+                Payload = message.PayloadSegment
             });
         };
 
@@ -213,5 +235,11 @@ public sealed class MqttClient : ICommunicationDevice, IDisposable
             _mqttClientProvider?.Dispose();
             _isDisposed = true;
         }
+    }
+
+    private enum EncoderType
+    {
+        Jpeg,
+        Png
     }
 }

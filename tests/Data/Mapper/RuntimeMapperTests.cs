@@ -118,7 +118,7 @@ public class RuntimeMapperTests
     [InlineData(PortBrand.Enum, PortDirection.Output)]
     [InlineData(PortBrand.Rectangle, null)]
     [InlineData(PortBrand.Image, null)]
-    public void Test_FromRuntime_Port(PortBrand portBrand, object value)
+    public void Test_FromRuntime_Port(PortBrand portBrand, object? value)
     {
         // Arrange
         RuntimeMapper service = new();
@@ -134,13 +134,13 @@ public class RuntimeMapperTests
 
         IPort runtimePort = portBrand switch
         {
-            PortBrand.Boolean => new BooleanPort("P1", PortDirection.Input, (bool)value),
+            PortBrand.Boolean => new BooleanPort("P1", PortDirection.Input, (bool)value!),
             PortBrand.Numeric => new NumericPort("P2", PortDirection.Output, Convert.ToDouble(value)),
-            PortBrand.String => new StringPort("P3", PortDirection.Input, (string)value),
-            PortBrand.Folder => new FolderPort("P4", PortDirection.Output, (string)value),
-            PortBrand.Enum => new EnumPort("P5", PortDirection.Input, (PortDirection)value),
-            PortBrand.Rectangle => new RectanglePort("P6", PortDirection.Input, (ImageTorque.Rectangle)value),
-            PortBrand.Image => new ImagePort("P7", PortDirection.Input, (Image)value),
+            PortBrand.String => new StringPort("P3", PortDirection.Input, (string)value!),
+            PortBrand.Folder => new FolderPort("P4", PortDirection.Output, (string)value!),
+            PortBrand.Enum => new EnumPort("P5", PortDirection.Input, (PortDirection)value!),
+            PortBrand.Rectangle => new RectanglePort("P6", PortDirection.Input, (ImageTorque.Rectangle)value!),
+            PortBrand.Image => new ImagePort("P7", PortDirection.Input, (Image)value!),
             _ => throw new NotImplementedException(),
         };
 
@@ -183,7 +183,7 @@ public class RuntimeMapperTests
                         Height = 2,
                         PixelFormat = PixelFormat.Mono8
                     },
-                    OriginalImage = new Image((Image)value)
+                    OriginalImage = new Image((Image)value!)
                 }, result.Value);
                 break;
         }

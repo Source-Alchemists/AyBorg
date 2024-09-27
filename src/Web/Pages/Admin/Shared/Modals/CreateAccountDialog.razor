@@ -2,8 +2,8 @@
 <MudDialog>
     <DialogContent>
         <MudForm @ref="_form" @bind-IsValid="@_success" @bind-Errors="@_errors">
-            <MudTextField T="string" @bind-Text="@_userName" Label="Account name" Required="true" RequiredError="Account name is required!" />
-            <MudTextField T="string" @bind-Text="@_userEmail" Label="Email" Required="false"
+            <MudTextField T="string" @bind-Text="@_userName" Label="Account name" Required RequiredError="Account name is required!" />
+            <MudTextField T="string" @bind-Text="@_userEmail" Label="Email" Required RequiredError="Email is required!"
                 Validation="@(new EmailAddressAttribute() {ErrorMessage = "Invalid email address!"})" />
             <MudCard Outlined="true" class="my-2">
                 <MudCardHeader class="pb-0">
@@ -12,7 +12,7 @@
                 <MudCardContent class="pt-0">
                     @foreach (var role in _roles)
                     {
-                        <MudCheckBox @bind-Checked="@role.Checked" Label="@role.IdentityRole.Name"/>
+                        <MudCheckBox @bind-Value="@role.Checked" Label="@role.IdentityRole.Name"/>
                     }
                 </MudCardContent>
             </MudCard>

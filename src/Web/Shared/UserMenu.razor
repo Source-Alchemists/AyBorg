@@ -26,11 +26,9 @@
                         Change password
                     </MudMenuItem>
                 </MudLink>
-                <MudLink Href="Identity/Account/LogOut" Underline="Underline.None">
-                    <MudMenuItem Icon="@Icons.Material.Filled.Logout">
-                        Log out
-                    </MudMenuItem>
-                </MudLink>
+                <MudMenuItem Icon="@Icons.Material.Filled.Logout" OnClick="@Logout">
+                    Log out
+                </MudMenuItem>
             </ChildContent>
         </MudMenu>
     </Authorized>
