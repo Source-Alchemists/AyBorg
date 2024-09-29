@@ -1,12 +1,6 @@
 name: Build & Release
 
-on:
-  push:
-    branches:
-      - 'main'
-      - 'release/*'
-    tags:
-      - "v*.*.*"
+on: workflow_dispatch
 
 jobs:
   build-gateway:
