@@ -154,7 +154,7 @@ download:
     s2: "AyBorg.Web"
     s3: "AyBorg.Agent"
     macOS:
-      header: "(Optional) macOS only"
+      title: "(Optional) macOS only"
       description: "For macOS, you will need to add execute permissions to the application files. Open a terminal and navigate to the directory where you unpacked the binaries. Run the following command for each application:"
       s1: "chmod +x [application] (eg. chmod +x ./AyBorg.Log)"
       s2: "./[application] (eg. ./AyBorg.Log)"
