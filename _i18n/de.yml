@@ -154,7 +154,7 @@ download:
     s3: "AyBorg.Agent"
     macOS:
       title: "(Optional) Nur macOS"
-      description: "Unter macOS müssen Sie den Anwendungsdateien Ausführungsberechtigungen hinzufügen. Öffnen Sie ein Terminal und wechseln Sie in das Verzeichnis, in das Sie die Binärdateien entpackt haben. Führen Sie den folgenden Befehl für jede Anwendung aus:"
+      description: "Unter macOS müssen Sie den Anwendungsdateien Ausführungsberechtigungen hinzufügen. Öffnen Sie ein Terminal und wechseln Sie in das Verzeichnis, in das Sie die Binärdateien entpackt haben. Führen Sie den folgenden Befehle für jede Anwendung aus:"
       s1: "chmod +x [application] (z.B. chmod +x ./AyBorg.Log)"
       s2: "./[application] (z.B. ./AyBorg.Log)"
       s3: "Öffnen Sie Systemeinstellungen -> Sicherheit & Datenschutz -> Sicherheit und erlauben Sie die Ausführung von [application]."
