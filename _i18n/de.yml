@@ -152,6 +152,12 @@ download:
     s1: "AyBorg.Gateway"
     s2: "AyBorg.Web"
     s3: "AyBorg.Agent"
+    macOS:
+      description: "Unter macOS müssen Sie den Anwendungsdateien Ausführungsberechtigungen hinzufügen. Öffnen Sie ein Terminal und wechseln Sie in das Verzeichnis, in das Sie die Binärdateien entpackt haben. Führen Sie den folgenden Befehl für jede Anwendung aus:"
+      s1: "chmod +x <application> (z.B. chmod +x AyBorg.Log)"
+      s2: "./<application> (z.B. ./AyBorg.Log)"
+      s3: "Öffnen Sie Systemeinstellungen -> Sicherheit & Datenschutz -> Sicherheit und erlauben Sie die Ausführung von <application>."
+      s4: "Starten Sie die Anwendung erneut: ./<application> (z.B. ./AyBorg.Log)"
   webfrontend:
     title: "Öffnen Sie das AyBorg Web-Frontend"
     s1: "Öffnen Sie Ihren Webbrowser"

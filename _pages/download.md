@@ -2,7 +2,7 @@
 title: download.title
 subtitle: download.subtitle
 ignore_title: true
-version: v0.8-beta.1
+version: v0.10-beta.1
 ---
 
 {% include components/download/download-header.html %}
