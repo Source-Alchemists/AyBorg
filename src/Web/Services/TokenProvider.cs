@@ -8,14 +8,14 @@ public sealed class TokenProvider : ITokenProvider
     private readonly ILogger<TokenProvider> _logger;
     private readonly UserManager<IdentityUser> _userManager;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IJwtGenerator _jwtGenerator;
+    private readonly ITokenGenerator _tokenGenerator;
 
-    public TokenProvider(ILogger<TokenProvider> logger, UserManager<IdentityUser> userManager, IHttpContextAccessor httpContextAccessor, IJwtGenerator jwtGenerator)
+    public TokenProvider(ILogger<TokenProvider> logger, UserManager<IdentityUser> userManager, IHttpContextAccessor httpContextAccessor, ITokenGenerator tokenGenerator)
     {
         _logger = logger;
         _userManager = userManager;
         _httpContextAccessor = httpContextAccessor;
-        _jwtGenerator = jwtGenerator;
+        _tokenGenerator = tokenGenerator;
 
     }
 
@@ -42,6 +42,6 @@ public sealed class TokenProvider : ITokenProvider
         }
 
         IList<string> roles = await _userManager.GetRolesAsync(identity);
-        return _jwtGenerator.GenerateToken(identity.UserName!, roles);
+        return _tokenGenerator.GenerateUserToken(identity.UserName!, roles);
     }
 }

@@ -118,7 +118,7 @@ builder.Services.AddSingleton<IRegistryService, RegistryService>();
 builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IRpcMapper, RpcMapper>();
 
-builder.Services.AddScoped<IJwtGenerator, JwtGenerator>();
+builder.Services.AddScoped<ITokenGenerator, JwtGenerator>();
 builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddScoped<IEventLogService, EventLogService>();
 

@@ -42,6 +42,21 @@
             }
         },
         {
+          "name": ".NET Core Launch (Hub)",
+          "type": "coreclr",
+          "request": "launch",
+          "preLaunchTask": "build-hub",
+          // If you have changed target frameworks, make sure to update the program path.
+          "program": "${workspaceFolder}/src/Hub/bin/Debug/net8.0/AyBorg.Hub.dll",
+          "args": [],
+          "cwd": "${workspaceFolder}/src/Hub",
+          "stopAtEntry": false,
+          "requireExactSource": false,
+          "env": {
+              "ASPNETCORE_ENVIRONMENT": "Development"
+          }
+      },
+        {
           "name": ".NET Core Launch (Result)",
           "type": "coreclr",
           "request": "launch",
