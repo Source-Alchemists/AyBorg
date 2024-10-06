@@ -27,9 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Shared\Authorization\src\AyBorg.SDK.Authorization.csproj" />
     <ProjectReference Include="..\SDK\src\System\AyBorg.SDK.System.csproj" />
     <ProjectReference Include="..\SDK\src\Logging\Analytics\AyBorg.SDK.Logging.Analytics.csproj" />
-    <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
     <ProjectReference Include="..\SDK\src\Communication\gRPC\AyBorg.SDK.Communication.gRPC.csproj" />
   </ItemGroup>
 

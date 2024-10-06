@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
 
   <ItemGroup>
-    <ProjectReference Include="..\SDK\src\Authorization\AyBorg.SDK.Authorization.csproj" />
+    <ProjectReference Include="..\..\Shared\Authorization\src\AyBorg.SDK.Authorization.csproj" />
   </ItemGroup>
 
   <ItemGroup>
