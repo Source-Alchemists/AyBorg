@@ -1,6 +1,3 @@
-[submodule "src/SDK"]
-	path = src/SDK
-	url = https://github.com/Source-Alchemists/AyBorg.SDK.git
 [submodule "Shared"]
 	path = Shared
 	url = https://github.com/Source-Alchemists/AyBorg.Shared.git
