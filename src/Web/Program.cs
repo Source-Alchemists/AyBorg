@@ -52,6 +52,8 @@ int maximumReceiveMessageSize = builder.Configuration.GetValue("MaximumReceiveMe
 bool isOpenTelemetryEnabled = builder.Configuration.GetValue("OpenTelemetry:Enabled", false)!;
 bool isElasticApmEnabled = builder.Configuration.GetValue("ElasticApm:Enabled", false)!;
 
+builder.Services.Configure<SecurityConfiguration>(builder.Configuration.GetSection("Security"));
+
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
 

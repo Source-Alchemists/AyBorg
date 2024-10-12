@@ -32,12 +32,15 @@ using Elastic.Extensions.Logging;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using System.IdentityModel.Tokens.Jwt;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 string serviceUniqueName = builder.Configuration.GetValue("AyBorg:Service:UniqueName", "AyBorg.Gateway")!;
 bool isOpenTelemetryEnabled = builder.Configuration.GetValue("OpenTelemetry:Enabled", false)!;
 bool isElasticApmEnabled = builder.Configuration.GetValue("ElasticApm:Enabled", false)!;
+
+builder.Services.Configure<SecurityConfiguration>(builder.Configuration.GetSection("Security"));
 
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
@@ -85,7 +88,7 @@ builder.Services.AddSingleton<IGatewayConfiguration, GatewayConfiguration>();
 builder.Services.AddSingleton<IGrpcChannelService, GrpcChannelService>();
 builder.Services.AddSingleton<IKeeperService, KeeperService>();
 
-builder.Services.AddScoped<IJwtConsumer, JwtConsumer>();
+builder.Services.AddScoped<ITokenValidator<JwtSecurityToken>, JwtValidator>();
 
 WebApplication app = builder.Build();
 
