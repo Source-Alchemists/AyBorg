@@ -20,10 +20,11 @@ using AyBorg.Authorization;
 using AyBorg.Hub;
 using AyBorg.Hub.Database;
 using AyBorg.Hub.Database.InMemory;
+using AyBorg.Hub.Services;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-builder.Services.Configure<SecurityConfiguration>(builder.Configuration.GetSection("Security"));
+builder.Services.Configure<SecurityOptions>(builder.Configuration.GetSection("Security"));
 builder.Services.AddScoped<ITokenValidator<JwtSecurityToken>, JwtValidator>();
 
 builder.Services.AddGraphQLServer()
@@ -47,12 +48,17 @@ else
     throw new NotSupportedException("Database configuration not found. Please provide a configuration for either Redis or InMemory database.");
 }
 
+builder.Services.AddSignalR();
+
 builder.Services.AddAuthorization();
 
 WebApplication app = builder.Build();
 
 app.UseAuthorization();
+app.UseJwtMiddleware();
 app.MapGraphQL();
+app.MapHub<AgentHub>("/hub/agent");
+app.MapHub<FrontendHub>("/hub/frontend");
 
 
 await app.RunAsync().ConfigureAwait(false);

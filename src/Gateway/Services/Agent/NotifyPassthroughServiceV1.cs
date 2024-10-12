@@ -91,7 +91,7 @@ public sealed class NotifyPassthroughServiceV1 : Notify.NotifyBase
     {
         return Task.Factory.StartNew(() =>
         {
-            IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Web);
+            IEnumerable<ChannelInfo> channels = _channelService.GetChannelsByTypeName(ServiceTypes.Frontend);
             foreach (ChannelInfo channel in channels.Where(c => c.IsAcceptingNotifications))
             {
                 while (channel.Notifications.Count >= 10)

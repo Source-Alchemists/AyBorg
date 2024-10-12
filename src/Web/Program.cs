@@ -44,6 +44,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
+using AyBorg.Web.Services.Hub;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -52,7 +53,9 @@ int maximumReceiveMessageSize = builder.Configuration.GetValue("MaximumReceiveMe
 bool isOpenTelemetryEnabled = builder.Configuration.GetValue("OpenTelemetry:Enabled", false)!;
 bool isElasticApmEnabled = builder.Configuration.GetValue("ElasticApm:Enabled", false)!;
 
-builder.Services.Configure<SecurityConfiguration>(builder.Configuration.GetSection("Security"));
+builder.Services.Configure<SecurityOptions>(builder.Configuration.GetSection("Security"));
+builder.Services.Configure<ServiceOptions>(builder.Configuration.GetSection("AyBorg:Service"));
+builder.Services.Configure<HubOptions>(builder.Configuration.GetSection("AyBorg:Hub"));
 
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
@@ -120,6 +123,8 @@ builder.Services.AddIdentityCore<IdentityUser>(options =>
 
 builder.Services.AddSingleton<IEmailSender<IdentityUser>, IdentityNoOpEmailSender>();
 
+builder.Services.AddSingleton<IHubClient, HubClient>();
+
 builder.Services.AddMudServices(config =>
 {
     config.SnackbarConfiguration.PositionClass = Defaults.Classes.Position.BottomCenter;
@@ -141,7 +146,7 @@ builder.Services.AddSingleton<IRegistryService, RegistryService>();
 builder.Services.AddSingleton<INotifyService, NotifyService>();
 builder.Services.AddSingleton<IRpcMapper, RpcMapper>();
 
-builder.Services.AddScoped<ITokenGenerator, JwtGenerator>();
+builder.Services.AddSingleton<ITokenGenerator, JwtGenerator>();
 builder.Services.AddScoped<IStateService, StateService>();
 builder.Services.AddScoped<IEventLogService, EventLogService>();
 
@@ -197,5 +202,7 @@ await (await app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!
 // Initialize identity
 IServiceProvider scopedServiceProvider = app.Services.CreateScope().ServiceProvider;
 await IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).AsTask();
+
+await app.Services.GetService<IHubClient>()!.StartAsync();
 
 await app.RunAsync();

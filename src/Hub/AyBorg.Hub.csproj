@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\Authorization\src\AyBorg.Authorization.csproj" />
+    <ProjectReference Include="..\..\Shared\Communication\src\AyBorg.Communication.csproj" />
   </ItemGroup>
 
 </Project>
