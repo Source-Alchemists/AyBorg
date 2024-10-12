@@ -1,24 +1,45 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using AyBorg.Data.Identity;
-using AyBorg.SDK.Authorization;
-using AyBorg.SDK.Communication.gRPC;
-using AyBorg.SDK.Communication.gRPC.Registry;
-using AyBorg.SDK.Logging.Analytics;
-using AyBorg.SDK.System.Configuration;
+using AyBorg.Logging;
+using AyBorg.Communication;
 using AyBorg.Web;
 using AyBorg.Web.Components.Account;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Services.Analytics;
+using AyBorg.Authorization;
+using AyBorg.Communication.gRPC.Registry;
+using AyBorg.Communication.gRPC;
+
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
-using Elastic.Extensions.Logging;
+using MudBlazor;
+using MudBlazor.Services;
+using MudExtensions.Services;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using MudBlazor;
-using MudBlazor.Services;
-using MudExtensions.Services;
+
+using Elastic.Extensions.Logging;
+
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;

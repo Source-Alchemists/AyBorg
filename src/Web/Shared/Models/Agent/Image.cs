@@ -15,7 +15,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using AyBorg.SDK.Common.Models;
+using AyBorg.Types.Models;
 using ImageTorque;
 
 namespace AyBorg.Web.Shared.Models;

@@ -27,10 +27,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Shared\Authorization\src\AyBorg.SDK.Authorization.csproj" />
-    <ProjectReference Include="..\SDK\src\System\AyBorg.SDK.System.csproj" />
-    <ProjectReference Include="..\SDK\src\Logging\Analytics\AyBorg.SDK.Logging.Analytics.csproj" />
-    <ProjectReference Include="..\SDK\src\Communication\gRPC\AyBorg.SDK.Communication.gRPC.csproj" />
+    <ProjectReference Include="..\..\Shared\AspNet\src\AyBorg.AspNet.csproj" />
+    <ProjectReference Include="..\..\Shared\Authorization\src\AyBorg.Authorization.csproj" />
+    <ProjectReference Include="..\..\Shared\Logging\src\AyBorg.Logging.csproj" />
+    <ProjectReference Include="..\..\Shared\Runtime\src\AyBorg.Runtime.csproj" />
+    <ProjectReference Include="..\..\Shared\Communication\src\AyBorg.Communication.csproj" />
+    <ProjectReference Include="..\..\Shared\Communication.gRPC\src\AyBorg.Communication.gRPC.csproj" />
   </ItemGroup>
 
   <ItemGroup>

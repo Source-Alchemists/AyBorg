@@ -15,11 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Communication;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Communication.MQTT;
-using AyBorg.SDK.System.Runtime;
+using AyBorg.Communication;
+using AyBorg.Communication.MQTT;
+using AyBorg.Types;
+using AyBorg.Types.Communication;
+using AyBorg.Types.Ports;
 using Microsoft.Extensions.Logging;
 using MQTTnet.Protocol;
 

@@ -1,6 +1,6 @@
 @page "/cognitive/jobs"
-@using SDK.Authorization
-@using SDK.Common
+@using AyBorg.Authorization
+@using AyBorg.Runtime
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}, {Roles.Auditor}")]
 
 <PageTitle>Jobs/Cognitive | AyBorg</PageTitle>

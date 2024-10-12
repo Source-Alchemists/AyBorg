@@ -1,9 +1,26 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Projects;
+using AyBorg.Runtime;
+using AyBorg.Runtime.Projects;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 
 namespace AyBorg.Agent.Services;
 
@@ -47,7 +64,7 @@ internal sealed class CacheService : ICacheService
             }
             catch
             {
-                // Non critical exception, may the step is already creating new outputs. 
+                // Non critical exception, may the step is already creating new outputs.
             }
         });
     }
@@ -59,7 +76,7 @@ internal sealed class CacheService : ICacheService
     /// <param name="step">The step.</param>
     /// <returns></returns>
     /// <remarks>If the iteration does not exist, it will create a step entry from the last iteration.</remarks>
-    public Step GetOrCreateStepEntry(Guid iterationId, IStepProxy step)
+    public StepModel GetOrCreateStepEntry(Guid iterationId, IStepProxy step)
     {
         return GetOrCreateStepMetaEntry(iterationId, step);
     }
@@ -71,27 +88,27 @@ internal sealed class CacheService : ICacheService
     /// <param name="port">The port.</param>
     /// <returns></returns>
     /// <remarks>If the iteration does not exist, it will create a port entry from the last iteration.</remarks>
-    public Port GetOrCreatePortEntry(Guid iterationId, IPort port)
+    public PortModel GetOrCreatePortEntry(Guid iterationId, IPort port)
     {
         object cacheItem = GetCacheItem(_cache, iterationId, port.Id);
         cacheItem ??= CreatePortEntry(iterationId, port);
-        return (Port)cacheItem;
+        return (PortModel)cacheItem;
     }
 
-    private Step GetOrCreateStepMetaEntry(Guid iterationId, IStepProxy stepProxy)
+    private StepModel GetOrCreateStepMetaEntry(Guid iterationId, IStepProxy stepProxy)
     {
         object cacheItem = GetCacheItem(_cache, iterationId, stepProxy.Id);
         cacheItem ??= CreateStepEntry(iterationId, stepProxy);
-        return (Step)cacheItem;
+        return (StepModel)cacheItem;
     }
 
-    private Step CreateStepEntry(Guid iterationId, IStepProxy step)
+    private StepModel CreateStepEntry(Guid iterationId, IStepProxy step)
     {
-        Step cachedStep = CreateStepMetaEntry(iterationId, step);
-        var cachedPorts = new HashSet<Port>();
+        StepModel cachedStep = CreateStepMetaEntry(iterationId, step);
+        var cachedPorts = new HashSet<PortModel>();
         foreach (IPort port in step.Ports)
         {
-            Port cachedPort = CreatePortEntry(iterationId, port);
+            PortModel cachedPort = CreatePortEntry(iterationId, port);
             cachedPorts.Add(cachedPort);
         }
 
@@ -99,9 +116,9 @@ internal sealed class CacheService : ICacheService
         return cachedStep;
     }
 
-    private Step CreateStepMetaEntry(Guid iterationId, IStepProxy stepProxy)
+    private StepModel CreateStepMetaEntry(Guid iterationId, IStepProxy stepProxy)
     {
-        Step step = _runtimeMapper.FromRuntime(stepProxy, true);
+        StepModel step = _runtimeMapper.FromRuntime(stepProxy, true);
         var cacheItem = new CacheItem(stepProxy.Id, step);
         CacheKey? key = _cache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));
         if (key != null && _cache.TryGetValue(key, out ConcurrentBag<CacheItem>? value))
@@ -118,9 +135,9 @@ internal sealed class CacheService : ICacheService
         return step;
     }
 
-    private Port CreatePortEntry(Guid iterationId, IPort port)
+    private PortModel CreatePortEntry(Guid iterationId, IPort port)
     {
-        Port? result;
+        PortModel? result;
         result = _runtimeMapper.FromRuntime(port);
         var cacheItem = new CacheItem(port.Id, result);
         CacheKey? key = _cache.Keys.FirstOrDefault(k => k.Id.Equals(iterationId));

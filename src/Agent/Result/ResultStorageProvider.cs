@@ -1,14 +1,34 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
+
 using Ayborg.Gateway.Result.V1;
 using AyBorg.Agent.Runtime;
 using AyBorg.Agent.Services;
 using AyBorg.Agent.Services.gRPC;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.Common.Result;
-using AyBorg.SDK.Communication.gRPC;
-using AyBorg.SDK.System.Configuration;
+using AyBorg.Communication;
+using AyBorg.Communication.gRPC;
+using AyBorg.Types.Result;
+using AyBorg.Types;
+using AyBorg.Types.Ports;
+using AyBorg.Types.Models;
+
 using ImageTorque;
 
 namespace AyBorg.Agent.Result;
@@ -118,7 +138,7 @@ public sealed class ResultStorageProvider : IResultStorageProvider, IDisposable
                         request.Ports.Add(rpcPort);
 
                         // If image, send as chunks
-                        if (portResult.Port.Brand == SDK.Common.Ports.PortBrand.Image)
+                        if (portResult.Port.Brand == PortBrand.Image)
                         {
                             var cacheImage = (CacheImage)portResult.Port.Value!;
                             using Grpc.Core.AsyncClientStreamingCall<ImageChunkDto, Google.Protobuf.WellKnownTypes.Empty> imageStreamCall = _storageClient.AddImage(cancellationToken: cancellationToken);

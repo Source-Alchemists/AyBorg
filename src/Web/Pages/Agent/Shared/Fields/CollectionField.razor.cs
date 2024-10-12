@@ -1,6 +1,23 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Collections.Immutable;
-using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.Common.Ports;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 using Microsoft.AspNetCore.Components;
 
 namespace AyBorg.Web.Pages.Agent.Shared.Fields;
@@ -9,7 +26,7 @@ public partial class CollectionField : ComponentBase
 {
     private ImmutableList<object> _values = null!;
 
-    [Parameter, EditorRequired] public Port Port { get; set; } = null!;
+    [Parameter, EditorRequired] public PortModel Port { get; set; } = null!;
 
     [Parameter] public bool Disabled { get; set; }
 
@@ -47,7 +64,7 @@ public partial class CollectionField : ComponentBase
         await ValueChanged.InvokeAsync(new ValueChangedEventArgs(Port, brandType));
     }
 
-    private static object AddEmptyItemTo(Port port)
+    private static object AddEmptyItemTo(PortModel port)
     {
         switch (port.Brand)
         {
@@ -63,15 +80,15 @@ public partial class CollectionField : ComponentBase
                 }
             case PortBrand.RectangleCollection:
                 {
-                    var oldValues = (IEnumerable<Rectangle>)port.Value!;
-                    return oldValues.ToImmutableList().Append(new Rectangle());
+                    var oldValues = (IEnumerable<RectangleModel>)port.Value!;
+                    return oldValues.ToImmutableList().Append(new RectangleModel());
                 }
             default:
                 throw new InvalidOperationException($"Port {port.Name} is not a collection.");
         }
     }
 
-    private static object RemoveItemAt(Port port, int index)
+    private static object RemoveItemAt(PortModel port, int index)
     {
         switch (port.Brand)
         {
@@ -87,7 +104,7 @@ public partial class CollectionField : ComponentBase
                 }
             case PortBrand.RectangleCollection:
                 {
-                    var oldValues = (ImmutableList<Rectangle>)port.Value!;
+                    var oldValues = (ImmutableList<RectangleModel>)port.Value!;
                     return oldValues.RemoveAt(index);
                 }
 
@@ -97,7 +114,7 @@ public partial class CollectionField : ComponentBase
         }
     }
 
-    private static object CreateBrandType(Port port, ImmutableList<object> oldValues, BaseInput.InputChange change)
+    private static object CreateBrandType(PortModel port, ImmutableList<object> oldValues, BaseInput.InputChange change)
     {
         switch (port.Brand)
         {
@@ -115,8 +132,8 @@ public partial class CollectionField : ComponentBase
                 }
             case PortBrand.RectangleCollection:
                 {
-                    Rectangle[] newValues = oldValues.Cast<Rectangle>().ToArray();
-                    newValues[change.Index] = (Rectangle)change.Value;
+                    RectangleModel[] newValues = oldValues.Cast<RectangleModel>().ToArray();
+                    newValues[change.Index] = (RectangleModel)change.Value;
                     return newValues.ToImmutableList();
                 }
             default:
@@ -138,9 +155,9 @@ public partial class CollectionField : ComponentBase
 
     private static ImmutableList<object> ConvertRectangleCollection(object value)
     {
-        var tmpCollection = (IEnumerable<Rectangle>)value;
+        var tmpCollection = (IEnumerable<RectangleModel>)value;
         ImmutableList<object> resultList = ImmutableList<object>.Empty;
-        foreach (Rectangle tmp in tmpCollection)
+        foreach (RectangleModel tmp in tmpCollection)
         {
             resultList = resultList.Add(tmp);
         }

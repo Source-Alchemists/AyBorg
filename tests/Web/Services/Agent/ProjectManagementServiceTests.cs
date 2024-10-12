@@ -1,5 +1,23 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Security.Principal;
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.Runtime.Projects;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Tests.Helpers;
 using Google.Protobuf.WellKnownTypes;
@@ -37,7 +55,7 @@ public class ProjectManagementServiceTests
     {
         // Arrange
         var response = new GetProjectMetasResponse();
-        response.ProjectMetas.Add(new ProjectMeta
+        response.ProjectMetas.Add(new Ayborg.Gateway.Agent.V1.ProjectMeta
         {
             CreationDate = new Timestamp(),
             ChangeDate = new Timestamp()
@@ -70,13 +88,13 @@ public class ProjectManagementServiceTests
     {
         // Arrange
         var response = new GetProjectMetasResponse();
-        response.ProjectMetas.Add(new ProjectMeta
+        response.ProjectMetas.Add(new Ayborg.Gateway.Agent.V1.ProjectMeta
         {
             CreationDate = new Timestamp(),
             ChangeDate = new Timestamp(),
             IsActive = false
         });
-        response.ProjectMetas.Add(new ProjectMeta
+        response.ProjectMetas.Add(new Ayborg.Gateway.Agent.V1.ProjectMeta
         {
             CreationDate = new Timestamp(),
             ChangeDate = new Timestamp(),
@@ -112,7 +130,7 @@ public class ProjectManagementServiceTests
         // Arrange
         var response = new CreateProjectResponse
         {
-            ProjectMeta = new ProjectMeta
+            ProjectMeta = new Ayborg.Gateway.Agent.V1.ProjectMeta
             {
                 CreationDate = new Timestamp(),
                 ChangeDate = new Timestamp()
@@ -208,7 +226,7 @@ public class ProjectManagementServiceTests
         // Act
         bool result = await _service.TrySaveAsync(new Shared.Models.Agent.ProjectMeta(), new Shared.Models.Agent.ProjectSaveInfo
         {
-            State = SDK.Projects.ProjectState.Draft,
+            State = ProjectState.Draft,
             VersionName = "123",
             Comment = string.Empty
         });
@@ -226,7 +244,7 @@ public class ProjectManagementServiceTests
         // Act
         bool result = await _service.TrySaveAsync(new Shared.Models.Agent.ProjectMeta(), new Shared.Models.Agent.ProjectSaveInfo
         {
-            State = SDK.Projects.ProjectState.Draft,
+            State = ProjectState.Draft,
             VersionName = "123",
             Comment = string.Empty
         });
@@ -246,7 +264,7 @@ public class ProjectManagementServiceTests
         // Act
         bool result = await _service.TryApproveAsync(new Shared.Models.Agent.ProjectMeta(), new Shared.Models.Agent.ProjectSaveInfo
         {
-            State = SDK.Projects.ProjectState.Review,
+            State = ProjectState.Review,
             VersionName = "123",
             Comment = string.Empty
         });
@@ -264,7 +282,7 @@ public class ProjectManagementServiceTests
         // Act
         bool result = await _service.TryApproveAsync(new Shared.Models.Agent.ProjectMeta(), new Shared.Models.Agent.ProjectSaveInfo
         {
-            State = SDK.Projects.ProjectState.Draft,
+            State = ProjectState.Draft,
             VersionName = "123",
             Comment = string.Empty
         });

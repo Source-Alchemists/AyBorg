@@ -1,3 +1,21 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+using AyBorg.Runtime.Projects;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Shared.Modals;
@@ -13,9 +31,9 @@ public partial class Projects : ComponentBase
     private string _serviceName = string.Empty;
     private bool _hasServiceError = false;
     private bool _isLoading = true;
-    private IEnumerable<ProjectMeta> _readyProjects = new List<ProjectMeta>();
-    private IEnumerable<ProjectMeta> _reviewProjects = new List<ProjectMeta>();
-    private IEnumerable<ProjectMeta> _draftProjects = new List<ProjectMeta>();
+    private IEnumerable<Web.Shared.Models.Agent.ProjectMeta> _readyProjects = new List<Web.Shared.Models.Agent.ProjectMeta>();
+    private IEnumerable<Web.Shared.Models.Agent.ProjectMeta> _reviewProjects = new List<Web.Shared.Models.Agent.ProjectMeta>();
+    private IEnumerable<Web.Shared.Models.Agent.ProjectMeta> _draftProjects = new List<Web.Shared.Models.Agent.ProjectMeta>();
 
     [Parameter]
     public string ServiceId { get; set; } = string.Empty;
@@ -51,14 +69,14 @@ public partial class Projects : ComponentBase
 
     private async Task ReceiveProjectsAsync()
     {
-        IEnumerable<ProjectMeta> allProjectMetas = await ProjectManagementService.GetMetasAsync();
-        _readyProjects = allProjectMetas.Where(p => p.State == SDK.Projects.ProjectState.Ready);
-        _reviewProjects = allProjectMetas.Where(p => p.State == SDK.Projects.ProjectState.Review);
-        _draftProjects = allProjectMetas.Where(p => p.State == SDK.Projects.ProjectState.Draft);
+        IEnumerable<Web.Shared.Models.Agent.ProjectMeta> allProjectMetas = await ProjectManagementService.GetMetasAsync();
+        _readyProjects = allProjectMetas.Where(p => p.State == ProjectState.Ready);
+        _reviewProjects = allProjectMetas.Where(p => p.State == ProjectState.Review);
+        _draftProjects = allProjectMetas.Where(p => p.State == ProjectState.Draft);
         await InvokeAsync(StateHasChanged);
     }
 
-    private async Task OnActivateProjectClicked(ProjectMeta project)
+    private async Task OnActivateProjectClicked(Web.Shared.Models.Agent.ProjectMeta project)
     {
         if (await ProjectManagementService.TryActivateAsync(project))
         {
@@ -66,7 +84,7 @@ public partial class Projects : ComponentBase
         }
     }
 
-    private async void OnProjectDeleteClicked(ProjectMeta project)
+    private async void OnProjectDeleteClicked(Web.Shared.Models.Agent.ProjectMeta project)
     {
         var options = new DialogOptions();
         var parameters = new DialogParameters
@@ -82,7 +100,7 @@ public partial class Projects : ComponentBase
         }
     }
 
-    private async void OnSaveAsReviewClicked(ProjectMeta projectMeta)
+    private async void OnSaveAsReviewClicked(Web.Shared.Models.Agent.ProjectMeta projectMeta)
     {
         IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>($"Create Review for {projectMeta.Name}",
         new DialogParameters {
@@ -115,7 +133,7 @@ public partial class Projects : ComponentBase
         }
     }
 
-    private async void OnAbandonReviewClicked(ProjectMeta projectMeta)
+    private async void OnAbandonReviewClicked(Web.Shared.Models.Agent.ProjectMeta projectMeta)
     {
         var options = new DialogOptions();
         var parameters = new DialogParameters
@@ -129,7 +147,7 @@ public partial class Projects : ComponentBase
         {
             if (await ProjectManagementService.TrySaveAsync(projectMeta, new ProjectSaveInfo
             {
-                State = SDK.Projects.ProjectState.Draft,
+                State = ProjectState.Draft,
                 VersionName = projectMeta.VersionName,
                 Comment = "Abandoned Review"
             }))
@@ -143,7 +161,7 @@ public partial class Projects : ComponentBase
         }
     }
 
-    private async void OnSaveAsReadyClicked(ProjectMeta projectMeta)
+    private async void OnSaveAsReadyClicked(Web.Shared.Models.Agent.ProjectMeta projectMeta)
     {
         IDialogReference dialog = await DialogService.ShowAsync<ConfirmDialog>($"Approve Project {projectMeta.Name}",
         new DialogParameters {
@@ -161,7 +179,7 @@ public partial class Projects : ComponentBase
             var dialogResult = (ConfirmDialog.ConfirmResult)result.Data;
             if (await ProjectManagementService.TryApproveAsync(projectMeta, new ProjectSaveInfo
             {
-                State = SDK.Projects.ProjectState.Draft,
+                State = ProjectState.Draft,
                 VersionName = projectMeta.VersionName,
                 Comment = dialogResult.Comment,
                 UserName = dialogResult.UserName

@@ -1,6 +1,25 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using AyBorg.Data.Agent;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Projects;
+using AyBorg.Runtime.Devices;
+using AyBorg.Types;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 
 namespace AyBorg.Agent.Services;
 
@@ -164,9 +183,9 @@ internal sealed class DeviceProxyManagerService : IDeviceProxyManagerService
     public async ValueTask<IDeviceProxy> UpdateAsync(UpdateDeviceOptions options)
     {
         IDeviceProxy device = DeviceProviders.SelectMany(p => p.Devices).Single(d => d.Id.Equals(options.DeviceId, StringComparison.InvariantCultureIgnoreCase));
-        foreach (SDK.Common.Models.Port port in options.Ports)
+        foreach (PortModel port in options.Ports)
         {
-            SDK.Common.Ports.IPort targetPort = device.Native.Ports.First(p => p.Id.Equals(port.Id));
+            IPort targetPort = device.Native.Ports.First(p => p.Id.Equals(port.Id));
             if (!await _runtimeConverter.TryUpdatePortValueAsync(targetPort, port.Value!))
             {
                 _logger.LogWarning(new EventId((int)EventLogType.Plugin), "Failed to update port {portId} value to {portValue}", port.Id, port.Value);

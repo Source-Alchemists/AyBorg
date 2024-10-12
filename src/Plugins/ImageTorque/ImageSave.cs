@@ -15,9 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Ports;
+using AyBorg.Types;
+using AyBorg.Types.Ports;
+
 using ImageTorque;
+
 using Microsoft.Extensions.Logging;
 
 namespace AyBorg.Plugins.ImageTorque;

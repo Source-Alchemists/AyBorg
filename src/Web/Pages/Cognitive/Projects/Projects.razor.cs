@@ -1,5 +1,5 @@
 using System.Collections.Immutable;
-using AyBorg.SDK.Common;
+using AyBorg.Types;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Cognitive;
 using AyBorg.Web.Shared.Modals;

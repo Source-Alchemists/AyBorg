@@ -1,8 +1,8 @@
 @page "/net/models/{projectId}/inspect/{modelId}"
+@using AyBorg.Authorization
 @using AyBorg.Web.Shared
 @using AyBorg.Web.Shared.ImageSelection
 @using AyBorg.Web.Shared.Display
-@using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 
 <PageTitle>@_projectName/@_modelName | Inspect/NET | AyBorg</PageTitle>

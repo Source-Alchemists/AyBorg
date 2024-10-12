@@ -1,6 +1,25 @@
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Projects;
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+using AyBorg.Runtime.Devices;
+using AyBorg.Types;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
+using SR = System.Reflection;
 
 namespace AyBorg.Agent;
 
@@ -42,8 +61,8 @@ public sealed class DeviceProxy : IDeviceProxy
     private void FillDeviceMetaInfo(IDevice device)
     {
         string typeName = device.GetType().Name;
-        System.Reflection.Assembly assembly = device.GetType().Assembly;
-        System.Reflection.AssemblyName? assemblyName = assembly?.GetName();
+        SR.Assembly assembly = device.GetType().Assembly;
+        SR.AssemblyName? assemblyName = assembly?.GetName();
 
         MetaInfo = new PluginMetaInfo
         {
@@ -56,8 +75,8 @@ public sealed class DeviceProxy : IDeviceProxy
     private void FillDeviceProviderMetaInfo(IDeviceProvider deviceProvider)
     {
         string typeName = deviceProvider.GetType().Name;
-        System.Reflection.Assembly assembly = deviceProvider.GetType().Assembly;
-        System.Reflection.AssemblyName? assemblyName = assembly?.GetName();
+        SR.Assembly assembly = deviceProvider.GetType().Assembly;
+        SR.AssemblyName? assemblyName = assembly?.GetName();
 
         ProviderMetaInfo = new PluginMetaInfo
         {

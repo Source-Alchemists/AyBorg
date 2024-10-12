@@ -1,7 +1,24 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using Ayborg.Gateway.Agent.V1;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.Communication.gRPC;
+using AyBorg.Communication.gRPC;
+using AyBorg.Types;
+using AyBorg.Types.Models;
 using AyBorg.Web.Shared.Models.Agent;
 
 namespace AyBorg.Web.Services.Agent;
@@ -105,7 +122,7 @@ public class DeviceManagerService : IDeviceManagerService
             DeviceId = options.DeviceId
         };
 
-        foreach(Port port in options.Ports)
+        foreach(PortModel port in options.Ports)
         {
             request.Ports.Add(_rpcMapper.ToRpc(port));
         }
@@ -117,7 +134,7 @@ public class DeviceManagerService : IDeviceManagerService
 
     private DeviceMeta ToObject(DeviceDto dtoDevice)
     {
-        var ports = new List<Port>();
+        var ports = new List<PortModel>();
         foreach (PortDto? portDto in dtoDevice.Ports)
         {
             ports.Add(_rpcMapper.FromRpc(portDto));
@@ -138,5 +155,5 @@ public class DeviceManagerService : IDeviceManagerService
     public sealed record CommonDeviceRequestOptions(string AgentUniqueName, string DeviceId);
     public sealed record AddDeviceRequestOptions(string AgentUniqueName, string DeviceProviderName, string DevicePrefix, string DeviceId);
     public sealed record ChangeDeviceStateRequestOptions(string AgentUniqueName, string DeviceId, bool Activate);
-    public sealed record UpdateDeviceRequestOptions(string AgentUniqueName, string DeviceId, IReadOnlyCollection<Port> Ports);
+    public sealed record UpdateDeviceRequestOptions(string AgentUniqueName, string DeviceId, IReadOnlyCollection<PortModel> Ports);
 }

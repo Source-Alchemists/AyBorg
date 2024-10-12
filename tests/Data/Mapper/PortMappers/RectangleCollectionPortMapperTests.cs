@@ -1,6 +1,24 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Collections.Immutable;
 using System.Text.Json;
-using AyBorg.SDK.Common.Ports;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 using ImageTorque;
 
 namespace AyBorg.Data.Mapper.Tests;
@@ -13,12 +31,12 @@ public class RectangleCollectionPortMapperTests
         // Arrange
         var mapper = new RectangleCollectionPortMapper();
         var port = new RectangleCollectionPort("Test", PortDirection.Input, new List<Rectangle> {
-            new Rectangle { X = 1, Y = 2, Width = 3, Height = 4},
-            new Rectangle { X = 5, Y = 6, Width = 7, Height = 8}
+            new() { X = 1, Y = 2, Width = 3, Height = 4},
+            new() { X = 5, Y = 6, Width = 7, Height = 8}
          }.ToImmutableList());
 
         // Act
-        SDK.Common.Models.Port portModel = mapper.ToModel(port);
+        PortModel portModel = mapper.ToModel(port);
 
         // Assert
         Assert.Equal(port.Name, portModel.Name);
@@ -31,9 +49,9 @@ public class RectangleCollectionPortMapperTests
     {
         // Arrange
         var mapper = new RectangleCollectionPortMapper();
-        var value = new List<SDK.Common.Models.Rectangle> {
-            new SDK.Common.Models.Rectangle { X = 1, Y = 2, Width = 3, Height = 4},
-            new SDK.Common.Models.Rectangle { X = 5, Y = 6, Width = 7, Height = 8}
+        var value = new List<RectangleModel> {
+            new() { X = 1, Y = 2, Width = 3, Height = 4},
+            new() { X = 5, Y = 6, Width = 7, Height = 8}
          }.ToImmutableList();
 
         // Act
@@ -44,7 +62,7 @@ public class RectangleCollectionPortMapperTests
         int index = 0;
         foreach(Rectangle n in nativeValue)
         {
-            SDK.Common.Models.Rectangle v = value.ElementAt(index);
+            RectangleModel v = value.ElementAt(index);
             Assert.Equal(v.X, n.X);
             Assert.Equal(v.Y, n.Y);
             Assert.Equal(v.Width, n.Width);
@@ -59,8 +77,8 @@ public class RectangleCollectionPortMapperTests
         // Arrange
         var mapper = new RectangleCollectionPortMapper();
         var port = new RectangleCollectionPort("Test", PortDirection.Input, new List<Rectangle> {
-            new Rectangle { X = 1, Y = 2, Width = 3, Height = 4},
-            new Rectangle { X = 5, Y = 6, Width = 7, Height = 8}
+            new() { X = 1, Y = 2, Width = 3, Height = 4},
+            new() { X = 5, Y = 6, Width = 7, Height = 8}
          }.ToImmutableList());
         string json = JsonSerializer.Serialize(port.Value, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
@@ -69,8 +87,8 @@ public class RectangleCollectionPortMapperTests
 
         // Assert
         Assert.Equal(new List<Rectangle> {
-            new Rectangle { X = 1, Y = 2, Width = 3, Height = 4},
-            new Rectangle { X = 5, Y = 6, Width = 7, Height = 8}
+            new() { X = 1, Y = 2, Width = 3, Height = 4},
+            new() { X = 5, Y = 6, Width = 7, Height = 8}
         }.ToImmutableList(), nativeValue);
     }
 }

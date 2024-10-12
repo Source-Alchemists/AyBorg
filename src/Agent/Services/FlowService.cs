@@ -1,7 +1,25 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Runtime.CompilerServices;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Projects;
+using AyBorg.Runtime;
+using AyBorg.Runtime.Projects;
+using AyBorg.Types;
+using AyBorg.Types.Ports;
 
 namespace AyBorg.Agent.Services;
 
@@ -114,7 +132,7 @@ internal sealed class FlowService : IFlowService
         stepProxy.Y = y;
 
         _runtimeHost.ActiveProject.Steps.Add(stepProxy);
-        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        await _notifyService.SendAutomationFlowChangedAsync(new Communication.gRPC.Models.AgentAutomationFlowChangeArgs
         {
             AddedSteps = new[] { stepProxy.Id.ToString() }
         });
@@ -135,7 +153,7 @@ internal sealed class FlowService : IFlowService
             return false;
         }
 
-        SDK.Projects.Project project = _runtimeHost.ActiveProject;
+        Project project = _runtimeHost.ActiveProject;
         IStepProxy? step = project.Steps.FirstOrDefault(s => s.Id == stepId);
         if (step == null)
         {
@@ -164,7 +182,7 @@ internal sealed class FlowService : IFlowService
         }
 
         step.Dispose();
-        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        await _notifyService.SendAutomationFlowChangedAsync(new Communication.gRPC.Models.AgentAutomationFlowChangeArgs
         {
             RemovedSteps = new[] { step.Id.ToString() },
             RemovedLinks = removedLinks.Select(l => l.Id.ToString()).ToArray()
@@ -198,7 +216,7 @@ internal sealed class FlowService : IFlowService
         step.X = x;
         step.Y = y;
 
-        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        await _notifyService.SendAutomationFlowChangedAsync(new Communication.gRPC.Models.AgentAutomationFlowChangeArgs
         {
             ChangedSteps = new[] { step.Id.ToString() }
         });
@@ -265,7 +283,7 @@ internal sealed class FlowService : IFlowService
         targetStep.Links.Add(link);
         _runtimeHost.ActiveProject.Links.Add(link);
 
-        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        await _notifyService.SendAutomationFlowChangedAsync(new Communication.gRPC.Models.AgentAutomationFlowChangeArgs
         {
             AddedLinks = new[] { link.Id.ToString() }
         });
@@ -307,7 +325,7 @@ internal sealed class FlowService : IFlowService
 
         _runtimeHost.ActiveProject.Links.Remove(link);
 
-        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        await _notifyService.SendAutomationFlowChangedAsync(new Communication.gRPC.Models.AgentAutomationFlowChangeArgs
         {
             RemovedLinks = new[] { link.Id.ToString() }
         });
@@ -339,7 +357,7 @@ internal sealed class FlowService : IFlowService
 
         IPort port = targetStep.Ports.First(p => p.Id == portId);
 
-        await _notifyService.SendAutomationFlowChangedAsync(new SDK.Communication.gRPC.Models.AgentAutomationFlowChangeArgs
+        await _notifyService.SendAutomationFlowChangedAsync(new Communication.gRPC.Models.AgentAutomationFlowChangeArgs
         {
             ChangedPorts = new[] { port.Id.ToString() }
         });

@@ -1,5 +1,5 @@
 @page "/cognitive/browse/{projectId}"
-@using SDK.Authorization
+@using AyBorg.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
 
 <PageTitle>@_projectName | Browse/Cognitive | AyBorg</PageTitle>

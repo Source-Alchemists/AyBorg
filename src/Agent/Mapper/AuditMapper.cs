@@ -1,5 +1,23 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using Ayborg.Gateway.Audit.V1;
 using AyBorg.Data.Agent;
+using AyBorg.Types.Ports;
 
 namespace AyBorg.Agent;
 
@@ -55,7 +73,7 @@ public static class AuditMapper
         };
         foreach (PortRecord port in step.Ports)
         {
-            string value = port.Direction == SDK.Common.Ports.PortDirection.Input ? port.Value : string.Empty;
+            string value = port.Direction == PortDirection.Input ? port.Value : string.Empty;
             stepDto.Ports.Add(Map(port, value));
         }
 

@@ -1,6 +1,7 @@
 @page "/agents/editor/{serviceId}/step/{stepId}"
+@using AyBorg.Authorization
+@using AyBorg.Types.Ports
 @using AyBorg.Web.Pages.Agent.Shared
-@using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 
 @if (_step.Id == Guid.Empty)
@@ -55,14 +56,14 @@ else{
             </MudCardHeader>
             <MudCardContent Class="overflow-auto" Style="height: calc(100% - 65px)">
                 <MudList>
-                    @foreach (var port in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Brand != SDK.Common.Ports.PortBrand.Image))
+                    @foreach (var port in _ports.Where(p => p.Direction == PortDirection.Input && p.Brand != PortBrand.Image))
                     {
                         <MudListItem>
                             <PortResolver Port="@port" Ports="@_ports" Disabled="@(IsDisabled(port))" />
                         </MudListItem>
                     }
                 </MudList>
-                @if(!_ports.Any(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Brand != SDK.Common.Ports.PortBrand.Image))
+                @if(!_ports.Any(p => p.Direction == PortDirection.Input && p.Brand != PortBrand.Image))
                 {
                     <div class="center relative">
                         <LogoPlaceholder Watermark/>
@@ -88,15 +89,15 @@ else{
             </MudCardHeader>
             <MudCardContent>
                 <MudTabs Class="d-block" Centered="true" style="height: calc(100vh - 300px);">
-                    @foreach (var imagePort in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Input && p.Brand ==
-                    SDK.Common.Ports.PortBrand.Image))
+                    @foreach (var imagePort in _ports.Where(p => p.Direction == PortDirection.Input && p.Brand ==
+                    PortBrand.Image))
                     {
                         <MudTabPanel Icon="@Icons.Material.Filled.Input" Text="@imagePort.Name" Class="mud-full-height">
                             <PortResolver Port="@imagePort" Ports="@_ports" Disabled="@(IsDisabled(imagePort))" />
                         </MudTabPanel>
                     }
-                    @foreach (var imagePort in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Brand ==
-                    SDK.Common.Ports.PortBrand.Image))
+                    @foreach (var imagePort in _ports.Where(p => p.Direction == PortDirection.Output && p.Brand ==
+                    PortBrand.Image))
                     {
                         <MudTabPanel Icon="@Icons.Material.Filled.Output" Text="@imagePort.Name" Class="mud-full-height">
                             <PortResolver Port="@imagePort" Ports="@_ports" Disabled="@(IsDisabled(imagePort))" />
@@ -122,14 +123,14 @@ else{
             </MudCardHeader>
             <MudCardContent Class="overflow-auto" Style="height: calc(100% - 65px)">
                 <MudList>
-                    @foreach (var port in _ports.Where(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Brand != SDK.Common.Ports.PortBrand.Image))
+                    @foreach (var port in _ports.Where(p => p.Direction == PortDirection.Output && p.Brand != PortBrand.Image))
                     {
                         <MudListItem>
                             <PortResolver Port="@port" Ports="@_ports" Disabled="@(IsDisabled(port))"  />
                         </MudListItem>
                     }
                 </MudList>
-                @if(!_ports.Any(p => p.Direction == SDK.Common.Ports.PortDirection.Output && p.Brand != SDK.Common.Ports.PortBrand.Image))
+                @if(!_ports.Any(p => p.Direction == PortDirection.Output && p.Brand != PortBrand.Image))
                 {
                     <div class="center relative">
                         <LogoPlaceholder Watermark/>

@@ -15,9 +15,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Communication;
-using AyBorg.SDK.Common.Ports;
+using AyBorg.Types;
+using AyBorg.Types.Communication;
+using AyBorg.Types.Ports;
 using ImageTorque;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;

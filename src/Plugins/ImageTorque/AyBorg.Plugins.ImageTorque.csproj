@@ -9,7 +9,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SDK\src\Common\AyBorg.SDK.Common.csproj" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="AyBorg.Types" Version="0.4.3" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,24 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.Authorization;
 using AyBorg.Data.Agent;
+using AyBorg.Runtime.Projects;
 using AyBorg.SDK.Authorization;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
@@ -61,7 +80,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
         }
         ProjectSaveInfo saveInfo = request.ProjectSaveInfo;
         ProjectManagementResult result = await _projectManagementService.TrySaveAsync(dbId,
-                                                                                                SDK.Projects.ProjectState.Ready,
+                                                                                                ProjectState.Ready,
                                                                                                 saveInfo.VersionName,
                                                                                                 saveInfo.UserName,
                                                                                                 saveInfo.Comment);
@@ -104,8 +123,8 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer, Roles.Reviewer });
         ProjectManagementResult result;
         ProjectSaveInfo saveInfo = request.ProjectSaveInfo;
-        var state = (SDK.Projects.ProjectState)saveInfo.State;
-        if (!string.IsNullOrEmpty(request.ProjectId) && state == SDK.Projects.ProjectState.Draft)
+        var state = (ProjectState)saveInfo.State;
+        if (!string.IsNullOrEmpty(request.ProjectId) && state == ProjectState.Draft)
         {
             if (!Guid.TryParse(request.ProjectId, out Guid id))
             {
@@ -116,7 +135,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
             {
                 IEnumerable<ProjectMetaRecord> allProjects = await _projectManagementService.GetAllMetasAsync();
                 ProjectMetaRecord? activeProject = allProjects.First(x => x.Id.Equals(_projectManagementService.ActiveProjectId));
-                if (activeProject.State == SDK.Projects.ProjectState.Draft)
+                if (activeProject.State == ProjectState.Draft)
                 {
                     // Save active project
                     result = await _projectManagementService.TrySaveActiveAsync(request.ProjectSaveInfo.UserName);
@@ -147,9 +166,9 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
         return new Empty();
     }
 
-    private static ProjectMeta CreateProjectMeta(ProjectMetaRecord record)
+    private static Ayborg.Gateway.Agent.V1.ProjectMeta CreateProjectMeta(ProjectMetaRecord record)
     {
-        return new ProjectMeta
+        return new Ayborg.Gateway.Agent.V1.ProjectMeta
         {
             DbId = record.DbId.ToString(),
             Id = record.Id.ToString(),
@@ -171,7 +190,7 @@ public sealed class ProjectManagementServiceV1 : ProjectManagement.ProjectManage
             throw new RpcException(new Status(StatusCode.InvalidArgument, "Invalid ProjectDbId"));
         }
         ProjectSaveInfo saveInfo = request.ProjectSaveInfo;
-        var state = (SDK.Projects.ProjectState)saveInfo.State;
+        var state = (ProjectState)saveInfo.State;
 
         return await _projectManagementService.TrySaveAsync(dbId,
                                                                         state,

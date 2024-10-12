@@ -1,3 +1,4 @@
+@using AyBorg.Runtime.Projects
 @using AyBorg.Web.Shared.Models.Agent
 
 <MudTable Items="@Projects" Hover="true" Elevation="0">
@@ -30,12 +31,12 @@
             }
 
             <MudMenu Icon="@Icons.Material.Filled.MoreVert" AnchorOrigin="Origin.BottomRight">
-                @if (@context.State == SDK.Projects.ProjectState.Draft) {
+                @if (@context.State == ProjectState.Draft) {
                     <MudMenuItem Icon="@Icons.Material.Filled.SafetyCheck" IconColor="Color.Warning" @onclick="(args) => OnSaveAsReview(args, context)">
                             Create review
                     </MudMenuItem>
                 }
-                @if (@context.State == SDK.Projects.ProjectState.Review) {
+                @if (@context.State == ProjectState.Review) {
                     <MudMenuItem Icon="@Icons.Material.Filled.Cancel" IconColor="Color.Error" @onclick="(args) => OnAbandonClicked(args, context)">
                             Abandon
                     </MudMenuItem>
@@ -59,46 +60,46 @@
 @code {
     [Parameter]
     [EditorRequired]
-    public IEnumerable<ProjectMeta> Projects { get; set; } = new List<ProjectMeta>();
+    public IEnumerable<AyBorg.Web.Shared.Models.Agent.ProjectMeta> Projects { get; set; } = new List<AyBorg.Web.Shared.Models.Agent.ProjectMeta>();
 
     [Parameter]
     [EditorRequired]
-    public EventCallback<ProjectMeta> OnProjectActivateClicked { get; set; }
+    public EventCallback<AyBorg.Web.Shared.Models.Agent.ProjectMeta> OnProjectActivateClicked { get; set; }
 
     [Parameter]
     [EditorRequired]
-    public EventCallback<ProjectMeta> OnProjectDeleteClicked { get; set; }
+    public EventCallback<AyBorg.Web.Shared.Models.Agent.ProjectMeta> OnProjectDeleteClicked { get; set; }
 
     [Parameter]
-    public EventCallback<ProjectMeta> OnProjectSaveAsReviewClicked { get; set; }
+    public EventCallback<AyBorg.Web.Shared.Models.Agent.ProjectMeta> OnProjectSaveAsReviewClicked { get; set; }
 
     [Parameter]
-    public EventCallback<ProjectMeta> OnProjectSaveAsReadyClicked { get; set; }
+    public EventCallback<AyBorg.Web.Shared.Models.Agent.ProjectMeta> OnProjectSaveAsReadyClicked { get; set; }
 
     [Parameter]
-    public EventCallback<ProjectMeta> OnProjectAbandonClicked { get; set; }
+    public EventCallback<AyBorg.Web.Shared.Models.Agent.ProjectMeta> OnProjectAbandonClicked { get; set; }
 
-    private async Task OnActivateClicked(EventArgs args, ProjectMeta projectDto)
+    private async Task OnActivateClicked(EventArgs args, AyBorg.Web.Shared.Models.Agent.ProjectMeta projectDto)
     {
         await OnProjectActivateClicked.InvokeAsync(projectDto);
     }
 
-    private async Task OnDeleteClicked(EventArgs args, ProjectMeta projectDto)
+    private async Task OnDeleteClicked(EventArgs args, AyBorg.Web.Shared.Models.Agent.ProjectMeta projectDto)
     {
         await OnProjectDeleteClicked.InvokeAsync(projectDto);
     }
 
-    private async Task OnSaveAsReview(EventArgs args, ProjectMeta projectDto)
+    private async Task OnSaveAsReview(EventArgs args, AyBorg.Web.Shared.Models.Agent.ProjectMeta projectDto)
     {
         await OnProjectSaveAsReviewClicked.InvokeAsync(projectDto);
     }
 
-    private async Task OnSaveAsReady(EventArgs args, ProjectMeta projectDto)
+    private async Task OnSaveAsReady(EventArgs args, AyBorg.Web.Shared.Models.Agent.ProjectMeta projectDto)
     {
         await OnProjectSaveAsReadyClicked.InvokeAsync(projectDto);
     }
 
-    private async Task OnAbandonClicked(EventArgs args, ProjectMeta projectDto)
+    private async Task OnAbandonClicked(EventArgs args, AyBorg.Web.Shared.Models.Agent.ProjectMeta projectDto)
     {
         await OnProjectAbandonClicked.InvokeAsync(projectDto);
     }

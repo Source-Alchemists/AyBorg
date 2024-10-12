@@ -1,5 +1,5 @@
 @page "/dashboard"
-@using SDK.Authorization
+@using AyBorg.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}, {Roles.Auditor}")]
 
 <PageTitle>Dashboard</PageTitle>

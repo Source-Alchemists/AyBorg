@@ -1,5 +1,5 @@
 @page "/agents/devices/{serviceId}"
-@using SDK.Authorization
+@using AyBorg.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 
 @if (string.IsNullOrEmpty(_serviceName))

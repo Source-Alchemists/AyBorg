@@ -1,4 +1,4 @@
-using AyBorg.SDK.Authorization;
+using AyBorg.Authorization;
 using AyBorg.Web.Services;
 using AyBorg.Web.Shared.Modals;
 using AyBorg.Web.Shared.Models;

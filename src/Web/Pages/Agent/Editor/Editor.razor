@@ -1,7 +1,7 @@
 ﻿@page "/agents/editor/{serviceId}"
-@using AyBorg.SDK.Projects
+@using AyBorg.Authorization
+@using AyBorg.Runtime.Projects
 @using AyBorg.Web.Pages.Agent.Shared
-@using SDK.Authorization
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}")]
 
 @if (string.IsNullOrEmpty(_serviceName))

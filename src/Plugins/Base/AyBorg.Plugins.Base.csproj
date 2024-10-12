@@ -9,8 +9,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SDK\src\Communication\MQTT\AyBorg.SDK.Communication.MQTT.csproj" />
-    <ProjectReference Include="..\..\SDK\src\Common\AyBorg.SDK.Common.csproj" />
+    <PackageReference Include="AyBorg.Types" Version="0.4.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Shared\Runtime\src\AyBorg.Runtime.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Communication\src\AyBorg.Communication.csproj" />
   </ItemGroup>
 
 </Project>

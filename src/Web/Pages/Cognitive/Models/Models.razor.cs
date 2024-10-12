@@ -2,13 +2,13 @@ using AyBorg.Web.Services;
 using AyBorg.Web.Services.Cognitive;
 using AyBorg.Web.Shared.Models.Cognitive;
 using AyBorg.Web.Pages.Cognitive.Shared;
+using AyBorg.Web.Shared.Modals;
+using AyBorg.Types;
+
 using Grpc.Core;
 using Microsoft.AspNetCore.Components;
 using MudBlazor;
 using System.Collections.Immutable;
-using AyBorg.Web.Shared.Modals;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using AyBorg.SDK.Common;
 
 namespace AyBorg.Web.Pages.Cognitive.Models;
 

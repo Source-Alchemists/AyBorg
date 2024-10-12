@@ -1,8 +1,26 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Collections.Concurrent;
 using System.Collections.Immutable;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.Common.Ports;
+using AyBorg.Communication.gRPC;
+using AyBorg.Types;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Shared.Models;
@@ -30,8 +48,8 @@ public partial class StepView : ComponentBase, IDisposable
     [Inject] ILogger<StepView> Logger { get; init; }
 
     private bool _isLoading = true;
-    private Step _step = new();
-    private ImmutableList<Port> _ports = ImmutableList.Create<Port>();
+    private StepModel _step = new();
+    private ImmutableList<PortModel> _ports = [];
     private NotifyService.Subscription _iterationFinishedSubscription;
 
     protected override void OnInitialized()
@@ -55,7 +73,7 @@ public partial class StepView : ComponentBase, IDisposable
             _serviceUniqueName = service.UniqueName;
 
             var stepGuid = Guid.Parse(StepId);
-            _step = await FlowService.GetStepAsync(_serviceUniqueName, new Step { Id = stepGuid }, null, true, false, false);
+            _step = await FlowService.GetStepAsync(_serviceUniqueName, new StepModel { Id = stepGuid }, null, true, false, false);
 
             _ports = _ports.Clear();
             _ports = _ports.AddRange(_step.Ports);
@@ -63,7 +81,7 @@ public partial class StepView : ComponentBase, IDisposable
             await UpdateNode(null);
 
             if (_iterationFinishedSubscription != null) _iterationFinishedSubscription.Callback -= IterationFinishedNotificationReceived;
-            _iterationFinishedSubscription = NotifyService.Subscribe(_serviceUniqueName, SDK.Communication.gRPC.NotifyType.AgentIterationFinished);
+            _iterationFinishedSubscription = NotifyService.Subscribe(_serviceUniqueName, NotifyType.AgentIterationFinished);
             _iterationFinishedSubscription.Callback += IterationFinishedNotificationReceived;
             _isLoading = false;
             await InvokeAsync(StateHasChanged);
@@ -93,19 +111,19 @@ public partial class StepView : ComponentBase, IDisposable
 
     private async ValueTask GetUpdatedStepAsync(Guid? id)
     {
-        Step fullStep = await FlowService.GetStepAsync(_serviceUniqueName, _step, id, true, false, false);
+        StepModel fullStep = await FlowService.GetStepAsync(_serviceUniqueName, _step, id, true, false, false);
 
-        foreach (Port port in fullStep.Ports)
+        foreach (PortModel port in fullStep.Ports)
         {
             if (port.Direction == PortDirection.Input)
             {
-                Port inputPort = _ports.Find(p => p.Id.Equals(port.Id));
+                PortModel inputPort = _ports.Find(p => p.Id.Equals(port.Id));
                 if (inputPort == null || !_ports.Contains(inputPort)) continue;
                 _ports = _ports.Replace(inputPort, port);
             }
             else if (port.Direction == PortDirection.Output)
             {
-                Port outputPort = _ports.Find(p => p.Id.Equals(port.Id));
+                PortModel outputPort = _ports.Find(p => p.Id.Equals(port.Id));
                 if (outputPort == null || !_ports.Contains(outputPort)) continue;
                 _ports = _ports.Replace(outputPort, port);
             }
@@ -114,7 +132,7 @@ public partial class StepView : ComponentBase, IDisposable
         await InvokeAsync(StateHasChanged);
     }
 
-    private static bool IsDisabled(Port port)
+    private static bool IsDisabled(PortModel port)
     {
         if (port.Direction == PortDirection.Output)
         {

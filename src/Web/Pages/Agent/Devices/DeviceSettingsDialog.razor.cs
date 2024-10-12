@@ -1,6 +1,23 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Collections.Immutable;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Models;
+using AyBorg.Types;
+using AyBorg.Types.Models;
 using AyBorg.Web.Pages.Agent.Shared.Fields;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
@@ -25,7 +42,7 @@ public partial class DeviceSettingsDialog : ComponentBase
 
     private bool _isLoading = true;
     private bool _isDisabled => Device.IsConnected;
-    private ImmutableList<Port> _ports = ImmutableList.Create<Port>();
+    private ImmutableList<PortModel> _ports = [];
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -43,8 +60,8 @@ public partial class DeviceSettingsDialog : ComponentBase
         await InvokeAsync(StateHasChanged);
         DeviceMeta fullDevice = await DeviceManagerService.GetDeviceAsync(new DeviceManagerService.CommonDeviceRequestOptions(StateService.AgentState.UniqueName, Device.Id));
 
-        var tmpPorts = new List<Port>();
-        foreach (Port port in fullDevice.Ports)
+        var tmpPorts = new List<PortModel>();
+        foreach (PortModel port in fullDevice.Ports)
         {
             tmpPorts.Add(port);
         }
@@ -56,7 +73,7 @@ public partial class DeviceSettingsDialog : ComponentBase
 
     private async Task OnPortValueChangedAsync(ValueChangedEventArgs e)
     {
-        Port oldPort = _ports.First(p => e.Port.Id.Equals(p.Id));
+        PortModel oldPort = _ports.First(p => e.Port.Id.Equals(p.Id));
         _ports = _ports.Replace(oldPort, e.Port);
         Logger.LogInformation((int)EventLogType.UserInteraction, "Port [{portName}] changed to [{portValue}]", e.Port.Name, e.Port.Value);
         await InvokeAsync(StateHasChanged);
@@ -164,8 +181,8 @@ public partial class DeviceSettingsDialog : ComponentBase
     private async ValueTask UpdateDevicePortsAsync()
     {
         DeviceMeta newDevice = await DeviceManagerService.UpdateDeviceAsync(new DeviceManagerService.UpdateDeviceRequestOptions(StateService.AgentState.UniqueName, Device.Id, _ports));
-        var tmpPorts = new List<Port>();
-        foreach (Port port in newDevice.Ports)
+        var tmpPorts = new List<PortModel>();
+        foreach (PortModel port in newDevice.Ports)
         {
             tmpPorts.Add(port);
         }

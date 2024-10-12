@@ -1,5 +1,23 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using AyBorg.Data.Agent;
-using AyBorg.SDK.Projects;
+using AyBorg.Runtime.Projects;
+using AyBorg.Types.Ports;
 
 namespace AyBorg.Agent.Tests;
 
@@ -18,24 +36,24 @@ public class AuditMapperTests{
             Settings = new ProjectSettingsRecord {
                 IsForceResultCommunicationEnabled = true
             },
-            Steps = new List<StepRecord> {
-                new StepRecord {
+            Steps = [
+                new() {
                     Id = Guid.NewGuid(),
                     Name = "TestStep",
                     MetaInfo = new PluginMetaInfoRecord(),
                     X = 0,
                     Y = 0,
-                    Ports = new List<StepPortRecord> {
+                    Ports = [
                         new StepPortRecord {
                             Id = Guid.NewGuid(),
-                            Direction = SDK.Common.Ports.PortDirection.Input,
+                            Direction = PortDirection.Input,
                             Name = "TestPort",
                             Value = "TestValue",
-                            Brand = SDK.Common.Ports.PortBrand.String
+                            Brand = PortBrand.String
                         }
-                    }
+                    ]
                 }
-            }
+            ]
         };
 
         // Act

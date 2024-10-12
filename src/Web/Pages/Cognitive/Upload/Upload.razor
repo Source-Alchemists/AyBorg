@@ -1,7 +1,6 @@
 @page "/cognitive/upload/{projectId}"
+@using AyBorg.Authorization
 @using AyBorg.Web.Shared
-@using SDK.Authorization
-@using SDK.Common
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}")]
 
 <PageTitle>@_projectName | Upload/Cognitive | AyBorg</PageTitle>

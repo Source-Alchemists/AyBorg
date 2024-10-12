@@ -1,14 +1,34 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using Ayborg.Gateway.Analytics.V1;
 using AyBorg.Data.Gateway;
 using AyBorg.Gateway.Services;
 using AyBorg.Gateway.Services.Agent;
 using AyBorg.Gateway.Services.Analytics;
 using AyBorg.Gateway.Services.Audit;
-using AyBorg.SDK.Authorization;
-using AyBorg.SDK.Logging.Analytics;
-using AyBorg.SDK.System.Configuration;
-using Elastic.Extensions.Logging;
+using AyBorg.Logging;
+using AyBorg.Communication;
+using AyBorg.Authorization;
+
 using Microsoft.EntityFrameworkCore;
+
+using Elastic.Extensions.Logging;
+
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;

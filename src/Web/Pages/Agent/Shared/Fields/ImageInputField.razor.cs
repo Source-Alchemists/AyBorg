@@ -16,7 +16,7 @@
  */
 
 using System.Collections.Immutable;
-using AyBorg.SDK.Common.Models;
+using AyBorg.Types.Models;
 using AyBorg.Web.Shared;
 using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.Components;
@@ -25,12 +25,12 @@ namespace AyBorg.Web.Pages.Agent.Shared.Fields;
 
 public partial class ImageInputField : BaseInputField
 {
-    [Parameter, EditorRequired] public IReadOnlyCollection<Port> ShapePorts { get; init; } = null!;
+    [Parameter, EditorRequired] public IReadOnlyCollection<PortModel> ShapePorts { get; init; } = null!;
     [Parameter] public bool OnlyThumbnail { get; init; } = false;
 
     private readonly List<LabelRectangle> _labelRectangles = new();
     private string? _imageUrl;
-    private Rectangle _imagePosition;
+    private RectangleModel _imagePosition;
     private int _imageWidth = 0;
     private int _imageHeight = 0;
 
@@ -45,7 +45,7 @@ public partial class ImageInputField : BaseInputField
             _imageWidth = image.Width;
             _imageHeight = image.Height;
 
-            _imagePosition = new Rectangle
+            _imagePosition = new RectangleModel
             {
                 X = 0,
                 Y = 0,
@@ -59,13 +59,13 @@ public partial class ImageInputField : BaseInputField
         _labelRectangles.Clear();
         foreach (object? value in ShapePorts.Select(sh => sh.Value))
         {
-            if (value is Rectangle rectangle)
+            if (value is RectangleModel rectangle)
             {
                 AddRectangle(rectangle);
             }
-            else if (value is ImmutableList<Rectangle> rectangeCollection)
+            else if (value is ImmutableList<RectangleModel> rectangeCollection)
             {
-                foreach (Rectangle rect in rectangeCollection)
+                foreach (RectangleModel rect in rectangeCollection)
                 {
                     AddRectangle(rect);
                 }
@@ -75,7 +75,7 @@ public partial class ImageInputField : BaseInputField
         await base.OnParametersSetAsync();
     }
 
-    private void AddRectangle(Rectangle rectangle)
+    private void AddRectangle(RectangleModel rectangle)
     {
         float rectWidth = rectangle.Width;
         float rectHeight = rectangle.Height;

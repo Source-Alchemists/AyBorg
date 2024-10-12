@@ -1,7 +1,25 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using AyBorg.Agent.Services;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Projects;
+using AyBorg.Runtime;
+using AyBorg.Runtime.Projects;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 using Microsoft.Extensions.Configuration;
 using Moq;
 
@@ -41,10 +59,10 @@ public class CacheServiceTests
             }
         };
 
-        _mockRuntimeMapper.Setup(m => m.FromRuntime(It.IsAny<IStepProxy>(), true)).Returns(new SDK.Common.Models.Step
+        _mockRuntimeMapper.Setup(m => m.FromRuntime(It.IsAny<IStepProxy>(), true)).Returns(new StepModel
         {
-            Ports = new List<SDK.Common.Models.Port> {
-                new SDK.Common.Models.Port { Name = "P1", Direction = PortDirection.Input, IsConnected = true }
+            Ports = new List<PortModel> {
+                new() { Name = "P1", Direction = PortDirection.Input, IsConnected = true }
             }
         });
 
@@ -73,11 +91,11 @@ public class CacheServiceTests
             Steps = new List<IStepProxy> { stepProxy }
         };
 
-        _mockRuntimeMapper.Setup(m => m.FromRuntime(It.Is<IStepProxy>(s => s.Id.Equals(stepProxy.Id)), true)).Returns(new SDK.Common.Models.Step
+        _mockRuntimeMapper.Setup(m => m.FromRuntime(It.Is<IStepProxy>(s => s.Id.Equals(stepProxy.Id)), true)).Returns(new StepModel
         {
             ExecutionTimeMs = 42,
-            Ports = new List<SDK.Common.Models.Port> {
-                new SDK.Common.Models.Port { Name = "P1", Direction = PortDirection.Input, IsConnected = true }
+            Ports = new List<PortModel> {
+                new() { Name = "P1", Direction = PortDirection.Input, IsConnected = true }
             }
         });
 
@@ -87,7 +105,7 @@ public class CacheServiceTests
         }
 
         // Act
-        SDK.Common.Models.Step resultStep = _service.GetOrCreateStepEntry(iterationId, stepProxyMock.Object);
+        StepModel resultStep = _service.GetOrCreateStepEntry(iterationId, stepProxyMock.Object);
 
         // Assert
         Assert.Equal(42, resultStep.ExecutionTimeMs);
@@ -111,14 +129,14 @@ public class CacheServiceTests
             Steps = new List<IStepProxy> { stepProxy }
         };
 
-        _mockRuntimeMapper.Setup(m => m.FromRuntime(It.Is<IStepProxy>(s => s.Id.Equals(stepProxy.Id)), true)).Returns(new SDK.Common.Models.Step
+        _mockRuntimeMapper.Setup(m => m.FromRuntime(It.Is<IStepProxy>(s => s.Id.Equals(stepProxy.Id)), true)).Returns(new StepModel
         {
-            Ports = new List<SDK.Common.Models.Port> {
-                new SDK.Common.Models.Port { Name = "P1", Direction = PortDirection.Input, IsConnected = true, Value = "123" }
+            Ports = new List<PortModel> {
+                new PortModel { Name = "P1", Direction = PortDirection.Input, IsConnected = true, Value = "123" }
             }
         });
 
-        _mockRuntimeMapper.Setup(m => m.FromRuntime(It.IsAny<IPort>())).Returns(new SDK.Common.Models.Port
+        _mockRuntimeMapper.Setup(m => m.FromRuntime(It.IsAny<IPort>())).Returns(new PortModel
         {
             Value = "123"
         });
@@ -129,7 +147,7 @@ public class CacheServiceTests
         }
 
         // Act
-        SDK.Common.Models.Port resultPort = _service.GetOrCreatePortEntry(iterationId, stepProxy.Ports.First(p => p.Name.Equals("P1")));
+        PortModel resultPort = _service.GetOrCreatePortEntry(iterationId, stepProxy.Ports.First(p => p.Name.Equals("P1")));
 
         // Assert
         Assert.Equal("123", resultPort.Value);

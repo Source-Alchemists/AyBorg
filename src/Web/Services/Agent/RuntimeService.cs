@@ -1,7 +1,25 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.System.Runtime;
+using AyBorg.Runtime;
+using AyBorg.Types;
+using AGR = Ayborg.Gateway.Agent.V1.Runtime;
 using Grpc.Core;
 
 namespace AyBorg.Web.Services.Agent;
@@ -9,7 +27,7 @@ namespace AyBorg.Web.Services.Agent;
 public class RuntimeService : IRuntimeService
 {
     private readonly ILogger<RuntimeService> _logger;
-    private readonly Runtime.RuntimeClient _runtimeClient;
+    private readonly AGR.RuntimeClient _runtimeClient;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="RuntimeService"/> class.
@@ -18,7 +36,7 @@ public class RuntimeService : IRuntimeService
     /// <param name="stateService">The state service.</param>
     /// <param name="runtimeClient">The runtime client.</param>
     public RuntimeService(ILogger<RuntimeService> logger,
-                            Runtime.RuntimeClient runtimeClient)
+                            AGR.RuntimeClient runtimeClient)
     {
         _logger = logger;
         _runtimeClient = runtimeClient;

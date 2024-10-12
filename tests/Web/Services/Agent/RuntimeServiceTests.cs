@@ -1,8 +1,28 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using Ayborg.Gateway.Agent.V1;
 using AyBorg.Web.Services.Agent;
 using AyBorg.Web.Tests.Helpers;
+
 using Grpc.Core;
+
 using Microsoft.Extensions.Logging.Abstractions;
+
 using Moq;
 
 namespace AyBorg.Web.Tests.Services.Agent;
@@ -10,7 +30,7 @@ namespace AyBorg.Web.Tests.Services.Agent;
 public class RuntimeServiceTests
 {
     private static readonly NullLogger<RuntimeService> s_logger = new();
-    private readonly Mock<Runtime.RuntimeClient> _mockRuntimeClient = new();
+    private readonly Mock<Ayborg.Gateway.Agent.V1.Runtime.RuntimeClient> _mockRuntimeClient = new();
     private readonly RuntimeService _service;
 
     public RuntimeServiceTests()
@@ -43,7 +63,7 @@ public class RuntimeServiceTests
         }
 
         // Act
-        SDK.System.Runtime.EngineMeta result = await _service.GetStatusAsync(string.Empty);
+        Runtime.EngineMeta result = await _service.GetStatusAsync(string.Empty);
 
         // Assert
         if (isSuccessful)
@@ -81,7 +101,7 @@ public class RuntimeServiceTests
         }
 
         // Act
-        SDK.System.Runtime.EngineMeta result = await _service.StartRunAsync(string.Empty, SDK.System.Runtime.EngineExecutionType.SingleRun);
+        Runtime.EngineMeta result = await _service.StartRunAsync(string.Empty, Runtime.EngineExecutionType.SingleRun);
 
         // Assert
         if (isSuccessful)
@@ -119,7 +139,7 @@ public class RuntimeServiceTests
         }
 
         // Act
-        SDK.System.Runtime.EngineMeta result = await _service.StopRunAsync(string.Empty);
+        Runtime.EngineMeta result = await _service.StopRunAsync(string.Empty);
 
         // Assert
         if (isSuccessful)
@@ -157,7 +177,7 @@ public class RuntimeServiceTests
         }
 
         // Act
-        SDK.System.Runtime.EngineMeta result = await _service.AbortRunAsync(string.Empty);
+        Runtime.EngineMeta result = await _service.AbortRunAsync(string.Empty);
 
         // Assert
         if (isSuccessful)

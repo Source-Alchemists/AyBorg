@@ -15,6 +15,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+using Microsoft.EntityFrameworkCore;
+
 using AyBorg.Agent;
 using AyBorg.Agent.Guards;
 using AyBorg.Agent.Result;
@@ -22,16 +24,17 @@ using AyBorg.Agent.Services;
 using AyBorg.Agent.Services.gRPC;
 using AyBorg.Data.Agent;
 using AyBorg.Data.Mapper;
-using AyBorg.SDK.Authorization;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Result;
-using AyBorg.SDK.Communication.gRPC;
-using AyBorg.SDK.Communication.gRPC.Registry;
-using AyBorg.SDK.Logging.Analytics;
-using AyBorg.SDK.System.Configuration;
-using AyBorg.SDK.System.Runtime;
+using AyBorg.Logging;
+using AyBorg.Communication;
+using AyBorg.Communication.gRPC.Registry;
+using AyBorg.Types;
+using AyBorg.Types.Result;
+using AyBorg.Authorization;
+using AyBorg.Runtime;
+using AyBorg.Communication.gRPC;
+
 using Elastic.Extensions.Logging;
-using Microsoft.EntityFrameworkCore;
+
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -104,7 +107,7 @@ builder.Services.AddTransient<IJwtConsumer, JwtConsumer>();
 builder.Services.AddTransient<IProjectRepository, ProjectRepository>();
 builder.Services.AddTransient<IDeviceRepository, DeviceRepository>();
 // Environment / Configuration
-builder.Services.AddSingleton<IEnvironment, AyBorg.SDK.Common.Environment>();
+builder.Services.AddSingleton<IEnvironment, AyBorg.Runtime.Environment>();
 builder.Services.AddTransient<IServiceConfiguration, ServiceConfiguration>();
 // Mapper / Converter
 builder.Services.AddTransient<IRuntimeMapper, RuntimeMapper>();

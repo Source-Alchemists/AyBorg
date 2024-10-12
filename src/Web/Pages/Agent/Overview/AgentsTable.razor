@@ -1,4 +1,4 @@
-@using AyBorg.SDK.System.Runtime
+@using AyBorg.Runtime
 <MudTable Items="@Agents" Hover="true" Elevation="0">
     <HeaderContent>
         <MudTh Style="width: 33%">State</MudTh>
@@ -10,11 +10,11 @@
             @if (@context.Status == null)
             {
                 <span>Idle</span>
-            } 
+            }
             else if(@context.Status.State != EngineState.Running)
             {
                 <span>Idle (Since: @context.Status.StoppedAt)</span>
-            } 
+            }
             else
             {
                 <span>Active (Since: @context.Status.StartedAt)</span>

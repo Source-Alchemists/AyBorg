@@ -1,8 +1,25 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using Ayborg.Gateway.Agent.V1;
-using AyBorg.Data.Mapper;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Communication.gRPC;
-using AyBorg.SDK.Projects;
+using AyBorg.Communication.gRPC;
+using AyBorg.Runtime;
+using AyBorg.Runtime.Devices;
+using AyBorg.Types.Models;
 using Grpc.Core;
 
 namespace AyBorg.Agent.Services.gRPC;
@@ -82,7 +99,7 @@ public sealed class DeviceManagerServiceV1 : Ayborg.Gateway.Agent.V1.DeviceManag
 
     public override async Task<DeviceDto> UpdateDevice(UpdateDeviceRequest request, ServerCallContext context)
     {
-        var tmpPorts = new List<SDK.Common.Models.Port>();
+        var tmpPorts = new List<PortModel>();
         foreach(PortDto? portDto in request.Ports)
         {
             tmpPorts.Add(_rpcMapper.FromRpc(portDto));
@@ -110,7 +127,7 @@ public sealed class DeviceManagerServiceV1 : Ayborg.Gateway.Agent.V1.DeviceManag
 
         if (!skipPorts)
         {
-            foreach (SDK.Common.Ports.IPort port in device.Native.Ports)
+            foreach (Types.Ports.IPort port in device.Native.Ports)
             {
                 deviceDto.Ports.Add(_rpcMapper.ToRpc(_runtimeMapper.FromRuntime(port)));
             }

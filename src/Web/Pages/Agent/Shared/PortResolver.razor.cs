@@ -1,5 +1,22 @@
-using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.Common.Ports;
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 using AyBorg.Web.Pages.Agent.Shared.Fields;
 using AyBorg.Web.Services.Agent;
 using Microsoft.AspNetCore.Components;
@@ -9,8 +26,8 @@ namespace AyBorg.Web.Pages.Agent.Shared;
 
 public partial class PortResolver : ComponentBase
 {
-    [Parameter, EditorRequired] public Port Port { get; set; } = null!;
-    [Parameter, EditorRequired] public IEnumerable<Port> Ports { get; init; } = Array.Empty<Port>();
+    [Parameter, EditorRequired] public PortModel Port { get; set; } = null!;
+    [Parameter, EditorRequired] public IEnumerable<PortModel> Ports { get; init; } = Array.Empty<PortModel>();
     [Parameter] public bool Disabled { get; init; } = false;
     [Parameter] public bool OnlyThumbnail { get; init; } = false;
     [Parameter] public ListType Mode { get; init; } = ListType.Flow;
@@ -18,7 +35,7 @@ public partial class PortResolver : ComponentBase
     [Inject] IFlowService FlowService { get; init; } = null!;
     [Inject] ISnackbar Snackbar { get; init; } = null!;
 
-    private IReadOnlyCollection<Port> _shapePorts = Array.Empty<Port>();
+    private IReadOnlyCollection<PortModel> _shapePorts = Array.Empty<PortModel>();
 
     protected override void OnParametersSet()
     {
@@ -32,7 +49,7 @@ public partial class PortResolver : ComponentBase
     {
         try
         {
-            Port newPort = Port with { Value = e.Value };
+            PortModel newPort = Port with { Value = e.Value };
 
             if (Mode == ListType.Flow)
             {

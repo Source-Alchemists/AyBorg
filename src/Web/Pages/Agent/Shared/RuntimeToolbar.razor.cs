@@ -1,4 +1,22 @@
-using AyBorg.SDK.System.Runtime;
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+using AyBorg.Communication.gRPC;
+using AyBorg.Runtime;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
 using Microsoft.AspNetCore.Components;
@@ -35,7 +53,7 @@ public partial class RuntimeToolbar : ComponentBase, IDisposable
             _statusSubscription.Callback -= StatusCallbackReceived;
             NotifyService.Unsubscribe(_statusSubscription);
         }
-        _statusSubscription = NotifyService.Subscribe(ServiceUniqueName, SDK.Communication.gRPC.NotifyType.AgentEngineStateChanged);
+        _statusSubscription = NotifyService.Subscribe(ServiceUniqueName, NotifyType.AgentEngineStateChanged);
         _statusSubscription.Callback += StatusCallbackReceived;
         await base.OnParametersSetAsync();
     }

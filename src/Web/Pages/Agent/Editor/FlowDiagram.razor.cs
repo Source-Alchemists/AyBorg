@@ -1,8 +1,26 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+using AyBorg.Communication.gRPC;
+using AyBorg.Communication.gRPC.Models;
 using AyBorg.Diagrams.Core;
 using AyBorg.Diagrams.Core.Models;
 using AyBorg.Diagrams.Core.Models.Base;
-using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.Communication.gRPC.Models;
+using AyBorg.Types.Ports;
 using AyBorg.Web.Pages.Agent.Editor.Nodes;
 using AyBorg.Web.Services;
 using AyBorg.Web.Services.Agent;
@@ -100,11 +118,11 @@ public partial class FlowDiagram : ComponentBase, IDisposable
     private void Subscribe()
     {
         if (_iterationFinishedSubscription != null) _iterationFinishedSubscription.Callback -= IterationFinishedNotificationReceived;
-        _iterationFinishedSubscription = NotifyService.Subscribe(StateService.AgentState.UniqueName, SDK.Communication.gRPC.NotifyType.AgentIterationFinished);
+        _iterationFinishedSubscription = NotifyService.Subscribe(StateService.AgentState.UniqueName, NotifyType.AgentIterationFinished);
         _iterationFinishedSubscription.Callback += IterationFinishedNotificationReceived;
 
         if (_flowChangedSubscription != null) _flowChangedSubscription.Callback -= FlowChangedNotificationReceived;
-        _flowChangedSubscription = NotifyService.Subscribe(StateService.AgentState.UniqueName, SDK.Communication.gRPC.NotifyType.AgentAutomationFlowChanged);
+        _flowChangedSubscription = NotifyService.Subscribe(StateService.AgentState.UniqueName, NotifyType.AgentAutomationFlowChanged);
         _flowChangedSubscription.Callback += FlowChangedNotificationReceived;
     }
 
@@ -116,7 +134,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         {
             try
             {
-                Step newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, node.Step, iterationId);
+                Types.Models.StepModel newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, node.Step, iterationId);
                 if (newStep.Id != Guid.Empty)
                 {
                     await InvokeAsync(() => node.Update(newStep));
@@ -149,7 +167,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                     // Already exists
                     continue;
                 }
-                Step newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, new Step { Id = stepId });
+                Types.Models.StepModel newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, new Types.Models.StepModel { Id = stepId });
                 await InvokeAsync(() => CreateAndAddNode(newStep));
             }
 
@@ -163,7 +181,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                     continue;
                 }
 
-                Link newLink = await FlowService.GetLinkAsync(linkId);
+                Types.Models.LinkModel newLink = await FlowService.GetLinkAsync(linkId);
                 LinkModel linkModel = CreateLinkModel(newLink);
                 await InvokeAsync(() => _diagram.Links.Add(linkModel));
                 await UpdatePortByLinkModelAsync(linkModel);
@@ -215,7 +233,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
                     continue;
                 }
 
-                Step newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, new Step { Id = stepId }, updatePorts: false);
+                Types.Models.StepModel newStep = await FlowService.GetStepAsync(StateService.AgentState.UniqueName, new Types.Models.StepModel { Id = stepId }, updatePorts: false);
                 await InvokeAsync(() =>
                 {
                     node.Update(newStep);
@@ -233,16 +251,16 @@ public partial class FlowDiagram : ComponentBase, IDisposable
     {
         try
         {
-            IEnumerable<Step> steps = await FlowService.GetStepsAsync();
+            IEnumerable<Types.Models.StepModel> steps = await FlowService.GetStepsAsync();
             // First create all nodes
-            foreach (Step step in steps)
+            foreach (Types.Models.StepModel step in steps)
             {
                 CreateAndAddNode(step);
             }
             // Next create all links
-            IEnumerable<Link> links = await FlowService.GetLinksAsync();
-            var linkHashes = new HashSet<Link>();
-            foreach (Link link in links)
+            IEnumerable<Types.Models.LinkModel> links = await FlowService.GetLinksAsync();
+            var linkHashes = new HashSet<Types.Models.LinkModel>();
+            foreach (Types.Models.LinkModel link in links)
             {
                 if (linkHashes.Contains(link))
                 {
@@ -259,7 +277,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         }
     }
 
-    private void CreateAndAddNode(Step step)
+    private void CreateAndAddNode(Types.Models.StepModel step)
     {
         if (_diagram.Nodes.Cast<FlowNode>().Any(n => n.Step.Id.Equals(step.Id))) return;
         var node = new FlowNode(step, Disabled);
@@ -268,7 +286,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         _diagram.Nodes.Add(node);
     }
 
-    private LinkModel CreateLinkModel(Link link)
+    private LinkModel CreateLinkModel(Types.Models.LinkModel link)
     {
         NodeModel targetNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.TargetId) != false);
         NodeModel sourceNode = _diagram.Nodes.FirstOrDefault(n => ((FlowNode)n).Step.Ports?.Any(p => p.Id == link.SourceId) != false);
@@ -296,7 +314,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         if (linkModel.TargetPort != null)
         {
             var tp = (FlowPort)linkModel.TargetPort;
-            Port newPort = await FlowService.GetPortAsync(StateService.AgentState.UniqueName, tp.Port.Id);
+            Types.Models.PortModel newPort = await FlowService.GetPortAsync(StateService.AgentState.UniqueName, tp.Port.Id);
             tp.Update(newPort);
             await InvokeAsync(tp.Parent.RefreshAll);
         }
@@ -313,7 +331,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
         FlowPort targetPort;
 
         // Just basic validation, the rest is done in the backend
-        if (fp1.Port.Direction == SDK.Common.Ports.PortDirection.Output)
+        if (fp1.Port.Direction == PortDirection.Output)
         {
             sourcePort = fp1;
             targetPort = fp2;
@@ -340,7 +358,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             return;
         }
 
-        Link newLink = await FlowService.GetLinkAsync((Guid)newLinkId);
+        Types.Models.LinkModel newLink = await FlowService.GetLinkAsync((Guid)newLinkId);
         if (!tmpLink.Id.Equals(newLink.Id.ToString()))
         {
             _diagram.Links.Remove(tmpLink);
@@ -368,13 +386,13 @@ public partial class FlowDiagram : ComponentBase, IDisposable
     private async Task OnDrop(DragEventArgs args)
     {
         if (_diagram == null) return;
-        Step step = DragDropStateHandler.DraggedStep;
+        Types.Models.StepModel step = DragDropStateHandler.DraggedStep;
         if (step == null) return;
-        AyBorg.Diagrams.Core.Geometry.Point relativePosition = _diagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
+        Diagrams.Core.Geometry.Point relativePosition = _diagram.GetRelativeMousePoint(args.ClientX, args.ClientY);
         step.X = (int)relativePosition.X;
         step.Y = (int)relativePosition.Y;
 
-        Step receivedStep = await FlowService.AddStepAsync(step);
+        Types.Models.StepModel receivedStep = await FlowService.AddStepAsync(step);
         if (receivedStep == null)
         {
             Snackbar.Add($"Could not add '{step.Name}' (Step not found)", Severity.Error);
@@ -396,9 +414,9 @@ public partial class FlowDiagram : ComponentBase, IDisposable
     {
         if (_suspendDiagramRefresh) return;
         if (link.TargetPort == null || link.SourcePort == null) return; // Nothing to do.
-        IEnumerable<Link> links = await FlowService.GetLinksAsync();
+        IEnumerable<Types.Models.LinkModel> links = await FlowService.GetLinksAsync();
         var targetPort = (FlowPort)link.TargetPort;
-        Link orgLink = links.FirstOrDefault(l => l.Id.ToString().Equals(link.Id));
+        Types.Models.LinkModel orgLink = links.FirstOrDefault(l => l.Id.ToString().Equals(link.Id));
         if (orgLink.Id.Equals(Guid.Empty)) return; // Nothing to do. Already removed.
         if (!await FlowService.TryRemoveLinkAsync(orgLink))
         {
@@ -406,7 +424,7 @@ public partial class FlowDiagram : ComponentBase, IDisposable
             return;
         }
 
-        Port newPort = await FlowService.GetPortAsync(StateService.AgentState.UniqueName, targetPort.Port.Id);
+        Types.Models.PortModel newPort = await FlowService.GetPortAsync(StateService.AgentState.UniqueName, targetPort.Port.Id);
         targetPort.Update(newPort);
         await InvokeAsync(targetPort.Parent.RefreshAll);
     }

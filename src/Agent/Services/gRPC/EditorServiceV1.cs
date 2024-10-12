@@ -16,11 +16,13 @@
  */
 
 using Ayborg.Gateway.Agent.V1;
+using AyBorg.Authorization;
+using AyBorg.Communication.gRPC;
+using AyBorg.Runtime;
 using AyBorg.SDK.Authorization;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Communication.gRPC;
+using AyBorg.Types;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 using Google.Protobuf.WellKnownTypes;
 using Grpc.Core;
 using ImageTorque;
@@ -33,14 +35,14 @@ public sealed class EditorServiceV1 : Editor.EditorBase
     private readonly IPluginsService _pluginsService;
     private readonly IFlowService _flowService;
     private readonly ICacheService _cacheService;
-    private readonly IRuntimeMapper _runtimeMapper;
+    private readonly AyBorg.Runtime.IRuntimeMapper _runtimeMapper;
     private readonly IRpcMapper _rpcMapper;
 
     public EditorServiceV1(ILogger<EditorServiceV1> logger,
                             IPluginsService pluginsService,
                             IFlowService flowService,
                             ICacheService cacheService,
-                            IRuntimeMapper runtimeMapper,
+                            AyBorg.Runtime.IRuntimeMapper runtimeMapper,
                             IRpcMapper rpcMapper)
     {
         _logger = logger;
@@ -58,7 +60,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
             var result = new GetAvailableStepsResponse();
             foreach (IStepProxy step in _pluginsService.Steps)
             {
-                Step stepBinding = _runtimeMapper.FromRuntime(step);
+                StepModel stepBinding = _runtimeMapper.FromRuntime(step);
                 StepDto rpcStep = _rpcMapper.ToRpc(stepBinding);
                 result.Steps.Add(rpcStep);
             }
@@ -269,7 +271,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
     public override async Task<Empty> UpdateFlowPort(UpdateFlowPortRequest request, ServerCallContext context)
     {
         AuthorizeGuard.ThrowIfNotAuthorized(context.GetHttpContext(), new List<string> { Roles.Administrator, Roles.Engineer });
-        Port port = _rpcMapper.FromRpc(request.Port);
+        PortModel port = _rpcMapper.FromRpc(request.Port);
         if (!await _flowService.TryUpdatePortValueAsync(port.Id, port.Value!))
         {
             throw new RpcException(new Status(StatusCode.Internal, "Could not update port"));
@@ -292,7 +294,7 @@ public sealed class EditorServiceV1 : Editor.EditorBase
         }
 
         IPort port = _flowService.GetPort(portId) ?? throw new RpcException(new Status(StatusCode.NotFound, "Port not found"));
-        Port portModel;
+        PortModel portModel;
         bool isOriginalPortModelCreated = false;
         if (iterationId != Guid.Empty)
         {

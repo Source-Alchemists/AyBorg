@@ -1,6 +1,24 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using Ayborg.Gateway.Cognitive.V1;
-using AyBorg.SDK.Common;
+using AyBorg.Types;
 using AyBorg.Web.Shared.Models.Cognitive;
+using Point = AyBorg.Types.Point;
 
 namespace AyBorg.Web.Services.Cognitive;
 
@@ -37,8 +55,8 @@ public class AnnotationManagerService : IAnnotationManagerService
             LayerId = parameters.LayerId
         });
 
-        Point p1 = response.Points[0];
-        Point p2 = response.Points[1];
+        Ayborg.Gateway.Cognitive.V1.Point p1 = response.Points[0];
+        Ayborg.Gateway.Cognitive.V1.Point p2 = response.Points[1];
 
         return new RectangleLayer
         {
@@ -57,9 +75,9 @@ public class AnnotationManagerService : IAnnotationManagerService
             ClassIndex = parameters.ClassIndex
         };
 
-        foreach (SDK.Common.Models.Point point in parameters.Points)
+        foreach (Point point in parameters.Points)
         {
-            layer.Points.Add(new Point
+            layer.Points.Add(new Ayborg.Gateway.Cognitive.V1.Point
             {
                 X = point.X,
                 Y = point.Y
@@ -92,7 +110,7 @@ public class AnnotationManagerService : IAnnotationManagerService
     }
 
     public sealed record GetMetaParameters(string ProjectId, string ImageName);
-    public sealed record AddParameters(string ProjectId, string ImageName, ProjectType ProjectType, string LayerId, int ClassIndex, IEnumerable<SDK.Common.Models.Point> Points);
+    public sealed record AddParameters(string ProjectId, string ImageName, ProjectType ProjectType, string LayerId, int ClassIndex, IEnumerable<Point> Points);
     public sealed record RemoveParameters(string ProjectId, string ImageName, string LayerId);
     public sealed record GetRectangleLayerParameters(string ProjectId, string ImageName, ProjectType ProjectType, string LayerId);
     public sealed record Meta(IEnumerable<string> Tags, IEnumerable<string> LayerIds);

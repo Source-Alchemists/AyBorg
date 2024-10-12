@@ -1,3 +1,21 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+using AyBorg.Runtime.Projects;
 using AyBorg.Web.Pages.Agent.Projects;
 using AyBorg.Web.Pages.Agent.Shared;
 using AyBorg.Web.Services;
@@ -14,10 +32,10 @@ public partial class Editor : ComponentBase
     private string _serviceUniqueName = string.Empty;
     private string _serviceName = string.Empty;
     private bool _hasServiceError = false;
-    private ProjectMeta _projectMeta = new();
+    private AyBorg.Web.Shared.Models.Agent.ProjectMeta _projectMeta = new();
     private bool _isLoading = true;
     private bool _areSubComponentsHidden = true; // Workaround to update the flow with the correct Agent instance.
-    private SDK.Projects.ProjectState _projectState => _projectMeta?.State ?? SDK.Projects.ProjectState.Draft;
+    private ProjectState _projectState => _projectMeta?.State ?? ProjectState.Draft;
     private bool _isProjectLoaded => _projectMeta?.IsActive ?? false;
     private string _projectName => _projectMeta?.Name ?? string.Empty;
 
@@ -65,7 +83,7 @@ public partial class Editor : ComponentBase
         _isLoading = true;
         if (!await ProjectManagementService!.TrySaveAsync(_projectMeta!, new ProjectSaveInfo
         {
-            State = SDK.Projects.ProjectState.Draft,
+            State = ProjectState.Draft,
             VersionName = _projectMeta.VersionName,
             Comment = string.Empty
         }))

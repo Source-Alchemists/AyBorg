@@ -18,10 +18,10 @@
 using System.Buffers;
 using System.Runtime.CompilerServices;
 using Ayborg.Gateway.Agent.V1;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Communication.gRPC;
+using AyBorg.Communication.gRPC;
+using AyBorg.Types;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 using AyBorg.Web.Shared;
 using AyBorg.Web.Shared.Models;
 using Grpc.Core;
@@ -59,18 +59,18 @@ public class FlowService : IFlowService
     /// Gets the steps.
     /// </summary>
     /// <returns>The steps.</returns>
-    public async ValueTask<IEnumerable<Step>> GetStepsAsync()
+    public async ValueTask<IEnumerable<StepModel>> GetStepsAsync()
     {
         GetFlowStepsResponse response = await _editorClient.GetFlowStepsAsync(new GetFlowStepsRequest
         {
             AgentUniqueName = _stateService.AgentState.UniqueName
         });
-        var result = new List<Step>();
+        var result = new List<StepModel>();
         foreach (StepDto? s in response.Steps)
         {
-            Step stepModel = _rpcMapper.FromRpc(s);
-            var ports = new List<Port>();
-            foreach (Port portModel in stepModel.Ports!)
+            StepModel stepModel = _rpcMapper.FromRpc(s);
+            var ports = new List<PortModel>();
+            foreach (PortModel portModel in stepModel.Ports!)
             {
                 if (portModel.Brand == PortBrand.Image && portModel.Direction == PortDirection.Input)
                 {
@@ -96,7 +96,7 @@ public class FlowService : IFlowService
     /// <param name="updatePorts">if set to <c>true</c> [update ports].</param>
     /// <param name="skipOutputPorts">if set to <c>true</c> [skip output ports].</param>
     /// <returns>The step.</returns>
-    public async ValueTask<Step> GetStepAsync(string agentUniqueName, Step originalStep, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true, bool asThumbnail = true)
+    public async ValueTask<StepModel> GetStepAsync(string agentUniqueName, StepModel originalStep, Guid? iterationId = null, bool updatePorts = true, bool skipOutputPorts = true, bool asThumbnail = true)
     {
         try
         {
@@ -111,14 +111,14 @@ public class FlowService : IFlowService
             if (resultStep == null)
             {
                 _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), "Could not find step with id [{stepId}] in iteration [{iterationId}]!", originalStep.Id, iterationId);
-                return new Step();
+                return new StepModel();
             }
 
-            Step stepModel = _rpcMapper.FromRpc(resultStep);
+            StepModel stepModel = _rpcMapper.FromRpc(resultStep);
             if (updatePorts)
             {
-                var ports = new List<Port>();
-                foreach (Port portModel in stepModel.Ports!)
+                var ports = new List<PortModel>();
+                foreach (PortModel portModel in stepModel.Ports!)
                 {
                     if (portModel.Direction == PortDirection.Output && skipOutputPorts)
                     {
@@ -135,7 +135,7 @@ public class FlowService : IFlowService
         catch (RpcException ex)
         {
             _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting step!");
-            return new Step();
+            return new StepModel();
         }
     }
 
@@ -143,13 +143,13 @@ public class FlowService : IFlowService
     /// Gets the links.
     /// </summary>
     /// <returns>The links.</returns>
-    public async ValueTask<IEnumerable<Link>> GetLinksAsync()
+    public async ValueTask<IEnumerable<LinkModel>> GetLinksAsync()
     {
         GetFlowLinksResponse response = await _editorClient.GetFlowLinksAsync(new GetFlowLinksRequest
         {
             AgentUniqueName = _stateService.AgentState.UniqueName
         });
-        var result = new List<Link>();
+        var result = new List<LinkModel>();
         foreach (LinkDto? l in response.Links)
         {
             result.Add(_rpcMapper.FromRpc(l));
@@ -163,7 +163,7 @@ public class FlowService : IFlowService
     /// </summary>
     /// <param name="linkId">The link identifier.</param>
     /// <returns>The link.</returns>
-    public async ValueTask<Link> GetLinkAsync(Guid linkId)
+    public async ValueTask<LinkModel> GetLinkAsync(Guid linkId)
     {
         var request = new GetFlowLinksRequest
         {
@@ -175,7 +175,7 @@ public class FlowService : IFlowService
         if (resultLink == null)
         {
             _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), "Could not find link with id [{linkId}]!", linkId);
-            return new Link();
+            return new LinkModel();
         }
 
         return _rpcMapper.FromRpc(resultLink);
@@ -186,7 +186,7 @@ public class FlowService : IFlowService
     /// </summary>
     /// <param name="step">The step.</param>
     /// <returns>Added step.</returns>
-    public async ValueTask<Step> AddStepAsync(Step step)
+    public async ValueTask<StepModel> AddStepAsync(StepModel step)
     {
         try
         {
@@ -213,7 +213,7 @@ public class FlowService : IFlowService
     /// </summary>
     /// <param name="step">The step.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryRemoveStepAsync(Step step)
+    public async ValueTask<bool> TryRemoveStepAsync(StepModel step)
     {
         try
         {
@@ -266,7 +266,7 @@ public class FlowService : IFlowService
     /// <param name="sourcePort">The source port.</param>
     /// <param name="targetPort">The target port.</param>
     /// <returns></returns>
-    public async ValueTask<Guid?> AddLinkAsync(Port sourcePort, Port targetPort)
+    public async ValueTask<Guid?> AddLinkAsync(PortModel sourcePort, PortModel targetPort)
     {
         try
         {
@@ -298,7 +298,7 @@ public class FlowService : IFlowService
     /// </summary>
     /// <param name="link">The link.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TryRemoveLinkAsync(Link link)
+    public async ValueTask<bool> TryRemoveLinkAsync(LinkModel link)
     {
         try
         {
@@ -325,7 +325,7 @@ public class FlowService : IFlowService
     /// <param name="portId">The port identifier.</param>
     /// <param name="iterationId">The iteration identifier.</param>
     /// <returns></returns>
-    public async ValueTask<Port> GetPortAsync(string agentUniqueName, Guid portId, Guid? iterationId = null, bool asThumbnail = true)
+    public async ValueTask<PortModel> GetPortAsync(string agentUniqueName, Guid portId, Guid? iterationId = null, bool asThumbnail = true)
     {
         try
         {
@@ -339,10 +339,10 @@ public class FlowService : IFlowService
             PortDto? resultPort = response.Ports.FirstOrDefault();
             if (resultPort == null)
             {
-                return new Port();
+                return new PortModel();
             }
 
-            Port portModel = _rpcMapper.FromRpc(resultPort);
+            PortModel portModel = _rpcMapper.FromRpc(resultPort);
             if (portModel.Brand == PortBrand.Image)
             {
                 return await LazyLoadImagePortAsync(agentUniqueName, portModel, iterationId, asThumbnail);
@@ -355,7 +355,7 @@ public class FlowService : IFlowService
         catch (RpcException ex)
         {
             _logger.LogWarning(new EventId((int)EventLogType.UserInteraction), ex, "Error getting port!");
-            return new Port();
+            return new PortModel();
         }
     }
 
@@ -364,7 +364,7 @@ public class FlowService : IFlowService
     /// </summary>
     /// <param name="port">The port.</param>
     /// <returns></returns>
-    public async ValueTask<bool> TrySetPortValueAsync(Port port)
+    public async ValueTask<bool> TrySetPortValueAsync(PortModel port)
     {
         try
         {
@@ -384,7 +384,7 @@ public class FlowService : IFlowService
         }
     }
 
-    private async ValueTask<Port> LazyLoadImagePortAsync(string agentUniqueName, Port portModel, Guid? iterationId, bool asThumbnail)
+    private async ValueTask<PortModel> LazyLoadImagePortAsync(string agentUniqueName, PortModel portModel, Guid? iterationId, bool asThumbnail)
     {
         try
         {

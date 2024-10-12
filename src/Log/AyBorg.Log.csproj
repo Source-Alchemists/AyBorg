@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\SDK\src\Communication\gRPC\AyBorg.SDK.Communication.gRPC.csproj" />
+    <ProjectReference Include="..\..\Shared\Communication.gRPC\src\AyBorg.Communication.gRPC.csproj" />
     <ProjectReference Include="..\Data\Log\AyBorg.Data.Log.csproj" />
   </ItemGroup>
 

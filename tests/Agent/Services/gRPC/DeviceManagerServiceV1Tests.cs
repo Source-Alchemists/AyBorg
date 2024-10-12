@@ -1,10 +1,27 @@
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 using AyBorg.Agent.Tests.Services.gRPC;
-using AyBorg.Data.Mapper;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Models;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Communication.gRPC;
-using AyBorg.SDK.Projects;
+using AyBorg.Communication.gRPC;
+using AyBorg.Runtime;
+using AyBorg.Runtime.Devices;
+using AyBorg.Types;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 using Moq;
 
 namespace AyBorg.Agent.Services.gRPC.Tests;
@@ -45,7 +62,7 @@ public class DeviceManagerServiceV1Tests : BaseGrpcServiceTests<DeviceManagerSer
         _deviceManagerServiceMock.Setup(m => m.UpdateAsync(It.IsAny<UpdateDeviceOptions>())).ReturnsAsync(_deviceProxyMock.Object);
 
 
-        _rpcMapperMock.Setup(m => m.ToRpc(It.IsAny<Port>())).Returns(new Ayborg.Gateway.Agent.V1.PortDto
+        _rpcMapperMock.Setup(m => m.ToRpc(It.IsAny<PortModel>())).Returns(new Ayborg.Gateway.Agent.V1.PortDto
         {
             Id = "123",
             Name = "TestPort",

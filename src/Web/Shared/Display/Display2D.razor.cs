@@ -1,4 +1,22 @@
-using AyBorg.SDK.Common.Models;
+/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+using AyBorg.Types;
+using AyBorg.Types.Models;
 using AyBorg.Web.Shared.Models;
 using AyBorg.Web.Shared.Utils;
 using Microsoft.AspNetCore.Components;
@@ -21,7 +39,7 @@ public partial class Display2D : ComponentBase
     [Parameter] public EventCallback<DrawMode> DrawModeChanged { get; init; }
     [Parameter] public string StatusBarText { get; init; } = string.Empty;
     [Parameter] public EventCallback<string> StatusBarTextChanged { get; init; }
-    [Parameter] public EventCallback<Rectangle> OnShapeDrawed { get; init; }
+    [Parameter] public EventCallback<RectangleModel> OnShapeDrawed { get; init; }
     [Inject] public IJSRuntime JSRuntime { get; init; } = null!;
     private readonly string _maskId = $"mask_{Guid.NewGuid()}";
     private ElementReference _containerRef;
@@ -30,7 +48,7 @@ public partial class Display2D : ComponentBase
     private string _cursorClass = "default-cursor";
     private string _centerClass = "force-center";
     private string _pixelateClass = "image-pixelated";
-    private Rectangle _imagePosition = new();
+    private RectangleModel _imagePosition = new();
     private int _svgWidth = 0;
     private int _svgHeight = 0;
     private float _svgScaleFactor = 1f;
@@ -64,7 +82,7 @@ public partial class Display2D : ComponentBase
         _containerStyle = ToolbarVisible ? "height: calc(100% - 90px)" : string.Empty;
         _cursorClass = DrawCrosshairVisible ? "draw-cursor" : "default-cursor";
 
-        _imagePosition = new Rectangle
+        _imagePosition = new RectangleModel
         {
             X = 0,
             Y = 0,
@@ -238,14 +256,14 @@ public partial class Display2D : ComponentBase
         };
     }
 
-    private static Rectangle CalculateDrawingRectangle(DrawObject drawObject)
+    private static RectangleModel CalculateDrawingRectangle(DrawObject drawObject)
     {
         int minX = Math.Min(drawObject.StartPosition.X, drawObject.EndPosition.X);
         int minY = Math.Min(drawObject.StartPosition.Y, drawObject.EndPosition.Y);
         int maxX = Math.Max(drawObject.StartPosition.X, drawObject.EndPosition.X);
         int maxY = Math.Max(drawObject.StartPosition.Y, drawObject.EndPosition.Y);
 
-        return new Rectangle
+        return new RectangleModel
         {
             X = minX,
             Y = minY,
@@ -259,6 +277,6 @@ public partial class Display2D : ComponentBase
         public bool IsDrawing { get; init; }
         public Point StartPosition { get; init; }
         public Point EndPosition { get; init; }
-        public Rectangle Rect { get; init; }
+        public RectangleModel Rect { get; init; }
     }
 }

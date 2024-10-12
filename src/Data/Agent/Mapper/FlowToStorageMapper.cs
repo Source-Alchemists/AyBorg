@@ -1,9 +1,26 @@
-﻿using System.Globalization;
+﻿/*
+ * AyBorg - The new software generation for machine vision, automation and industrial IoT
+ * Copyright (C) 2024  Source Alchemists
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the,
+ * GNU Affero General Public License for more details.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
+using System.Globalization;
 using AutoMapper;
-using AyBorg.SDK.Common;
-using AyBorg.SDK.Common.Ports;
-using AyBorg.SDK.Projects;
-using ImageTorque;
+using AyBorg.Runtime;
+using AyBorg.Runtime.Projects;
+using AyBorg.Types.Models;
+using AyBorg.Types.Ports;
 
 namespace AyBorg.Data.Agent;
 
@@ -37,7 +54,7 @@ public sealed class FlowToStorageMapper : IFlowToStorageMapper
             // Port collections
             config.CreateMap<StringCollectionPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<string>()));
             config.CreateMap<NumericCollectionPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<double>()));
-            config.CreateMap<RectangleCollectionPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<Rectangle>()));
+            config.CreateMap<RectangleCollectionPort, StepPortRecord>().ForMember(d => d.Value, opt => opt.ConvertUsing(new CollectionToRecordConverter<ImageTorque.Rectangle>()));
         });
 
         _mapper = new Mapper(config);

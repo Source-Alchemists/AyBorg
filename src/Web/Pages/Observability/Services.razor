@@ -1,6 +1,6 @@
 @page "/observability/services"
 @attribute [Authorize(Roles = $"{Roles.Administrator}, {Roles.Engineer}, {Roles.Reviewer}, {Roles.Auditor}")]
-@using SDK.Authorization
+@using AyBorg.Authorization
 @using AyBorg.Web.Shared.Models
 @inject AyBorg.Web.Services.IRegistryService registryService
 

@@ -10,7 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\SDK\src\Projects\AyBorg.SDK.Projects.csproj" />
+    <ProjectReference Include="..\..\..\Shared\Runtime\src\AyBorg.Runtime.csproj" />
   </ItemGroup>
 
 </Project>
