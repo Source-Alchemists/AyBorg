@@ -32,6 +32,7 @@ using AyBorg.Types.Result;
 using AyBorg.Authorization;
 using AyBorg.Runtime;
 using AyBorg.Communication.gRPC;
+using AyBorg.Communication.Hub;
 
 using Elastic.Extensions.Logging;
 
@@ -39,6 +40,7 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using System.IdentityModel.Tokens.Jwt;
+using AyBorg.Agent.Services.Hub;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -47,6 +49,8 @@ bool isOpenTelemetryEnabled = builder.Configuration.GetValue("OpenTelemetry:Enab
 bool isElasticApmEnabled = builder.Configuration.GetValue("ElasticApm:Enabled", false)!;
 
 builder.Services.Configure<SecurityOptions>(builder.Configuration.GetSection("Security"));
+builder.Services.Configure<ServiceOptions>(builder.Configuration.GetSection("AyBorg:Service"));
+builder.Services.Configure<HubOptions>(builder.Configuration.GetSection("AyBorg:Hub"));
 
 // Add services to the container.
 string? databaseProvider = builder.Configuration.GetValue("DatabaseProvider", "SqlLite");
@@ -95,6 +99,9 @@ builder.Services.AddGrpc();
 builder.RegisterGrpcClients();
 
 builder.AddAyBorgAnalyticsLogger();
+
+builder.Services.AddSingleton<IHubClient, HubClient>();
+builder.Services.AddSingleton<ITokenGenerator, JwtGenerator>();
 
 builder.Services.AddHostedService<RegistryBackgroundService>();
 
@@ -146,6 +153,8 @@ app.MapGet("/", () => "Communication with gRPC endpoints must be made through a 
 // Create database if not exists
 await app.Services.GetService<IDbContextFactory<ProjectContext>>()!.CreateDbContext().Database.MigrateAsync();
 await app.Services.GetService<IDbContextFactory<DeviceContext>>()!.CreateDbContext().Database.MigrateAsync();
+
+app.UseAyBorgHub<IHubClient>();
 
 await app.Services.GetService<IPluginsService>()!.LoadAsync().AsTask()!;
 await app.Services.GetService<IDeviceProxyManagerService>()!.LoadAsync().AsTask()!;

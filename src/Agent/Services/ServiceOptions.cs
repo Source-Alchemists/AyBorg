@@ -15,9 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace AyBorg.Web.Services.Hub;
+namespace AyBorg.Agent.Services;
 
-public record HubOptions
+public record ServiceOptions
 {
-    public required string Url { get; init; }
+    public required string DisplayName { get; init; }
+
+    public required string UniqueName { get; init; }
 }

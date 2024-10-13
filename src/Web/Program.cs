@@ -26,6 +26,8 @@ using AyBorg.Web.Services.Analytics;
 using AyBorg.Authorization;
 using AyBorg.Communication.gRPC.Registry;
 using AyBorg.Communication.gRPC;
+using AyBorg.Web.Services.Hub;
+using AyBorg.Communication.Hub;
 
 using Blazored.LocalStorage;
 using Blazored.SessionStorage;
@@ -44,7 +46,6 @@ using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Toolbelt.Blazor.Extensions.DependencyInjection;
-using AyBorg.Web.Services.Hub;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -203,6 +204,6 @@ await (await app.Services.GetService<IDbContextFactory<ApplicationDbContext>>()!
 IServiceProvider scopedServiceProvider = app.Services.CreateScope().ServiceProvider;
 await IdentityInitializer.InitializeAsync(scopedServiceProvider.GetRequiredService<UserManager<IdentityUser>>(), scopedServiceProvider.GetRequiredService<RoleManager<IdentityRole>>()).AsTask();
 
-await app.Services.GetService<IHubClient>()!.StartAsync();
+app.UseAyBorgHub<IHubClient>();
 
 await app.RunAsync();

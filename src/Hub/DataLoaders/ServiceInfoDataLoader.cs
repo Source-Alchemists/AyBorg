@@ -15,11 +15,23 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-namespace AyBorg.Web.Services.Hub;
+using AyBorg.Hub.Database;
+using AyBorg.Hub.Types.Services;
 
-public record ServiceOptions
+namespace AyBorg.Hub.DataLoader;
+
+public class ServiceInfoDataLoader : BatchDataLoader<string, ServiceInfo>
 {
-    public required string DisplayName { get; init; }
-    public required string UniqueName { get; init; }
+    private readonly IServiceInfoRepository _repository;
 
+    public ServiceInfoDataLoader(IServiceInfoRepository repository, IBatchScheduler scheduler, DataLoaderOptions? options = null) : base(scheduler, options)
+    {
+        _repository = repository;
+    }
+
+    protected override async Task<IReadOnlyDictionary<string, ServiceInfo>> LoadBatchAsync(IReadOnlyList<string> keys, CancellationToken cancellationToken)
+    {
+        IQueryable<ServiceInfo> serviceInfos = await _repository.GetAsync(keys, cancellationToken);
+        return serviceInfos.ToDictionary(x => x.Id);
+    }
 }

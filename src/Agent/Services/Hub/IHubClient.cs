@@ -16,11 +16,10 @@
  */
 
 using AyBorg.Communication.Hub;
-using AyBorg.Web.Shared.Models;
 
-namespace AyBorg.Web.Services.Hub;
+namespace AyBorg.Agent.Services.Hub;
 
 public interface IHubClient : IBaseHubClient
 {
-    // public ValueTask<IQueryable<ServiceInfoEntry>> GetServiceInfosAsync(CancellationToken cancellationToken = default);
+
 }

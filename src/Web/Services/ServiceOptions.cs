@@ -15,12 +15,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-using AyBorg.Communication.Hub;
-using AyBorg.Web.Shared.Models;
+namespace AyBorg.Web.Services;
 
-namespace AyBorg.Web.Services.Hub;
-
-public interface IHubClient : IBaseHubClient
+public record ServiceOptions
 {
-    // public ValueTask<IQueryable<ServiceInfoEntry>> GetServiceInfosAsync(CancellationToken cancellationToken = default);
+    public required string DisplayName { get; init; }
+
+    public required string UniqueName { get; init; }
 }

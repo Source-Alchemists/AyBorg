@@ -1,3 +1,4 @@
+
 /*
  * AyBorg - The new software generation for machine vision, automation and industrial IoT
  * Copyright (C) 2024  Source Alchemists
@@ -18,11 +19,10 @@
 using System.Reflection;
 using AyBorg.Authorization;
 using AyBorg.Communication.Hub;
-using AyBorg.Web.Shared.Models;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.Options;
 
-namespace AyBorg.Web.Services.Hub;
+namespace AyBorg.Agent.Services.Hub;
 
 public class HubClient : BaseHubClient, IHubClient
 {
@@ -36,21 +36,16 @@ public class HubClient : BaseHubClient, IHubClient
         _serviceOptions = serviceOptions.Value;
 
         Connection = new HubConnectionBuilder()
-                   .WithUrl(hubOptions.Value.Url, options =>
-                   {
-                       options.AccessTokenProvider = () => Task.FromResult(_tokenGenerator.GenerateServiceToken(_serviceOptions.DisplayName, _serviceOptions.UniqueName, _version))!;
-                   })
-                   .WithAutomaticReconnect()
-                   .Build();
+                    .WithUrl(hubOptions.Value.Url, options =>
+                    {
+                        options.AccessTokenProvider = () => Task.FromResult(_tokenGenerator.GenerateServiceToken(_serviceOptions.DisplayName, _serviceOptions.UniqueName, _version))!;
+                    })
+                    .WithAutomaticReconnect()
+                    .Build();
 
         Connection.On<string, string>("ReceiveMessage", (user, message) =>
         {
             Logger.LogInformation($"Received message from {user}: {message}");
         });
     }
-
-    // public ValueTask<IQueryable<ServiceInfoEntry>> GetServiceInfosAsync(CancellationToken cancellationToken = default)
-    // {
-
-    // }
 }
